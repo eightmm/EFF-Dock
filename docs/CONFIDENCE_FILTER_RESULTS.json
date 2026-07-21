@@ -1,0 +1,68 @@
+{
+  "protocol_id": "EFFDOCK-CONFIDENCE-FILTER-V1",
+  "completed": "2026-07-20",
+  "checkpoint_sha256": "e31fde6f351284205c78f7a1510002779c43312e94d9f82003d47a14d72bc78f",
+  "fit_split": "PLINDER train first 1024",
+  "confirm_split": "PLINDER val all 1076",
+  "num_candidates": 80,
+  "pure_confidence": {
+    "train_lt2_pct": 57.03125,
+    "train_median_rmsd": 1.728712797164917,
+    "val_lt2_pct": 53.90334725379944,
+    "val_median_rmsd": 1.839161992073059
+  },
+  "strict_filter": {
+    "train_lt2_pct": 57.2265625,
+    "train_switch_pct": 4.6875,
+    "val_lt2_pct": 54.182153940200806,
+    "val_switch_pct": 3.717472031712532,
+    "passed": false
+  },
+  "atom_rmsd_guard": {
+    "config": {
+      "pred_rmsd_margin": 0.2,
+      "atom_rmsd_gain": 0.0,
+      "success_tolerance": 0.05,
+      "atom_ok_tolerance": 0.02,
+      "clash_no_worse_than_base": true
+    },
+    "train_lt2_pct": 58.30078125,
+    "train_switch_pct": 34.1796875,
+    "val_lt2_pct": 53.71747016906738,
+    "val_switch_pct": 32.89962708950043,
+    "passed": false
+  },
+  "decision": "pure_confidence_auto_cluster_free",
+  "external_benchmarks_opened": true,
+  "external_characterization": {
+    "candidate_contract": "historical matched N80/S25/sigma0.5/pocket10 single-run artifacts",
+    "official_posebusters_pass_all_run": false,
+    "astex": {
+      "n": 85,
+      "pure_lt2_count": 67,
+      "pure_lt2_pct": 78.82352941176471,
+      "strict_lt2_count": 67,
+      "strict_lt2_pct": 78.82352941176471,
+      "strict_switch_count": 3,
+      "atom_guard_lt2_count": 67,
+      "atom_guard_lt2_pct": 78.82352941176471,
+      "atom_guard_switch_count": 29
+    },
+    "posebusters": {
+      "n": 308,
+      "pure_lt2_count": 226,
+      "pure_lt2_pct": 73.37662337662337,
+      "strict_lt2_count": 226,
+      "strict_lt2_pct": 73.37662337662337,
+      "strict_switch_count": 10,
+      "atom_guard_lt2_count": 228,
+      "atom_guard_lt2_pct": 74.02597402597402,
+      "atom_guard_switch_count": 113
+    }
+  },
+  "jobs": {
+    "smoke": "38990",
+    "cache_and_strict_confirm": "38991",
+    "atom_guard_confirm": "38994"
+  }
+}

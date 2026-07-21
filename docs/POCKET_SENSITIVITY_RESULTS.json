@@ -1,0 +1,49 @@
+{
+  "study_id": "EFFDOCK-POCKET-SENSITIVITY-LEGACY-V1",
+  "status": "historical_matched_ablation",
+  "metric": "selected top-1 symmetry-aware heavy-atom RMSD < 2A (%)",
+  "protocol": {
+    "geometry_checkpoint": "outputs/flowfrag_geometry_ft_100k_from_200k/checkpoints/latest.pt",
+    "geometry_step": 100000,
+    "confidence_checkpoint": "outputs/pose_confidence_pocket_lighidden_v2_clean_success_listwise_64pose_det_muon_20k/best.pt",
+    "confidence_step": 20000,
+    "num_samples": 40,
+    "num_steps": 25,
+    "sigma": 1.0,
+    "pocket_crop_mode": "center",
+    "pocket_center_mode": "residue",
+    "note": "This is not the retained EFF-Dock step-42500/N80/sigma0.5 headline stack."
+  },
+  "astex": {
+    "n": 85,
+    "rows": [
+      {"pocket_cutoff_A": 6, "center_jitter_sigma_A": 0, "selected_lt2_pct": 47.06, "selected_median_rmsd_A": 2.134, "oracle_lt2_pct": 85.88},
+      {"pocket_cutoff_A": 6, "center_jitter_sigma_A": 1, "selected_lt2_pct": 42.35, "selected_median_rmsd_A": 2.202, "oracle_lt2_pct": 81.18},
+      {"pocket_cutoff_A": 6, "center_jitter_sigma_A": 2, "selected_lt2_pct": 27.06, "selected_median_rmsd_A": 3.320, "oracle_lt2_pct": 62.35},
+      {"pocket_cutoff_A": 8, "center_jitter_sigma_A": 0, "selected_lt2_pct": 70.59, "selected_median_rmsd_A": 1.151, "oracle_lt2_pct": 89.41},
+      {"pocket_cutoff_A": 8, "center_jitter_sigma_A": 1, "selected_lt2_pct": 64.71, "selected_median_rmsd_A": 1.233, "oracle_lt2_pct": 87.06},
+      {"pocket_cutoff_A": 8, "center_jitter_sigma_A": 2, "selected_lt2_pct": 47.06, "selected_median_rmsd_A": 2.094, "oracle_lt2_pct": 72.94},
+      {"pocket_cutoff_A": 10, "center_jitter_sigma_A": 0, "selected_lt2_pct": 75.29, "selected_median_rmsd_A": 1.328, "oracle_lt2_pct": 91.76},
+      {"pocket_cutoff_A": 10, "center_jitter_sigma_A": 1, "selected_lt2_pct": 70.59, "selected_median_rmsd_A": 1.373, "oracle_lt2_pct": 92.94},
+      {"pocket_cutoff_A": 10, "center_jitter_sigma_A": 2, "selected_lt2_pct": 44.71, "selected_median_rmsd_A": 2.203, "oracle_lt2_pct": 68.24},
+      {"pocket_cutoff_A": 12, "center_jitter_sigma_A": 0, "selected_lt2_pct": 71.76, "selected_median_rmsd_A": 1.297, "oracle_lt2_pct": 91.76},
+      {"pocket_cutoff_A": 12, "center_jitter_sigma_A": 1, "selected_lt2_pct": 64.71, "selected_median_rmsd_A": 1.542, "oracle_lt2_pct": 88.24},
+      {"pocket_cutoff_A": 12, "center_jitter_sigma_A": 2, "selected_lt2_pct": 50.59, "selected_median_rmsd_A": 1.969, "oracle_lt2_pct": 64.71}
+    ]
+  },
+  "posebusters": {
+    "n": 308,
+    "rows": [
+      {"pocket_cutoff_A": 6, "center_jitter_sigma_A": 0, "selected_lt2_pct": 47.08, "selected_median_rmsd_A": 2.175, "oracle_lt2_pct": 78.25},
+      {"pocket_cutoff_A": 8, "center_jitter_sigma_A": 0, "selected_lt2_pct": 72.08, "selected_median_rmsd_A": 1.305, "oracle_lt2_pct": 91.23},
+      {"pocket_cutoff_A": 10, "center_jitter_sigma_A": 0, "selected_lt2_pct": 72.08, "selected_median_rmsd_A": 1.280, "oracle_lt2_pct": 91.23},
+      {"pocket_cutoff_A": 12, "center_jitter_sigma_A": 0, "selected_lt2_pct": 66.56, "selected_median_rmsd_A": 1.518, "oracle_lt2_pct": 89.94}
+    ],
+    "missing": "The matched PoseBusters jitter sweep has not been run."
+  },
+  "source_artifacts": [
+    "outputs/astex_cutoff_jitter_sweep_flowfrag_20260623/",
+    "outputs/posebusters_cutoff_sweep_flowfrag_20260623/",
+    "outputs/astex_cutoff_jitter_sweep_flowfrag_vs_sigmadock_20260624.csv"
+  ]
+}

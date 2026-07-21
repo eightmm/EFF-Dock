@@ -1,0 +1,85 @@
+# Confidence training on PLINDER pose shards matched to the current external
+# benchmark sampling preset: N80/S25, sigma=0.5, pocket_cutoff=10, no local
+# resampling. This isolates confidence distribution shift from architecture
+# changes.
+
+model:
+  model_type: docking_graph_pose_confidence
+  hidden_dim: 384
+  hidden_vec_dim: 32
+  l2_dim: 16
+  l2o_dim: 16
+  n_rbf: 32
+  sh_lmax: 2
+  contact_cutoff: 5.0
+
+training:
+  max_steps: 50000
+  use_muon: true
+  muon_lr: 0.02
+  lr: 3.0e-4
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  scheduler_type: warmup_stable_cosine
+  warmup_ratio: 0.02
+  cooldown_ratio: 0.5
+  min_lr_ratio: 0.05
+
+loss:
+  atom_weight: 0.2
+  atom_bce_weight: 0.2
+  pose_weight: 0.3
+  pose_bce_weight: 0.4
+  rank_weight: 0.1
+  listwise_weight: 0.0
+  listwise_tau: 1.0
+  listwise_pred_temp: 1.0
+  success_listwise_weight: 1.0
+  success_listwise_margin: 0.2
+  success_threshold: 2.0
+  rank_margin: 0.05
+  min_rank_gap: 0.3
+
+confidence:
+  split_file: data/splits/plinder.json
+  processed_dir: data/plinder_processed
+  pose_tag: conf_ligonly_extmatch_n80_s25_sig0p5_pc10
+  out_dir: outputs/eff-dock/confidence-extmatch
+  run_name: effdock-confidence-extmatch
+  use_wandb: true
+  wandb_project: eff-dock
+  wandb_run_name: effdock-confidence-extmatch
+
+  batch_complexes: 1
+  num_workers: 4
+  train_limit: 4096
+  val_limit: null
+
+  hidden: 512
+  num_layers: 4
+  n_rbf: 32
+  sh_lmax: 2
+  cond_dim: 128
+  contact_cutoff: 5.0
+  pose_readout: global_contact_attention
+  dropout: 0.1
+  max_protein_atoms: 1024
+  max_train_poses_per_complex: 80
+  max_val_poses_per_complex: 80
+  pose_sample_strategy: stratified
+
+  protein_crop_mode: center
+  protein_contact_cutoff: 5.0
+  protein_crop_cutoff: 10.0
+  protein_crop_cutoff_min: 10.0
+  protein_crop_cutoff_max: 10.0
+  protein_crop_jitter_sigma: 0.0
+  protein_crop_jitter_max: 0.0
+  stochastic_crop: false
+
+  eval_every: 2500
+  eval_complexes: 256
+  best_metric: success_selected_lt2
+  best_metric_mode: max
+  save_every: 2500
+  seed: 42

@@ -1,0 +1,81 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+.venv*/
+venv/
+ENV/
+env/
+
+# uv
+.uv/
+
+# PyTorch — ignore intermediate checkpoints; distribute only the weights/ dir
+# (tracked via Git LFS for the published model, see .gitattributes).
+*.pth
+*.pt
+!weights/*.pt
+checkpoints/
+
+# Data
+data/raw/
+data/processed/
+data/external_benchmarks/
+data/conf_train/
+data/conf_val/
+data/conf_train_*/
+data/conf_val_*/
+data/plinder*
+data/splits/plinder*.json
+data/splits/*.txt
+data/splits/*.bak
+data/splits/manifest.json
+*.sdf
+*.pdb
+*.mol2
+
+# Outputs
+outputs/
+wandb/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/
+CLAUDE.md
+AGENTS.md
+
+# OMC artifacts
+.omc/
+*.pdf
+/archive/
+data/
+!src/effdock/data/
+!src/effdock/data/**
+runs/
+.oms/
+
+# Keep Python caches ignored after the src/effdock/data negation above.
+**/__pycache__/
+**/*.py[cod]

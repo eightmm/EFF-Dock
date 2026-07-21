@@ -1,0 +1,52 @@
+{
+  "protocol_id": "EFFDOCK-VINA-GUIDANCE-V1",
+  "date": "2026-07-19",
+  "n": 308,
+  "configuration": {
+    "num_samples": 80,
+    "num_steps": 25,
+    "sigma": 0.5,
+    "pocket_cutoff_angstrom": 10.0,
+    "guidance_scale": 0.05,
+    "guidance_start_t": 0.5,
+    "guidance_ramp_power": 1.0,
+    "max_atom_force": 10.0,
+    "max_translation_velocity": 5.0,
+    "max_angular_velocity": 5.0,
+    "strain_weight": 1.0,
+    "protein_shell_angstrom": 18.0
+  },
+  "baseline": {
+    "official_valid_n": 169,
+    "official_valid_pct": 54.87012987012987,
+    "confidence_final_lt2_pct": 72.72727272727273,
+    "confidence_final_fast_valid_pct": 66.88311688311688,
+    "oracle_top80_lt2_pct": 94.8051948051948
+  },
+  "guided": {
+    "official_valid_n": 173,
+    "official_valid_pct": 56.16883116883117,
+    "confidence_final_lt2_pct": 72.72727272727273,
+    "confidence_final_fast_valid_pct": 67.53246753246754,
+    "oracle_top80_lt2_pct": 94.8051948051948
+  },
+  "paired": {
+    "official_valid_delta_pp": 1.2987012987013031,
+    "official_valid_delta_bootstrap_ci95_pp": [-0.3246753246753247, 3.2467532467532467],
+    "invalid_to_valid": 6,
+    "valid_to_invalid": 2,
+    "mcnemar_exact_p": 0.2890625
+  },
+  "gate": {
+    "validity_target_delta_pp": 3.0,
+    "accuracy_noninferiority_margin_pp": -2.0,
+    "validity_target_met": false,
+    "accuracy_guardrail_met": true,
+    "conclusion": "weak_positive_not_confirmed"
+  },
+  "jobs": {
+    "sampling": [38791, 38797, 38799],
+    "rescue": [38801],
+    "posebusters_official": [38802]
+  }
+}

@@ -1,0 +1,103 @@
+model:
+  model_type: unified
+  hidden_dim: 384
+  hidden_vec_dim: 32
+  l2_dim: 16
+  l2o_dim: 16
+  num_layers: 6
+  n_rbf: 32
+  t_emb_dim: 128
+  sh_lmax: 2
+  dropout: 0.1
+  contact_cutoff: 5.0
+
+data:
+  data_dir: data/plinder_processed
+  # Preserved migration split: train=47,310 / val=1,076. It remains usable for
+  # legacy-weight compatibility runs but predates the strict three-benchmark
+  # EFF-Dock split contract. See docs/DATA.md before publishing new results.
+  split_file: data/splits/plinder.json
+
+  # Pocket / size filters
+  min_atoms: 5
+  max_atoms: 120
+  max_frags: 30
+  min_protein_res: 50
+
+  # Single-value fallbacks (used by val + when range is null at train time)
+  pocket_cutoff: 8.0
+  pocket_jitter_sigma: 2.0        # 실전형: noisy pocket center robustness
+  pocket_cutoff_noise: 0.0        # ignored when pocket_cutoff_range is set
+  prior_sigma: 1.0                # val/inference fallback; train uses mixture below
+
+  # Range-based per-sample sampling at training (val turns these off):
+  #
+  # pocket_cutoff_range — Uniform[6, 12] Å. Covers tight inhibitors (6 Å) →
+  # cofactor sites needing 10-12 Å of context. 5 Å leaves ~6 residues which
+  # is too thin for fragment hopping; 13+ Å risks OOM on B200 batch=64.
+  pocket_cutoff_range: [6.0, 12.0]
+
+  # Robust multi-sigma training. Small σ teaches local refinement when the
+  # pocket center is good; σ=2-4 keeps enough basin recovery for noisy pockets.
+  prior_sigma_values: [0.5, 1.0, 2.0, 3.0, 4.0]
+  prior_sigma_weights: [0.10, 0.25, 0.30, 0.25, 0.10]
+  prior_sigma_range: null
+  prior_sigma_log_uniform: true
+
+  # Time-sampling distribution (default = "simplefold"):
+  #   p(t) = 0.02 * U(0, 1) + 0.98 * LN(m=0.8, s=1.7)
+  # Shifted logit-normal peaked near t≈0.69 (late refinement focus) with a
+  # 2 % uniform floor so both endpoints stay non-zero. Matches SimpleFold /
+  # AF3-style structure models and aligns naturally with our late-biased
+  # ODE inference schedule (rollout_time_schedule: late, power=3).
+  # Other options:
+  #   uniform      — Lipman 2023 baseline, flat density
+  #   logit_normal — SD3 style (peaked at t≈0.5)
+  #   mixture      — 70 % LN(0,1) + 10 % U[0.02,0.20] + 20 % U[0.75,0.98]
+  time_distribution: simplefold
+
+  rotation_augmentation: ligand_uniform
+  deterministic: false
+  num_workers: 8
+
+  # Receptor augmentation is disabled for this run. The current mapping is
+  # empty, so leaving this nonzero would be a misleading no-op.
+  receptor_aug_prob: 0.0
+  alt_receptor_root: data/plinder_processed/_alt_proteins
+  alt_receptor_mapping: data/plinder_processed/alt_receptor_mapping.json
+
+training:
+  max_steps: 200000
+  batch_size: 64                 # per-GPU
+  gradient_accumulation_steps: 1
+  size_aware_batches: true       # balance variable-size graph batches across DDP ranks
+  size_aware_bucket_mult: 16
+  use_muon: false
+  muon_lr: 0.02
+  lr: 3.0e-4
+  weight_decay: 0.01
+  omega_weight: 8.0
+  atom_aux_weight: 0.3
+  dg_weight: 3.0
+  max_grad_norm: 1.0
+  scheduler_type: warmup_stable_cosine
+  warmup_ratio: 0.02             # 4k step warmup at max_steps=200k
+  cooldown_ratio: 0.5            # 100k step cosine cooldown
+  min_lr_ratio: 0.05             # final LR = 5% of peak, keeps resume/extension viable
+  seed: 42
+  use_ema: true
+  ema_decay: 0.999
+  use_time_weighting: false
+
+logging:
+  use_wandb: true
+  wandb_project: eff-dock
+  wandb_run_name: eff-dock-compatibility-baseline
+  log_every: 5
+  val_every: 1000
+  rollout_every: 5000
+  rollout_steps: 20
+  rollout_time_schedule: late
+  rollout_schedule_power: 3.0
+  rollout_max_samples: 0
+  output_dir: outputs/eff-dock/compatibility-baseline

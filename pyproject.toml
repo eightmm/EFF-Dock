@@ -1,0 +1,71 @@
+[project]
+name = "eff-dock"
+version = "0.1.0"
+description = "Fragment-based SE(3)-equivariant protein-ligand docking"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "biopython==1.87",
+    "cuequivariance==0.9.0",
+    "cuequivariance-ops-torch-cu13==0.9.0",
+    "cuequivariance-torch==0.9.0",
+    "e3nn==0.6.0",
+    "einops==0.8.2",
+    "networkx==3.6.1",
+    "numpy==2.4.2",
+    "openmm==8.5.1",
+    "pandas==3.0.2",
+    "plinder==0.2.26",
+    "posebusters==0.6.5",
+    "pyarrow==24.0.0",
+    "pyyaml==6.0.3",
+    "rdkit==2025.9.5",
+    "scipy==1.17.1",
+    "torch==2.10.0",
+    "torch-cluster==1.6.3+pt210cu130",
+    "torch-geometric==2.7.0",
+    "torch-scatter==2.1.2+pt210cu130",
+    "torch-sparse==0.6.18+pt210cu130",
+    "tqdm==4.67.3",
+    "wandb==0.25.0",
+]
+
+[project.scripts]
+eff-dock = "effdock.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest==9.0.2",
+    "pytest-cov==7.0.0",
+    "ruff==0.15.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/effdock"]
+
+[tool.uv]
+find-links = ["https://data.pyg.org/whl/torch-2.10.0+cu130.html"]
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501", "E741"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["gpu: requires a CUDA device"]

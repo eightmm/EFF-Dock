@@ -1,0 +1,82 @@
+{
+  "coordinate_unit": "angstrom",
+  "figure_set": "effdock_intro_visuals_v1",
+  "figures": [
+    "docs/assets/intro/fragmentation_examples.png",
+    "docs/assets/intro/protein_pocket_context.png"
+  ],
+  "fragmentation_examples": [
+    {
+      "case_id": "1T46_STI",
+      "cut_bonds": [
+        [
+          2,
+          6
+        ],
+        [
+          10,
+          12
+        ],
+        [
+          17,
+          19
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          24,
+          27
+        ]
+      ],
+      "fragment_sizes": [
+        6,
+        6,
+        6,
+        8,
+        3,
+        8
+      ],
+      "heavy_atoms": 37,
+      "label": "STI / imatinib",
+      "n_fragments": 6
+    }
+  ],
+  "fragmentation_implementation": "src/effdock/preprocess/fragments.py::decompose_fragments",
+  "protein_pocket_example": {
+    "case_id": "1T46_STI",
+    "fragment_sizes": [
+      6,
+      6,
+      6,
+      8,
+      3,
+      8
+    ],
+    "full_protein_atoms": 2369,
+    "full_protein_residues": 297,
+    "ligand_atoms": 37,
+    "ligand_label": "STI / imatinib",
+    "n_fragments": 6,
+    "pdb_id": "1t46",
+    "pocket_atoms": 295,
+    "pocket_center_angstrom": [
+      26.578163146972656,
+      25.020668029785156,
+      40.60732650756836
+    ],
+    "pocket_cutoff_angstrom": 10.0,
+    "pocket_definition": "reference_ligand_residue_center",
+    "pocket_residues": 37
+  },
+  "scientific_boundary": "The pocket panel is a reference-defined holo visualization. It illustrates the explicit pocket-conditioning interface and is not evidence of blind pocket detection.",
+  "software": {
+    "rdkit": "2025.09.5",
+    "torch": "2.10.0+cu130"
+  },
+  "sources": {
+    "dataset": "Astex Diverse Set (local frozen benchmark snapshot)",
+    "pocket_centers": "data/external_test/astex_reference_pocket_centers.json"
+  }
+}
