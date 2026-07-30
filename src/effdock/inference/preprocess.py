@@ -11,7 +11,7 @@ from pathlib import Path
 
 import torch
 from rdkit import Chem
-from rdkit.Chem import AllChem, rdmolops
+from rdkit.Chem import AllChem
 
 from effdock.data.dataset import crop_to_nearest_residues, crop_to_pocket
 from effdock.preprocess.fragments import decompose_fragments
@@ -33,14 +33,10 @@ def load_ligand(ligand_input: str) -> tuple[Chem.Mol, bool]:
         return mol, True
 
     if path.suffix.lower() == ".mol2" and path.exists():
-        mol = Chem.MolFromMol2File(str(path), sanitize=False)
-        assert mol is not None, f"Failed to parse MOL2: {ligand_input}"
-        Chem.SanitizeMol(mol)
-        mol = Chem.RemoveHs(mol)
-        frags = rdmolops.GetMolFrags(mol, asMols=True, sanitizeFrags=False)
-        if len(frags) > 1:
-            mol = max(frags, key=lambda m: m.GetNumAtoms())
-        assert mol.GetNumConformers() > 0, "MOL2 has no 3D conformer"
+        mol, _, sanitize_ok = load_molecule(None, path)
+        assert mol is not None and sanitize_ok, (
+            f"Failed to parse and fully sanitize MOL2: {ligand_input}"
+        )
         return mol, True
 
     # SMILES → ETKDG conformer

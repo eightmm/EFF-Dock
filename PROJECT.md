@@ -5,7 +5,7 @@
 - State: confirmed
 - Name: EFF-Dock
 - Type: ml
-- Last updated: 2026-07-19
+- Last updated: 2026-07-30
 - Gate: confirmed for non-destructive migration and EFF-Dock bootstrap.
 
 ## Project
@@ -39,7 +39,67 @@ The confidence-selection study below is an explicitly approved post-baseline
 experiment and does not replace the retained step-42500 compatibility stack
 unless its validation and external gates pass.
 
-### Vina-guided Sampling Experiment
+### Guidance Contract
+
+- Status: diagnostic implementation active. The pure-Torch energy kernel,
+  force/fragment projection, crystal perturbation trace, and saved-trajectory
+  trace are implemented. They are not yet admitted to the production sampler;
+  operator-split correction and an internal held-out validation ablation
+  (currently PLINDER validation) remain gates.
+- Goal: build one inference-time
+  `GuidanceEnergy = PhysicalEnergy + InteractionEnergy` corrector for the
+  fragment SE(3) ODE while keeping docking and confidence checkpoints frozen.
+- Runtime boundary: energy, force, fragment projection, scheduling, and
+  correction must be evaluated by code and versioned parameter tables inside
+  this repository. The active path may use PyTorch tensor/autograd operations
+  and existing molecular parsing, but it may not call or import an external
+  force-field, docking, minimization, or molecular-simulation engine.
+- External references: published equations, constants, atom/residue parameters,
+  and offline reference outputs may be copied into versioned in-repository
+  tables or golden fixtures when their provenance and redistribution terms are
+  recorded. External software may be used offline only to produce independent
+  validation values; it is never a runtime or required-test dependency.
+- Scientific boundary: `PhysicalEnergy` contains declared generic geometry and
+  force-field-like terms; `InteractionEnergy` contains typed directional
+  motifs. Both are components of one diagnostic `GuidanceEnergy`. Hydrophobic
+  contact, idealized missing-valence-cone heavy-atom hydrogen bond, and
+  screened formal-charge-group terms are active diagnostics; metal
+  coordination remains contract-only. Vina is explicitly excluded from this
+  guidance objective. Its legacy code and historical results are retained but
+  are not imported, weighted, or combined here.
+- Claim boundary: this is force-field energy-gradient guidance on a
+  dimensionless generative ODE, not molecular dynamics, binding free-energy
+  calculation, or affinity prediction.
+- Missing parameterization fails explicitly or uses a separately named and
+  reported `geometry-only` mode; no atom type, charge, or energy term is
+  silently zero-filled or delegated to an external engine.
+- Receptor admission follows normalized residue chemistry, not PDB
+  `ATOM`/`HETATM` formatting. Active-shell cofactors, ions, and other
+  unsupported nonprotein residues fail with structured provenance.
+- Full term, solver, provenance, naming, and evaluation contract:
+  `docs/GUIDANCE_CONTRACT.md`.
+- Frozen pre-formal-charge V3 diagnostic results and exact input/parameter
+  hashes: `docs/GUIDANCE_DIAGNOSTIC_RESULTS.json`. The screened-charge V4
+  external fixed-coordinate characterization is recorded in
+  `docs/GUIDANCE_FORMAL_CHARGE_BENCHMARK_CHARACTERIZATION_V4.json`.
+- Interaction terms are admitted one at a time. The screened formal-charge
+  study freezes its typing, constants, numerical gates, and validation order in
+  `docs/INTERACTION_GUIDANCE_STUDY.md`; physically valid terms may remain as
+  traced diagnostics even when they do not pass the separate sampler-activation
+  gate.
+- `docs/GUIDANCE_FORMAL_CHARGE_COVERAGE_V4.json` preserves the earlier
+  PLINDER net-charge proxy inventory as historical provenance. Net charge is
+  not the eligibility rule because it misses zwitterions. Stage 1B now uses
+  any nonzero ligand formal-charge site in the frozen Astex/PoseBusters raw
+  structures and is strictly report-only; external outcomes cannot select a
+  formula, coefficient, schedule, term, or sampler setting.
+
+### Archived Vina-guided Sampling Experiment (inactive)
+
+This protocol is retained only as historical evidence. It is not part of the
+current guidance target, is not a baseline component, and must not supply
+equations, coefficients, typing, gradients, or selection values to
+`GuidanceEnergy`.
 
 - Protocol ID: `EFFDOCK-VINA-GUIDANCE-V1`.
 - Intervention: inference-only, late-time negative gradient of the official

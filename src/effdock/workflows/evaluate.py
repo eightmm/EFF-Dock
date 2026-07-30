@@ -29,6 +29,17 @@ from effdock.evaluation.benchmark import (
 )
 from effdock.evaluation.pose_scoring import build_protein_vina_inputs, score_poses
 from effdock.evaluation.pose_validity import check_validity, ligand_bounds, vdw_radii
+from effdock.inference.defaults import (
+    DEFAULT_CONFIDENCE_CHECKPOINT,
+    DEFAULT_CONFIG,
+    DEFAULT_DOCKING_CHECKPOINT,
+    DEFAULT_NUM_SAMPLES,
+    DEFAULT_NUM_STEPS,
+    DEFAULT_POCKET_CUTOFF,
+    DEFAULT_SCHEDULE_POWER,
+    DEFAULT_SIGMA,
+    DEFAULT_TIME_SCHEDULE,
+)
 from effdock.inference.docking import load_model
 from effdock.inference.preprocess import load_ligand, preprocess_complex
 from effdock.inference.sampler import parse_sigma_list, sample_unified, sample_unified_multi_sigma
@@ -225,6 +236,7 @@ def evaluate_one(
     model: torch.nn.Module,
     item: ComplexInput,
     *,
+    dataset: str,
     confidence_model: torch.nn.Module | None,
     device: torch.device,
     num_samples: int,
@@ -250,6 +262,7 @@ def evaluate_one(
     seed: int,
     refine: str,
     pose_dir: Path | None,
+    trajectory_dir: Path | None,
 ) -> dict:
     torch.manual_seed(seed)
     mol_ref = load_ref_ligand(item.ligand_ref, item.ligand_format)
@@ -305,6 +318,7 @@ def evaluate_one(
             score_rot_sigma_max=score_rot_sigma_max,
             score_alpha_min=score_alpha_min,
             device=device,
+            save_traj=trajectory_dir is not None,
             guidance_fn=guidance_fn,
             guidance_scale=vina_guidance_scale,
             guidance_min_t=vina_guidance_start_t,
@@ -324,6 +338,7 @@ def evaluate_one(
             score_rot_sigma_max=score_rot_sigma_max,
             score_alpha_min=score_alpha_min,
             device=device,
+            save_traj=trajectory_dir is not None,
             guidance_fn=guidance_fn,
             guidance_scale=vina_guidance_scale,
             guidance_min_t=vina_guidance_start_t,
@@ -443,10 +458,57 @@ def evaluate_one(
             row[f"{selector}_rmsd"] = float(rmsds[index])
             row[f"{selector}_pred_rmsd"] = confidence_scores[index]["confidence_rmsd"]
             row[f"{selector}_pred_success"] = confidence_scores[index]["confidence_success"]
+    if trajectory_dir is not None:
+        if confidence_scores is None:
+            raise ValueError("--trajectory-dir requires --confidence-checkpoint")
+        if refine != "none":
+            raise ValueError("trajectory export requires --refine none")
+        selected_index = selector_indices["confidence_final"]
+        selected_result = results[selected_index]
+        trajectory_dir.mkdir(parents=True, exist_ok=True)
+        torch.save(
+            {
+                "schema_version": 1,
+                "dataset": dataset,
+                "complex_id": item.complex_id,
+                "protein": str(item.protein),
+                "ligand_ref": str(item.ligand_ref),
+                "selector": "pair_gate_density_rank_vote_plclash_ambig",
+                "selected_index": selected_index,
+                "seed": seed,
+                "num_samples": num_samples,
+                "num_steps": num_steps,
+                "pocket_cutoff": pocket_cutoff,
+                "pocket_center": meta["pocket_center"].detach().cpu(),
+                "fragment_id": lig_data["fragment_id"].detach().cpu(),
+                "atomic_numbers": torch.tensor(
+                    [atom.GetAtomicNum() for atom in mol_in.GetAtoms()], dtype=torch.long
+                ),
+                "bonds": [
+                    (
+                        bond.GetBeginAtomIdx(),
+                        bond.GetEndAtomIdx(),
+                        float(bond.GetBondTypeAsDouble()),
+                    )
+                    for bond in mol_in.GetBonds()
+                ],
+                "traj": [
+                    frame.detach().cpu() + meta["pocket_center"].detach().cpu()
+                    for frame in selected_result["traj"]
+                ],
+                "traj_times": list(selected_result["traj_times"]),
+                "selected_rmsd": float(rmsds[selected_index]),
+                "oracle_index": oracle_i,
+                "oracle_rmsd": float(rmsds[oracle_i]),
+                "confidence_pred_rmsd": confidence_scores[selected_index]["confidence_rmsd"],
+                "confidence_pred_success": confidence_scores[selected_index]["confidence_success"],
+            },
+            trajectory_dir / f"{item.complex_id}.pt",
+        )
     return row
 
 
-def main(argv: list[str] | None = None) -> None:
+def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", choices=("astex", "posebusters", "casf"), required=True)
     parser.add_argument("--data-dir", type=Path, required=True)
@@ -457,30 +519,35 @@ def main(argv: list[str] | None = None) -> None:
         required=True,
         help="Frozen JSON mapping benchmark IDs to declared [x,y,z] pocket centers.",
     )
-    parser.add_argument(
-        "--checkpoint", type=Path, default=Path("weights/effdock_legacy_flowfrag_200k_ema.pt")
-    )
+    parser.add_argument("--checkpoint", type=Path, default=DEFAULT_DOCKING_CHECKPOINT)
     parser.add_argument(
         "--confidence-checkpoint",
         type=Path,
-        default=None,
-        help="Optional learned confidence checkpoint evaluated on the same sampled poses.",
+        default=DEFAULT_CONFIDENCE_CHECKPOINT,
+        help="Learned confidence checkpoint evaluated on the same sampled poses.",
     )
-    parser.add_argument("--config", type=Path, default=Path("configs/train.yaml"))
+    parser.add_argument(
+        "--no-confidence",
+        action="store_const",
+        dest="confidence_checkpoint",
+        const=None,
+        help="Disable learned confidence evaluation.",
+    )
+    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument(
         "--output-dir", dest="out_dir", type=Path, default=Path("outputs/external_benchmarks")
     )
-    parser.add_argument("--num-samples", type=int, default=40)
-    parser.add_argument("--num-steps", type=int, default=10)
-    parser.add_argument("--sigma", type=float, default=None)
+    parser.add_argument("--num-samples", type=int, default=DEFAULT_NUM_SAMPLES)
+    parser.add_argument("--num-steps", type=int, default=DEFAULT_NUM_STEPS)
+    parser.add_argument("--sigma", type=float, default=DEFAULT_SIGMA)
     parser.add_argument(
         "--sigma-list",
         type=str,
         default=None,
         help='Multi-sigma sampling, e.g. "2.5,3.0,3.5" or "2.5:14,3.0:13,3.5:13".',
     )
-    parser.add_argument("--time-schedule", type=str, default="late")
-    parser.add_argument("--schedule-power", type=float, default=3.0)
+    parser.add_argument("--time-schedule", type=str, default=DEFAULT_TIME_SCHEDULE)
+    parser.add_argument("--schedule-power", type=float, default=DEFAULT_SCHEDULE_POWER)
     parser.add_argument("--vina-guidance-scale", type=float, default=0.0)
     parser.add_argument("--vina-guidance-start-t", type=float, default=0.5)
     parser.add_argument("--vina-guidance-ramp-power", type=float, default=1.0)
@@ -490,7 +557,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--vina-guidance-protein-shell", type=float, default=18.0)
     parser.add_argument("--vina-guidance-w-strain", type=float, default=1.0)
     parser.add_argument("--center-jitter-sigma", type=float, default=0.0)
-    parser.add_argument("--pocket-cutoff", type=float, default=8.0)
+    parser.add_argument("--pocket-cutoff", type=float, default=DEFAULT_POCKET_CUTOFF)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--limit", type=int, default=None)
@@ -509,8 +576,18 @@ def main(argv: list[str] | None = None) -> None:
         action=argparse.BooleanOptionalAction,
         default=True,
     )
+    parser.add_argument(
+        "--trajectory-dir",
+        type=Path,
+        default=None,
+        help="Optionally save the actual confidence-selected ODE trajectory as a PT bundle.",
+    )
     parser.add_argument("--refine", choices=("none", "mmff"), default="none")
-    args = parser.parse_args(argv)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = build_arg_parser().parse_args(argv)
 
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
     model, cfg, ckpt = load_model(args.config, args.checkpoint, device)
@@ -559,6 +636,7 @@ def main(argv: list[str] | None = None) -> None:
             row = evaluate_one(
                 model,
                 item,
+                dataset=args.dataset,
                 confidence_model=confidence_model,
                 device=device,
                 num_samples=args.num_samples,
@@ -588,6 +666,7 @@ def main(argv: list[str] | None = None) -> None:
                     if args.save_selected_poses
                     else None
                 ),
+                trajectory_dir=args.trajectory_dir,
             )
             rows.append(row)
             print(
@@ -612,7 +691,11 @@ def main(argv: list[str] | None = None) -> None:
         else f"sig{sigma:g}"
     )
     jitter_tag = f"_cj{args.center_jitter_sigma:g}" if args.center_jitter_sigma > 0.0 else ""
-    cutoff_tag = f"_pc{args.pocket_cutoff:g}" if args.pocket_cutoff != 8.0 else ""
+    cutoff_tag = (
+        f"_pc{args.pocket_cutoff:g}"
+        if args.pocket_cutoff != DEFAULT_POCKET_CUTOFF
+        else ""
+    )
     base_tag = args.run_name or (
         f"{args.dataset}_{args.checkpoint.stem}_n{args.num_samples}_s{args.num_steps}_"
         f"{sigma_tag}{jitter_tag}{cutoff_tag}"

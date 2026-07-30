@@ -75,6 +75,10 @@ def _rgb01(value: str) -> tuple[float, float, float]:
     return tuple(int(value[i : i + 2], 16) / 255.0 for i in (0, 2, 4))
 
 
+def _rgba01(value: str, alpha: float) -> tuple[float, float, float, float]:
+    return (*_rgb01(value), alpha)
+
+
 def _load_astex_mol(case_id: str) -> Chem.Mol:
     sdf = ASTEX_ROOT / case_id / f"{case_id}_ligand.sdf"
     mol, _, sanitize_ok = load_molecule(sdf)
@@ -143,44 +147,45 @@ def _draw_fragment_regions(
     *,
     cut_bonds: list[int] | None = None,
 ) -> Image.Image:
-    """Draw colored fragment regions while keeping the chemical diagram conventional."""
+    """Draw fragment regions with RDKit's native continuous highlighting."""
     mol = Chem.Mol(mol_input)
     rdDepictor.Compute2DCoords(mol)
     cut_set = set(cut_bonds or [])
 
-    atom_map = {
-        atom_idx: [_rgb01(FRAGMENT_COLORS[fragment_ids[atom_idx] % len(FRAGMENT_COLORS)])]
+    atom_colors = {
+        atom_idx: _rgba01(FRAGMENT_COLORS[fragment_ids[atom_idx] % len(FRAGMENT_COLORS)], 0.30)
         for atom_idx in range(mol.GetNumAtoms())
     }
-    bond_map: dict[int, list[tuple[float, float, float]]] = {}
+    bond_colors: dict[int, tuple[float, float, float, float]] = {}
     for bond in mol.GetBonds():
         bond_idx = bond.GetIdx()
         if bond_idx in cut_set:
-            bond_map[bond_idx] = [_rgb01(CUT_RED)]
+            bond_colors[bond_idx] = _rgba01(CUT_RED, 0.95)
         else:
             begin = bond.GetBeginAtomIdx()
             end = bond.GetEndAtomIdx()
             if fragment_ids[begin] == fragment_ids[end]:
                 color = FRAGMENT_COLORS[fragment_ids[begin] % len(FRAGMENT_COLORS)]
-                bond_map[bond_idx] = [_rgb01(color)]
+                bond_colors[bond_idx] = _rgba01(color, 0.30)
 
     drawer = rdMolDraw2D.MolDraw2DCairo(width, height)
     options = drawer.drawOptions()
     options.clearBackground = True
-    options.fillHighlights = False
-    options.multiColourHighlightStyle = rdMolDraw2D.MultiColourHighlightStyle.Lasso
-    options.highlightBondWidthMultiplier = 10
+    options.fillHighlights = True
+    options.continuousHighlight = True
+    options.atomHighlightsAreCircles = False
+    options.highlightBondWidthMultiplier = 14
     options.bondLineWidth = 3.0
     options.padding = 0.06
     options.fixedFontSize = 25
     options.useBWAtomPalette()
-    drawer.DrawMoleculeWithHighlights(
+    drawer.DrawMolecule(
         mol,
-        "",
-        atom_map,
-        bond_map,
-        {atom_idx: 0.30 for atom_idx in atom_map},
-        {bond_idx: 3 for bond_idx in bond_map},
+        highlightAtoms=list(atom_colors),
+        highlightBonds=list(bond_colors),
+        highlightAtomColors=atom_colors,
+        highlightBondColors=bond_colors,
+        highlightAtomRadii={atom_idx: 0.34 for atom_idx in atom_colors},
     )
     cut_segments: list[tuple[tuple[float, float], tuple[float, float]]] = []
     for bond_idx in cut_set:
@@ -279,27 +284,25 @@ def make_fragmentation_panel(output_dir: Path) -> tuple[Path, list[dict]]:
     ligand_image = _draw_fragment_regions(
         mol,
         fragment_ids,
-        2050,
-        570,
+        1070,
+        760,
         cut_bonds=cut_bonds,
     )
-    canvas.paste(ligand_image, (175, 35))
+    canvas.paste(ligand_image, (35, 285))
 
-    # Only the requested visual grammar remains: red cut-bond legend and a
-    # top-to-bottom decomposition arrow.
-    draw.line((1880, 75, 2010, 75), fill=CUT_RED, width=12)
-    draw.text((2035, 75), "rotatable bond", font=_font(28, True), fill=CUT_RED, anchor="lm")
-    arrow_x = 1200
-    draw.line((arrow_x, 625, arrow_x, 790), fill=INK, width=9)
-    draw.polygon(((arrow_x, 830), (1168, 778), (1232, 778)), fill=INK)
+    draw.line((120, 180, 250, 180), fill=CUT_RED, width=12)
+    draw.text((275, 180), "rotatable bond", font=_font(28, True), fill=CUT_RED, anchor="lm")
+    arrow_y = 675
+    draw.line((1110, arrow_y, 1310, arrow_y), fill=INK, width=9)
+    draw.polygon(((1350, arrow_y), (1298, 643), (1298, 707)), fill=INK)
 
     slots = (
-        (95, 875, 795, 1085),
-        (850, 875, 1550, 1085),
-        (1605, 875, 2305, 1085),
-        (95, 1110, 795, 1320),
-        (850, 1110, 1550, 1320),
-        (1605, 1110, 2305, 1320),
+        (1370, 70, 1840, 430),
+        (1880, 70, 2350, 430),
+        (1370, 485, 1840, 845),
+        (1880, 485, 2350, 845),
+        (1370, 900, 1840, 1260),
+        (1880, 900, 2350, 1260),
     )
     for idx, (piece, slot) in enumerate(zip(pieces, slots)):
         x0, y0, x1, y1 = slot

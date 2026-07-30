@@ -547,6 +547,7 @@ def _get_res_atom_token(res_name: str, atom_name: str) -> int:
 
 @dataclass
 class ParsedAtom:
+    record_type: str
     atom_name: str
     res_name: str  # post-PTM mapping for AAs, original for metals
     chain: str
@@ -555,6 +556,7 @@ class ParsedAtom:
     coords: tuple[float, float, float]
     element: str
     is_metal: bool
+    raw_res_name: str | None = None
 
 
 def _compute_pseudo_cb(
@@ -637,6 +639,7 @@ def _parse_pdb_lines(pdb_path: Path) -> list[ParsedAtom]:
 
             atoms.append(
                 ParsedAtom(
+                    record_type=line[0:6].strip(),
                     atom_name=atom_name,
                     res_name=res_name,
                     chain=chain,
@@ -645,6 +648,7 @@ def _parse_pdb_lines(pdb_path: Path) -> list[ParsedAtom]:
                     coords=(x, y, z),
                     element=element,
                     is_metal=is_metal,
+                    raw_res_name=res_name_raw,
                 )
             )
     return atoms

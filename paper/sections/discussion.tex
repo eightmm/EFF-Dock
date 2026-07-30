@@ -1,0 +1,46 @@
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\method separates three sources of docking performance: candidate generation,
+within-set selection, and molecular validity. High oracle-80 coverage indicates
+that the fragment-level flow often reaches the native basin, whereas the
+smaller top-1 rates quantify a ranking gap. The PoseBusters validity result
+shows a second, partly independent gap that cannot be inferred from RMSD alone.
+Registered selector and guidance studies did not pass their deployment gates,
+which argues against attributing the remaining gap to a single post-processing
+choice.
+
+The rigid-fragment state reduces the dimensionality of ligand motion and
+preserves within-fragment geometry, but independent fragment motions can still
+distort cut-bond geometry or create protein clashes. The auxiliary atom and
+distance-geometry losses mitigate these effects without enforcing a complete
+molecular mechanics model. Large and highly flexible ligands remain the
+clearest observed failure regime. Their lower oracle coverage shows that
+improving only the confidence model will not resolve this weakness.
+
+The pocket study further distinguishes receptor context from pocket
+localization. Crops below \(8\,\angstrom\) remove useful receptor information,
+whereas modest differences among \(8\), \(10\), and \(12\,\angstrom\) depend
+on the dataset. In contrast, a \(2\,\angstrom\) center perturbation sharply
+reduces both top-1 and oracle success. Robust deployment therefore requires an
+independently validated pocket definition; random crop augmentation during
+training does not make the model insensitive to localization error.
+
+The present evaluation is reference-pocket redocking with a rigid receptor.
+It does not test blind site identification, apo-to-holo receptor changes,
+induced fit, affinity prediction, virtual screening, covalent docking, or
+prospective generalization. In addition, the currently preserved training
+split is a compatibility asset rather than the final strict external-exclusion
+split. These limitations constrain the claims that can be made from the
+current results. Literature values obtained with different pocket inputs,
+candidate budgets, receptor preparation, or post-processing are therefore not
+used as matched baselines in the main table.
+
+The highest-priority next evidence is a strict ligand- and pocket-disjoint
+training split with frozen external exclusions, followed by matched reruns of
+representative classical and learned baselines. Independent training or
+sampling seeds, wall-clock and memory measurements, and component ablations
+for fragmentation, Newton--Euler aggregation, and auxiliary geometry losses
+are also required to isolate which design choices cause the observed behavior.
+Target-independent pocket centers and apo or predicted receptors would extend
+the evidence beyond the present holo redocking boundary.

@@ -23,12 +23,12 @@ pocket.
 uv run eff-dock evaluate \
   --dataset astex \
   --data-dir data/external_test/astex \
-  --pocket-centers data/external_test/astex_reference_pocket_centers.json \
-  --checkpoint weights/effdock_geometry_ft_100k_best.pt \
-  --confidence-checkpoint weights/effdock_confidence_extmatch_n80_s25_step42500.pt \
-  --config configs/train.yaml \
-  --num-samples 80 --num-steps 25 --sigma 0.5 --pocket-cutoff 10
+  --pocket-centers data/external_test/astex_reference_pocket_centers.json
 ```
+
+The promoted geometry/confidence checkpoints and the N80/S25/sigma0.5/pocket10
+preset are the defaults for both `dock` and `evaluate`. Every value remains
+overridable; `--no-confidence` runs generator-only diagnostics.
 
 Active selection choices are sampling order, Vina+strain, pure learned
 confidence, the cluster-free confidence filter diagnostic, and the frozen
@@ -48,13 +48,15 @@ reproduction. The completed active diagnostic found pure confidence slightly
 stronger overall than this composite, so all results remain separate and none
 may be used to tune a new external-test selector post hoc.
 
-## Vina-guided sampling
+## Archived Vina-guided sampling (inactive)
 
-Vina can also act inside the ODE sampler, which is distinct from scoring a
-finished candidate set. The inference-time callback differentiates the Torch
-Vina+DG energy with respect to current ligand coordinates, converts atom forces
-to fragment translation/torque, and adds the capped late-time correction to the
-learned vector field. Scale zero is the exact unguided path.
+This path is retained only for historical reproduction and is not the unified
+`GuidanceEnergy` or recommended inference path. It can act inside the ODE
+sampler, which is distinct from scoring a finished candidate set. The
+inference-time callback differentiates the Torch Vina+DG energy with respect to
+current ligand coordinates, converts atom forces to fragment
+translation/torque, and adds the capped late-time correction to the learned
+vector field. Scale zero is the exact unguided path.
 
 ```bash
 uv run eff-dock dock ... \

@@ -1,0 +1,571 @@
+\section{Architecture and Objective Details}
+\label{app:architecture_details}
+
+This appendix specifies the implementation-level equations omitted from the
+main text. All distances supplied to neural networks are represented by their
+numerical values in Angstrom.
+
+\subsection{Node initialization and edge features}
+\label{app:edge_features}
+
+\paragraph{Radial basis.}
+For an edge distance \(d\), the docking trunk uses 32 Gaussian radial basis
+functions
+\begin{equation}
+    \rho_m(d)
+    =
+    \exp\left[-\frac{(d-\mu_m)^2}{2\Delta^2}\right],
+    \qquad
+    \mu_m\in[0,16]\,\angstrom,\quad
+    \Delta=\frac{16}{32}\,\angstrom.
+    \label{eq:rbf}
+\end{equation}
+
+\paragraph{Conditioning and initialization.}
+The conditioning vector in Eq.~\eqref{eq:time_sigma_embedding} uses a
+32-dimensional sinusoidal embedding. The final linear map of the prior-scale
+branch is initialized to zero. Let \(\mathbf{a}_i\) denote raw node
+attributes. Initial scalar states are
+\begin{align}
+    \mathbf{s}^{0}_i
+    &=
+    \operatorname{MLP}_{\mathrm{node}}(\mathbf{a}_i),
+    \qquad i\notin\mathcal{V}_{\mathrm{frag}},\\
+    \mathbf{s}^{0}_k
+    &=
+    \operatorname{MLP}_{\mathrm{frag}}
+    \left(
+      \left[
+      \operatorname{MLP}_{\mathrm{node}}(\mathbf{a}_k),
+      \operatorname{Emb}(|\mathcal{A}_k|),
+      \boldsymbol{\eta}_{b(k)}
+      \right]
+    \right),
+    \qquad k\in\mathcal{V}_{\mathrm{frag}}.
+    \label{eq:scalar_initialization}
+\end{align}
+With graph center
+\(\mathbf{c}_b=|\mathcal{V}_b|^{-1}\sum_{i\in\mathcal{V}_b}\mathbf{x}_i\),
+the \(c\)-th initial \(1o\) channel is
+\begin{equation}
+    \mathbf{h}^{0,1o}_{i,c}
+    =
+    G_c(\mathbf{s}^{0}_i)(\mathbf{x}_i-\mathbf{c}_{b(i)})
+    +
+    \mathbb{1}_{i\in\mathcal{V}_{\mathrm{frag}}}
+    \sum_{q=1}^{3}W^{R}_{cq}\mathbf{R}_{i,t}^{(:,q)}.
+    \label{eq:vector_initialization}
+\end{equation}
+Here \(G_c\) ends in \(\tanh\), \(\mathbf{R}^{(:,q)}\) is a rotation-matrix
+column, and \(W^R\) is zero-initialized.
+
+\paragraph{Complete edge scalar.}
+Let \(\bar{\mathbf{s}}_i^{(\ell)}\in\R^{384}\) be the scalar block after
+pre-normalization. The reference-distance feature is
+\begin{equation}
+    \boldsymbol{\delta}_{ji}
+    =
+    \left[
+      d_{ji},\;
+      d_{ji}-d^{\mathrm{ref}}_{ji},\;
+      q_{ji}\log
+      \frac{d_{ji}}{d^{\mathrm{ref}}_{ji}+\epsilon},\;
+      q_{ji}
+    \right],
+    \qquad
+    q_{ji}=\mathbb{1}[d^{\mathrm{ref}}_{ji}>0].
+    \label{eq:distance_evolution}
+\end{equation}
+For a source assigned to fragment \(k\), the local-frame feature is
+\(\mathbf{R}_{k,t}^{\top}\mathbf{r}_{ji}\); it is zero otherwise. The
+six-dimensional pair vector \(\boldsymbol{\chi}_{ji}\) represents
+hydrogen-bond compatibility, salt-bridge compatibility, equal-charge clash,
+hydrophobic contact, halogen--acceptor contact, and metal coordination. The
+full edge descriptor is
+\begin{align}
+    \mathbf{e}^{(\ell)}_{ji}
+    =\big[
+      &\boldsymbol{\rho}(d_{ji}),
+      \operatorname{Emb}(\tau_{ji}),
+      \operatorname{Emb}(\mathrm{bond}_{ji}),
+      W_d\boldsymbol{\delta}_{ji},
+      \operatorname{Emb}(\mathrm{hop}_{ji}),\nonumber\\
+      &W_R\mathbf{R}_{k,t}^{\top}\mathbf{r}_{ji},
+      W_c\boldsymbol{\chi}_{ji},
+      \bar{\mathbf{s}}_j^{(\ell)},
+      \bar{\mathbf{s}}_i^{(\ell)},
+      \boldsymbol{\eta}_{b(i)}
+    \big]\in\R^{1020}.
+    \label{eq:edge_scalar}
+\end{align}
+The bond embedding concatenates bond order, conjugation, ring, and
+stereochemistry embeddings; unavailable attributes use explicit sentinel
+categories.
+
+\subsection{Equivariant normalization and gated aggregation}
+
+\paragraph{Normalization and activation.}
+For an \((l,p)\) block
+\(\mathbf{h}^{lp}\in\R^{C_{lp}\times(2l+1)}\), equivariant RMS
+normalization is
+\begin{align}
+    \operatorname{rms}_{lp}(\mathbf{h})
+    &=
+    \left(
+      \frac{1}{C_{lp}}
+      \sum_{c=1}^{C_{lp}}\|\mathbf{h}^{lp}_c\|_2^2+\epsilon
+    \right)^{1/2},\\
+    \operatorname{RMSNorm}(\mathbf{h})^{lp}_c
+    &=
+    \gamma^{lp}_c
+    \frac{\mathbf{h}^{lp}_c}{\operatorname{rms}_{lp}(\mathbf{h})}.
+    \label{eq:irrep_rmsnorm}
+\end{align}
+\(0e\) scalars receive SiLU. Non-scalar channels receive invariant norm gates,
+\begin{equation}
+    \operatorname{EqAct}(\mathbf{h})^{lp}_c
+    =
+    \mathbf{h}^{lp}_c\,
+    \operatorname{sigmoid}
+    \left(
+      A^{lp}_c(
+      \{\|\mathbf{h}^{l'p'}_{c'}\|_2\}_{l'>0,c'})
+    \right),
+    \qquad l>0.
+    \label{eq:equivariant_activation}
+\end{equation}
+Dropout samples one mask per irrep channel and broadcasts it over the
+\(2l+1\) representation components.
+
+\paragraph{Dual radial scales.}
+The input and output channel scales in Eq.~\eqref{eq:tp_message} are
+\begin{equation}
+    \mathbf{u}_{ji}^{(\ell)}
+    =
+    \operatorname{SiLU}
+    (W_r^{(\ell)}\mathbf{e}_{ji}^{(\ell)}+\mathbf{b}_r^{(\ell)}),
+    \qquad
+    \boldsymbol{\alpha}_{ji}^{\mathrm{in/out}}
+    =
+    \mathbf{1}
+    +W_{\mathrm{in/out}}^{(\ell)}
+    \mathbf{u}_{ji}^{(\ell)}.
+    \label{eq:dual_radial}
+\end{equation}
+The scales are broadcast across all \(2l+1\) components of a channel.
+
+\paragraph{Edge gates and aggregation.}
+For edge type \(\tau_{ji}\), the gate network returns a scalar component and
+one component per non-scalar channel:
+\begin{align}
+    [a_{ji}^{0},\mathbf{a}_{ji}^{\mathrm{ns}}]
+    &=
+    \operatorname{MLP}_{g}^{(\ell)}
+    (\mathbf{e}_{ji}^{(\ell)}),\\
+    g_{ji}^{0}
+    &=
+    \operatorname{sigmoid}(a_{ji}^{0})
+    \exp\left(-\frac{d_{ji}}{\zeta_{\tau_{ji}}^{(\ell)}}\right),
+    \qquad
+    \zeta_{\tau,\mathrm{init}}^{(\ell)}=8\,\angstrom,\\
+    g_{ji,c}^{lp}
+    &=
+    g_{ji}^{0}\operatorname{sigmoid}(a_{ji,c}^{lp}),
+    \qquad l>0.
+    \label{eq:edge_gates}
+\end{align}
+Scalar and non-scalar aggregates are respectively
+\begin{align}
+    \mathbf{q}_{i,c}^{0e}
+    &=
+    \frac{
+      \sum_{j\in\mathcal{N}(i)}
+      g_{ji}^{0}\mathbf{m}_{ji,c}^{0e}
+    }{
+      \sum_{j\in\mathcal{N}(i)}g_{ji}^{0}+\epsilon
+    },
+    \label{eq:scalar_aggregation}\\
+    \widetilde{\mathbf{q}}_{i,c}^{lp}
+    &=
+    \frac{
+      \sum_{j\in\mathcal{N}(i)}
+      g_{ji,c}^{lp}\mathbf{m}_{ji,c}^{lp}
+    }{
+      \sum_{j\in\mathcal{N}(i)}g_{ji,c}^{lp}+\epsilon
+    }.
+    \label{eq:nonscalar_aggregation}
+\end{align}
+Channels with the same \(l\) are split into direction and magnitude. If
+\(\boldsymbol{\nu}_{i,l}\) concatenates
+\(\|\widetilde{\mathbf{q}}_{i,c}^{lp}\|_2\) across both parities, then
+\begin{equation}
+    \mathbf{q}_{i,c}^{lp}
+    =
+    \frac{\widetilde{\mathbf{q}}_{i,c}^{lp}}
+         {\|\widetilde{\mathbf{q}}_{i,c}^{lp}\|_2+\epsilon}
+    \left[
+      \operatorname{SiLU}
+      (W_l^{(\ell)}\boldsymbol{\nu}_{i,l}+\mathbf{b}_l^{(\ell)})
+    \right]_c.
+    \label{eq:nonscalar_rescale}
+\end{equation}
+
+\paragraph{Adaptive normalization.}
+Let
+\(\mathbf{u}_i^{(\ell)}
+=\mathbf{h}_i^{(\ell)}
++\operatorname{EqBlock}^{(\ell)}(\mathbf{q}_i^{(\ell)})\) and
+\(\bar{\mathbf{u}}=\operatorname{RMSNorm}(\mathbf{u})\). The expanded form of
+Eq.~\eqref{eq:compact_layer_update} is
+\begin{align}
+    \mathbf{h}_{i}^{(\ell+1),0e}
+    &=
+    \bar{\mathbf{u}}_{i}^{0e}
+    \odot(\mathbf{1}+\boldsymbol{\gamma}_{i}^{0e})
+    +\boldsymbol{\beta}_{i}^{0e},\\
+    \mathbf{h}_{i,c}^{(\ell+1),lp}
+    &=
+    \bar{\mathbf{u}}_{i,c}^{lp}
+    \left[1+0.1\tanh(\gamma_{i,c}^{lp})\right],
+    \qquad l>0,\\
+    [\boldsymbol{\gamma}_{i}^{0e},
+      \boldsymbol{\beta}_{i}^{0e},
+      \boldsymbol{\gamma}_{i}^{\mathrm{ns}}]
+    &=
+    W_{\eta}^{(\ell)}\boldsymbol{\eta}_{b(i)}
+    +\mathbf{b}_{\eta}^{(\ell)}.
+    \label{eq:equivariant_adaln}
+\end{align}
+The conditioning projection is zero-initialized.
+
+\subsection{Newton--Euler observable subspace}
+\label{app:newton_euler_details}
+
+For
+\(\mathbf{I}_k=\mathbf{V}_k
+\operatorname{diag}(\boldsymbol{\lambda}_k)\mathbf{V}_k^\top\), define
+\begin{align}
+    m_{ka}
+    &=
+    \mathbb{1}[|\mathcal{A}_k|>1]\,
+    \mathbb{1}
+    \left[
+      \lambda_{ka}>0.01\max_b\lambda_{kb}
+    \right],\\
+    \mathbf{I}_k^{+}
+    &=
+    \mathbf{V}_k
+    \operatorname{diag}
+    \left(
+      \frac{m_{ka}}{\max(\lambda_{ka},10^{-6})}
+    \right)
+    \mathbf{V}_k^\top,\\
+    \mathbf{P}_k
+    &=
+    \mathbf{V}_k\operatorname{diag}(\mathbf{m}_k)\mathbf{V}_k^\top.
+    \label{eq:observable_projection}
+\end{align}
+The eigendecomposition is evaluated on a symmetrized double-precision inertia
+matrix. Single-atom fragments bypass the eigensolver.
+
+\subsection{Auxiliary docking losses}
+\label{app:loss_details}
+
+The atom-level auxiliary objective is
+\begin{align}
+    \widehat{\mathbf{u}}_i
+    &=
+    \widehat{\mathbf{v}}_{g(i)}
+    +
+    \widehat{\boldsymbol{\omega}}_{g(i)}
+    \times\mathbf{r}_i,\\
+    \mathbf{u}^{\star}_i
+    &=
+    \mathbf{v}^{\star}_{g(i)}
+    +
+    \boldsymbol{\omega}^{\star}_{g(i)}
+    \times\mathbf{r}_i,\\
+    \mathcal{L}_{\mathrm{atom}}
+    &=
+    \frac{1}{3N}
+    \sum_{i=1}^{N}
+    \|\widehat{\mathbf{u}}_i-\mathbf{u}^{\star}_i\|_2^2.
+    \label{eq:atom_aux_loss}
+\end{align}
+
+For the distance-geometry loss, one predicted step gives
+\begin{align}
+    \widetilde{\mathbf{T}}_{k,1}
+    &=
+    \mathbf{T}_{k,t_b}
+    +(1-t_b)\widehat{\mathbf{v}}_k,\\
+    \widetilde{\mathbf{R}}_{k,1}
+    &=
+    \operatorname{Exp}
+    \left((1-t_b)\widehat{\boldsymbol{\omega}}_k\right)
+    \mathbf{R}_{k,t_b},\\
+    \widetilde{\mathbf{x}}_{i,1}
+    &=
+    \widetilde{\mathbf{R}}_{g(i),1}\mathbf{y}_i
+    +\widetilde{\mathbf{T}}_{g(i),1}.
+    \label{eq:one_step_endpoint}
+\end{align}
+For inter-fragment atom pairs
+\(\mathcal{P}_b=\{(i,j):i<j,\ g(i)\neq g(j)\}\),
+\begin{equation}
+    \mathcal{L}_{\mathrm{DG}}
+    =
+    \frac{
+      \sum_b t_b^2
+      \frac{1}{|\mathcal{P}_b|}
+      \sum_{(i,j)\in\mathcal{P}_b}
+      \left(
+        \|\widetilde{\mathbf{x}}_{i,1}
+          -\widetilde{\mathbf{x}}_{j,1}\|_2
+        -
+        \|\mathbf{x}^{\star}_i-\mathbf{x}^{\star}_j\|_2
+      \right)^2
+    }{
+      \sum_b t_b^2
+    }.
+    \label{eq:distance_geometry_loss}
+\end{equation}
+
+\section{Confidence Model Details}
+\label{app:confidence_details}
+
+\subsection{Invariant features and readout}
+
+For candidate \(m\), the confidence hidden state is initialized by
+\begin{equation}
+    \mathbf{h}^{C,0}_{mi}
+    =
+    \mathbf{h}^{\mathrm{fresh}}_{mi}
+    +
+    \alpha\,
+    \mathbb{1}
+    [i\in\mathcal{V}_{\mathrm{lig\text{-}atom}}
+      \cup\mathcal{V}_{\mathrm{frag}}]\,
+    \mathbf{h}^{D}_{mi},
+    \qquad \alpha_{\mathrm{init}}=0.25.
+    \label{eq:confidence_hidden_init}
+\end{equation}
+The invariantized node descriptor is
+\begin{equation}
+    \mathbf{z}_{mi}
+    =
+    \left[
+      \mathbf{h}_{mi}^{0e},
+      \{\|\mathbf{h}_{mi,c}^{lp}\|_2\}_{l>0,p,c}
+    \right].
+    \label{eq:confidence_invariants}
+\end{equation}
+
+For ligand atom \(i\), let
+\(d_{mip}=\|\mathbf{x}_{mi}-\mathbf{x}_p\|_2\),
+\(d^{\min}_{mi}=\min_p d_{mip}\), and
+\(w_{mip}=\exp[-d_{mip}/(2\,\angstrom)]\). With protein-atom flags
+\(\mathbf{q}_p\), the explicit contact descriptor is
+\begin{align}
+    \mathbf{c}_{mi}
+    =\bigg[
+      &\frac{d^{\min}_{mi}}{10\,\angstrom},
+      \boldsymbol{\rho}_{[0,10]}(d^{\min}_{mi}),
+      \left\{
+      \log\left(1+\sum_p\mathbb{1}[d_{mip}<r]\right)
+      \right\}_{r\in\{2,3.5,5\}\,\angstrom},\nonumber\\
+      &\log\left(1+\sum_p w_{mip}\right),
+      \frac{\sum_p w_{mip}\mathbf{q}_p}
+           {\sum_p w_{mip}+\epsilon}
+    \bigg].
+    \label{eq:confidence_contact_features}
+\end{align}
+The atom features and outputs are
+\begin{align}
+    \mathbf{a}_{mi}
+    &=
+    \operatorname{MLP}_{a}
+    \left(
+      \operatorname{LN}[
+      \mathbf{z}_{mi},\mathbf{c}_{mi}]
+    \right),\\
+    [\widehat{\ell}^{\,\mathrm{atom}}_{mi},
+      \widehat{o}^{\,\mathrm{atom}}_{mi}]
+    &=
+    \operatorname{MLP}_{\mathrm{atom}}(\mathbf{a}_{mi}).
+    \label{eq:confidence_atom_head}
+\end{align}
+
+Contact attention is
+\begin{align}
+    \mathbf{u}_{mi}
+    &=
+    \operatorname{MLP}_{c}
+    \left(
+      \operatorname{LN}[
+      \mathbf{a}_{mi},\mathbf{c}_{mi}]
+    \right),\\
+    \alpha_{mi}
+    &=
+    \frac{
+      \exp(s(\mathbf{u}_{mi}))
+    }{
+      \sum_{j\in\mathcal{V}_{\mathrm{lig\text{-}atom}}}
+      \exp(s(\mathbf{u}_{mj}))
+    },\\
+    \mathbf{r}^{\mathrm{contact}}_m
+    &=
+    \left[
+      \sum_i\alpha_{mi}\mathbf{u}_{mi},
+      \max_i\mathbf{u}_{mi},
+      \operatorname{mean}_i\mathbf{a}_{mi},
+      \max_i\mathbf{a}_{mi}
+    \right].
+    \label{eq:contact_attention}
+\end{align}
+For node type
+\(q\in\{\mathrm{lig\text{-}atom},\mathrm{frag},
+\mathrm{prot\text{-}atom},\mathrm{prot\text{-}res}\}\), let
+\(\mathbf{v}_{mi}=\operatorname{MLP}_g(\operatorname{LN}(\mathbf{z}_{mi}))\).
+Then
+\begin{equation}
+    \mathbf{r}^{\mathrm{global}}_m
+    =
+    \mathop{\Vert}_{q}
+    \left[
+      \operatorname{mean}_{i:\tau(i)=q}\mathbf{v}_{mi},
+      \max_{i:\tau(i)=q}\mathbf{v}_{mi}
+    \right].
+    \label{eq:global_type_pooling}
+\end{equation}
+The pose head is defined in Eq.~\eqref{eq:confidence_pose_head}; its reported
+RMSD prediction is
+\begin{equation}
+    \widehat{r}_m
+    =
+    \max
+    \left\{
+      0,\,
+      \exp\left(
+        \operatorname{clip}
+        (\widehat{\ell}^{\,\mathrm{pose}}_m,-2,5)
+      \right)-1
+    \right\}.
+\end{equation}
+
+\subsection{Confidence targets and losses}
+\label{app:confidence_loss_details}
+
+For fixed atom correspondence,
+\begin{equation}
+    d_{mi}^{\star}
+    =
+    \|\mathbf{x}_{mi}-\mathbf{x}^{\star}_i\|_2,
+    \qquad
+    r_m^{\star}
+    =
+    \left(
+      \frac{1}{N}\sum_i(d_{mi}^{\star})^2
+    \right)^{1/2}.
+    \label{eq:confidence_targets}
+\end{equation}
+With unit-transition Huber loss \(H_1\) and binary cross entropy
+\(\operatorname{BCE}\), the pointwise terms are
+\begin{align}
+    \mathcal{L}_{\mathrm{atom\text{-}reg}}
+    &=
+    \frac{1}{MN}\sum_{m,i}
+    H_1\left(
+      \widehat{\ell}^{\,\mathrm{atom}}_{mi},
+      \log(1+d_{mi}^{\star})
+    \right),\\
+    \mathcal{L}_{\mathrm{pose\text{-}reg}}
+    &=
+    \frac{1}{M}\sum_m
+    H_1\left(
+      \widehat{\ell}^{\,\mathrm{pose}}_m,
+      \log(1+r_m^{\star})
+    \right),\\
+    \mathcal{L}_{\mathrm{atom\text{-}BCE}}
+    &=
+    \frac{1}{MN}\sum_{m,i}
+    \operatorname{BCE}
+    \left(
+      \widehat{o}^{\,\mathrm{atom}}_{mi},
+      \mathbb{1}[d_{mi}^{\star}<2\,\angstrom]
+    \right),\\
+    \mathcal{L}_{\mathrm{pose\text{-}BCE}}
+    &=
+    \frac{1}{M}\sum_m
+    \operatorname{BCE}
+    \left(
+      \widehat{o}^{\,\mathrm{pose}}_m,
+      \mathbb{1}[r_m^{\star}<2\,\angstrom]
+    \right).
+    \label{eq:confidence_pointwise_losses}
+\end{align}
+
+For
+\(\mathcal{Q}=\{(m,n):
+\log(1+r_n^{\star})-\log(1+r_m^{\star})>0.3\}\), the pairwise term is
+\begin{equation}
+    \mathcal{L}_{\mathrm{rank}}
+    =
+    \frac{1}{|\mathcal{Q}|}
+    \sum_{(m,n)\in\mathcal{Q}}
+    \max
+    \left(
+      0,\,
+      0.05-
+      (\widehat{\ell}^{\,\mathrm{pose}}_n
+       -\widehat{\ell}^{\,\mathrm{pose}}_m)
+    \right),
+    \label{eq:confidence_pairwise}
+\end{equation}
+with zero contribution when \(\mathcal{Q}\) is empty. The success-listwise
+target and loss are
+\begin{align}
+    q_m
+    &=
+    \frac{
+      \operatorname{sigmoid}
+      ((2-r_m^{\star})/0.2)
+    }{
+      \sum_n
+      \operatorname{sigmoid}
+      ((2-r_n^{\star})/0.2)
+    },\\
+    \mathcal{L}_{\mathrm{success\text{-}listwise}}
+    &=
+    -\sum_m q_m
+    \log
+    \frac{
+      \exp(\widehat{o}^{\,\mathrm{pose}}_m)
+    }{
+      \sum_n\exp(\widehat{o}^{\,\mathrm{pose}}_n)
+    }.
+    \label{eq:confidence_listwise}
+\end{align}
+
+\section{Additional Reproducibility Material}
+
+The active benchmark and sensitivity studies use the promoted geometry
+checkpoint at step 100,000 (SHA-256 prefix \texttt{6932fb3ba6eb}) and
+confidence checkpoint at step 42,500 (prefix \texttt{e31fde6f3512}). The
+training-configuration hash begins with \texttt{39aa62e4a48e}. Full
+checkpoint, configuration, and dataset-manifest hashes are retained in the
+machine-readable benchmark summaries rather than abbreviated during
+execution.
+
+The active runs used PyTorch 2.10.0, CUDA 13.0, and RTX 6000 Ada or H100 PCIe
+accelerators. Every final benchmark and pocket-sensitivity condition contains
+all frozen IDs with zero unresolved failures. Exact wall-clock and peak-memory
+measurements remain to be collected under one dedicated hardware
+configuration.
+
+Machine-readable summaries retain the first, Vina+DG, pure-confidence,
+historical-composite, and oracle selectors; RMSD thresholds at 1, 2, 3, and
+\(5\,\angstrom\); heavy-atom, fragment-count, rotatable-bond, and cofactor
+slices; failure and rescue records; runtime versions; and output paths. The
+public archival location for these artifacts will be added with the final
+code and weight release.

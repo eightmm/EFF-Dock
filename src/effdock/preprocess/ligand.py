@@ -1,7 +1,9 @@
 """Ligand preprocessing: SDF/MOL2 → atom/bond feature tensors."""
 
+import json
 import logging
 import os
+from hashlib import sha256
 from pathlib import Path
 
 import torch
@@ -84,6 +86,63 @@ FAMILY_TO_FEATURE: dict[str, str] = {
 }
 
 HALOGEN_ATOMIC_NUMS: set[int] = {9, 17, 35, 53}
+
+
+def ligand_graph_identity(
+    mol: Chem.Mol,
+    fragment_id: torch.Tensor,
+) -> dict[str, object]:
+    """Return an order-sensitive ligand graph/fragment identity.
+
+    This metadata binds saved pose coordinates to the exact ordered atom graph
+    and fragmentation used to generate them. Canonical SMILES alone is
+    insufficient because it intentionally discards input atom order.
+    """
+    fragments = torch.as_tensor(fragment_id).detach().cpu().to(torch.long).view(-1)
+    if fragments.numel() != mol.GetNumAtoms():
+        raise ValueError("fragment_id length must match ligand atom count")
+    atoms = [
+        {
+            "atomic_number": atom.GetAtomicNum(),
+            "formal_charge": atom.GetFormalCharge(),
+            "isotope": atom.GetIsotope(),
+            "aromatic": atom.GetIsAromatic(),
+            "chiral_tag": str(atom.GetChiralTag()),
+        }
+        for atom in mol.GetAtoms()
+    ]
+    bonds = []
+    for bond in mol.GetBonds():
+        atom_i, atom_j = sorted(
+            (bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
+        )
+        bonds.append(
+            {
+                "atom_indices": [atom_i, atom_j],
+                "order": float(bond.GetBondTypeAsDouble()),
+                "aromatic": bond.GetIsAromatic(),
+                "conjugated": bond.GetIsConjugated(),
+                "stereo": str(bond.GetStereo()),
+            }
+        )
+    bonds.sort(key=lambda item: tuple(item["atom_indices"]))
+    payload: dict[str, object] = {
+        "schema_version": "effdock.ordered_ligand_identity.v1",
+        "canonical_isomeric_smiles": Chem.MolToSmiles(
+            mol,
+            canonical=True,
+            isomericSmiles=True,
+        ),
+        "atoms": atoms,
+        "bonds": bonds,
+        "fragment_id": fragments.tolist(),
+    }
+    canonical = json.dumps(
+        payload,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode()
+    return {**payload, "sha256": sha256(canonical).hexdigest()}
 
 
 def _get_atom_valence(atom: Chem.Atom, explicit: bool) -> int:

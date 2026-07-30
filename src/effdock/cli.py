@@ -18,6 +18,7 @@ commands:
   evaluate        evaluate a checkpoint on an external benchmark
   benchmark       aggregate completed external benchmark shards
   dock            dock one ligand into an explicitly defined pocket
+  physical trace  trace unified guidance on crystal/saved trajectory coordinates
 
 Run `eff-dock <command> --help` for command-specific options.
 """
@@ -48,6 +49,10 @@ def _resolve(command: str, data_command: str | None = None) -> Callable[[list[st
         from effdock.workflows.benchmark_report import main
 
         return main
+    if command == "physical" and data_command == "trace":
+        from effdock.workflows.trace_physical import main
+
+        return main
     if command == "data" and data_command == "curate":
         from effdock.workflows.curate import main
 
@@ -75,12 +80,14 @@ def main(argv: list[str] | None = None) -> None:
 
     command = args.pop(0)
     data_command = None
-    if command in {"data", "confidence"}:
+    if command in {"data", "confidence", "physical"}:
         if not args or args[0] in {"-h", "--help"}:
             if command == "data":
                 print("usage: eff-dock data {curate,prepare,split,benchmark} [options]")
-            else:
+            elif command == "confidence":
                 print("usage: eff-dock confidence {prepare,train} [options]")
+            else:
+                print("usage: eff-dock physical {trace} [options]")
             return
         data_command = args.pop(0)
     try:

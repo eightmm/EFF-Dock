@@ -1,0 +1,151 @@
+{
+  "schema_version": "effdock.guidance_formal_charge_coverage.v1",
+  "created_date": "2026-07-30",
+  "protocol_id": "EFFDOCK-INTERACTION-GUIDANCE-V1",
+  "stage": "1B_coverage_inventory",
+  "status": "historical_proxy_superseded_for_site_eligibility",
+  "scientific_result": false,
+  "superseded_by": "docs/GUIDANCE_FORMAL_CHARGE_BENCHMARK_CHARACTERIZATION_V4.json",
+  "method": {
+    "split_order_policy": "sort validation sample_key lexicographically",
+    "charge_proxy": "sum data/plinder_processed/<sample_key>/ligand.pt atom_charge",
+    "selection_rule": "retain nonzero stored net atom charge and take the first 16 sorted keys",
+    "outcome_blind": true,
+    "coordinate_scoring_performed": false,
+    "reduced_tensor_chemistry_used_for_exact_typing": false
+  },
+  "source": {
+    "split": "data/splits/plinder.json",
+    "split_sha256": "3ac570bf08bced053f1ce040b57efca27c3be616f29a82cd66ef887c08860e6b",
+    "processed_manifest": "data/plinder_processed/manifest.json",
+    "processed_manifest_sha256": "e415df12e50df680eeb17665b9409a7879db3a186ffa39d741ca1b8fc8cdea0a",
+    "pool": "data/plinder_pool.parquet",
+    "pool_sha256": "0ff455da77ce5540b839918cccb96f45414e91efff6272d7da3a65337ab1fe91",
+    "interaction_parameter_file": "src/effdock/guidance/parameters/interaction_v1.json",
+    "interaction_parameter_file_sha256": "ef1daf16ac33863232ecfc5e5cb8ad088393ccaa4fbebfeac5f0a5461403d7dc"
+  },
+  "coverage": {
+    "validation_samples": 1076,
+    "loaded_samples": 1076,
+    "net_zero_samples": 1037,
+    "net_charged_samples": 39,
+    "charged_ligand_sanitize_ok": 39,
+    "net_charge_histogram_e": {
+      "-1": 6,
+      "+1": 29,
+      "+2": 4
+    }
+  },
+  "selected_raw_recovery_subset": [
+    {
+      "sample_key": "1gos__1__1.A_1.B__1.C_1.D__1.D",
+      "ccd": "NYP",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 12
+    },
+    {
+      "sample_key": "1k9s__1__1.A_1.D__1.G_1.H__1.H",
+      "ccd": "FM2",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 20
+    },
+    {
+      "sample_key": "1m4n__1__1.A_2.A__2.B_2.C_2.D__2.C",
+      "ccd": "AAD",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 24
+    },
+    {
+      "sample_key": "1n4u__1__1.A__1.G__1.G",
+      "ccd": "FAE",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 53
+    },
+    {
+      "sample_key": "1pe5__1__1.A__1.B_1.G_1.H_1.I__1.G",
+      "ccd": "BR3",
+      "net_stored_atom_charge_e": -1,
+      "ligand_heavy_atoms": 15
+    },
+    {
+      "sample_key": "1pe7__1__1.A__1.B_1.G_1.H_1.I__1.G",
+      "ccd": "4BR",
+      "net_stored_atom_charge_e": -1,
+      "ligand_heavy_atoms": 13
+    },
+    {
+      "sample_key": "1pe8__1__1.A__1.B_1.G_1.H_1.I__1.G",
+      "ccd": "BR5",
+      "net_stored_atom_charge_e": -1,
+      "ligand_heavy_atoms": 8
+    },
+    {
+      "sample_key": "1pu7__1__1.A__1.C__1.C",
+      "ccd": "39A",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 12
+    },
+    {
+      "sample_key": "1pw1__1__1.A__1.B_1.F_1.G__1.B",
+      "ccd": "HEL",
+      "net_stored_atom_charge_e": -1,
+      "ligand_heavy_atoms": 29
+    },
+    {
+      "sample_key": "2c64__1__1.A_1.B__1.D_1.E__1.E",
+      "ccd": "MA0",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 15
+    },
+    {
+      "sample_key": "2c65__1__1.A_1.B__1.C_1.D__1.D",
+      "ccd": "4CR",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 21
+    },
+    {
+      "sample_key": "2gce__1__1.A_1.B__1.G_1.H__1.G",
+      "ccd": "SFC",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 62
+    },
+    {
+      "sample_key": "2gce__1__1.A_1.B__1.G_1.H__1.H",
+      "ccd": "RFC",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 62
+    },
+    {
+      "sample_key": "2j47__1__1.A__1.B__1.B",
+      "ccd": "GDV",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 26
+    },
+    {
+      "sample_key": "2j62__1__1.A_1.B__1.H__1.H",
+      "ccd": "GSZ",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 27
+    },
+    {
+      "sample_key": "2p41__1__1.A__1.F_1.H_1.I__1.I",
+      "ccd": "G1G",
+      "net_stored_atom_charge_e": 1,
+      "ligand_heavy_atoms": 53
+    }
+  ],
+  "raw_input_status": {
+    "expected_root": "~/.local/share/plinder/2024-06/v2/systems",
+    "expected_files": "<system_id>/receptor.pdb and <system_id>/ligand_files/<instance_chain>.sdf",
+    "root_present": false,
+    "exact_build_physical_system_inputs_recoverable_from_processed_tensors": false,
+    "reason": "protein.pt omits exact atom names, raw residue/protonation names, chain and residue identifiers; ligand.pt omits the original sanitized RDKit molecule and source SDF provenance",
+    "next_gate": "restore the selected PLINDER system shards, then run strict raw chemistry support typing before any energy or pose-margin analysis"
+  },
+  "limitations": [
+    "Stored net atom charge is a coverage proxy, not exact resonance-aware site typing.",
+    "The nonzero-net-charge selection rule misses net-neutral zwitterions with nonzero formal-charge sites and must not be used as the current eligibility rule.",
+    "No receptor charge group, cofactor, ion, PTM, protonation, shell, energy, gradient, RMSD, or selection claim is made.",
+    "This historical artifact cannot admit sampler activation or support an Astex or PoseBusters claim."
+  ]
+}

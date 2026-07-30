@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 
 import torch
@@ -16,6 +17,17 @@ import yaml
 from rdkit.Chem import rdMolDescriptors
 
 from effdock.checkpoint import load_checkpoint_file, load_portable_model_state
+from effdock.inference.defaults import (
+    DEFAULT_CONFIDENCE_CHECKPOINT,
+    DEFAULT_CONFIG,
+    DEFAULT_DOCKING_CHECKPOINT,
+    DEFAULT_NUM_SAMPLES,
+    DEFAULT_NUM_STEPS,
+    DEFAULT_POCKET_CUTOFF,
+    DEFAULT_SCHEDULE_POWER,
+    DEFAULT_SIGMA,
+    DEFAULT_TIME_SCHEDULE,
+)
 from effdock.inference.io import (
     write_multi_sdf,
     write_sdf,
@@ -28,22 +40,23 @@ from effdock.inference.sampler import (
     sample_unified,
     sample_unified_multi_sigma,
 )
+from effdock.preprocess.ligand import ligand_graph_identity
 
 
 @dataclass(frozen=True)
 class DockingOptions:
     protein: Path
     ligand: str
-    checkpoint: Path
-    config: Path
+    checkpoint: Path = DEFAULT_DOCKING_CHECKPOINT
+    config: Path = DEFAULT_CONFIG
     pocket_center: torch.Tensor | None = None
-    pocket_cutoff: float = 8.0
-    num_steps: int = 25
-    time_schedule: str = "late"
-    schedule_power: float = 3.0
-    sigma: float | None = None
+    pocket_cutoff: float = DEFAULT_POCKET_CUTOFF
+    num_steps: int = DEFAULT_NUM_STEPS
+    time_schedule: str = DEFAULT_TIME_SCHEDULE
+    schedule_power: float = DEFAULT_SCHEDULE_POWER
+    sigma: float | None = DEFAULT_SIGMA
     sigma_list: str | None = None
-    num_samples: int = 1
+    num_samples: int = DEFAULT_NUM_SAMPLES
     seed: int | None = None
     save_traj: bool = False
     out_dir: Path = Path("outputs/docked")
@@ -57,7 +70,7 @@ class DockingOptions:
     vina_guidance_max_velocity: float = 5.0
     vina_guidance_max_angular_velocity: float = 5.0
     vina_guidance_protein_shell: float = 18.0
-    confidence_checkpoint: Path | None = None
+    confidence_checkpoint: Path | None = DEFAULT_CONFIDENCE_CHECKPOINT
     rank_by: str = "auto"
 
 
@@ -72,6 +85,18 @@ def parse_center(value: str | None) -> torch.Tensor | None:
 
 def resolve_device(device: str | None) -> torch.device:
     return torch.device(device if device else ("cuda" if torch.cuda.is_available() else "cpu"))
+
+
+def _ligand_source_identity(value: str) -> dict[str, str]:
+    path = Path(value)
+    digest = sha256()
+    if path.is_file():
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return {"kind": "file", "sha256": digest.hexdigest()}
+    digest.update(value.encode())
+    return {"kind": "literal", "sha256": digest.hexdigest()}
 
 
 def load_model(config_path: Path, checkpoint_path: Path, device: torch.device):
@@ -216,6 +241,11 @@ def write_docking_outputs(
 
     torch.save(
         {
+            "schema_version": "effdock.docking_results.v2",
+            "ligand_identity": {
+                **ligand_graph_identity(mol, lig_data["fragment_id"]),
+                "source": _ligand_source_identity(opts.ligand),
+            },
             "pocket_center": pocket_center,
             "frag_centers": lig_data["frag_centers"],
             "frag_sizes": lig_data["frag_sizes"],
@@ -443,21 +473,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--protein", type=Path, required=True)
     parser.add_argument("--ligand", type=str, required=True)
-    parser.add_argument("--checkpoint", type=Path, required=True)
-    parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--checkpoint", type=Path, default=DEFAULT_DOCKING_CHECKPOINT)
+    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument(
         "--pocket-center", type=parse_center, required=True, help="Binding site x,y,z"
     )
-    parser.add_argument("--pocket-cutoff", type=float, default=8.0)
-    parser.add_argument("--num-steps", type=int, default=25)
+    parser.add_argument("--pocket-cutoff", type=float, default=DEFAULT_POCKET_CUTOFF)
+    parser.add_argument("--num-steps", type=int, default=DEFAULT_NUM_STEPS)
     parser.add_argument(
-        "--time-schedule", type=str, default="late", choices=("uniform", "late", "early")
+        "--time-schedule",
+        type=str,
+        default=DEFAULT_TIME_SCHEDULE,
+        choices=("uniform", "late", "early"),
     )
-    parser.add_argument("--schedule-power", type=float, default=3.0)
+    parser.add_argument("--schedule-power", type=float, default=DEFAULT_SCHEDULE_POWER)
     parser.add_argument(
         "--sigma",
         type=float,
-        default=None,
+        default=DEFAULT_SIGMA,
         help="Single prior sigma. Ignored when --sigma_list is set.",
     )
     parser.add_argument(
@@ -467,7 +500,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help='Multi-sigma inference. "2,3,4,5" splits --num_samples '
         'across values; "2:10,3:10,4:20" gives explicit counts.',
     )
-    parser.add_argument("--num-samples", type=int, default=1)
+    parser.add_argument("--num-samples", type=int, default=DEFAULT_NUM_SAMPLES)
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--save-traj", action="store_true")
     parser.add_argument("--output-dir", dest="out_dir", type=Path, default=Path("outputs/docked"))
@@ -504,8 +537,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--confidence-checkpoint",
         type=Path,
-        default=None,
-        help="Optional learned pose-confidence checkpoint used for reranking.",
+        default=DEFAULT_CONFIDENCE_CHECKPOINT,
+        help="Learned pose-confidence checkpoint used for reranking.",
+    )
+    parser.add_argument(
+        "--no-confidence",
+        action="store_const",
+        dest="confidence_checkpoint",
+        const=None,
+        help="Disable learned confidence reranking.",
     )
     parser.add_argument(
         "--rank-by",

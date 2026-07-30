@@ -1,0 +1,461 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Problem formulation}
+
+The prediction unit is one receptor structure, one ligand chemical entity, and
+one explicitly specified binding pocket. The model receives receptor
+coordinates and atom/residue identities, the ligand molecular graph and
+stereochemistry, and a pocket center. It does not receive the crystallographic
+ligand coordinates, pose RMSD, benchmark identity, or any feature computed
+from a downstream evaluation. The output is a set of sampled all-atom ligand
+poses and a separately declared pose-selection score. \method is a pose
+generator and ranker; it is not trained as an affinity predictor or a blind
+pocket detector.
+
+Let the ligand contain \(N\) heavy atoms partitioned into \(K\) rigid
+fragments. Atom \(i\) has a fragment assignment \(g(i)\) and a fixed
+fragment-local coordinate \(\mathbf{y}_i\). A ligand pose is parameterized by
+one translation and one proper rotation per fragment,
+\[
+    \mathbf{z}
+    =
+    \left\{(\mathbf{T}_k,\mathbf{R}_k)
+    \mid \mathbf{T}_k\in\R^3,\,
+    \mathbf{R}_k\in\SO(3)\right\}_{k=1}^{K},
+\]
+and the corresponding global atom coordinate is
+\begin{equation}
+    \mathbf{x}_i
+    =
+    \mathbf{R}_{g(i)}\mathbf{y}_i+\mathbf{T}_{g(i)}.
+    \label{eq:atom_reconstruction}
+\end{equation}
+This representation preserves the internal geometry of each fragment while
+allowing relative fragment motions to express ligand flexibility.
+
+\subsection{Rigid-fragment decomposition}
+\label{sec:fragmentation}
+
+Ligands are sanitized and featurized with RDKit
+\citep{landrum2024rdkit}. We identify cuttable bonds as heavy-atom single
+bonds that are outside rings, are not planar conjugated bonds such as
+amide-like linkages, and have endpoints with heavy-atom degree greater than
+one. Candidate bonds are processed in deterministic order. A cut is accepted
+only when each endpoint retains at least one non-cut heavy-atom bond, which
+prevents isolated atoms along simple chains. Any remaining singleton component
+is merged into its largest adjacent fragment. The resulting connected
+components define \(g(i)\).
+
+For each retained cut bond, we preserve the fragment adjacency and add local
+cross-fragment triangulation edges around the cut-bond atoms. Their reference
+distances provide a geometry signal without fixing the torsion angle. Fragment
+centers are the geometric means of their member atoms, and local coordinates
+are formed by subtracting the corresponding center. Single-atom fragments,
+when unavoidable, have no supervised rotational degree of freedom.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{fragmentation_examples.png}
+    \caption{Rigid-fragment representation. Cuttable rotatable bonds are
+    highlighted in red, and atoms belonging to the same connected rigid
+    component share a color. The model predicts one translation and one proper
+    rotation per retained fragment while preserving atom-level chemistry and
+    fragment adjacency.}
+    \label{fig:fragmentation}
+\end{figure}
+
+\subsection{Pocket-conditioned heterogeneous graph}
+\label{sec:graph}
+
+The receptor is cropped in a residue-aware manner around the supplied pocket
+center. During training, the current configuration samples the crop radius
+uniformly from \(6\) to \(12\,\angstrom\) and applies Gaussian center jitter
+with standard deviation \(2\,\angstrom\). The matched confidence and external
+redocking protocol uses a fixed \(10\,\angstrom\) crop without center jitter.
+At prospective inference, the pocket center must be supplied independently of
+the unknown target pose.
+
+We construct a single heterogeneous graph with four node types:
+ligand atoms, ligand fragments, protein atoms, and protein-residue virtual
+nodes. Ligand atom features encode element, formal charge, aromaticity,
+hybridization, valence, chirality, ring membership, and pharmacophore flags.
+Protein atom features encode residue--atom identity, backbone and metal
+indicators, and protein-side pharmacophore flags. Residue virtual nodes encode
+residue identity and provide a coarser structural communication path.
+
+Ten typed edge relations represent ligand covalent bonds, local
+triangulation, cut bonds, atom-to-fragment ownership, fragment adjacency,
+protein covalent bonds, atom-to-residue membership, residue connectivity,
+residue-to-fragment context, and dynamic protein-to-ligand contacts.
+At flow time \(t\), the graph is
+\(\mathcal{G}_t=(\mathcal{V},\mathcal{E}_{\mathrm{static}}\cup
+\mathcal{E}_{\mathrm{contact},t})\). Protein--ligand atom contact edges are
+rebuilt bidirectionally at every forward pass:
+\begin{equation}
+    \mathcal{E}_{\mathrm{contact},t}
+    =
+    \left\{
+    (p,i),(i,p)
+    \,\middle|\,
+    p\in\mathcal{V}_{\mathrm{prot\text{-}atom}},
+    i\in\mathcal{V}_{\mathrm{lig\text{-}atom}},
+    \|\mathbf{x}_{p}-\mathbf{x}_{i,t}\|_2\leq 5\,\angstrom
+    \right\}.
+    \label{eq:dynamic_contacts}
+\end{equation}
+Edges are created only within the same complex in a minibatch.
+
+For an edge \(j\rightarrow i\), define
+\(\mathbf{r}_{ji}=\mathbf{x}_i-\mathbf{x}_j\) and
+\(d_{ji}=\|\mathbf{r}_{ji}\|_2\). Edge attributes combine a 32-component
+radial basis expansion with relation, bond, fragment-topology, local-frame,
+pair-chemistry, endpoint-state, and time features. Their exact construction is
+given in Appendix~\ref{app:edge_features}.
+
+\subsection{Flow matching on fragment poses}
+\label{sec:flow}
+
+We center coordinates at the pocket and define a factorized prior over
+fragment poses. For each fragment \(k\),
+\begin{equation}
+    \mathbf{T}_{k,0}
+    \sim
+    \mathcal{N}(\mathbf{0},\sigma^2\mathbf{I}),
+    \qquad
+    \mathbf{R}_{k,0}
+    \sim
+    \mathrm{Uniform}(\SO(3)).
+    \label{eq:pose_prior}
+\end{equation}
+Single-atom fragment rotations are fixed to identity. During training,
+\(\sigma\in\{0.5,1,2,3,4\}\,\angstrom\) is sampled with probabilities
+\(\{0.10,0.25,0.30,0.25,0.10\}\), and \(\log\sigma\) is embedded along with
+time. A global random proper rotation is applied to the ligand representation
+as augmentation.
+
+Given prior and target fragment poses
+\((\mathbf{T}_{k,0},\mathbf{R}_{k,0})\) and
+\((\mathbf{T}_{k,1},\mathbf{R}_{k,1})\), respectively, the default objective
+uses a linear translation path and shortest-path spherical interpolation for
+rotation:
+\begin{align}
+    \mathbf{T}_{k,t}
+    &=
+    (1-t)\mathbf{T}_{k,0}
+    +t\mathbf{T}_{k,1},
+    \label{eq:translation_path}\\
+    \mathbf{R}_{k,t}
+    &=
+    \operatorname{Exp}(t\boldsymbol{\omega}^{\star}_k)
+    \mathbf{R}_{k,0},
+    \label{eq:rotation_path}\\
+    \boldsymbol{\omega}^{\star}_k
+    &=
+    \operatorname{Log}
+    \left(\mathbf{R}_{k,1}\mathbf{R}_{k,0}^{-1}\right).
+\end{align}
+The world-frame conditional velocity targets are therefore
+\begin{equation}
+    \mathbf{v}^{\star}_k
+    =
+    \mathbf{T}_{k,1}-\mathbf{T}_{k,0},
+    \qquad
+    \boldsymbol{\omega}^{\star}_k
+    =
+    \operatorname{Log}
+    \left(\mathbf{R}_{k,1}\mathbf{R}_{k,0}^{-1}\right).
+    \label{eq:flow_targets}
+\end{equation}
+Following the flow-matching formulation \citep{lipman2023flow}, a time-
+conditioned network regresses these vector fields without integrating an ODE
+during training. Time is sampled from
+\[
+  p(t)=0.02\,\mathcal{U}(0,1)
+  +0.98\,\operatorname{sigmoid}
+  \left(\mathcal{N}(0.8,1.7^2)\right),
+\]
+which emphasizes late refinement while retaining support near both endpoints.
+
+\subsection{\texorpdfstring{\(\SE(3)\)}{SE(3)}-equivariant interaction network}
+\label{sec:equivariant_network}
+
+All node types share one six-layer equivariant trunk. Scalar chemical and
+topological features are embedded into 384 channels. The full hidden state
+uses the irreducible-representation layout
+\[
+    384\times 0e
+    \;+\;
+    32\times 1o
+    \;+\;
+    32\times 1e
+    \;+\;
+    16\times 2e
+    \;+\;
+    16\times 2o.
+\]
+Thus each node has 736 real-valued coordinates arranged into typed irrep
+blocks rather than treated as an unstructured vector.
+
+For complex \(b\), flow time and prior scale are embedded as
+\begin{equation}
+    \boldsymbol{\eta}_b
+    =
+    \operatorname{MLP}_{t}(\operatorname{PE}(t_b))
+    +
+    \operatorname{MLP}_{\sigma}
+    \left(\operatorname{PE}(\log\sigma_b)\right)
+    \in\R^{128}.
+    \label{eq:time_sigma_embedding}
+\end{equation}
+Chemical and topological features initialize the \(0e\) block. The initial
+\(1o\) channels are gated displacements from the graph center, with an
+additional zero-initialized linear mixture of the current fragment rotation
+columns. The \(1e\), \(2e\), and \(2o\) blocks start at zero.
+
+For edge \(j\rightarrow i\), let \(\mathbf{e}_{ji}^{(\ell)}\) be the invariant
+1020-dimensional descriptor and
+\(\bar{\mathbf{h}}_j^{(\ell)}
+=\operatorname{RMSNorm}(\mathbf{h}_j^{(\ell)})\). Each layer applies
+dual radial channel scaling, a fully connected tensor product with normalized
+spherical harmonics through \(l_{\max}=2\), and a direction-preserving
+equivariant activation:
+\begin{equation}
+    \mathbf{m}_{ji}^{(\ell)}
+    =
+    \operatorname{EqAct}
+    \left[
+      \boldsymbol{\alpha}_{ji}^{\mathrm{out}}
+      \odot
+      \operatorname{TP}^{(\ell)}
+      \left(
+        \boldsymbol{\alpha}_{ji}^{\mathrm{in}}
+        \odot\bar{\mathbf{h}}_j^{(\ell)},
+        \mathbf{Y}_{0:2}(\widehat{\mathbf{r}}_{ji})
+      \right)
+    \right].
+    \label{eq:tp_message}
+\end{equation}
+Scalar and non-scalar gates, including a learned edge-type-specific distance
+decay, produce a normalized neighborhood aggregate
+\(\mathbf{q}_i^{(\ell)}
+=\operatorname{GateMean}_{j\in\mathcal{N}(i)}
+(\mathbf{m}_{ji}^{(\ell)})\). The residual and time-conditioned update is
+\begin{equation}
+    \mathbf{h}_i^{(\ell+1)}
+    =
+    \operatorname{EqAdaLN}
+    \left(
+      \mathbf{h}_i^{(\ell)}
+      +
+      \operatorname{EqBlock}^{(\ell)}
+      (\mathbf{q}_i^{(\ell)}),
+      \boldsymbol{\eta}_{b(i)}
+    \right).
+    \label{eq:compact_layer_update}
+\end{equation}
+Appendix~\ref{app:architecture_details} gives the exact initialization, edge
+descriptor, irrep normalization, radial gates, aggregation denominators, and
+adaptive normalization.
+
+Because coordinates enter only through equivariant geometric quantities and
+all non-scalar operations respect their irreducible representations, scalar
+features are invariant and predicted vectors are equivariant under a joint
+proper rotation and translation of the complex. In particular, for
+\(\mathbf{Q}\in\SO(3)\) and translation \(\mathbf{a}\),
+\[
+    \widehat{\mathbf{v}}(\mathbf{Q}\mathbf{x}+\mathbf{a})
+    =
+    \mathbf{Q}\widehat{\mathbf{v}}(\mathbf{x}),
+    \qquad
+    \widehat{\boldsymbol{\omega}}
+    (\mathbf{Q}\mathbf{x}+\mathbf{a})
+    =
+    \mathbf{Q}\widehat{\boldsymbol{\omega}}(\mathbf{x}).
+\]
+
+\subsection{Atom-force head and Newton--Euler aggregation}
+\label{sec:newton_euler}
+
+The output head selects ligand-atom states and predicts one polar vector
+\(\mathbf{f}_i\in\R^3\) per ligand atom. A linear equivariant path is augmented
+with a self tensor product so that higher-order directional information can
+reach the \(1o\) output:
+\begin{align}
+    \widetilde{\mathbf{h}}_i
+    &=
+    \operatorname{EqAct}
+    (L_{\mathrm{pre}}\mathbf{h}_i^{(6)}),\\
+    \mathbf{f}_i
+    &=
+    L_{1o}\widetilde{\mathbf{h}}_i
+    +
+    \operatorname{TP}_{1o}
+    (\widetilde{\mathbf{h}}_i,\widetilde{\mathbf{h}}_i).
+    \label{eq:atom_force_head}
+\end{align}
+The self-tensor-product branch is zero-initialized. The vectors are
+``force-like'' equivariant readouts rather than gradients of a learned energy.
+Rather than directly regressing two independent vectors for every fragment,
+we convert them into rigid-body velocities. For fragment \(k\), with member set
+\(\mathcal{A}_k\), center \(\mathbf{T}_k\), and lever arm
+\(\mathbf{r}_i=\mathbf{x}_i-\mathbf{T}_k\),
+\begin{align}
+    \widehat{\mathbf{v}}_k
+    &=
+    \frac{1}{|\mathcal{A}_k|}
+    \sum_{i\in\mathcal{A}_k}\mathbf{f}_i,
+    \label{eq:newton_translation}\\
+    \boldsymbol{\tau}_k
+    &=
+    \sum_{i\in\mathcal{A}_k}
+    \mathbf{r}_i\times\mathbf{f}_i,\\
+    \mathbf{I}_k
+    &=
+    \sum_{i\in\mathcal{A}_k}
+    \left(
+      \|\mathbf{r}_i\|_2^2\mathbf{I}_3
+      -\mathbf{r}_i\mathbf{r}_i^\top
+    \right),\\
+    \widehat{\boldsymbol{\omega}}_k
+    &=
+    \mathbf{I}_k^{+}\boldsymbol{\tau}_k.
+    \label{eq:newton_rotation}
+\end{align}
+We compute the pseudoinverse in the inertia eigenspace. Eigenmodes below 1\%
+of the largest eigenvalue are treated as unobservable, so single-atom
+fragments have no angular output and nearly singular modes of collinear
+fragments are excluded. The corresponding projection \(\mathbf{P}_k\) is
+applied to the angular target in the primary flow loss. The exact eigenspace
+construction is given in Appendix~\ref{app:newton_euler_details}.
+
+\subsection{Training objective}
+\label{sec:objective}
+
+Let
+\(\mathcal{K}_{\mathrm{rot}}=\{k:|\mathcal{A}_k|>1\}\). The primary
+translation and observable-rotation losses are
+\begin{align}
+    \mathcal{L}_{v}
+    &=
+    \frac{1}{3K}
+    \sum_{k=1}^{K}
+    \|\widehat{\mathbf{v}}_k-\mathbf{v}^{\star}_k\|_2^2,\\
+    \mathcal{L}_{\omega}
+    &=
+    \frac{1}{3|\mathcal{K}_{\mathrm{rot}}|}
+    \sum_{k\in\mathcal{K}_{\mathrm{rot}}}
+    \|
+      \widehat{\boldsymbol{\omega}}_k
+      -\mathbf{P}_k\boldsymbol{\omega}^{\star}_k
+    \|_2^2.
+    \label{eq:primary_flow_losses}
+\end{align}
+Empty rotational sets contribute zero. The active configuration uses uniform
+time weighting.
+
+An atom-level auxiliary term compares the rigid-body atom velocities
+\(\mathbf{u}_i=\mathbf{v}_{g(i)}
++\boldsymbol{\omega}_{g(i)}\times\mathbf{r}_i\).
+A distance-geometry term extrapolates one predicted step to \(t=1\) and
+penalizes inter-fragment atom-pair distance errors, weighted by \(t^2\).
+Appendix~\ref{app:loss_details} gives both reductions explicitly. The total
+objective is
+\begin{equation}
+    \mathcal{L}
+    =
+    \mathcal{L}_{v}
+    +8\mathcal{L}_{\omega}
+    +0.3\mathcal{L}_{\mathrm{atom}}
+    +3.0\mathcal{L}_{\mathrm{DG}}.
+    \label{eq:total_loss}
+\end{equation}
+All reductions use explicit valid-item counts so that distributed training on
+unequal graph sizes matches a global masked mean.
+
+\subsection{ODE sampling}
+\label{sec:sampling}
+
+At inference, independently sampled fragment priors are integrated from
+\(t=0\) to \(t=1\). The default benchmark uses 25 Euler steps on the
+late-biased grid
+\begin{equation}
+    t_s
+    =
+    1-\left(1-\frac{s}{S}\right)^3,
+    \qquad s=0,\ldots,S,\quad S=25.
+\end{equation}
+At every step the ligand atom coordinates are reconstructed using
+Eq.~\eqref{eq:atom_reconstruction}, dynamic contacts are rebuilt, and the
+network predicts fragment velocities. Translations use an Euler update, while
+rotations use left multiplication,
+\[
+    \mathbf{R}_{k,t+\Delta t}
+    =
+    \operatorname{Exp}
+    \left(\Delta t\,
+    \widehat{\boldsymbol{\omega}}_{k,t}\right)
+    \mathbf{R}_{k,t}.
+\]
+The benchmark configuration is deterministic conditional on the complex ID,
+global seed, and candidate index.
+
+\subsection{Pose-confidence model}
+\label{sec:confidence}
+
+Sampling and top-1 selection are treated as separate decisions. The frozen
+docking model first produces a set of \(M=80\) poses. For each candidate, a
+second network initializes the same heterogeneous graph and adds the frozen
+docking model's terminal ligand-atom and fragment irreps through a learned
+gate initialized to 0.25. Four additional equivariant interaction layers then
+process the full candidate complex.
+
+The confidence network converts every terminal irrep state to an invariant
+descriptor by concatenating its \(0e\) scalars with the norms of all
+non-scalar channels. For each ligand atom, this descriptor is augmented with
+explicit protein-contact features: minimum-distance RBFs, contact counts at
+\(2\), \(3.5\), and \(5\,\angstrom\), a soft contact count, and
+distance-weighted protein flags. An atom head predicts
+\(\log(1+\)displacement\()\) and a \(2\,\angstrom\) success logit.
+
+The deployed \texttt{global\_contact\_attention} readout combines local
+contact attention with mean--maximum pooling over each of the four node types.
+The final pose head is
+\begin{equation}
+    [\widehat{\ell}^{\,\mathrm{pose}}_m,
+      \widehat{o}^{\,\mathrm{pose}}_m]
+    =
+    \operatorname{MLP}_{\mathrm{pose}}
+    \left(
+      \operatorname{LN}
+      [\mathbf{r}^{\mathrm{global}}_m,
+       \mathbf{r}^{\mathrm{contact}}_m]
+    \right).
+    \label{eq:confidence_pose_head}
+\end{equation}
+It predicts pose-level \(\log(1+\mathrm{RMSD})\) and a \(2\,\angstrom\)
+success logit. Appendix~\ref{app:confidence_details} gives the invariant
+features, attention, pooling, and output transformation explicitly.
+
+For a pose set, the confidence objective combines atom and pose Huber
+regression, binary success classification at \(2\,\angstrom\), pairwise
+ranking, and a success-listwise term:
+\begin{align}
+    \mathcal{L}_{\mathrm{conf}}
+    ={}&
+    0.2\mathcal{L}_{\mathrm{atom\text{-}reg}}
+    +0.2\mathcal{L}_{\mathrm{atom\text{-}BCE}}
+    +0.3\mathcal{L}_{\mathrm{pose\text{-}reg}}
+    +0.4\mathcal{L}_{\mathrm{pose\text{-}BCE}}
+    \nonumber\\
+    &+
+    0.1\mathcal{L}_{\mathrm{rank}}
+    +1.0\mathcal{L}_{\mathrm{success\text{-}listwise}}.
+    \label{eq:confidence_loss}
+\end{align}
+The exact targets and pointwise, pairwise, and listwise reductions are given
+in Appendix~\ref{app:confidence_loss_details}. The deployable default selects
+the pose with minimum predicted RMSD. These predictions are used only for
+within-set ranking and are not claimed to be calibrated RMSD estimates across
+datasets or sampling distributions. A historical composite selector is
+retained solely for exact compatibility analyses and is reported separately.

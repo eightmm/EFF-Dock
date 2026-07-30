@@ -1,0 +1,180 @@
+{
+  "name": "EFF-Interaction-v1-diagnostic",
+  "version": "1.3.0",
+  "energy_unit": "kcal/mol",
+  "distance_unit": "angstrom",
+  "formula_version": "effdock-interaction-diagnostic-4",
+  "claim": "Differentiable hydrophobic-contact, idealized missing-valence-cone heavy-atom hydrogen-bond, and screened formal-charge-group guidance. This is a pose-guidance diagnostic, not explicit-hydrogen geometry, partial-charge electrostatics, solvation, affinity, free energy, or an external docking-score implementation.",
+  "active_terms": [
+    "hydrophobic",
+    "hydrogen_bond",
+    "screened_formal_charge"
+  ],
+  "functional_form": {
+    "hydrophobic_contact": "q_ij = quintic_switch(r_ij; contact_on, cutoff)",
+    "hydrogen_bond_contact": "q_DA = exp(-0.5*((r_DA-r0)/sigma_r)^2) * quintic_switch(r_DA; switch_distance, cutoff) * cone_gate(cos_D; target_D, donor_half_width) * cone_gate(cos_A; target_A, acceptor_half_width) * axis_quality_D * axis_quality_A",
+    "screened_formal_charge": "R_a = sum_i(W_ai*x_i); rho_ab = sqrt(||R_a-R_b||^2 + alpha^2); E_ab = (k_e/epsilon_r)*Q_a*Q_b*exp(-kappa*rho_ab)*Q5((r_off^2-||R_a-R_b||^2)/(r_off^2-r_on^2))/rho_ab",
+    "site_saturation": "q_ij is clamped to [0,1] before q_i = 1 - product_j(1 - (1-delta)*q_ij); E = -epsilon*sum_i(q_i), with ligand hydrophobes or hydrogen-bond donors as the saturated sites",
+    "direction_proxy": "axis = normalize(sum_heavy_neighbor(normalize(atom_coordinate - neighbor_coordinate))); the target cosine around this axis is derived from an idealized linear, trigonal, or tetrahedral missing-valence cone",
+    "cone_targets": "linear degree 1: 1; trigonal degree 1/2: 0.5/1; tetrahedral degree 1/2/3: 1/3, 1/sqrt(3), 1",
+    "cone_gate": "C2 quintic rise/fall around target cosine with an angular half-width; compactly zero outside the target cone window",
+    "axis_quality": "Each normalized heavy-bond direction is multiplied by a C2 bond-length quality. rho = norm(sum weighted bond directions); site_quality = product(bond_quality) * Q5((rho-zero_below)/(full_above-zero_below)); the H-bond pair weight is multiplied by donor and acceptor site quality",
+    "combined_guidance": "GuidanceEnergy = PhysicalEnergy + InteractionEnergy"
+  },
+  "defaults": {
+    "hydrophobic_epsilon": 0.25,
+    "hydrophobic_contact_on_angstrom": 3.5,
+    "hydrophobic_cutoff_angstrom": 4.5,
+    "hydrogen_bond_epsilon": 1.0,
+    "hydrogen_bond_optimal_distance_angstrom": 2.9,
+    "hydrogen_bond_distance_sigma_angstrom": 0.35,
+    "hydrogen_bond_switch_distance_angstrom": 3.5,
+    "hydrogen_bond_cutoff_angstrom": 4.1,
+    "hydrogen_bond_donor_cone_half_width_degrees": 60.0,
+    "hydrogen_bond_acceptor_cone_half_width_degrees": 45.0,
+    "formal_charge_coulomb_constant_kcal_mol_angstrom_per_e2": 332.06371,
+    "formal_charge_relative_dielectric": 78.5,
+    "formal_charge_screening_kappa_per_angstrom": 0.127,
+    "formal_charge_softcore_angstrom": 0.75,
+    "formal_charge_switch_distance_angstrom": 8.0,
+    "formal_charge_cutoff_angstrom": 10.0,
+    "direction_epsilon_angstrom": 1e-08,
+    "direction_quality_zero_below": 0.1,
+    "direction_quality_full_above": 0.4,
+    "bond_direction_quality_zero_below_angstrom": 0.1,
+    "bond_direction_quality_full_above_angstrom": 0.5
+  },
+  "ligand_smarts": {
+    "donor": [
+      "[N;!H0;+0]",
+      "[N;!H0;+1]",
+      "[nH;+0]",
+      "[O;H1;+0]"
+    ],
+    "acceptor": [
+      "[n;+0;!X3;!$([nH])]",
+      "[N;H0;+0;v3;!$(N-C=O);!$(N-S(=O)=O)]",
+      "[N;H0;+0;$([N]#[C])]",
+      "[O;H0;v2;!$(O=N-*)]",
+      "[O;-;!$(*-N=O)]",
+      "[o;+0]",
+      "[O;H1;+0;v2;!$([O;H1]-[C,S,P]=O)]"
+    ],
+    "hydrophobe": [
+      "[#6;+0;!$([#6]~[#7,#8,#9])]"
+    ]
+  },
+  "ligand_delocalized_charge_groups": [
+    {
+      "name": "carboxylate",
+      "smarts": "[O-:1]-[C:2](=[O:3])",
+      "member_atom_maps": [
+        1,
+        3
+      ],
+      "total_charge_e": -1.0
+    },
+    {
+      "name": "guanidinium",
+      "smarts": "[N:1]-[C:2](=[N+:3])-[N:4]",
+      "member_atom_maps": [
+        1,
+        3,
+        4
+      ],
+      "total_charge_e": 1.0
+    },
+    {
+      "name": "amidinium",
+      "smarts": "[N:1]-[C:2]=[N+:3]",
+      "member_atom_maps": [
+        1,
+        3
+      ],
+      "total_charge_e": 1.0
+    }
+  ],
+  "protein_charge_groups": [
+    {
+      "normalized_residue_name": "ARG",
+      "raw_residue_names": [
+        "ARG"
+      ],
+      "member_atom_names": [
+        "NE",
+        "NH1",
+        "NH2"
+      ],
+      "total_charge_e": 1.0
+    },
+    {
+      "normalized_residue_name": "LYS",
+      "raw_residue_names": [
+        "LYS"
+      ],
+      "member_atom_names": [
+        "NZ"
+      ],
+      "total_charge_e": 1.0
+    },
+    {
+      "normalized_residue_name": "ASP",
+      "raw_residue_names": [
+        "ASP"
+      ],
+      "member_atom_names": [
+        "OD1",
+        "OD2"
+      ],
+      "total_charge_e": -1.0
+    },
+    {
+      "normalized_residue_name": "GLU",
+      "raw_residue_names": [
+        "GLU"
+      ],
+      "member_atom_names": [
+        "OE1",
+        "OE2"
+      ],
+      "total_charge_e": -1.0
+    },
+    {
+      "normalized_residue_name": "HIS",
+      "raw_residue_names": [
+        "HIP"
+      ],
+      "member_atom_names": [
+        "ND1",
+        "NE2"
+      ],
+      "total_charge_e": 1.0
+    }
+  ],
+  "typing_policy": {
+    "ligand": "Versioned single-atom SMARTS evaluated once with RDKit on the sanitized heavy-atom graph; energy evaluation does not call RDKit.",
+    "protein": "Versioned canonical standard-amino-acid atom-name tables, expected heavy degree, and canonical heavy-atom bonds; no protein SMARTS or bond-order inference from PDB distance. A degree mismatch, free terminus, chain gap, or missing required neighbor fails closed. Explicit mapped residue variants other than HID/HIE/HIP are excluded from active interaction typing and reported.",
+    "hydrogen_bond_elements": [
+      "N",
+      "O"
+    ],
+    "hydrophobic_element_policy": "Only carbon is an active v1 hydrophobe. S, F, Cl, Br, and I are excluded so weak sulfur and future halogen-bond terms cannot be silently double counted.",
+    "hydrophobic_typing_asymmetry": "Ligand hydrophobes use a graph SMARTS exclusion around N/O/F, while receptor hydrophobes use a curated canonical residue/atom-name table. This is an intentional representation asymmetry; the two sides share a carbon-only boundary but not one atom-type ontology.",
+    "histidine_policy": "Explicit HID/HIE/HIP residue names are typed by their declared tautomer/protonation. Plain HIS has ambiguous protonation, so ND1 and NE2 are excluded from v1 hydrogen-bond candidates and counted in trace metadata.",
+    "missing_direction_policy": "A donor or acceptor without a non-degenerate canonical heavy-neighbor direction or a declared linear/trigonal/tetrahedral geometry is excluded from hydrogen-bond pairs.",
+    "direction_geometry_policy": "RDKit hybridization and heavy degree define ligand cone targets. Protein N/O cone targets use canonical atom-name geometry: Lys NZ and Ser/Thr hydroxyl O are tetrahedral; other admitted N/O sites are trigonal. These are idealized heavy-atom cones, not reconstructed hydrogen or lone-pair coordinates."
+    ,"ligand_formal_charge_policy": "The sanitized input molecule supplies integer formal charges and the complete protonation/tautomer boundary. Versioned carboxylate, guanidinium, and amidinium SMARTS collapse recognized resonance-equivalent atoms into one equally weighted group site; remaining nonzero formal charges are explicit atom-centered sites. Group membership cannot overlap and the site-charge sum must equal the input molecular formal charge."
+    ,"protein_formal_charge_policy": "Canonical complete side-chain groups only: ARG +1, LYS +1, ASP -1, GLU -1, and explicitly named HIP +1. HID/HIE are neutral; plain HIS, termini, mapped variants/PTMs, incomplete groups, cofactors, metals, and counterions receive no inferred charge and are reported or rejected by the receptor boundary."
+    ,"formal_charge_site_coordinate": "Each group coordinate is the equally weighted centroid of its declared member atoms. This avoids multiplying one residue charge across resonance-equivalent atoms and distributes the Torch gradient back to members by the same weights."
+  },
+  "provenance": {
+    "typing_reference": "RDKit SMARTS/FDef chemical-feature model, https://www.rdkit.org/docs/RDKit_Book.html",
+    "geometric_reference": "PLIP protein-ligand interaction geometry, DOI 10.1093/nar/gkv315",
+    "hydrophobic_distance_basis": "PLIP reports hydrophobic contacts using a 4.0 angstrom heavy-atom criterion; v1 uses a smooth 3.5-to-4.5 angstrom transition around that criterion.",
+    "hydrogen_bond_distance_basis": "PLIP reports hydrogen bonds up to 4.1 angstrom with a donor-angle criterion; v1 uses a smooth radial cutoff. Because hydrogens are absent, directionality uses broad idealized missing-valence cones rather than treating the opposite heavy-neighbor axis as a hydrogen coordinate.",
+    "screened_formal_charge_basis": "Lee, Fitch, and Garcia-Moreno, Protein Science 11 (2002), DOI 10.1110/ps.4700102, motivates a Debye-Huckel-screened pairwise Coulomb diagnostic and the 25 C water dielectric. kappa=0.127 per angstrom is the rounded value for 0.15 M monovalent ionic strength, 298.15 K, and epsilon_r=78.5. The unit-converted Coulomb prefactor is derived from NIST 2022 CODATA constants.",
+    "formal_charge_limitations": "This is an input-state formal-charge-group proxy. It omits partial charges, pKa inference, dielectric heterogeneity, desolvation, polarization, receptor relaxation, cofactors, metals, counterions, and ionic-strength variation.",
+    "coefficient_status": "The epsilon and cone-width values are preregistered EFF-Dock diagnostic guidance priors. Axis and bond-quality thresholds were fixed from numerical-stability review before the final frozen Astex traces. They were not fitted to Astex, PoseBusters, crystal energies, RMSD, affinity, or Vina.",
+    "external_engine_policy": "No external scoring or force-field engine is used. RDKit is restricted to one-time ligand SMARTS typing; all coordinate-dependent values and gradients are computed in Torch."
+  }
+}

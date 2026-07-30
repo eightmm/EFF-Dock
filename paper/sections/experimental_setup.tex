@@ -1,0 +1,107 @@
+\section{Data, Training, and Evaluation}
+\label{sec:experiments}
+
+\subsection{Training data and split boundary}
+
+We use PLINDER 2024-06/v2 \citep{durairaj2024plinder}. The preserved processed
+pool contains 50,213 complexes. The current compatibility split contains
+47,310 training and 1,076 validation sample keys. Exact sample-key, canonical
+SMILES, and PLINDER pocket70-community overlaps between these two partitions
+are zero. Ligands contain between 5 and 120 heavy atoms and at most 30
+fragments; cropped receptors contain at least 50 residues.
+
+\paragraph{Draft scientific boundary.}
+The preserved split predates the final strict exclusion of canonical ligand
+SMILES from all three external benchmarks. We therefore describe the current
+external results as frozen compatibility diagnostics, not as evidence of
+prospective or chemically novel generalization. A publishable retraining claim
+requires the strict split manifest and leakage audit described in the project
+data contract.
+
+\subsection{Optimization}
+
+The current geometry training recipe uses six equivariant layers, scalar width
+384, 32 channels for each \(l=1\) parity, 16 channels for each \(l=2\)
+parity, 32 radial basis functions, dropout 0.1, and a \(5\,\angstrom\)
+dynamic-contact cutoff. We use AdamW with learning rate \(3\times10^{-4}\),
+weight decay 0.01, gradient-norm clipping at 1.0, and a warmup--stable--cosine
+schedule over at most 200,000 updates. The per-rank batch size is 64,
+size-aware batching balances variable graph sizes, and exponential moving
+average weights use decay 0.999. Automatic mixed precision is disabled for the
+current fused equivariant kernels; TF32 is enabled.
+
+The promoted geometry checkpoint contains approximately \(5.72\) million
+learned parameters, excluding serialized equivariant-operator constants. The
+separate confidence checkpoint contains approximately \(9.40\) million
+parameters, for a combined inference stack of approximately \(15.12\) million
+parameters.
+
+The confidence model is trained on 4,096 PLINDER complexes with pose sets
+generated under the matched \(M=80\), 25-step, \(\sigma=0.5\,\angstrom\),
+\(10\,\angstrom\)-pocket protocol. Training uses at most 80 poses per
+complex, four confidence interaction layers, hidden width 512, and the loss in
+Eq.~\eqref{eq:confidence_loss}. External benchmark labels are not used for
+confidence training, checkpoint selection, or hyperparameter selection. The
+retained checkpoint is step 42,500; subsequent registered fine-tuning
+experiments did not pass their PLINDER validation gate.
+
+\subsection{Frozen reference-pocket redocking}
+
+We evaluate on Astex Diverse (85 complexes)
+\citep{hartshorn2007astex}, PoseBusters v2 (308 complexes)
+\citep{buttenschoen2024posebusters}, and the CASF-2016 scoring set (285
+complexes) \citep{su2019casf}. In this diagnostic, the pocket center is derived
+from receptor residue virtual nodes lying within \(8\,\angstrom\) of the
+reference ligand. The reference ligand is removed before sampling and its
+coordinates are subsequently used only to compute the evaluation label. The
+model receives canonical ligand chemistry, the cleaned receptor, and the
+frozen pocket center. Because the site is target-derived, these numbers do not
+measure blind pocket finding.
+
+For every complex, we sample the same 80 poses with 25 ODE steps,
+\(\sigma=0.5\,\angstrom\), a \(10\,\angstrom\) pocket crop, no refinement,
+and base seed 42 with deterministic complex-ID offsets. We compare:
+(i) the first generated pose; (ii) Vina plus the ligand distance-geometry
+strain term \citep{trott2010vina}; (iii) pure learned confidence;
+(iv) the frozen historical composite selector; and (v) the minimum-RMSD
+oracle among the same 80 poses. The oracle uses the reference label and is
+reported only as a sampling-coverage upper bound.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{protein_pocket_context.png}
+    \caption{Explicit-pocket inference boundary illustrated on Astex 1T46.
+    The supplied center defines a residue-aware \(10\,\angstrom\) receptor
+    crop. The reference ligand is shown only to explain this diagnostic; it is
+    removed before sampling. Because the center is target-derived, the
+    experiment measures redocking robustness rather than pocket discovery.}
+    \label{fig:pocket_context}
+\end{figure}
+
+\subsection{Pocket crop and center perturbation}
+
+We characterize the promoted model under the pre-registered V2
+pocket-sensitivity protocol. The docking and
+confidence checkpoints, 80-candidate budget, 25-step integrator,
+\(\sigma=0.5\,\angstrom\), and per-complex random stream are fixed. We vary
+the receptor crop radius over \(\{6,8,10,12\}\,\angstrom\) and perturb each
+reference-defined center by isotropic Gaussian noise with standard deviation
+\(\{0,1,2\}\,\angstrom\). The 1 and \(2\,\angstrom\) perturbations for one
+complex share a direction, enabling within-complex interpretation of the
+perturbation magnitude. All 24 dataset--condition runs cover all 85 Astex and
+308 PoseBusters complexes without unresolved failures. This study
+characterizes robustness only; external benchmark outcomes are not used to
+select a new default crop radius.
+
+\subsection{Metrics}
+
+The primary pose metric is top-1 symmetry-aware heavy-atom RMSD success below
+\(2\,\angstrom\). We additionally report median RMSD, oracle top-80 success,
+failure rate, and official PoseBusters validity excluding the RMSD criterion.
+Sampling coverage and top-1 selection are reported separately: an oracle
+success is not a deployable docking success. Likewise, a docking score is used
+for within-candidate selection and is not interpreted as binding affinity.
+For primary complex-level success proportions we report 95\% Wilson intervals
+where space permits. These intervals describe finite benchmark-set
+uncertainty; they do not replace variability across training or sampling
+seeds, which has not yet been measured for the promoted stack.

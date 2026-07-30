@@ -1,0 +1,281 @@
+{
+  "schema_version": "effdock.guidance_charge_benchmark_characterization.v1",
+  "created_date": "2026-07-30",
+  "protocol_id": "EFFDOCK-INTERACTION-GUIDANCE-V1",
+  "stage": "1B_external_fixed_coordinate_characterization",
+  "status": "complete_report_only",
+  "scientific_result": true,
+  "claim_boundary": {
+    "external_benchmarks_consumed_for_tuning": false,
+    "allowed": [
+      "formal-charge-site coverage",
+      "strict chemistry support",
+      "fixed-coordinate energy and force diagnostics",
+      "descriptive frozen-candidate pose-margin and ranking changes"
+    ],
+    "forbidden": [
+      "formula selection",
+      "constant or scale fitting",
+      "schedule or force-cap selection",
+      "term retention or removal",
+      "sampler activation"
+    ],
+    "production_activation_gate": "internal held-out validation only; currently PLINDER validation",
+    "development_reclassification_rule": "If an external outcome is used for any forbidden decision, the consumed subset becomes development data and cannot support a blind benchmark claim."
+  },
+  "method": {
+    "eligibility": "any sanitized ligand atom has nonzero integer formal charge",
+    "net_molecular_charge_used_for_selection": false,
+    "reason": "net molecular charge misses net-neutral zwitterions with nonzero formal-charge sites",
+    "selection_order": "sanitize and charge-site inventory, then strict 10 A crystal-shell chemistry support, all before energy or RMSD inspection",
+    "coordinate_policy": "no relaxation; identical frozen coordinates for baseline and augmented energy",
+    "candidate_mapping": "full strict substructure match plus mapped atom/formal-charge/aromatic and bond/order/aromatic graph equality",
+    "baseline_terms": [
+      "hydrophobic",
+      "hydrogen_bond"
+    ],
+    "augmented_terms": [
+      "hydrophobic",
+      "hydrogen_bond",
+      "screened_formal_charge"
+    ],
+    "ranking": "argmin interaction energy; this is not the deployed confidence selector",
+    "correct_pose": "frozen SDF RMSD < 2.0 A",
+    "margin": "min_wrong(E) - min_correct(E)",
+    "delta_margin": "margin_augmented - margin_baseline",
+    "device": "cpu",
+    "dtype": "float64",
+    "runtime": {
+      "torch": "2.10.0+cu130",
+      "rdkit": "2025.09.5"
+    }
+  },
+  "implementation": {
+    "script": "scripts/analyze_charge_guidance_benchmarks.py",
+    "script_sha256": "d66e596f70aef430f6017db4f74910d6a45f33d63bb9f5415ed84594eecbffe0",
+    "focused_test": "tests/test_charge_benchmark_analysis.py",
+    "focused_test_sha256": "3e24d61f38980d7c30ef1a1edfc4fd97dbbe6bbcee18dd27bfbb2f3dcfb573e4",
+    "interaction_parameters": "src/effdock/guidance/parameters/interaction_v1.json",
+    "interaction_parameters_sha256": "ef1daf16ac33863232ecfc5e5cb8ad088393ccaa4fbebfeac5f0a5461403d7dc",
+    "executed_command": ".venv/bin/python scripts/analyze_charge_guidance_benchmarks.py --output /tmp/effdock_charge_benchmark_v4.json",
+    "reproduction_command": "uv run python scripts/analyze_charge_guidance_benchmarks.py --output outputs/guidance/formal_charge_benchmark_v4.json"
+  },
+  "coverage": {
+    "posebusters_v2": {
+      "root": "data/external_benchmarks/data/posebusters_benchmark_set",
+      "complexes": 308,
+      "full_sanitize_ok": 308,
+      "ids_sha256": "a69a7b6b9a5a52531933078ef983e6c069e3a987a1d7a733bd7d72cbe1793de6",
+      "formal_charge_site_bearing": 15,
+      "site_bearing_net_neutral": 6,
+      "strict_chemistry_supported": 5,
+      "strict_supported_ids": [
+        "6Z14_Q4Z",
+        "7JMV_4NC",
+        "7M6K_YRJ",
+        "7RH3_59O",
+        "7V14_ORU"
+      ],
+      "strict_supported_ids_sha256": "9884c9222a37ecda6b27ef655fd814ff5951b8da16d9cfc93e2f7993b40604c6",
+      "strict_unsupported": {
+        "6YR2_T1C": [
+          "MG"
+        ],
+        "7A9H_TPP": [
+          "MG"
+        ],
+        "7JG0_GAR": [
+          "V97"
+        ],
+        "7NF3_4LU": [
+          "K",
+          "MN"
+        ],
+        "7OMX_CNA": [
+          "SCN"
+        ],
+        "7RZL_NPO": [
+          "EDO",
+          "FMN"
+        ],
+        "7TM6_GPJ": [
+          "S3P"
+        ],
+        "7TXK_LW8": [
+          "144"
+        ],
+        "7UMW_NAD": [
+          "NUC"
+        ],
+        "8B8H_OJQ": [
+          "CL"
+        ]
+      }
+    },
+    "astex_diverse": {
+      "root": "data/external_benchmarks/data/astex_diverse_set",
+      "complexes": 85,
+      "full_sanitize_ok": 85,
+      "ids_sha256": "7c2bc6702b62abe282bbd6f67146ec071c623cc3bd17d4683c1afd898b2df5ef",
+      "formal_charge_site_bearing": 5,
+      "site_bearing_net_neutral": 0,
+      "strict_chemistry_supported": 0,
+      "strict_unsupported": {
+        "1IG3_VIB": [
+          "SO4"
+        ],
+        "1MMV_3AR": [
+          "ACT",
+          "H4B",
+          "HEM"
+        ],
+        "1N2J_PAF": [
+          "SO4"
+        ],
+        "1OYT_FSN": [
+          "NA"
+        ],
+        "1Q1G_MTI": [
+          "SO4"
+        ]
+      }
+    }
+  },
+  "candidate_source": {
+    "root": "outputs/external_benchmarks/posebusters_latest_n40_s20_confidence_v1_conf200000_rerank_poses",
+    "poses_per_complex": 40,
+    "frozen_before_screened_charge_analysis": true
+  },
+  "results": {
+    "summary": {
+      "complexes_scored": 5,
+      "candidate_sets_with_both_correct_and_wrong": 3,
+      "median_delta_margin_kcal_mol": -0.010864139406160156,
+      "margin_nonloss_fraction": 0.3333333333333333,
+      "top_pose_unchanged": 4,
+      "top_pose_changed": 1,
+      "descriptive_frozen_gate_comparison": "The previously written positive-median and >=0.60 non-loss thresholds are not met. This external observation is not a sampler-activation decision."
+    },
+    "complexes": [
+      {
+        "complex_id": "6Z14_Q4Z",
+        "input_sha256": {
+          "ligand": "c0c8feddb54a72fa629185b0765a2a7198d6c4d31e95e7f6855ab5c39a600b26",
+          "protein": "7174197b0987a1b483e75c73ba603008f73a6f31223e463714a2a7ef6cb5f27b",
+          "candidates": "43de9d906f17b095cb7c881fbc92770137002c5e1b547f58ca90040bd1705c5c"
+        },
+        "correct_candidates": 12,
+        "crystal_charge_energy_kcal_mol": -1.190453176808449,
+        "crystal_active_charge_pairs": 10,
+        "crystal_attractive_pairs": 8,
+        "crystal_repulsive_pairs": 2,
+        "crystal_max_atom_charge_force_kcal_mol_per_angstrom": 0.3190218028989829,
+        "baseline_top_index": 1,
+        "baseline_top_rmsd_angstrom": 3.585057,
+        "augmented_top_index": 1,
+        "augmented_top_rmsd_angstrom": 3.585057,
+        "baseline_margin_kcal_mol": -0.3232900492496933,
+        "augmented_margin_kcal_mol": -1.1812492761642526,
+        "delta_margin_kcal_mol": -0.8579592269145593
+      },
+      {
+        "complex_id": "7JMV_4NC",
+        "input_sha256": {
+          "ligand": "3d7cd8061f417f337ea84df11992e9449864dae6c66d9efdbff59407d788079c",
+          "protein": "e8e1dd5f6e7fb8cab68aa06548d3e480e265d3823290c09b6a03486cb14ab14f",
+          "candidates": "4c16cd0ee19bcd6ab8472ac78af1d60ac465a218ebb9ec415e09443845d01691"
+        },
+        "correct_candidates": 8,
+        "crystal_charge_energy_kcal_mol": -0.2819527537955223,
+        "crystal_active_charge_pairs": 6,
+        "crystal_attractive_pairs": 3,
+        "crystal_repulsive_pairs": 3,
+        "crystal_max_atom_charge_force_kcal_mol_per_angstrom": 0.38955975912364627,
+        "baseline_top_index": 30,
+        "baseline_top_rmsd_angstrom": 1.729227,
+        "augmented_top_index": 30,
+        "augmented_top_rmsd_angstrom": 1.729227,
+        "baseline_margin_kcal_mol": 0.275375531603375,
+        "augmented_margin_kcal_mol": 0.26451139219721487,
+        "delta_margin_kcal_mol": -0.010864139406160156
+      },
+      {
+        "complex_id": "7M6K_YRJ",
+        "input_sha256": {
+          "ligand": "b0f46b70083bd0142810b3af1a96bd9838e85958aba377f8abfe9a5690220304",
+          "protein": "95d621a492fabca2612ce4c0646c4d8b2b64946af8bf94328bb150270d0ea8bb",
+          "candidates": "d19e9a0376c21a3a4ff2652f19d04a29e45fba9dcdc3ee54f0cec240527a3362"
+        },
+        "correct_candidates": 0,
+        "crystal_charge_energy_kcal_mol": -0.1476514722932227,
+        "crystal_active_charge_pairs": 14,
+        "crystal_attractive_pairs": 7,
+        "crystal_repulsive_pairs": 7,
+        "crystal_max_atom_charge_force_kcal_mol_per_angstrom": 0.203361858496268,
+        "baseline_top_index": 3,
+        "baseline_top_rmsd_angstrom": 9.398769,
+        "augmented_top_index": 3,
+        "augmented_top_rmsd_angstrom": 9.398769,
+        "baseline_margin_kcal_mol": null,
+        "augmented_margin_kcal_mol": null,
+        "delta_margin_kcal_mol": null
+      },
+      {
+        "complex_id": "7RH3_59O",
+        "input_sha256": {
+          "ligand": "6c843895a59cce96120228af6bb44923946260cdc4c7c46ab35f259634fb347c",
+          "protein": "d01e3c376c61274ff6499f8ba9f112923098a7b27063d30904c2468a67577d6b",
+          "candidates": "e465de242bf960aa6988ef08317512e3774495cbe590a423b09761cd479a6580"
+        },
+        "correct_candidates": 0,
+        "crystal_charge_energy_kcal_mol": 0.12045921310363353,
+        "crystal_active_charge_pairs": 14,
+        "crystal_attractive_pairs": 7,
+        "crystal_repulsive_pairs": 7,
+        "crystal_max_atom_charge_force_kcal_mol_per_angstrom": 0.10523362854597139,
+        "baseline_top_index": 23,
+        "baseline_top_rmsd_angstrom": 6.384374,
+        "augmented_top_index": 2,
+        "augmented_top_rmsd_angstrom": 3.839716,
+        "baseline_margin_kcal_mol": null,
+        "augmented_margin_kcal_mol": null,
+        "delta_margin_kcal_mol": null
+      },
+      {
+        "complex_id": "7V14_ORU",
+        "input_sha256": {
+          "ligand": "04b8a101048ccf87b591ab9477d1bda5e60e5deb69b58a80148f69d3df86d0ba",
+          "protein": "381f13e5c03a4a704fe2c226b976448d5061fc61c8a8e9e9b8cfc249322f134c",
+          "candidates": "b68870a552e2659e53f30e26c02cd63a0343edfd477ba958676c62e36504baed"
+        },
+        "correct_candidates": 12,
+        "crystal_charge_energy_kcal_mol": 0.0015496638030398913,
+        "crystal_active_charge_pairs": 8,
+        "crystal_attractive_pairs": 5,
+        "crystal_repulsive_pairs": 3,
+        "crystal_max_atom_charge_force_kcal_mol_per_angstrom": 0.21082980674455187,
+        "baseline_top_index": 11,
+        "baseline_top_rmsd_angstrom": 1.373756,
+        "augmented_top_index": 11,
+        "augmented_top_rmsd_angstrom": 1.373756,
+        "baseline_margin_kcal_mol": 0.049683523276153,
+        "augmented_margin_kcal_mol": 0.06721916948517892,
+        "delta_margin_kcal_mol": 0.017535646209025924
+      }
+    ]
+  },
+  "interpretation": {
+    "screened_charge_diagnostic": "finite and chemically interpretable on all five supported crystal complexes",
+    "candidate_ranking": "top pose is unchanged in four of five complexes; 7RH3_59O moves from 6.384 A to 3.840 A but remains above 2 A",
+    "pose_margin": "one of three computable margins improves and two worsen; the median change is slightly negative",
+    "term_status": "retain as a separately traced physical diagnostic; do not activate it in the production sampler from this result",
+    "next_step": "run the unchanged term on a frozen internal held-out set before any sampler activation; do not tune screened-charge constants from Astex or PoseBusters"
+  },
+  "limitations": [
+    "Only five charged PoseBusters complexes pass the current strict chemistry contract.",
+    "Two of the five frozen candidate sets contain no RMSD < 2 A pose, so candidate margin is defined for only three complexes.",
+    "Astex contributes coverage and fail-closed evidence but no scoreable complex under the current cofactor/ion policy.",
+    "Interaction-energy argmin is a diagnostic ranking and is not the deployed confidence-based top-1 selector.",
+    "This characterization cannot estimate overall PoseBusters or Astex docking performance."
+  ]
+}

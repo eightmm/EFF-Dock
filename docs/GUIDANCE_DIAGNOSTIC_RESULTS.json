@@ -1,0 +1,495 @@
+{
+  "schema_version": "effdock.guidance_diagnostic_results.v3",
+  "date": "2026-07-29",
+  "protocol_id": "EFFDOCK-GUIDANCE-DIAGNOSTIC-V3",
+  "scope": {
+    "status": "diagnostic_only",
+    "guidance_energy": "PhysicalEnergy + InteractionEnergy",
+    "sampler_coupling": false,
+    "crystal_optimization": false,
+    "vina": "excluded_from_guidance",
+    "external_engine": null,
+    "reference_geometry": "sanitized input ligand conformer",
+    "selection_policy": "Astex structures are chemistry-boundary and energy/force diagnostics only; no value in this file was used to fit coefficients, gates, or admission policy."
+  },
+  "parameter_set": {
+    "schema_version": "effdock.guidance_parameter_set.v1",
+    "name": "EFF-Dock-Guidance",
+    "version": "1.0.0",
+    "formula_version": "physical-v2_plus_interaction-v1",
+    "sha256": "41d493fe93077b49a2eb039466febe0d140ab7422887f090669e130d86bb1bca",
+    "energy_unit": "kcal/mol",
+    "distance_unit": "angstrom",
+    "claim": "Unified self-contained diagnostic GuidanceEnergy = PhysicalEnergy + InteractionEnergy; Vina is excluded.",
+    "physical": {
+      "name": "EFF-FF-v2-diagnostic",
+      "version": "2.0.0",
+      "formula_version": "effff-diagnostic-2",
+      "sha256": "4e65d5c629005c474e1cd107218416beaf035c27e59a817e4baaa7b02b16631e",
+      "energy_unit": "kcal/mol",
+      "distance_unit": "angstrom",
+      "claim": "Input-reference cut-interface ligand geometry plus normalized cut-bond torsions and heavy-atom soft-core UFF-style Lennard-Jones; no AMBER, GAFF, OpenFF, UFF, or MMFF compatibility claim."
+    },
+    "interaction": {
+      "name": "EFF-Interaction-v1-diagnostic",
+      "version": "1.2.0",
+      "formula_version": "effdock-interaction-diagnostic-3",
+      "sha256": "70dccd8d358b40f4af70b17e6d4bca8e7020c7f01ec2268f3d3bafc94bb4ada0",
+      "energy_unit": "kcal/mol",
+      "distance_unit": "angstrom",
+      "claim": "Differentiable hydrophobic-contact and idealized missing-valence-cone heavy-atom hydrogen-bond guidance. This is a pose-guidance diagnostic, not explicit-hydrogen geometry, affinity, free energy, or an external docking-score implementation."
+    }
+  },
+  "implementation": {
+    "sha256": "77e9a7729969df2f0adae6716e03f41724e196a782e02afe0232e11dbed204fa",
+    "identity_rule": "SHA-256 over exact active guidance, trace workflow, CLI, ligand/fragment/protein preprocessing files and parameter tables, plus the recorded RDKit and Torch versions.",
+    "package": "src/effdock/guidance",
+    "layout": "one flat GuidanceEnergy assembled from physical and interaction leaf terms",
+    "runtime_versions": {
+      "rdkit": "2025.09.5",
+      "torch": "2.10.0+cu130"
+    }
+  },
+  "guidance_layers": {
+    "physical": {
+      "status": "active_diagnostic",
+      "active_terms": [
+        "ligand_intra_bond",
+        "ligand_intra_angle",
+        "ligand_intra_proper",
+        "ligand_intra_improper",
+        "ligand_intra_lj_repulsive",
+        "ligand_intra_lj_attractive",
+        "protein_ligand_lj_repulsive",
+        "protein_ligand_lj_attractive"
+      ],
+      "inactive_terms": {
+        "electrostatic": "no provenance-tracked partial-charge contract",
+        "solvation": "no admitted self-contained solvation model",
+        "metal_coordination": "owned by InteractionEnergy and contract-only"
+      }
+    },
+    "interaction": {
+      "status": "active_diagnostic",
+      "active_terms": [
+        "hydrophobic",
+        "hydrogen_bond"
+      ],
+      "formula_version": "effdock-interaction-diagnostic-3",
+      "inactive_terms": [
+        "salt_bridge",
+        "pi_stacking",
+        "cation_pi",
+        "halogen_bond",
+        "metal_coordination"
+      ],
+      "direction_model": "bond-quality-weighted normalized-heavy-bond missing-valence cones with exact protein heavy-degree declarations, donor/acceptor C2 angular gates, and C2 axis-cancellation suppression",
+      "external_engine": null,
+      "vina": "excluded_from_guidance",
+      "metal_coordination": "contract_only_inactive"
+    }
+  },
+  "configuration": {
+    "device": "cpu",
+    "dtype": "float64",
+    "protein_shell_cutoff_angstrom": 10.0,
+    "energy_config": {
+      "physical": {
+        "softcore": 0.75,
+        "switch_distance": 6.0,
+        "cutoff": 8.0,
+        "protein_chunk_size": 512
+      },
+      "interaction": {
+        "active_terms": [
+          "hydrophobic",
+          "hydrogen_bond"
+        ],
+        "hydrophobic_epsilon": 0.25,
+        "hydrophobic_contact_on": 3.5,
+        "hydrophobic_cutoff": 4.5,
+        "hydrogen_bond_epsilon": 1.0,
+        "hydrogen_bond_optimal_distance": 2.9,
+        "hydrogen_bond_distance_sigma": 0.35,
+        "hydrogen_bond_switch_distance": 3.5,
+        "hydrogen_bond_cutoff": 4.1,
+        "hydrogen_bond_donor_cone_half_width_degrees": 60.0,
+        "hydrogen_bond_acceptor_cone_half_width_degrees": 45.0,
+        "direction_quality_zero_below": 0.1,
+        "direction_quality_full_above": 0.4,
+        "bond_direction_quality_zero_below": 0.1,
+        "bond_direction_quality_full_above": 0.5,
+        "direction_epsilon": 1e-08
+      }
+    },
+    "crystal_perturbations": {
+      "cut_bond_stretch_angstrom": 0.5,
+      "cut_bond_torsion_degrees": 30.0,
+      "forced_overlap_distance_angstrom": 0.5
+    }
+  },
+  "supported_crystal_traces": [
+    {
+      "sample_id": "1G9V_RQ3",
+      "dataset": "Astex Diverse",
+      "selection_basis": "retained pre-registered clean-shell diagnostic; HEM and SO4 are outside every active shell coordinate",
+      "trace_artifact": {
+        "path": "outputs/guidance/astex_1G9V_crystal_trace.json",
+        "created_utc": "2026-07-29T13:15:49.191899+00:00",
+        "sha256": "dfc700b2a25195e2802b142f48c311a04ecd409792469240e41e880783bbca8f"
+      },
+      "inputs": {
+        "protein_sha256": "dc71ba98786c69b5a65b53ae1de9e867562bb678ed1bb060d9751dc64e1647d3",
+        "ligand_sha256": "a19636422c46fac0b75773a818195cd98f465ec4a86f54961062618826c155a4"
+      },
+      "topology": {
+        "physical_reference_sha256": "833e7b73443f190d855f73e062e7bef8e08984fedbec82605bbee9c672634650",
+        "interaction_reference_sha256": "478f909c4b7728a04c050efeeeb1f1ff868814d3a3c8210d24d55191a813b1b7"
+      },
+      "system": {
+        "ligand_heavy_atoms": 25,
+        "ligand_fragments": 5,
+        "protein_shell_heavy_atoms": 514,
+        "excluded_nonprotein_atoms_outside_active_shell": 182,
+        "excluded_nonprotein_residues_outside_active_shell": [
+          "HEM",
+          "SO4"
+        ],
+        "term_counts": {
+          "cut_bonds": 4,
+          "cross_fragment_angles": 14,
+          "torsion_cut_bonds": 4,
+          "torsion_quads": 13,
+          "cross_fragment_impropers": 3,
+          "interfragment_nonbonded_pairs": 221,
+          "protein_ligand_pairs": 12850
+        },
+        "interaction_term_counts": {
+          "ligand_donors": 2,
+          "ligand_acceptors": 3,
+          "ligand_hydrophobes": 15,
+          "protein_donors": 99,
+          "protein_acceptors": 101,
+          "protein_hydrophobes": 78,
+          "protein_ambiguous_histidine_atoms": 4,
+          "protein_unsupported_variant_atoms": 0,
+          "ligand_geometry_excluded_hbond_sites": 0,
+          "protein_geometry_excluded_hbond_sites": 2,
+          "hydrophobic_candidate_pairs": 1170,
+          "hydrogen_bond_candidate_pairs": 499
+        }
+      },
+      "crystal": {
+        "energies": {
+          "ligand_intra_bond": 0.0,
+          "ligand_intra_angle": 0.0,
+          "ligand_intra_proper": 2.6766154751075133,
+          "ligand_intra_improper": 0.3692439702229806,
+          "ligand_intra_lj_repulsive": 10.008496852920832,
+          "ligand_intra_lj_attractive": -9.66778539126931,
+          "protein_ligand_lj_repulsive": 5.792329095737555,
+          "protein_ligand_lj_attractive": -23.54698847253245,
+          "interaction_hydrophobic": -1.9831088345069992,
+          "interaction_hydrogen_bond": -0.04076232169283486,
+          "total": -16.391959626012714
+        },
+        "energy_groups": {
+          "physical": -14.36808846981288,
+          "interaction": -2.023871156199834,
+          "combined": -16.391959626012714
+        },
+        "minimum_protein_ligand_distance_angstrom": 3.223927573628167,
+        "minimum_distance_over_uff_x": 0.858732648237656,
+        "interaction_contacts": {
+          "hydrophobic": {
+            "nonzero_pairs": 25,
+            "weight_sum": 10.286872536988202,
+            "maximum_weight": 0.9960531798708769
+          },
+          "hydrogen_bond": {
+            "nonzero_pairs": 1,
+            "weight_sum": 0.04076232576906744,
+            "strongest_pair": {
+              "donor": "A:LYS99:NZ",
+              "acceptor": "15:O",
+              "distance_angstrom": 3.281262104739576,
+              "radial_gate": 0.5524958498591909,
+              "donor_cosine": 0.194600879212595,
+              "donor_target_cosine": 0.3333333333333333,
+              "donor_cone_gate": 0.9775145426660444,
+              "acceptor_cosine": 0.8628747480426753,
+              "acceptor_target_cosine": 0.5,
+              "acceptor_cone_gate": 0.075475623292476,
+              "donor_axis_quality": 1.0,
+              "acceptor_axis_quality": 1.0,
+              "weight": 0.04076232576906744
+            }
+          }
+        }
+      },
+      "perturbations": [
+        {
+          "pose_kind": "cut_bond_stretch",
+          "energy_groups": {
+            "physical": 4.612585561047979,
+            "interaction": -2.023871156199834,
+            "combined": 2.5887144048481447
+          },
+          "combined_delta_from_crystal": 18.980674030860857
+        },
+        {
+          "pose_kind": "cut_bond_torsion",
+          "energy_groups": {
+            "physical": -14.27530341852214,
+            "interaction": -2.023871156199834,
+            "combined": -16.299174574721974
+          },
+          "combined_delta_from_crystal": 0.09278505129073977
+        },
+        {
+          "pose_kind": "protein_ligand_overlap",
+          "energy_groups": {
+            "physical": 2331718.131217374,
+            "interaction": -2.0902045158426867,
+            "combined": 2331716.041012858
+          },
+          "combined_delta_from_crystal": 2331732.4329724843
+        }
+      ]
+    },
+    {
+      "sample_id": "1KE5_LS1",
+      "dataset": "Astex Diverse",
+      "selection_basis": "first lexicographic Astex replacement case with zero parsed nonprotein receptor records; selected by chemistry support before inspecting its energy",
+      "trace_artifact": {
+        "path": "outputs/guidance/astex_1KE5_crystal_trace.json",
+        "created_utc": "2026-07-29T13:15:48.690667+00:00",
+        "sha256": "b0ac3ec28d68a81f04369da8b4438c70313d34f4274eb97b5c992626a1cc6726"
+      },
+      "inputs": {
+        "protein_sha256": "3614cf375345a21e11d7f548229d2aad2aa0e81a015f7b2e4950e6241d5215d0",
+        "ligand_sha256": "66c14905dddae28f44a897c2657b5d223c2163721ca65ec292f8788c64854a7f"
+      },
+      "topology": {
+        "physical_reference_sha256": "8d3b356ca911609c25725edf860b0a6d751993af2718131bfdb162fff4da6854",
+        "interaction_reference_sha256": "9f86af4e1079adee8a879b8d36123627052835e31cc0c8bbd20b4cf2cc416182"
+      },
+      "system": {
+        "ligand_heavy_atoms": 23,
+        "ligand_fragments": 3,
+        "protein_shell_heavy_atoms": 426,
+        "excluded_nonprotein_atoms_outside_active_shell": 0,
+        "excluded_nonprotein_residues_outside_active_shell": [],
+        "term_counts": {
+          "cut_bonds": 2,
+          "cross_fragment_angles": 7,
+          "torsion_cut_bonds": 2,
+          "torsion_quads": 7,
+          "cross_fragment_impropers": 1,
+          "interfragment_nonbonded_pairs": 158,
+          "protein_ligand_pairs": 9798
+        },
+        "interaction_term_counts": {
+          "ligand_donors": 3,
+          "ligand_acceptors": 3,
+          "ligand_hydrophobes": 11,
+          "protein_donors": 70,
+          "protein_acceptors": 71,
+          "protein_hydrophobes": 87,
+          "protein_ambiguous_histidine_atoms": 4,
+          "protein_unsupported_variant_atoms": 0,
+          "ligand_geometry_excluded_hbond_sites": 0,
+          "protein_geometry_excluded_hbond_sites": 1,
+          "hydrophobic_candidate_pairs": 957,
+          "hydrogen_bond_candidate_pairs": 423
+        }
+      },
+      "crystal": {
+        "energies": {
+          "ligand_intra_bond": 0.0,
+          "ligand_intra_angle": 0.0,
+          "ligand_intra_proper": 0.5470388421684478,
+          "ligand_intra_improper": 0.44339505718800876,
+          "ligand_intra_lj_repulsive": 3.1249940797818234,
+          "ligand_intra_lj_attractive": -4.271332297561285,
+          "protein_ligand_lj_repulsive": 12.295373289783063,
+          "protein_ligand_lj_attractive": -36.12019776599748,
+          "interaction_hydrophobic": -1.9572248627402733,
+          "interaction_hydrogen_bond": -0.5770098421918021,
+          "total": -26.514963499569497
+        },
+        "energy_groups": {
+          "physical": -23.98072879463742,
+          "interaction": -2.5342347049320755,
+          "combined": -26.514963499569497
+        },
+        "minimum_protein_ligand_distance_angstrom": 2.8915589221041316,
+        "minimum_distance_over_uff_x": 0.8078997646145994,
+        "interaction_contacts": {
+          "hydrophobic": {
+            "nonzero_pairs": 36,
+            "weight_sum": 14.468407375376232,
+            "maximum_weight": 1.0
+          },
+          "hydrogen_bond": {
+            "nonzero_pairs": 5,
+            "weight_sum": 0.5770098998927919,
+            "strongest_pair": {
+              "donor": "A:ASP86:N",
+              "acceptor": "19:O",
+              "distance_angstrom": 3.324154027718933,
+              "radial_gate": 0.47983508204762304,
+              "donor_cosine": 0.9766726418862777,
+              "donor_target_cosine": 1.0,
+              "donor_cone_gate": 0.9990542259023784,
+              "acceptor_cosine": 0.6583361277123456,
+              "acceptor_target_cosine": 0.5,
+              "acceptor_cone_gate": 0.780404099774746,
+              "donor_axis_quality": 1.0,
+              "acceptor_axis_quality": 1.0,
+              "weight": 0.3741111056973882
+            }
+          }
+        }
+      },
+      "perturbations": [
+        {
+          "pose_kind": "cut_bond_stretch",
+          "energy_groups": {
+            "physical": -3.9614833787348402,
+            "interaction": -2.4091265763462557,
+            "combined": -6.370609955081096
+          },
+          "combined_delta_from_crystal": 20.1443535444884
+        },
+        {
+          "pose_kind": "cut_bond_torsion",
+          "energy_groups": {
+            "physical": 414.74351092658236,
+            "interaction": -2.7395361608032536,
+            "combined": 412.0039747657791
+          },
+          "combined_delta_from_crystal": 438.5189382653486
+        },
+        {
+          "pose_kind": "protein_ligand_overlap",
+          "energy_groups": {
+            "physical": 1047224.1050338539,
+            "interaction": -2.415689121559379,
+            "combined": 1047221.6893447323
+          },
+          "combined_delta_from_crystal": 1047248.204308232
+        }
+      ]
+    }
+  ],
+  "structured_unsupported_traces": [
+    {
+      "sample_id": "1HNN_SKF",
+      "dataset": "Astex Diverse",
+      "trace_artifact": {
+        "path": "outputs/guidance/astex_1HNN_crystal_trace.json",
+        "created_utc": "2026-07-29T13:15:47.793086+00:00",
+        "sha256": "b47d4471f985707bebf2ddb32bbd51540bd43639dece5cdbbcb0e5c54b4216a9"
+      },
+      "inputs": {
+        "protein_sha256": "cf19c7987c3f7672e78c8dcb044a68732f32ce0a78f48b432ddef6df0fa98f19",
+        "ligand_sha256": "ede839f05e4f85fc7a75ea5eb2252ea9504e7d60f808c912036907ff0c2d6743"
+      },
+      "supported": false,
+      "failure": {
+        "code": "active_nonprotein_residue",
+        "residue_names": [
+          "SAH"
+        ],
+        "record_types": [
+          "ATOM"
+        ]
+      },
+      "interpretation": "SAH is an active cofactor but has no admitted self-contained topology/typing contract. PDB ATOM formatting cannot silently turn it into a generic protein LJ receptor."
+    },
+    {
+      "sample_id": "1GKC_NFH",
+      "dataset": "Astex Diverse",
+      "trace_artifact": {
+        "path": "outputs/guidance/astex_1GKC_unsupported.json",
+        "created_utc": "2026-07-29T13:15:48.107405+00:00",
+        "sha256": "4368db9d4080a8a853c830a5d717fc3ae38e35a2da0b8d32636bfca73dc39fb6"
+      },
+      "inputs": {
+        "protein_sha256": "b7a9b45f33eead4ea9abebc3d6f69071aa829a9ea86b76d8b0f9f895a6b21a89",
+        "ligand_sha256": "f76a6df958ea4c92023615d5ed97d683dbeb165bdb8407044fef9f6e51ae39eb"
+      },
+      "supported": false,
+      "failure": {
+        "code": "active_nonprotein_residue",
+        "residue_names": [
+          "CA",
+          "ZN"
+        ],
+        "record_types": [
+          "HETATM"
+        ]
+      },
+      "interpretation": "Metal coordination remains contract-only, so active calcium/zinc cannot be treated as generic protein atoms or silently removed."
+    }
+  ],
+  "diagnostic_interpretation": [
+    "Input-reference cut-bond and cross-fragment angle energies are zero on the same sanitized input conformer by construction; this is not a force-field equilibrium claim.",
+    "The interaction term records strongest nonzero atom pairs and nearest radial candidates, including distance, radial gate, donor/acceptor cone cosine and target, cone gates, per-site bond/axis quality, and final weight so both accepted and rejected crystal contacts are auditable.",
+    "Forced-overlap and torsion states are adversarial diagnostics, not optimized poses or physical free energies; large positive physical energy is the expected clash response.",
+    "Absolute physical, interaction, and combined values are not binding affinity and are not benchmark success metrics.",
+    "1HNN was demoted from a provisional supported trace after the receptor-boundary audit found active SAH admitted only by its ATOM record type; the provisional energy is not an admitted result."
+  ],
+  "verification": {
+    "focused_guidance_pre_freeze": {
+      "command": ".venv/bin/pytest -q tests/test_interaction_energy.py tests/test_physical_energy.py tests/test_physical_diagnostics.py -k 'not frozen'",
+      "result": "49 passed"
+    },
+    "formula_and_boundary_reviews": {
+      "result": "C2 missing-valence cone, exact protein degree, per-bond and axis-quality stability, float32-bounded soft-OR, explicit residue-state fail-closed policy, and record-type-independent receptor admission reviewed; no remaining P1 blocker"
+    },
+    "final_full_suite": {
+      "command": ".venv/bin/pytest -q",
+      "result": "169 passed, 3 skipped; 2 expected cuequivariance fallback warnings"
+    },
+    "lint": {
+      "command": ".venv/bin/ruff check src/effdock/guidance src/effdock/workflows/trace_physical.py tests/test_interaction_energy.py tests/test_physical_diagnostics.py",
+      "result": "passed"
+    },
+    "remaining_before_production_ode_coupling": [
+      "Independent immutable golden energy and force fixtures beyond self-generated crystal traces",
+      "PLINDER validation without external-test tuning",
+      "Operator-split trust-region descent and rejection corrector",
+      "Schedule, caps, and mobility calibration on PLINDER validation",
+      "Ablation of physical-only, each interaction term, and their combination"
+    ]
+  },
+  "commands": {
+    "crystal": "eff-dock physical trace --protein <protein.pdb> --ligand <input_ligand.sdf> --output outputs/guidance/<sample>_crystal_trace.json --device cpu",
+    "saved_trajectory": "eff-dock physical trace --protein <protein.pdb> --ligand <input_ligand.sdf> --results <results.pt> --frame-stride 1 --output outputs/guidance/<sample>_trajectory_trace.json --device cpu"
+  },
+  "external_benchmark_policy": "These Astex structures validate diagnostics and structured failure behavior only. They do not tune parameters, schedules, caps, term admission, or model selection.",
+  "references": [
+    {
+      "topic": "UFF nonbonded constants and form",
+      "doi": "10.1021/ja00051a040"
+    },
+    {
+      "topic": "RDKit SMARTS and chemical feature definitions",
+      "url": "https://www.rdkit.org/docs/RDKit_Book.html"
+    },
+    {
+      "topic": "PLIP protein-ligand interaction geometry",
+      "doi": "10.1093/nar/gkv315"
+    },
+    {
+      "topic": "orientation-dependent hydrogen-bond potential",
+      "doi": "10.1016/S0022-2836(03)00021-4"
+    },
+    {
+      "topic": "zinc-specific docking precedent for the inactive metal contract",
+      "doi": "10.1021/ci500209e"
+    }
+  ]
+}

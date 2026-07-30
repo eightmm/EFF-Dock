@@ -6,9 +6,14 @@ import pytest
 import torch
 from rdkit import Chem
 
+from effdock.inference.preprocess import load_ligand
 from effdock.preprocess.fragments import decompose_fragments
 from effdock.preprocess.graph import build_static_complex_graph
-from effdock.preprocess.ligand import featurize_ligand, load_molecule
+from effdock.preprocess.ligand import (
+    featurize_ligand,
+    ligand_graph_identity,
+    load_molecule,
+)
 from effdock.preprocess.protein import AA3_TO_IDX, parse_pocket_atoms, parse_pocket_pdb
 
 # ─── Fixtures ─────────────────────────────────────────────────────────
@@ -25,6 +30,26 @@ ATOM      8  CA  MET A  20      21.000  15.000  10.000  1.00 20.00           C
 HETATM    9  CA  MSE A  25      25.000  18.000  10.000  1.00 20.00          SE
 HETATM   10  O   HOH A 100      30.000  30.000  30.000  1.00 20.00           O
 END
+"""
+
+CHIRAL_MOL2 = """\
+@<TRIPOS>MOLECULE
+chiral_halocarbon
+5 4 0 0 0
+SMALL
+NO_CHARGES
+
+@<TRIPOS>ATOM
+      1 C1          0.0000    0.0000    0.0000 C.3       1 LIG       0.0000
+      2 F1          1.0000    1.0000    1.0000 F         1 LIG       0.0000
+      3 CL1        -1.0000   -1.0000    1.0000 Cl        1 LIG       0.0000
+      4 BR1        -1.0000    1.0000   -1.0000 Br        1 LIG       0.0000
+      5 H1          1.0000   -1.0000   -1.0000 H         1 LIG       0.0000
+@<TRIPOS>BOND
+     1    1    2 1
+     2    1    3 1
+     3    1    4 1
+     4    1    5 1
 """
 
 
@@ -148,6 +173,27 @@ class TestLigandParsing:
         assert not used_fallback
         assert sanitize_ok
         assert loaded.GetNumAtoms() == 6
+
+    def test_docking_and_trace_mol2_loaders_have_identity_parity(
+        self,
+        tmp_path: Path,
+    ):
+        mol2_path = tmp_path / "chiral.mol2"
+        mol2_path.write_text(CHIRAL_MOL2)
+        docking_mol, has_pose = load_ligand(str(mol2_path))
+        trace_mol, _, sanitize_ok = load_molecule(None, mol2_path)
+
+        assert has_pose
+        assert trace_mol is not None
+        assert sanitize_ok
+        fragment_id = torch.zeros(docking_mol.GetNumAtoms(), dtype=torch.long)
+        assert ligand_graph_identity(
+            docking_mol,
+            fragment_id,
+        ) == ligand_graph_identity(
+            trace_mol,
+            fragment_id,
+        )
 
     def test_featurize_benzene(self):
         mol = _make_mol_manual_coords("c1ccccc1", BENZENE_COORDS)

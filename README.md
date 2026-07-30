@@ -44,15 +44,21 @@ uv run eff-dock confidence prepare \
   --checkpoint weights/effdock_geometry_ft_100k_best.pt --split train
 uv run eff-dock confidence train --config configs/train_confidence.yaml
 uv run eff-dock evaluate --dataset astex --data-dir DATASET \
-  --pocket-centers FROZEN_CENTERS.json \
-  --checkpoint weights/effdock_geometry_ft_100k_best.pt \
-  --confidence-checkpoint weights/effdock_confidence_extmatch_n80_s25_step42500.pt
+  --pocket-centers FROZEN_CENTERS.json
 uv run eff-dock benchmark --help
 uv run eff-dock dock --protein receptor.pdb --ligand ligand.sdf \
-  --pocket-center X,Y,Z --config configs/train.yaml \
-  --checkpoint weights/effdock_geometry_ft_100k_best.pt \
-  --confidence-checkpoint weights/effdock_confidence_extmatch_n80_s25_step42500.pt
+  --pocket-center X,Y,Z
+uv run eff-dock physical trace --protein receptor.pdb \
+  --ligand crystal_ligand.sdf --output outputs/guidance/trace.json
 ```
+
+`physical trace` is the backward-compatible command for the diagnostic-only,
+self-contained Torch guidance trace. It records physical, hydrophobic,
+idealized missing-valence-cone hydrogen-bond, screened formal-charge-group, and
+combined energies/forces for a crystal pose or saved trajectory; it does not
+optimize the crystal or enable production ODE guidance. Vina is not part of
+this path. See
+[`docs/GUIDANCE_CONTRACT.md`](docs/GUIDANCE_CONTRACT.md).
 
 ## Retained weights
 
@@ -62,6 +68,10 @@ matched inference stack is:
 - `effdock_geometry_ft_100k_best.pt`
 - `effdock_confidence_extmatch_n80_s25_step42500.pt`
 - 80 poses, 25 ODE steps, translation sigma 0.5, and a 10A pocket crop
+
+Both `eff-dock dock` and `eff-dock evaluate` use this matched stack by
+default. Pass explicit checkpoint or sampling arguments to override it, or
+`--no-confidence` to disable learned reranking.
 
 Checksums, compatibility notes, and the confidence model card are in
 [`weights/MANIFEST.md`](weights/MANIFEST.md) and

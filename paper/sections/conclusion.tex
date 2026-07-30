@@ -1,0 +1,17 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented \method, a fragment-based \(\SE(3)\)-equivariant flow-matching
+framework for pocket-conditioned protein--ligand docking. The method combines
+a unified atom--fragment--protein graph, an equivariant atom-force head,
+Newton--Euler fragment dynamics, and a separately trained confidence ranker.
+Across three frozen reference-pocket diagnostics, the promoted stack places a
+near-native candidate among 80 samples for 91.93--95.29\% of complexes and
+selects one as top-1 for 69.47--76.47\%. Robustness and slice analyses show
+that pocket-center error, ligand size, and flexibility reduce generator
+coverage as well as ranking accuracy, while the PoseBusters checks reveal a
+separate molecular-validity gap. These results establish the behavior of the
+current pocket-conditioned system without claiming blind or prospective
+docking. A submission-level evaluation should next combine a strictly
+leakage-controlled split, target-independent pocket definitions, matched
+baselines, component ablations, and compute measurements.
