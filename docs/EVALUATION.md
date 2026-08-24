@@ -48,6 +48,12 @@ reproduction. The completed active diagnostic found pure confidence slightly
 stronger overall than this composite, so all results remain separate and none
 may be used to tune a new external-test selector post hoc.
 
+The completed S50 symmetry-confidence experiment does not alter public
+defaults. Its internal rule selected U25k, while U50k is the terminal state;
+both require explicit checkpoint paths. Their Astex/PoseBusters comparison is
+repeated-use and descriptive and cannot promote either checkpoint. Exact
+metrics and hashes are in `S50_SYMMETRY_CONFIDENCE_RESULTS.md`.
+
 ## Archived Vina-guided sampling (inactive)
 
 This path is retained only for historical reproduction and is not the unified

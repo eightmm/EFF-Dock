@@ -77,6 +77,12 @@ Checksums, compatibility notes, and the confidence model card are in
 [`weights/MANIFEST.md`](weights/MANIFEST.md) and
 [`weights/CONFIDENCE_MODEL_CARD.md`](weights/CONFIDENCE_MODEL_CARD.md).
 
+The later S50/sigma-2 symmetry-confidence experiment is complete but remains
+an unpromoted research result. Its internally selected U25k checkpoint,
+terminal U50k checkpoint, exact hashes, and repeated-use Astex/PoseBusters
+diagnostics are documented in
+[`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`](docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md).
+
 ## Reference-defined redocking diagnostics
 
 The retained N80 confidence stack produced the following frozen-manifest

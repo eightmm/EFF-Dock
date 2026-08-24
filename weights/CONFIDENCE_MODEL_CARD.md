@@ -47,6 +47,17 @@ The completed active N80 rerun reached composite <2A rates of 78.82% on Astex,
 confidence model; the composite selector is retained for reproducibility but
 did not consistently improve the learned RMSD head.
 
+## Experimental S50 successor
+
+A later internal PLINDER study retrained this confidence model on the frozen
+S50 N100/S10/sigma-2 bank using symmetry-aware no-alignment RMSD. Its selected
+U25k checkpoint reached 58.45% Top-1 `<2A` on 1,035 internal validation
+complexes; the terminal U50k checkpoint reached 56.81%. These checkpoints are
+preserved under ignored `outputs/` and are not packaged release artifacts, so
+they do not change this model card's default checkpoint or intended-use
+contract. Exact hashes, slices, and repeated-use external diagnostics are in
+`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`.
+
 ## Limitations
 
 - Requires an explicit pocket and a compatible EFF-Dock hidden representation.

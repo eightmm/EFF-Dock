@@ -5,7 +5,7 @@
 - State: confirmed
 - Name: EFF-Dock
 - Type: ml
-- Last updated: 2026-07-30
+- Last updated: 2026-08-24
 - Gate: confirmed for non-destructive migration and EFF-Dock bootstrap.
 
 ## Project
@@ -395,6 +395,43 @@ eff-dock dock --protein P.pdb --ligand L.sdf --pocket-center X,Y,Z \
   `docs/CONFIDENCE_BENCHMARK_PROTOCOL.md`.
 - Future experiments must declare hypothesis, baseline, metric, seed/update
   budget, and disconfirming result before compute.
+
+### S50 Symmetry-Confidence Training (2026-08-22)
+
+- Status: completed. The four-GPU recovery run reached U50,000 on the frozen
+  43,092-complex S50/sigma-2 train bank and 1,035-complex validation bank.
+  Every pose-level confidence target and selection metric used RDKit `CalcRMS`
+  symmetry-aware no-alignment RMSD; fixed-map atom displacement remained only
+  for the atom-level auxiliary heads.
+- Internal selection: U25k achieved `605/1,035 = 58.45%` Top-1 `<2A`, versus
+  `497/1,035 = 48.02%` at U0 and `588/1,035 = 56.81%` at U50k. Therefore the
+  registered validation rule selects U25k `best.pt`; U50k `latest.pt` is the
+  terminal state and continuation source.
+- Experimental checkpoint SHA-256 values are
+  `1c59034172fb925cc8a70777dcba236be349f1a1de1775d49cc17d492b17c030`
+  for U25k best and
+  `fd49fa86f67187bf26d6c1bcf2daf925ba3e3b19dfeae733e57535d183280469`
+  for U50k latest. They remain under ignored `outputs/` and have not replaced
+  the packaged step-42,500 compatibility checkpoint in `weights/`.
+- Repeated-use Astex/PoseBusters characterization favored U50k descriptively,
+  especially after refinement, but cannot override the internally selected
+  U25k checkpoint or promote a production default.
+- Frozen contract and complete result:
+  `docs/S50_SYMMETRY_CONFIDENCE_TRAINING_PROTOCOL.md` and
+  `docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`.
+
+### S50 Raw + Refined Confidence Continuation (2026-08-23)
+
+- The separately registered branch mixes 32 raw sigma-2 poses, 32
+  deterministically refined poses, and one mapped-crystal anchor per complex.
+  Validation uses all 100 refined poses and excludes crystal anchors.
+- It initializes weights-only from immutable U50k `latest.pt`, uses a fresh
+  optimizer/scheduler for 10,000 updates, and writes new `latest.pt` and
+  `best.pt` artifacts under a distinct output identity. This continuation does
+  not retroactively promote U50k over the internally selected U25k checkpoint.
+- The current frozen budget is 10,000 updates. Any longer continuation requires
+  a new registered content identity.
+- Frozen contract: `docs/S50_RAW_REFINED_CONFIDENCE_FINETUNE_PROTOCOL.md`.
 
 ## Decisions
 
