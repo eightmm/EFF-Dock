@@ -66,6 +66,10 @@ Thumbs.db
 CLAUDE.md
 AGENTS.md
 
+# Private project planning and manuscript sources
+/PROJECT.md
+/paper/
+
 # OMC artifacts
 .omc/
 *.pdf
