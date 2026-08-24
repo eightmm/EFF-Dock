@@ -67,17 +67,17 @@ inference stack is:
 
 - `effdock_geometry_ft_100k_best.pt`
 - `effdock_confidence_extmatch_n80_s25_step42500.pt`
-- 100 candidate poses, 10 ODE steps, translation sigma 0.5, and a 10A pocket crop
+- 100 candidate poses, 10 ODE steps, translation sigma 2.0, and a 10A pocket crop
 
 Both `eff-dock dock` and `eff-dock evaluate` therefore run with
 `--num-samples 100 --num-steps 10` unless explicitly overridden. Use
 `--no-confidence` to disable learned reranking.
 
-The packaged confidence checkpoint was originally trained on N80/S25 pose
-banks. N100/S10 is the current deployment sampling budget, so this is an
-intentional candidate-distribution shift rather than a claim that the retained
-checkpoint was trained with the new defaults. The historical N80/S25 contract
-remains in the model card for exact reproduction.
+The packaged confidence checkpoint was originally trained on N80/S25/sigma0.5
+pose banks. N100/S10/sigma2 is the current deployment sampling budget, so this
+is an intentional candidate-distribution shift rather than a claim that the
+retained checkpoint was trained with the new defaults. The historical
+N80/S25/sigma0.5 contract remains in the model card for exact reproduction.
 
 Checksums, compatibility notes, and the confidence model card are in
 [`weights/MANIFEST.md`](weights/MANIFEST.md) and

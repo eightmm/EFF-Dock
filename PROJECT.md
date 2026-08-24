@@ -313,7 +313,7 @@ eff-dock dock --protein P.pdb --ligand L.sdf --pocket-center X,Y,Z \
 - The selected confidence checkpoint and paired docking checkpoint are a frozen
   compatibility stack. Its historical training-matched preset is
   N80/S25/sigma0.5 with a 10A pocket crop. The public deployment default is
-  N100/S10/sigma0.5 with the same crop; this candidate-distribution shift must
+  N100/S10/sigma2 with the same crop; this candidate-distribution shift must
   remain explicit in user-facing documentation and result provenance.
 
 ## Evaluation

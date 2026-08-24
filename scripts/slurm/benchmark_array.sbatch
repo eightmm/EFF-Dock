@@ -24,12 +24,12 @@ mkdir -p outputs/benchmarks/logs
 : "${EFFDOCK_NUM_SHARDS:?set EFFDOCK_NUM_SHARDS}"
 : "${EFFDOCK_RUN_NAME:?set EFFDOCK_RUN_NAME}"
 
-checkpoint=${EFFDOCK_CHECKPOINT:-weights/effdock_legacy_flowfrag_200k_ema.pt}
+checkpoint=${EFFDOCK_CHECKPOINT:-weights/effdock_geometry_ft_100k_best.pt}
 config=${EFFDOCK_CONFIG:-configs/train.yaml}
-num_samples=${EFFDOCK_NUM_SAMPLES:-40}
-num_steps=${EFFDOCK_NUM_STEPS:-25}
-sigma=${EFFDOCK_SIGMA:-1.0}
-pocket_cutoff=${EFFDOCK_POCKET_CUTOFF:-8.0}
+num_samples=${EFFDOCK_NUM_SAMPLES:-100}
+num_steps=${EFFDOCK_NUM_STEPS:-10}
+sigma=${EFFDOCK_SIGMA:-2.0}
+pocket_cutoff=${EFFDOCK_POCKET_CUTOFF:-10.0}
 protocol_id=${EFFDOCK_PROTOCOL_ID:-}
 vina_guidance_scale=${EFFDOCK_VINA_GUIDANCE_SCALE:-0.0}
 vina_guidance_start_t=${EFFDOCK_VINA_GUIDANCE_START_T:-0.5}

@@ -17,6 +17,7 @@ from effdock.workflows.evaluate import build_arg_parser as build_evaluate_parser
 def test_public_sampling_budget_is_n100_s10() -> None:
     assert DEFAULT_NUM_SAMPLES == 100
     assert DEFAULT_NUM_STEPS == 10
+    assert DEFAULT_SIGMA == 2.0
     assert sample_unified.__kwdefaults__["num_steps"] == DEFAULT_NUM_STEPS
     assert sample_unified_multi_sigma.__kwdefaults__["num_steps"] == DEFAULT_NUM_STEPS
 

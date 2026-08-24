@@ -70,7 +70,7 @@ given; each success, skip, and failure is appended to a JSONL manifest.
 
 That confidence-preparation default preserves the retained checkpoint's
 training provenance. It is distinct from public inference: `eff-dock dock` and
-`eff-dock evaluate` default to N100/S10 with sigma 0.5 and a 10A pocket crop.
+`eff-dock evaluate` default to N100/S10/sigma2 with a 10A pocket crop.
 
 On the completed active three-dataset diagnostic, pure predicted-RMSD ranking
 was slightly stronger overall than the frozen composite (488 versus 486 <2A
