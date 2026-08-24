@@ -109,14 +109,20 @@ uv run python scripts/calibrate_s50_refinement_budget.py --help
 uv run python scripts/refine_s50_confidence_pose_bank.py --help
 uv run python scripts/materialize_s50_refined_confidence_bank.py --help
 uv run python scripts/report_s50_confidence_training.py --help
+uv run python scripts/run_guidance_sdf_post_refinement.py --help
+uv run python scripts/score_guidance_sdf_post_refinement_confidence.py --help
+uv run python scripts/report_s50_symmetry_confidence_refined_external.py --help
+uv run python scripts/evaluate_s50_u50_refinement_validity.py --help
 ```
 
 `configs/train_confidence_s50_symmetry.yaml` reproduces the symmetry-target
 confidence setup. `configs/train_confidence_s50_raw_refined_10k.yaml` defines
 the paired raw/refined continuation with 32 poses from each bank plus one
 mapped-crystal anchor. The scripts require explicit manifests, hashes, paths,
-and output roots; generated banks, checkpoints, and cluster-specific submission
-wrappers are intentionally not stored in Git.
+and output roots. The external scripts reproduce the frozen refined-pose
+rescoring and official PoseBusters validity decomposition. Generated banks,
+checkpoints, and cluster-specific submission wrappers are intentionally not
+stored in Git.
 
 ## Reference-defined redocking diagnostics
 

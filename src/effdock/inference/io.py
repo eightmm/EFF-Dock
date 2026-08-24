@@ -54,6 +54,16 @@ def _tag_score(mol_out: Chem.Mol, score: dict | None) -> None:
     ):
         if key in score:
             mol_out.SetProp(key, f"{score[key]:.6f}")
+    # Keep the historical inference/export names as aliases so archived
+    # reranking scripts can consume newly written candidate ensembles without
+    # translating the active confidence runtime field names.
+    for source, alias in (
+        ("confidence_rmsd", "confidence_pred_rmsd"),
+        ("confidence_success", "confidence_pred_success"),
+        ("confidence_success_logit", "confidence_pred_success_logit"),
+    ):
+        if source in score:
+            mol_out.SetProp(alias, f"{score[source]:.6f}")
 
 
 def write_sdf(
@@ -80,14 +90,22 @@ def write_multi_sdf(
     out_path: Path,
     scores: list[dict] | None = None,
     props: dict | None = None,
+    per_pose_props: list[dict] | None = None,
+    force_v3000: bool = False,
 ) -> None:
+    if scores is not None and len(scores) != len(all_poses):
+        raise ValueError("scores must have one entry per pose")
+    if per_pose_props is not None and len(per_pose_props) != len(all_poses):
+        raise ValueError("per_pose_props must have one entry per pose")
     writer = Chem.SDWriter(str(out_path))
+    writer.SetForceV3000(bool(force_v3000))
     for i, atom_pos in enumerate(all_poses):
         mol_out = _set_coords(mol, atom_pos + pocket_center)
         mol_out.SetProp("_Name", f"docked_pose_{i}")
         mol_out.SetProp("sample_index", str(i))
-        _tag_score(mol_out, scores[i] if scores else None)
+        _tag_score(mol_out, scores[i] if scores is not None else None)
         _tag_props(mol_out, props)
+        _tag_props(mol_out, per_pose_props[i] if per_pose_props is not None else None)
         writer.write(mol_out)
     writer.close()
 

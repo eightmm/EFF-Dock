@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from effdock.workflows.guidance_budget_posebusters_report import VALIDITY_CHECKS
+from effdock.workflows.posebusters_report import VALIDITY_CHECKS
 
 COFACTOR_AND_WATER_CHECKS = (
     "minimum_distance_to_organic_cofactors",
