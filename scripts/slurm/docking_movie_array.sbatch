@@ -17,36 +17,32 @@ repo_dir=${SLURM_SUBMIT_DIR:?submit this job from the repository root}
 cd "$repo_dir"
 
 datasets=(
-  astex posebusters casf posebusters posebusters posebusters posebusters
-  posebusters casf astex posebusters
+  astex posebusters posebusters posebusters posebusters posebusters
+  posebusters astex posebusters
 )
 complex_ids=(
-  1n46 6ysp_pal 4djv 7uj5_dgl 7xg5_plp 6xbo_5mc 8b8h_ojq
-  7frx_o88 3pyy 1oq5 7cns_pmv
+  1n46 6ysp_pal 7uj5_dgl 7xg5_plp 6xbo_5mc 8b8h_ojq
+  7frx_o88 1oq5 7cns_pmv
 )
 data_dirs=(
   data/external_benchmarks/data/astex_diverse_set
   data/external_benchmarks/data/posebusters_benchmark_set
-  data/external_benchmarks/data/casf2016
   data/external_benchmarks/data/posebusters_benchmark_set
   data/external_benchmarks/data/posebusters_benchmark_set
   data/external_benchmarks/data/posebusters_benchmark_set
   data/external_benchmarks/data/posebusters_benchmark_set
   data/external_benchmarks/data/posebusters_benchmark_set
-  data/external_benchmarks/data/casf2016
   data/external_benchmarks/data/astex_diverse_set
   data/external_benchmarks/data/posebusters_benchmark_set
 )
 center_files=(
   data/external_test/astex_reference_pocket_centers.json
   data/external_test/posebusters_reference_pocket_centers.json
-  data/external_test/casf_reference_pocket_centers.json
   data/external_test/posebusters_reference_pocket_centers.json
   data/external_test/posebusters_reference_pocket_centers.json
   data/external_test/posebusters_reference_pocket_centers.json
   data/external_test/posebusters_reference_pocket_centers.json
   data/external_test/posebusters_reference_pocket_centers.json
-  data/external_test/casf_reference_pocket_centers.json
   data/external_test/astex_reference_pocket_centers.json
   data/external_test/posebusters_reference_pocket_centers.json
 )

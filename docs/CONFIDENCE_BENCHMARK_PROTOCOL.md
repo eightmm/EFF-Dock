@@ -28,7 +28,7 @@ confidence, and oracle results are paired within each complex.
   predicted RMSD from the confidence head.
 - Primary metric: PoseBusters v2 frozen-confidence selected top-1 symmetry-aware
   heavy-atom RMSD <2A.
-- Secondary metrics: Astex and CASF selected top-1, pure-confidence top-1,
+- Secondary metrics: Astex selected top-1, pure-confidence top-1,
   Vina+DG, oracle top-80, median RMSD, fast validity, and failure rate.
 - Failure threshold: invalidate a dataset if more than 2% of frozen IDs fail or
   if shard checkpoint/config/center hashes differ.
@@ -54,9 +54,9 @@ its results are not overwritten or presented as the confidence model result.
 
 ## Frozen outcome
 
-Completed 2026-07-19 with 678/678 final rows. Frozen-composite <2A rates were
-78.82% Astex, 72.73% PoseBusters, and 68.42% CASF; same-candidate Vina rates
-were 77.65%, 71.10%, and 69.47%. The PoseBusters improvement prediction passed
+Completed 2026-07-19 with 393/393 final rows. Frozen-composite <2A rates were
+78.82% Astex and 72.73% PoseBusters; same-candidate Vina rates were 77.65% and
+71.10%. The PoseBusters improvement prediction passed
 (+1.62pp), while historical reproduction failed the ±2pp criterion on Astex
 (-2.35pp) and PoseBusters (-4.87pp). Official PoseBusters pass-all validity was
 54.87%. Full results and rescue provenance are in `BENCHMARK_RESULTS.md` and

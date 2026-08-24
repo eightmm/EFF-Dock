@@ -15,8 +15,8 @@ set -euo pipefail
 repo_dir=${SLURM_SUBMIT_DIR:?submit this job from the repository root}
 cd "$repo_dir"
 
-datasets=(astex posebusters casf posebusters posebusters casf posebusters)
-complex_ids=(1n46 7xg5_plp 4djv 6xbo_5mc 8b8h_ojq 3pyy 7cns_pmv)
+datasets=(astex posebusters posebusters posebusters posebusters)
+complex_ids=(1n46 7xg5_plp 6xbo_5mc 8b8h_ojq 7cns_pmv)
 task_index=${SLURM_ARRAY_TASK_ID:?missing array task ID}
 dataset=${datasets[$task_index]}
 complex_id=${complex_ids[$task_index]}

@@ -1,21 +1,12 @@
 from __future__ import annotations
 
-import numpy as np
 import pytest
 import torch
 from rdkit import Chem
 
 from effdock.evaluation.benchmark import compute_pose_rmsd, compute_pose_rmsd_with_method
-from effdock.workflows.benchmark_data import strip_reference_ligand
+from effdock.workflows.benchmark_report import EXPECTED_COUNTS
 from effdock.workflows.evaluate import ComplexInput, shard_complexes, summarize_rows
-
-
-def _atom_line(record: str, serial: int, atom: str, residue: str, number: int, xyz) -> str:
-    x, y, z = xyz
-    return (
-        f"{record:<6}{serial:5d} {atom:^4s} {residue:>3s} A{number:4d}    "
-        f"{x:8.3f}{y:8.3f}{z:8.3f}  1.00 20.00           C  \n"
-    )
 
 
 def _molecule_with_conformer(
@@ -29,6 +20,10 @@ def _molecule_with_conformer(
         conformer.SetAtomPosition(index, xyz)
     mol.AddConformer(conformer)
     return mol
+
+
+def test_benchmark_aggregate_scope_is_astex_and_posebusters() -> None:
+    assert EXPECTED_COUNTS == {"astex": 85, "posebusters": 308}
 
 
 def test_pose_rmsd_reports_symmetry_aware_method() -> None:
@@ -72,32 +67,6 @@ def test_pose_rmsd_reports_mapped_index_fallback() -> None:
 
     assert value == pytest.approx(1.0)
     assert method == "mapped_index_fallback"
-
-
-def test_strip_reference_ligand_handles_atom_encoded_peptide() -> None:
-    ligand = np.asarray([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [2.0, 0.0, 0.0]])
-    pdb = "".join(
-        [
-            _atom_line("ATOM", 1, "C1", "LIG", 9, ligand[0]),
-            _atom_line("ATOM", 2, "C2", "LIG", 9, ligand[1]),
-            _atom_line("ATOM", 3, "C3", "LIG", 9, ligand[2]),
-            _atom_line("ATOM", 4, "CA", "ALA", 10, [10.0, 0.0, 0.0]),
-            "END\n",
-        ]
-    )
-    cleaned, removed = strip_reference_ligand(pdb, ligand)
-    assert removed == ["A:9:LIG"]
-    assert "LIG" not in cleaned
-    assert "ALA" in cleaned
-
-
-def test_strip_reference_ligand_fails_without_coordinate_match() -> None:
-    pdb = "".join(
-        _atom_line("HETATM", i, f"C{i}", "LIG", 9, [10.0 + i, 0.0, 0.0])
-        for i in range(1, 4)
-    )
-    with pytest.raises(ValueError, match="no RCSB residue matched"):
-        strip_reference_ligand(pdb, np.zeros((3, 3)))
 
 
 def test_shard_complexes_is_disjoint_and_complete() -> None:

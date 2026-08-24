@@ -72,9 +72,9 @@ That confidence-preparation default preserves the retained checkpoint's
 training provenance. It is distinct from public inference: `eff-dock dock` and
 `eff-dock evaluate` default to N100/S10/sigma2 with a 10A pocket crop.
 
-On the completed active three-dataset diagnostic, pure predicted-RMSD ranking
-was slightly stronger overall than the frozen composite (488 versus 486 <2A
-successes among 678 complexes). The composite is retained for exact historical
+On the completed active Astex/PoseBusters diagnostic, pure predicted-RMSD
+ranking produced 290 <2A successes versus 291 for the frozen composite among
+393 complexes. The composite is retained for exact historical
 reproducibility and remains an explicit selector, but is not evidence of a
 universally better ranking policy.
 

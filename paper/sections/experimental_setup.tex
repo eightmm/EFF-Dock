@@ -12,7 +12,7 @@ fragments; cropped receptors contain at least 50 residues.
 
 \paragraph{Draft scientific boundary.}
 The preserved split predates the final strict exclusion of canonical ligand
-SMILES from all three external benchmarks. We therefore describe the current
+SMILES from both external benchmarks. We therefore describe the current
 external results as frozen compatibility diagnostics, not as evidence of
 prospective or chemically novel generalization. A publishable retraining claim
 requires the strict split manifest and leakage audit described in the project
@@ -48,9 +48,8 @@ experiments did not pass their PLINDER validation gate.
 \subsection{Frozen reference-pocket redocking}
 
 We evaluate on Astex Diverse (85 complexes)
-\citep{hartshorn2007astex}, PoseBusters v2 (308 complexes)
-\citep{buttenschoen2024posebusters}, and the CASF-2016 scoring set (285
-complexes) \citep{su2019casf}. In this diagnostic, the pocket center is derived
+\citep{hartshorn2007astex} and PoseBusters v2 (308 complexes)
+\citep{buttenschoen2024posebusters}. In this diagnostic, the pocket center is derived
 from receptor residue virtual nodes lying within \(8\,\angstrom\) of the
 reference ligand. The reference ligand is removed before sampling and its
 coordinates are subsequently used only to compute the evaluation label. The

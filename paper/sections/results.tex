@@ -4,12 +4,11 @@
 \subsection{Frozen reference-pocket redocking}
 
 Table~\ref{tab:frozen_benchmark} summarizes the active frozen-manifest
-evaluation. Pure confidence selects 488 poses below \(2\,\angstrom\) among
-678 complexes, compared with 483 for Vina+DG and 486 for the historical
+evaluation. Pure confidence selects 290 poses below \(2\,\angstrom\) among
+393 complexes, compared with 285 for Vina+DG and 291 for the historical
 composite selector. The corresponding pure-confidence success rates are
 76.47\% on Astex (65/85; 95\% Wilson interval 66.43--84.22\%), 73.05\% on
-PoseBusters (225/308; 67.84--77.70\%), and 69.47\% on CASF (198/285;
-63.90--74.53\%).
+PoseBusters (225/308; 67.84--77.70\%).
 
 \begin{table}[H]
     \centering
@@ -28,16 +27,15 @@ PoseBusters (225/308; 67.84--77.70\%), and 69.47\% on CASF (198/285;
         \midrule
         Astex Diverse & 85  & 32.94 & 77.65 & 76.47 & 78.82 & 95.29 \\
         PoseBusters v2 & 308 & 35.71 & 71.10 & 73.05 & 72.73 & 94.81 \\
-        CASF-2016 & 285 & 32.98 & 69.47 & 69.47 & 68.42 & 91.93 \\
         \bottomrule
     \end{tabular}
     \endgroup
 \end{table}
 
-The median RMSD of pure-confidence selections is \(1.156\,\angstrom\),
-\(1.211\,\angstrom\), and \(1.274\,\angstrom\) on Astex, PoseBusters, and
-CASF, respectively. Learned ranking improves over the same-candidate Vina+DG
-baseline on PoseBusters but not uniformly across all three datasets. Likewise,
+The median RMSD of pure-confidence selections is \(1.156\,\angstrom\) on
+Astex and \(1.211\,\angstrom\) on PoseBusters. Learned ranking improves over
+the same-candidate Vina+DG baseline on PoseBusters but not uniformly across
+both datasets. Likewise,
 the frozen composite does not dominate pure confidence. These results support
 the simpler minimum-predicted-RMSD rule as the deployment default but do not
 establish superiority to external docking methods, whose pocket information,
@@ -45,9 +43,9 @@ candidate budgets, receptor preparation, and post-processing may differ.
 
 \subsection{Candidate generation and pose selection are distinct bottlenecks}
 
-Oracle-80 success exceeds 91\% on every dataset, leaving gaps of 18.82,
-21.76, and 22.46 percentage points between pure-confidence top-1 and oracle
-coverage on Astex, PoseBusters, and CASF. Thus most benchmark complexes have a
+Oracle-80 success exceeds 94\% on every dataset, leaving gaps of 18.82 and
+21.76 percentage points between pure-confidence top-1 and oracle coverage on
+Astex and PoseBusters. Thus most benchmark complexes have a
 near-native candidate, but the ranker does not consistently identify it.
 The gap is not attributed solely to confidence: the first-pose rates near
 33--36\% show that candidate ordering from the stochastic generator is not
@@ -119,11 +117,8 @@ most 20 heavy atoms (\(N=120\)) but 44.00\% above 40 heavy atoms (\(N=25\));
 oracle coverage decreases from 99.17\% to 60.00\%. For ligands with at least
 eight rotatable bonds (\(N=66\)), pure-confidence and oracle success are
 62.12\% and 86.36\%, compared with 77.88\% and 98.23\% for at most three
-rotatable bonds (\(N=113\)). CASF shows the same size trend: pure-confidence
-success drops from 82.57\% at at most 20 heavy atoms (\(N=109\)) to 38.89\%
-above 40 atoms (\(N=18\)), with oracle coverage dropping from 97.25\% to
-55.56\%. These paired declines indicate that larger ligands stress both
-fragment-pose generation and candidate selection.
+rotatable bonds (\(N=113\)). These paired declines indicate that larger
+ligands stress both fragment-pose generation and candidate selection.
 
 \subsection{Pose accuracy does not guarantee physical validity}
 

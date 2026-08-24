@@ -66,9 +66,6 @@ def load_smiles(dataset: str, external_dir: Path) -> dict[str, str]:
         if keep_path.exists():
             keep = {line.strip() for line in keep_path.read_text().splitlines() if line.strip()}
             raw = {k: v for k, v in raw.items() if k in keep}
-    elif dataset == "casf":
-        with open(external_dir / "casf_smiles.json") as handle:
-            raw = json.load(handle)
     else:
         raise ValueError(dataset)
     return {k.lower(): v["smiles"] for k, v in raw.items()}
@@ -510,7 +507,7 @@ def evaluate_one(
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", choices=("astex", "posebusters", "casf"), required=True)
+    parser.add_argument("--dataset", choices=("astex", "posebusters"), required=True)
     parser.add_argument("--data-dir", type=Path, required=True)
     parser.add_argument("--external-dir", type=Path, default=Path("data/external_test"))
     parser.add_argument(

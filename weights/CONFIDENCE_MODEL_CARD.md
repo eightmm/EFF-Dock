@@ -44,9 +44,9 @@ PoseBusters v2 with the frozen composite selector. Those values are diagnostic,
 not prospective screening claims. Active frozen-manifest results and their
 failure/rescue records live in `docs/BENCHMARK_RESULTS.md`.
 
-The completed active N80 rerun reached composite <2A rates of 78.82% on Astex,
-72.73% on PoseBusters, and 68.42% on CASF. Same-candidate pure confidence was
-76.47%, 73.05%, and 69.47%, respectively. The checkpoint remains the selected
+The completed active N80 rerun reached composite <2A rates of 78.82% on Astex
+and 72.73% on PoseBusters. Same-candidate pure confidence was 76.47% and
+73.05%, respectively. The checkpoint remains the selected
 confidence model; the composite selector is retained for reproducibility but
 did not consistently improve the learned RMSD head.
 

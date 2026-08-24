@@ -1,6 +1,6 @@
 # Evaluation contract
 
-External benchmarks are PoseBusters v2, Astex Diverse, and CASF-2016. Their raw
+External benchmarks are PoseBusters v2 and Astex Diverse. Their raw
 structures stay ignored locally, while snapshot identity, molecule mappings,
 and target-independent pocket definitions must be frozen in manifests.
 
@@ -10,8 +10,8 @@ oracle-pocket redocking diagnostic. It does not satisfy the prospective/public
 inference pocket contract and is not substituted for it.
 
 The primary metric is PoseBusters selected top-1 symmetry-aware ligand RMSD
-success at <2 Angstrom. Secondary reporting includes Astex and CASF top-1,
-oracle top-k, PoseBusters validity, and slices by ligand size, fragment count,
+success at <2 Angstrom. Secondary reporting includes Astex top-1, oracle top-k,
+PoseBusters validity, and slices by ligand size, fragment count,
 rotatable bonds, ligand similarity to train, and pocket similarity to train.
 
 Evaluation requires a JSON mapping each benchmark complex ID to an explicit
@@ -26,7 +26,7 @@ uv run eff-dock evaluate \
   --pocket-centers data/external_test/astex_reference_pocket_centers.json
 ```
 
-The promoted geometry/confidence checkpoints and the N80/S25/sigma0.5/pocket10
+The promoted geometry/confidence checkpoints and the N100/S10/sigma2/pocket10
 preset are the defaults for both `dock` and `evaluate`. Every value remains
 overridable; `--no-confidence` runs generator-only diagnostics.
 
@@ -44,8 +44,8 @@ The retained confidence outputs are ranking signals, not calibrated RMSD or
 success probabilities. `confidence_filter_v1` is an explicit conservative
 diagnostic; it did not meet its PLINDER validation deployment gate. The frozen
 `pair_gate_density_rank_vote_plclash_ambig` selector is retained for historical
-reproduction. The completed active diagnostic found pure confidence slightly
-stronger overall than this composite, so all results remain separate and none
+reproduction. The completed active diagnostic found that neither selector
+dominates across both datasets, so all results remain separate and none
 may be used to tune a new external-test selector post hoc.
 
 The completed S50 symmetry-confidence experiment does not alter public

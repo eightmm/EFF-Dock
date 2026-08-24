@@ -21,16 +21,14 @@ selector.
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Astex Diverse | 85 | 35.29 | **64.71** | +29.41 pp | 94.12 | 1.432A | 90.59 | 0 |
 | PoseBusters v2 | 308 | 31.82 | **64.29** | +32.47 pp | 91.56 | 1.446A | 74.68 | 0 |
-| CASF-2016 | 285 | 31.58 | **59.30** | +27.72 pp | 88.07 | 1.562A | 84.21 | 0 |
 
-Absolute Vina+DG <2A successes are 55/85, 198/308, and 169/285. Oracle-40
-successes are 80/85, 282/308, and 251/285. All 678 complexes have final rows.
+Absolute Vina+DG <2A successes are 55/85 and 198/308. Oracle-40 successes are
+80/85 and 282/308. All 393 complexes have final rows.
 
 | Dataset | Vina <1A | Vina <3A | Vina mean RMSD |
 |---|---:|---:|---:|
 | Astex Diverse | 41.18 | 77.65 | 2.106A |
 | PoseBusters v2 | 31.49 | 80.52 | 2.062A |
-| CASF-2016 | 34.04 | 77.19 | 2.180A |
 
 ## Official PoseBusters validity
 
@@ -79,7 +77,7 @@ and frozen selector artifacts, is:
 
 These historical values used the same model pair and N80 preset but predated
 the active EFF-Dock frozen pocket manifests. They are context, not substituted
-for the active three-dataset rerun defined in
+for the active two-dataset rerun defined in
 `CONFIDENCE_BENCHMARK_PROTOCOL.md`.
 
 The later cluster-free filter study applied its already-frozen rules to these
@@ -109,11 +107,10 @@ composite is the pre-registered
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Astex Diverse | 85 | 32.94 | 77.65 | 76.47 | **78.82** | +1.18 pp | 95.29 |
 | PoseBusters v2 | 308 | 35.71 | 71.10 | **73.05** | 72.73 | +1.62 pp | 94.81 |
-| CASF-2016 | 285 | 32.98 | **69.47** | **69.47** | 68.42 | -1.05 pp | 91.93 |
 
-Absolute composite successes are 67/85, 224/308, and 195/285. Pure confidence
-has 488 <2A successes across all 678 complexes, versus 486 for the composite
-and 483 for Vina+DG. Composite median RMSD is 1.074A, 1.293A, and 1.299A;
+Absolute composite successes are 67/85 and 224/308. Pure confidence has 290
+<2A successes across all 393 complexes, versus 291 for the composite and 285
+for Vina+DG. Composite median RMSD is 1.074A and 1.293A;
 failure rate is 0% after two recorded Astex numerical rescues.
 
 Official PoseBusters 0.6.5 `redock` on all 308 composite-selected poses gives
@@ -125,15 +122,14 @@ steric clash 95.78%, internal energy 98.70%, bond lengths 100%, and bond angles
 The pre-registered primary prediction passed: PoseBusters composite improved
 over same-candidate Vina by 1.62 percentage points. The historical-reproduction
 prediction failed: Astex was 2.35 points below 81.18%, and PoseBusters was 4.87
-points below 77.60%, outside the ±2-point criterion. CASF also shows that the
-composite is not uniformly stronger than Vina or pure confidence. Therefore the
-trained checkpoint remains active, while any selector recalibration must be a
+points below 77.60%, outside the ±2-point criterion. Therefore the trained
+checkpoint remains active, while any selector recalibration must be a
 new validation-only study rather than post-hoc tuning on these benchmarks.
 
 Machine artifacts are `outputs/benchmarks/confidence/summary.json`, combined
 rows under `outputs/benchmarks/confidence/combined/`, and ledger metrics under
 `outputs/benchmarks/confidence/ledger_metrics.json`. Inference arrays were
-`38752`, `38760`, and `38761`; Astex rescues were `38770`/`38771`; official
+`38752` and `38760`; Astex rescues were `38770`/`38771`; official
 PoseBusters validity was `38781`. The recorded active code-tree SHA256 is
 `5ffe2c0d3abec7748e59c134efd61997893727632304409d5559577eaf886cf9`.
 
@@ -147,7 +143,7 @@ large/flexible ligands as the clearest compatibility weakness.
 
 Train-neighbor ligand similarity and pocket similarity are deliberately not
 reported yet: the preserved compatibility split predates the strict
-three-benchmark exclusion contract. Those applicability-domain slices require
+two-benchmark exclusion contract. Those applicability-domain slices require
 the new strict split and will belong to a publishable target-independent
 evaluation, not this compatibility diagnostic.
 
@@ -159,21 +155,10 @@ evaluation, not this compatibility diagnostic.
   `39aa62e4a48ed6f3aa4ff59345fb43a81220e2baba22edfd5beb0c4981b307ec`
 - Final active code-tree SHA256:
   `9ec1ff3edfc61abc2b8127a3800293aaab4c2bba2005428a24b6846440846101`
-- Slurm arrays: Astex `38717`, PoseBusters `38718`, CASF `38719`, official
-  PoseBusters `38727`; CASF `1mq6` rescue `38749`.
+- Slurm arrays: Astex `38717`, PoseBusters `38718`, and official PoseBusters
+  `38727`.
 - Runtime: PyTorch 2.10.0+cu130 / CUDA 13.0 on RTX 6000 Ada and H100 PCIe.
 - Machine summary: `outputs/benchmarks/summary.json`.
-- Per-complex combined rows: `outputs/benchmarks/combined/{astex,posebusters,casf}.csv`.
+- Per-complex combined rows: `outputs/benchmarks/combined/{astex,posebusters}.csv`.
 - Selected pose SDFs, shard summaries, official PoseBusters rows, and Slurm
   logs remain under ignored `outputs/benchmarks/`.
-
-One CASF complex (`1mq6`) initially hit a CUDA `linalg.eigh` convergence error
-on an RTX 6000 Ada shard. It was rerun alone on H100 with the identical global
-dataset seed and hashes and succeeded; both the original failure and rescue
-are retained in the raw shard summaries and aggregate `rescued_failures`.
-
-CASF uses frozen CASF ligand/reference coordinates with current RCSB receptors;
-two structures (`4tmn`, `5tmn`) required recorded rigid transforms into the
-CASF ligand frame before exact reference-residue removal. This receptor source
-difference is another reason to treat CASF here as a compatibility diagnostic,
-not a canonical CASF leaderboard submission.

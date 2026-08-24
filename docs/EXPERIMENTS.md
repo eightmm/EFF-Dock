@@ -56,11 +56,11 @@ Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
   and reproduces historical Astex/PoseBusters within 2 percentage points.
 - Config: `EFFDOCK-CONFIDENCE-EXTMATCH-N80-S25-V1`; geometry-FT step 100000,
   confidence step 42500, seed 42, frozen reference-defined centers.
-- Result: Astex/PoseBusters/CASF frozen-composite <2A =
-  78.82/72.73/68.42%; same-candidate Vina+DG = 77.65/71.10/69.47%; pure
-  confidence = 76.47/73.05/69.47%; oracle-80 = 95.29/94.81/91.93%.
+- Result: Astex/PoseBusters frozen-composite <2A = 78.82/72.73%;
+  same-candidate Vina+DG = 77.65/71.10%; pure confidence = 76.47/73.05%;
+  oracle-80 = 95.29/94.81%.
 - Validity/completeness: official PoseBusters pass-all excluding RMSD = 54.87%
-  (169/308); 678/678 final rows, with two recorded Astex H100 numerical
+  (169/308); 393/393 final rows, with two recorded Astex H100 numerical
   rescues and no unresolved failures.
 - Historical evidence: single-run frozen selector Astex 81.18%, PoseBusters
   77.60%; hard-pair fine-tunes failed to beat step 42500 on validation.
@@ -68,8 +68,8 @@ Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
   over Vina), but historical reproduction failed (-2.35pp Astex, -4.87pp
   PoseBusters versus the ±2pp criterion). Keep the trained checkpoint; retain
   the composite for reproducibility and treat selector recalibration as a new
-  validation-only study. Pure confidence was slightly stronger overall.
-- Jobs: inference `38752`/`38760`/`38761`, Astex rescues `38770`/`38771`,
+  validation-only study. Neither selector dominated across both datasets.
+- Jobs: inference `38752`/`38760`, Astex rescues `38770`/`38771`,
   official validity `38781`; confidence prepare/train smokes `38773`/`38762`.
 - Artifacts: `docs/CONFIDENCE_BENCHMARK_PROTOCOL.md`,
   `outputs/benchmarks/confidence/summary.json`,
@@ -85,9 +85,8 @@ Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
   points without learned confidence.
 - Config: `EFFDOCK-REDOCK-EMA-N40-S25-V1`; N=40, 25 ODE steps, sigma=1,
   late schedule power=3, reference-defined 8A pocket center, seed=42.
-- Result: Astex/PoseBusters/CASF Vina+DG <2A = 64.71/64.29/59.30%; oracle-40
-  = 94.12/91.56/88.07%; official PoseBusters validity = 60.71%; 678/678 final
-  rows after one recorded CASF numerical rescue.
+- Result: Astex/PoseBusters Vina+DG <2A = 64.71/64.29%; oracle-40 =
+  94.12/91.56%; official PoseBusters validity = 60.71%; 393/393 final rows.
 - Conclusion: hypothesis passed. Keep the EMA sampler and fixed physical
   selector as the no-confidence compatibility baseline; prioritize selection
   and large/flexible-ligand behavior before a target-independent release.
@@ -103,7 +102,7 @@ Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
 - Config: `configs/train.yaml`; AdamW default; explicit pocket definitions.
 - Result: migration verification only; no new benchmark number claimed.
 - Conclusion: keep as the architecture/checkpoint compatibility baseline.
-- Next: create the frozen CASF mapping and pocket-center manifests, generate a
-  strict three-benchmark-excluded split, then run GPU train/inference smokes.
+- Next: freeze the Astex/PoseBusters mapping and pocket-center manifests,
+  generate a strict benchmark-excluded split, then run GPU train/inference smokes.
 
 ---

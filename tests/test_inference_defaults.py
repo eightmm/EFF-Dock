@@ -44,7 +44,10 @@ def test_dock_uses_promoted_inference_stack_by_default() -> None:
 
 
 def test_evaluate_uses_same_promoted_inference_stack_by_default() -> None:
-    args = build_evaluate_parser().parse_args(
+    parser = build_evaluate_parser()
+    dataset_action = next(action for action in parser._actions if action.dest == "dataset")
+    assert dataset_action.choices == ("astex", "posebusters")
+    args = parser.parse_args(
         [
             "--dataset",
             "astex",

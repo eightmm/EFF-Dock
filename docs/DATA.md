@@ -22,16 +22,15 @@ features are not silently zero-filled.
 
 `eff-dock data split` intersects the pool with successfully processed samples,
 canonicalizes ligands with RDKit, strictly removes canonical SMILES found in
-frozen Astex Diverse, PoseBusters v2, and CASF-2016 mappings, then groups
+frozen Astex Diverse and PoseBusters v2 mappings, then groups
 validation by `pocket_fident__70__community`. Train and validation must be
 disjoint on sample key, canonical SMILES, and pocket70 community.
 
-The command intentionally fails until all three files exist:
+The command intentionally fails until both files exist:
 
 ```text
 data/external_test/astex_smiles.json
 data/external_test/pb_smiles.json
-data/external_test/casf_smiles.json
 ```
 
 This prevents an apparently strict split from being generated with an omitted

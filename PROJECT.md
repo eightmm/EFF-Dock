@@ -23,7 +23,7 @@
 - Scope:
   - PLINDER curation, preprocessing, split generation, and manifest checks.
   - Fragment-level SE(3) flow-matching training and exact checkpoint resume.
-  - External docking evaluation on PoseBusters v2, Astex Diverse, and CASF-2016.
+  - External docking evaluation on PoseBusters v2 and Astex Diverse.
   - Pocket-conditioned inference from a protein structure, ligand, and an
     explicit pocket definition.
   - Portable release weights and a minimal legacy-weight compatibility path.
@@ -126,7 +126,7 @@ equations, coefficients, typing, gradients, or selection values to
   N80/S25/sigma0.5/pocket10 pose sets. The docking generator and frozen
   external benchmark manifests remain unchanged.
 - Model selection boundary: loss variants and checkpoints are selected using
-  PLINDER validation only. PoseBusters, Astex, and CASF are not used for loss,
+  PLINDER validation only. PoseBusters and Astex are not used for loss,
   hyperparameter, checkpoint, or selector tuning and are opened only after a
   candidate is frozen.
 - Primary screen metric: validation success-head selected RMSD <2A. The frozen
@@ -224,7 +224,7 @@ eff-dock dock --protein P.pdb --ligand L.sdf --pocket-center X,Y,Z \
 - Existing processed samples: `data/plinder_processed/`.
 - Existing split: `data/splits/plinder.json` with 47,310 train and 1,076 val
   samples; compatibility-only until the EFF-Dock split contract is finalized.
-- External benchmarks: PoseBusters v2, Astex Diverse, and CASF-2016; benchmark
+- External benchmarks: PoseBusters v2 and Astex Diverse; benchmark
   snapshots and molecule mappings must be versioned in manifests even though
   raw structures remain ignored by Git.
 - Coordinate unit: Angstrom throughout preprocessing, training, inference, and
@@ -239,8 +239,8 @@ eff-dock dock --protein P.pdb --ligand L.sdf --pocket-center X,Y,Z \
   no crystal target pose, label-derived feature, or benchmark outcome.
 - Entity IDs/standardization: immutable PLINDER `sample_key`; canonical RDKit
   SMILES for ligand grouping; PLINDER pocket70 community for pocket grouping.
-- Source snapshot/provenance: PLINDER 2024-06 v2 plus frozen PoseBusters v2,
-  Astex Diverse, and CASF-2016 snapshots; preprocessing version and hashes are
+- Source snapshot/provenance: PLINDER 2024-06 v2 plus frozen PoseBusters v2 and
+  Astex Diverse snapshots; preprocessing version and hashes are
   carried by manifests/checkpoints.
 - Label/target definition: experimental bound per-fragment translation and
   proper rotation, with flow velocity targets derived from the declared prior
@@ -270,7 +270,7 @@ eff-dock dock --protein P.pdb --ligand L.sdf --pocket-center X,Y,Z \
 - Alternate structures, poses, and derived views of one complex remain on the
   same side.
 - External benchmark complexes are frozen before training. Canonical ligand
-  SMILES from PoseBusters v2, Astex Diverse, and CASF-2016 are strictly excluded
+  SMILES from PoseBusters v2 and Astex Diverse are strictly excluded
   from train. Pocket similarity is retained as an evaluation slice rather than
   used as an additional destructive exclusion rule.
 - Every registered split gets an OMS data manifest; `check` and `leakage` must
@@ -322,7 +322,6 @@ eff-dock dock --protein P.pdb --ligand L.sdf --pocket-center X,Y,Z \
   ligand RMSD < 2 Angstrom, using the frozen trained-confidence selector.
 - Secondary metrics:
   - Astex Diverse selected top-1 < 2 Angstrom;
-  - CASF-2016 selected top-1 and oracle top-k RMSD;
   - PoseBusters chemical/structural validity;
   - oracle top-k success to separate sampling from selection quality.
 - Baselines:
