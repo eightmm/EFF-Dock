@@ -27,6 +27,7 @@ from effdock.geometry.se3 import (
     quaternion_to_matrix,
     standardize_quaternion,
 )
+from effdock.inference.defaults import DEFAULT_NUM_STEPS
 
 
 # ---------------------------------------------------------------------------
@@ -243,7 +244,7 @@ def sample_unified(
     meta: dict,
     num_samples: int = 1,
     *,
-    num_steps: int = 25,
+    num_steps: int = DEFAULT_NUM_STEPS,
     translation_sigma: float | Tensor = 5.0,
     time_schedule: str = "late",
     schedule_power: float = 3.0,
@@ -552,7 +553,7 @@ def sample_unified_multi_sigma(
     *,
     sigma_list: list[float],
     samples_per_sigma: list[int] | int,
-    num_steps: int = 25,
+    num_steps: int = DEFAULT_NUM_STEPS,
     time_schedule: str = "late",
     schedule_power: float = 3.0,
     device: torch.device = torch.device("cpu"),

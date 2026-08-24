@@ -12,10 +12,13 @@
 ## Intended use
 
 Rank multiple poses generated for the same receptor/ligand/explicit-pocket
-complex. The matched preset is 80 poses, 25 ODE steps, translation sigma 0.5,
-and a 10A protein crop. The model predicts pose RMSD and success plus per-atom
-displacement/success heads; these are ranking signals and are not claimed to be
-calibrated across datasets or sampling distributions.
+complex. This checkpoint's training-matched preset was 80 poses, 25 ODE steps,
+translation sigma 0.5, and a 10A protein crop. The public `dock` and `evaluate`
+commands now use 100 poses and 10 ODE steps by default while retaining sigma
+0.5 and the 10A crop. This is an explicit candidate-distribution shift. The
+model predicts pose RMSD and success plus per-atom displacement/success heads;
+these are ranking signals and are not claimed to be calibrated across datasets
+or sampling distributions.
 
 The frozen historical composite selector is
 `pair_gate_density_rank_vote_plclash_ambig`. It combines the learned heads with

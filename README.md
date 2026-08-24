@@ -62,16 +62,22 @@ this path. See
 
 ## Retained weights
 
-Model artifacts under `weights/` are tracked with Git LFS. The recommended
-matched inference stack is:
+Model artifacts under `weights/` are tracked with Git LFS. The public default
+inference stack is:
 
 - `effdock_geometry_ft_100k_best.pt`
 - `effdock_confidence_extmatch_n80_s25_step42500.pt`
-- 80 poses, 25 ODE steps, translation sigma 0.5, and a 10A pocket crop
+- 100 candidate poses, 10 ODE steps, translation sigma 0.5, and a 10A pocket crop
 
-Both `eff-dock dock` and `eff-dock evaluate` use this matched stack by
-default. Pass explicit checkpoint or sampling arguments to override it, or
+Both `eff-dock dock` and `eff-dock evaluate` therefore run with
+`--num-samples 100 --num-steps 10` unless explicitly overridden. Use
 `--no-confidence` to disable learned reranking.
+
+The packaged confidence checkpoint was originally trained on N80/S25 pose
+banks. N100/S10 is the current deployment sampling budget, so this is an
+intentional candidate-distribution shift rather than a claim that the retained
+checkpoint was trained with the new defaults. The historical N80/S25 contract
+remains in the model card for exact reproduction.
 
 Checksums, compatibility notes, and the confidence model card are in
 [`weights/MANIFEST.md`](weights/MANIFEST.md) and
@@ -123,28 +129,6 @@ and output roots. The external scripts reproduce the frozen refined-pose
 rescoring and official PoseBusters validity decomposition. Generated banks,
 checkpoints, and cluster-specific submission wrappers are intentionally not
 stored in Git.
-
-## Reference-defined redocking diagnostics
-
-The retained N80 confidence stack produced the following frozen-manifest
-diagnostic results. These use reference-defined pocket centers and must not be
-presented as blind-pocket or prospective docking performance.
-
-| Dataset | N | Pure confidence RMSD <2A | Frozen composite RMSD <2A | Oracle-80 RMSD <2A |
-|---|---:|---:|---:|---:|
-| Astex Diverse | 85 | 76.47% | 78.82% | 95.29% |
-| PoseBusters v2 | 308 | 73.05% | 72.73% | 94.81% |
-| CASF-2016 | 285 | 69.47% | 68.42% | 91.93% |
-
-The official PoseBusters pass-all validity of the composite-selected poses was
-54.87%. Full protocol, limitations, failure/rescue provenance, and selector
-comparisons are in [`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md).
-
-Prospective docking and publishable target-independent evaluation require
-target-independent pocket definitions. The retained-weight compatibility
-benchmarks are separately labeled as reference-defined oracle-pocket redocking
-diagnostics in [`docs/BENCHMARK_PROTOCOL.md`](docs/BENCHMARK_PROTOCOL.md) and
-[`docs/CONFIDENCE_BENCHMARK_PROTOCOL.md`](docs/CONFIDENCE_BENCHMARK_PROTOCOL.md).
 
 Raw data, generated outputs, and historical migration material stay local and
 are ignored by Git. The active package, configs, tests, documentation, and

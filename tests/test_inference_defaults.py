@@ -10,7 +10,15 @@ from effdock.inference.defaults import (
     DEFAULT_SIGMA,
 )
 from effdock.inference.docking import build_arg_parser as build_dock_parser
+from effdock.inference.sampler import sample_unified, sample_unified_multi_sigma
 from effdock.workflows.evaluate import build_arg_parser as build_evaluate_parser
+
+
+def test_public_sampling_budget_is_n100_s10() -> None:
+    assert DEFAULT_NUM_SAMPLES == 100
+    assert DEFAULT_NUM_STEPS == 10
+    assert sample_unified.__kwdefaults__["num_steps"] == DEFAULT_NUM_STEPS
+    assert sample_unified_multi_sigma.__kwdefaults__["num_steps"] == DEFAULT_NUM_STEPS
 
 
 def test_dock_uses_promoted_inference_stack_by_default() -> None:
