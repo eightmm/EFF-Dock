@@ -78,9 +78,26 @@ Checksums, compatibility notes, and the confidence model card are in
 [`weights/CONFIDENCE_MODEL_CARD.md`](weights/CONFIDENCE_MODEL_CARD.md).
 
 The later S50/sigma-2 symmetry-confidence experiment is complete but remains
-an unpromoted research result. Its internally selected U25k checkpoint,
-terminal U50k checkpoint, exact hashes, and repeated-use Astex/PoseBusters
-diagnostics are documented in
+an unpromoted research result. The registered internal PLINDER rule selected
+U25k (`58.45%` Top-1 `<2A`; U50k `56.81%`), while repeated-use external
+characterization consistently favored U50k on the same frozen sigma-2 N100
+Astex/PoseBusters candidate banks:
+
+| Dataset/stage | U25k Top-1 <2A | U50k Top-1 <2A | U25k joint valid+<2A | U50k joint valid+<2A |
+|---|---:|---:|---:|---:|
+| Astex raw | 80.00% | 82.35% | n/a | n/a |
+| Astex refined | 84.71% | 85.88% | 80.00% | 81.18% |
+| PoseBusters raw | 75.97% | 78.25% | n/a | 56.82% |
+| PoseBusters refined | 81.17% | 84.09% | 77.60% | 81.17% |
+
+These Astex/PoseBusters results are descriptive external evaluations, not an
+absence of external testing. Because both benchmarks had already been opened,
+they cannot override the preregistered internal checkpoint selection or alone
+promote U25k/U50k into the public deployment defaults. U25k remains the
+internally selected `best.pt`; U50k remains the terminal `latest.pt` and the
+more promising deployment candidate under this repeated-use characterization.
+Exact checkpoint hashes, validity decomposition, and the frozen evaluation
+contract are documented in
 [`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`](docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md).
 
 ## Reference-defined redocking diagnostics
