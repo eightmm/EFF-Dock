@@ -6,6 +6,7 @@ import math
 import os
 import random
 import time
+from datetime import timedelta
 from pathlib import Path
 
 import numpy as np
@@ -17,7 +18,11 @@ from torch.optim import AdamW
 from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data import DataLoader, DistributedSampler, Sampler, Subset
 
-from effdock.checkpoint import load_checkpoint_file, load_portable_model_state
+from effdock.checkpoint import (
+    atomic_torch_save,
+    load_checkpoint_file,
+    load_portable_model_state,
+)
 from effdock.data.dataset import EFFDockDataset, effdock_collate
 from effdock.geometry.flow_matching import integrate_se3_step, sample_prior_poses
 from effdock.geometry.se3 import quaternion_to_matrix
@@ -38,7 +43,10 @@ def setup_ddp() -> tuple[int, int, int]:
     if world_size > 1:
         cuda_idx = 0 if torch.cuda.device_count() == 1 else local_rank
         torch.cuda.set_device(cuda_idx)
-        dist.init_process_group(backend="nccl")
+        timeout_minutes = int(os.environ.get("EFFDOCK_DDP_TIMEOUT_MIN", "10"))
+        if timeout_minutes <= 0:
+            raise ValueError("EFFDOCK_DDP_TIMEOUT_MIN must be positive")
+        dist.init_process_group(backend="nccl", timeout=timedelta(minutes=timeout_minutes))
     return rank, local_rank, world_size
 
 
@@ -91,7 +99,14 @@ def configure_optimizers(
     if muon_params:
         from torch.optim import Muon
 
-        optimizers.append(Muon(muon_params, lr=muon_lr, momentum=0.95))
+        optimizers.append(
+            Muon(
+                muon_params,
+                lr=muon_lr,
+                momentum=0.95,
+                weight_decay=weight_decay,
+            )
+        )
     if adamw_params:
         optimizers.append(AdamW(adamw_params, lr=lr, weight_decay=weight_decay, betas=(0.9, 0.95)))
     return optimizers
@@ -144,6 +159,60 @@ def _sample_costs(dataset) -> list[float] | None:
     return None
 
 
+def _balanced_shard_indices(dataset, *, n_items: int, num_replicas: int, rank: int) -> list[int]:
+    """Greedily balance deterministic evaluation indices by static graph cost."""
+    if num_replicas <= 0 or rank < 0 or rank >= num_replicas:
+        raise ValueError("invalid distributed shard specification")
+    indices = list(range(max(int(n_items), 0)))
+    if num_replicas == 1:
+        return indices
+
+    costs = _sample_costs(dataset)
+    if costs is None or len(costs) < len(indices):
+        return indices[rank::num_replicas]
+    selected_costs = [float(costs[index]) for index in indices]
+    if any(not math.isfinite(cost) or cost < 0.0 for cost in selected_costs):
+        return indices[rank::num_replicas]
+
+    shards: list[list[int]] = [[] for _ in range(num_replicas)]
+    totals = [0.0] * num_replicas
+    for index in sorted(indices, key=lambda item: (-selected_costs[item], item)):
+        target = min(
+            range(num_replicas),
+            key=lambda replica: (totals[replica], len(shards[replica]), replica),
+        )
+        shards[target].append(index)
+        totals[target] += selected_costs[index]
+    return sorted(shards[rank])
+
+
+def _all_ranks_finite(value: torch.Tensor, world_size: int) -> bool:
+    """Return one synchronized finite decision so DDP ranks never skip alone."""
+    finite = torch.isfinite(value.detach()).all().to(dtype=torch.int32)
+    if world_size > 1:
+        dist.all_reduce(finite, op=dist.ReduceOp.MIN)
+    return bool(finite.item())
+
+
+def _require_finite_metrics(
+    metrics: dict[str, float],
+    *,
+    context: str,
+    device: torch.device,
+    world_size: int,
+) -> None:
+    """Fail every rank together when an evaluation emits NaN or infinity."""
+    if not metrics:
+        raise RuntimeError(f"{context} produced no metrics")
+    values = torch.tensor(
+        [float(value) for value in metrics.values()],
+        dtype=torch.float64,
+        device=device,
+    )
+    if not _all_ranks_finite(values, world_size):
+        raise FloatingPointError(f"{context} produced non-finite metrics: {metrics!r}")
+
+
 class DistributedSizeAwareSampler(Sampler[int]):
     """DDP sampler that balances variable-size graph batches across ranks.
 
@@ -163,6 +232,7 @@ class DistributedSizeAwareSampler(Sampler[int]):
         shuffle: bool = True,
         seed: int = 42,
         bucket_mult: int = 16,
+        drop_last: bool = True,
     ) -> None:
         self.dataset = dataset
         self.batch_size = int(batch_size)
@@ -171,11 +241,15 @@ class DistributedSizeAwareSampler(Sampler[int]):
         self.shuffle = shuffle
         self.seed = int(seed)
         self.bucket_mult = max(int(bucket_mult), 1)
+        self.drop_last = bool(drop_last)
         self.epoch = 0
         costs = _sample_costs(dataset)
         self.costs = costs if costs is not None else [1.0] * len(dataset)
         self.group_size = self.batch_size * self.num_replicas
-        self.num_global_batches = len(dataset) // self.group_size
+        if self.drop_last:
+            self.num_global_batches = len(dataset) // self.group_size
+        else:
+            self.num_global_batches = math.ceil(len(dataset) / self.group_size)
 
     def __len__(self) -> int:
         return self.num_global_batches * self.batch_size
@@ -193,7 +267,15 @@ class DistributedSizeAwareSampler(Sampler[int]):
             indices = list(range(n))
 
         usable = self.num_global_batches * self.group_size
-        indices = indices[:usable]
+        if self.drop_last:
+            indices = indices[:usable]
+        elif usable > n:
+            # Retain every split member, padding only enough for equal complete
+            # batches on every DDP rank. The duplicate tail rotates by epoch.
+            if n == 0:
+                return iter([])
+            repeats = math.ceil((usable - n) / n)
+            indices.extend((indices * repeats)[: usable - n])
         bucket_size = self.group_size * self.bucket_mult
         rank_indices: list[int] = []
 
@@ -333,6 +415,15 @@ class Trainer:
         self.wandb_run_id: str | None = None
         self._wandb_initialized = False
         self._best_rmsd = float("inf")
+        self.rollout_selection_metric = str(
+            cfg["logging"].get("rollout_selection_metric", "rollout/rmsd_median")
+        )
+        self.rollout_selection_mode = str(cfg["logging"].get("rollout_selection_mode", "min"))
+        if self.rollout_selection_mode not in ("min", "max"):
+            raise ValueError("logging.rollout_selection_mode must be 'min' or 'max'")
+        self._best_selection_value = (
+            float("inf") if self.rollout_selection_mode == "min" else -float("inf")
+        )
 
     # ---- Data ----
 
@@ -378,6 +469,10 @@ class Trainer:
             if dcfg.get("prior_sigma_weights")
             else None,
             time_distribution=dcfg.get("time_distribution", "uniform"),
+            time_early_replay_weights=tuple(
+                dcfg.get("time_early_replay_weights", (0.80, 0.10, 0.10))
+            ),
+            time_early_replay_max=dcfg.get("time_early_replay_max", 0.30),
             pose_objective=dcfg.get("pose_objective", "linear_fm"),
             score_rot_sigma_max=dcfg.get("score_rot_sigma_max", math.pi),
             score_alpha_min=dcfg.get("score_alpha_min", 0.0),
@@ -413,6 +508,9 @@ class Trainer:
         val_kwargs["prior_sigma_range"] = None
         val_kwargs["prior_sigma_values"] = None
         val_kwargs["prior_sigma_weights"] = None
+        val_kwargs["time_distribution"] = dcfg.get(
+            "val_time_distribution", dcfg.get("time_distribution", "uniform")
+        )
         val_kwargs["local_refine_prob"] = 0.0
 
         if split_file is not None:
@@ -433,6 +531,20 @@ class Trainer:
                 )
             else:
                 train_ds, val_ds = full_ds, None
+
+        expected_train_samples = dcfg.get("expected_train_samples")
+        if expected_train_samples is not None and len(train_ds) != int(expected_train_samples):
+            raise RuntimeError(
+                "filtered train split size changed: "
+                f"expected {int(expected_train_samples)}, got {len(train_ds)}"
+            )
+        expected_val_samples = dcfg.get("expected_val_samples")
+        actual_val_samples = len(val_ds) if val_ds is not None else 0
+        if expected_val_samples is not None and actual_val_samples != int(expected_val_samples):
+            raise RuntimeError(
+                "filtered validation split size changed: "
+                f"expected {int(expected_val_samples)}, got {actual_val_samples}"
+            )
 
         if overfit_mode:
             max_samples = min(len(train_ds), bs * overfit_batches)
@@ -459,6 +571,7 @@ class Trainer:
                     shuffle=True,
                     seed=tcfg.get("seed", 42),
                     bucket_mult=tcfg.get("size_aware_bucket_mult", 16),
+                    drop_last=tcfg.get("size_aware_drop_last", True),
                 )
             else:
                 self.train_sampler = DistributedSampler(
@@ -649,8 +762,25 @@ class Trainer:
 
     # ---- Checkpoint ----
 
+    @staticmethod
+    def _validate_resume_config(current: dict, saved: object) -> None:
+        """Fail closed when an exact-resume run no longer has the same config."""
+        if not isinstance(saved, dict):
+            raise RuntimeError("strict resume requires an embedded checkpoint config")
+        if saved == current:
+            return
+        sections = sorted(
+            key for key in set(current) | set(saved) if current.get(key) != saved.get(key)
+        )
+        raise RuntimeError(
+            "resume checkpoint config differs from the requested config; "
+            f"changed top-level sections={sections}"
+        )
+
     def load_checkpoint(self, path: str) -> None:
         ckpt = load_checkpoint_file(path)
+        if self.cfg["training"].get("strict_resume_config", False):
+            self._validate_resume_config(self.cfg, ckpt.get("config"))
         raw_model = self.model.module if isinstance(self.model, DDP) else self.model
         load_portable_model_state(raw_model, ckpt["model_state_dict"])
         if self.ema_model is not None and "ema_state_dict" in ckpt:
@@ -679,7 +809,43 @@ class Trainer:
             self.resume_batch_idx = 0
         self.wandb_run_id = ckpt.get("wandb_run_id")
         self._best_rmsd = float(ckpt.get("best_rmsd", float("inf")))
-        self._restore_rng_state(ckpt.get("rng_state"))
+        saved_selection_metric = ckpt.get("best_selection_metric")
+        saved_selection_mode = ckpt.get("best_selection_mode")
+        if saved_selection_metric is None:
+            if (
+                self.rollout_selection_metric == "rollout/rmsd_median"
+                and self.rollout_selection_mode == "min"
+            ):
+                self._best_selection_value = self._best_rmsd
+        else:
+            if saved_selection_metric != self.rollout_selection_metric:
+                raise RuntimeError(
+                    "resume checkpoint rollout selection metric differs from config: "
+                    f"{saved_selection_metric!r} != {self.rollout_selection_metric!r}"
+                )
+            if saved_selection_mode != self.rollout_selection_mode:
+                raise RuntimeError(
+                    "resume checkpoint rollout selection mode differs from config: "
+                    f"{saved_selection_mode!r} != {self.rollout_selection_mode!r}"
+                )
+            self._best_selection_value = float(ckpt["best_selection_value"])
+        rank_rng_states = ckpt.get("rank_rng_states")
+        if rank_rng_states is not None:
+            if not isinstance(rank_rng_states, list) or len(rank_rng_states) != self.world_size:
+                raise RuntimeError(
+                    "resume checkpoint rank RNG layout differs from the current world size: "
+                    f"saved={len(rank_rng_states) if isinstance(rank_rng_states, list) else 'invalid'}, "
+                    f"current={self.world_size}"
+                )
+            rng_state = rank_rng_states[self.rank]
+        else:
+            if self.world_size > 1 and self.cfg["training"].get("strict_resume_config", False):
+                raise RuntimeError(
+                    "strict distributed resume requires per-rank RNG states; "
+                    "use --init-from for legacy checkpoints"
+                )
+            rng_state = ckpt.get("rng_state")
+        self._restore_rng_state(rng_state)
         if self.is_main:
             print(
                 f"Resumed from {path} (data pass {self.start_epoch}, "
@@ -703,7 +869,13 @@ class Trainer:
                 f"Initialized model weights from {path} (source step {step}); optimizer/scheduler reset"
             )
 
-    def _build_checkpoint_state(self, epoch: int, metrics: dict) -> dict:
+    def _build_checkpoint_state(
+        self,
+        epoch: int,
+        metrics: dict,
+        *,
+        rank_rng_states: list[dict] | None = None,
+    ) -> dict:
         raw_model = self.model.module if isinstance(self.model, DDP) else self.model
         state = {
             "format_version": 1,
@@ -719,9 +891,18 @@ class Trainer:
             "metrics": metrics,
             "config": self.cfg,
             "best_rmsd": self._best_rmsd,
-            "rng_state": self._capture_rng_state(),
+            "best_selection_metric": self.rollout_selection_metric,
+            "best_selection_mode": self.rollout_selection_mode,
+            "best_selection_value": self._best_selection_value,
+            # Keep the legacy rank-0 field readable while exact DDP resume
+            # restores the distinct RNG stream for every rank.
+            "rng_state": (
+                rank_rng_states[0] if rank_rng_states is not None else self._capture_rng_state()
+            ),
             "wandb_run_id": self.wandb_run_id,
         }
+        if rank_rng_states is not None:
+            state["rank_rng_states"] = rank_rng_states
         if self.ema_model is not None:
             state["ema_state_dict"] = self.ema_model.state_dict()
         return state
@@ -763,27 +944,69 @@ class Trainer:
         if torch.cuda.is_available() and "cuda" in state:
             torch.cuda.set_rng_state_all(state["cuda"])
 
+    def _collect_rank_rng_states(self) -> list[dict] | None:
+        """Collect exact rank-local RNG streams at a synchronized save point."""
+        local_state = self._capture_rng_state()
+        if self.world_size <= 1:
+            return [local_state]
+        gathered: list[dict] | None = [None] * self.world_size if self.is_main else None  # type: ignore[list-item]
+        dist.gather_object(local_state, gathered, dst=0)
+        return gathered
+
     def _save_latest(self, epoch: int, metrics: dict) -> None:
         """Save latest.pt (overwritten every val). Used for resume."""
+        rank_rng_states = self._collect_rank_rng_states()
         if not self.is_main:
             return
-        state = self._build_checkpoint_state(epoch, metrics)
-        torch.save(state, self.ckpt_dir / "latest.pt")
+        assert rank_rng_states is not None
+        state = self._build_checkpoint_state(
+            epoch,
+            metrics,
+            rank_rng_states=rank_rng_states,
+        )
+        atomic_torch_save(state, self.ckpt_dir / "latest.pt")
 
     def _save_rollout(self, epoch: int, metrics: dict) -> None:
         """Save a named rollout checkpoint + update best.pt if RMSD improved."""
+        # Update selection state before serialization so named and best
+        # checkpoints and every rank carry the exact threshold used on resume.
+        rmsd = metrics.get("rollout/rmsd_median", float("inf"))
+        if math.isfinite(float(rmsd)) and rmsd < self._best_rmsd:
+            self._best_rmsd = rmsd
+        if self.rollout_selection_metric not in metrics:
+            raise KeyError(
+                f"rollout selection metric missing from evaluation: {self.rollout_selection_metric}"
+            )
+        selection_value = float(metrics[self.rollout_selection_metric])
+        if not math.isfinite(selection_value):
+            raise FloatingPointError(
+                f"non-finite rollout selection metric {self.rollout_selection_metric}"
+            )
+        improved = (
+            selection_value < self._best_selection_value
+            if self.rollout_selection_mode == "min"
+            else selection_value > self._best_selection_value
+        )
+        if improved:
+            self._best_selection_value = selection_value
+
+        rank_rng_states = self._collect_rank_rng_states()
         if not self.is_main:
             return
-        state = self._build_checkpoint_state(epoch, metrics)
+        assert rank_rng_states is not None
+        state = self._build_checkpoint_state(
+            epoch,
+            metrics,
+            rank_rng_states=rank_rng_states,
+        )
         path = self.ckpt_dir / f"rollout_step{self.global_step:07d}.pt"
-        torch.save(state, path)
+        atomic_torch_save(state, path)
 
-        # Update best.pt if median RMSD improved
-        rmsd = metrics.get("rollout/rmsd_median", float("inf"))
-        if rmsd < self._best_rmsd:
-            self._best_rmsd = rmsd
-            torch.save(state, self.ckpt_dir / "best.pt")
-            print(f"  New best RMSD: {rmsd:.2f}A → saved best.pt")
+        if improved:
+            atomic_torch_save(state, self.ckpt_dir / "best.pt")
+            print(
+                f"  New best {self.rollout_selection_metric}: {selection_value:.6g} → saved best.pt"
+            )
 
     def _init_wandb(self) -> None:
         if not self.use_wandb or self._wandb_initialized:
@@ -846,8 +1069,19 @@ class Trainer:
         epoch_loss = 0.0
         epoch_steps = 0
         avg_loss = 0.0
+        final_checkpoint_metrics: dict[str, float] | None = None
 
         try:
+            if lcfg.get("eval_on_start", False) and self.global_step == 0:
+                initial_metrics: dict[str, float] = {}
+                if val_every > 0:
+                    initial_metrics.update(self._validate(epoch))
+                if rollout_every > 0:
+                    initial_metrics.update(self._validate_rollout(epoch))
+                    self._save_rollout(epoch, initial_metrics)
+                if initial_metrics:
+                    self._save_latest(epoch, initial_metrics)
+
             while self.global_step < total_steps:
                 if self.train_sampler is not None:
                     self.train_sampler.set_epoch(epoch)
@@ -883,10 +1117,14 @@ class Trainer:
                         out = self.model(batch)
                     losses = self._compute_loss_unified(out, batch)
                     raw_loss = losses["loss"]
-                    if not torch.isfinite(raw_loss):
-                        print(f"  WARNING: non-finite loss at E{epoch} B{batch_idx}, skipping")
+                    if not _all_ranks_finite(raw_loss, self.world_size):
+                        message = f"non-finite loss on at least one rank at E{epoch} B{batch_idx}"
                         for opt in self.optimizers:
                             opt.zero_grad()
+                        if tcfg.get("fail_on_nonfinite", False):
+                            raise FloatingPointError(message)
+                        if self.is_main:
+                            print(f"  WARNING: {message}; skipping on every rank")
                         continue
                     loss = raw_loss / self.grad_accum
                     loss.backward()
@@ -900,10 +1138,23 @@ class Trainer:
                     epoch_steps += 1
 
                     if (batch_idx + 1) % self.grad_accum == 0:
-                        grad_norm = nn.utils.clip_grad_norm_(
+                        grad_norm_tensor = nn.utils.clip_grad_norm_(
                             self.model.parameters(),
                             self.max_grad_norm if self.max_grad_norm > 0 else float("inf"),
-                        ).item()
+                        )
+                        if not _all_ranks_finite(grad_norm_tensor, self.world_size):
+                            message = (
+                                "non-finite gradient norm on at least one rank "
+                                f"at E{epoch} B{batch_idx}"
+                            )
+                            for opt in self.optimizers:
+                                opt.zero_grad()
+                            if tcfg.get("fail_on_nonfinite", False):
+                                raise FloatingPointError(message)
+                            if self.is_main:
+                                print(f"  WARNING: {message}; skipping on every rank")
+                            continue
+                        grad_norm = grad_norm_tensor.item()
                         for opt in self.optimizers:
                             opt.step()
                             opt.zero_grad()
@@ -915,22 +1166,22 @@ class Trainer:
                             raw = self.model.module if isinstance(self.model, DDP) else self.model
                             self.ema_model.update_parameters(raw)
                         if self.global_step >= total_steps:
-                            # Final val + rollout before exiting
+                            # Preserve every final metric in latest.pt; the old
+                            # unconditional final save used to overwrite them.
+                            final_checkpoint_metrics = {
+                                "train_loss": epoch_loss / max(epoch_steps, 1)
+                            }
                             if val_every > 0:
                                 val_metrics = self._validate(epoch)
-                                self._save_latest(
-                                    epoch,
-                                    {"train_loss": epoch_loss / max(epoch_steps, 1), **val_metrics},
-                                )
+                                final_checkpoint_metrics.update(val_metrics)
                             if rollout_every > 0:
                                 rollout_metrics = self._validate_rollout(epoch)
+                                final_checkpoint_metrics.update(rollout_metrics)
                                 self._save_rollout(
                                     epoch,
-                                    {
-                                        "train_loss": epoch_loss / max(epoch_steps, 1),
-                                        **rollout_metrics,
-                                    },
+                                    final_checkpoint_metrics,
                                 )
+                            self._save_latest(epoch, final_checkpoint_metrics)
                             break
                     else:
                         grad_norm = None
@@ -977,42 +1228,55 @@ class Trainer:
                                     log_dict[f"step/{extra_key}"] = losses[extra_key].item()
                             wandb.log(log_dict, step=self.global_step)
 
-                    # Val (loss only) + save latest
-                    if val_every > 0 and self.global_step > 0 and self.global_step % val_every == 0:
-                        val_metrics = self._validate(epoch)
-                        self._save_latest(
-                            epoch, {"train_loss": epoch_loss / max(epoch_steps, 1), **val_metrics}
-                        )
-
-                    # Rollout (ODE integration + RMSD) + save rollout checkpoint
-                    if (
+                    val_trigger = (
+                        val_every > 0 and self.global_step > 0 and self.global_step % val_every == 0
+                    )
+                    rollout_trigger = (
                         rollout_every > 0
                         and self.global_step > 0
                         and self.global_step % rollout_every == 0
-                    ):
-                        rollout_metrics = self._validate_rollout(epoch)
-                        self._save_rollout(
-                            epoch,
-                            {"train_loss": epoch_loss / max(epoch_steps, 1), **rollout_metrics},
-                        )
+                    )
+                    if val_trigger or rollout_trigger:
+                        checkpoint_metrics = {"train_loss": epoch_loss / max(epoch_steps, 1)}
+                        if val_trigger:
+                            checkpoint_metrics.update(self._validate(epoch))
+                        if rollout_trigger:
+                            checkpoint_metrics.update(self._validate_rollout(epoch))
+                            self._save_rollout(epoch, checkpoint_metrics)
+                        # Save only after rollout has updated the registered best
+                        # threshold, so latest.pt is a lossless resume point.
+                        self._save_latest(epoch, checkpoint_metrics)
 
                 # Flush leftover gradients at epoch end
                 n_batches = batch_idx + 1 if epoch_steps > 0 else 0
                 if n_batches > 0 and n_batches % self.grad_accum != 0:
-                    if self.max_grad_norm > 0:
-                        nn.utils.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
-                    for opt in self.optimizers:
-                        opt.step()
-                        opt.zero_grad()
-                    for sched in self.schedulers:
-                        sched.step()
-                    self.global_step += 1
+                    leftover_grad_norm = nn.utils.clip_grad_norm_(
+                        self.model.parameters(),
+                        self.max_grad_norm if self.max_grad_norm > 0 else float("inf"),
+                    )
+                    if not _all_ranks_finite(leftover_grad_norm, self.world_size):
+                        message = (
+                            f"non-finite leftover gradient norm on at least one rank at E{epoch}"
+                        )
+                        for opt in self.optimizers:
+                            opt.zero_grad()
+                        if tcfg.get("fail_on_nonfinite", False):
+                            raise FloatingPointError(message)
+                        if self.is_main:
+                            print(f"  WARNING: {message}; skipping on every rank")
+                    else:
+                        for opt in self.optimizers:
+                            opt.step()
+                            opt.zero_grad()
+                        for sched in self.schedulers:
+                            sched.step()
+                        self.global_step += 1
 
                 # Epoch summary
                 elapsed = time.time() - t0
+                avg_loss = epoch_loss / epoch_steps if epoch_steps > 0 else float("nan")
                 if self.is_main:
                     if epoch_steps > 0:
-                        avg_loss = epoch_loss / epoch_steps
                         avg_v = epoch_loss_v / epoch_steps
                         avg_w = epoch_loss_w / epoch_steps
                         cv = epoch_cos_v / epoch_steps
@@ -1024,10 +1288,9 @@ class Trainer:
                         # Epoch-level wandb logging removed — step-level (every 50 steps)
                         # provides finer granularity; epoch averages add chart clutter.
                     else:
-                        avg_loss = float("nan")
                         print(f"Epoch {epoch}: ALL BATCHES SKIPPED ({elapsed:.1f}s)")
 
-                if overfit_mode and self.is_main and (epoch + 1) % 50 == 0:
+                if overfit_mode and (epoch + 1) % 50 == 0:
                     self._save_latest(epoch, {"train_loss": avg_loss})
 
                 if self.global_step < total_steps:
@@ -1038,14 +1301,18 @@ class Trainer:
                     self._next_batch_idx = 0
 
             # Final save
+            if final_checkpoint_metrics is None:
+                final_checkpoint_metrics = {"train_loss": avg_loss}
+                self._save_latest(epoch, final_checkpoint_metrics)
             if self.is_main:
-                self._save_latest(epoch, {"train_loss": avg_loss})
                 print("Training complete.")
 
         except KeyboardInterrupt:
             if self.is_main:
-                print("Interrupted. Saving checkpoint...")
-                self._save_latest(epoch, {"train_loss": epoch_loss / max(epoch_steps, 1)})
+                print(
+                    "Interrupted. Keeping the last synchronized latest.pt; "
+                    "an asynchronous rank-local save would not be exactly resumable."
+                )
         finally:
             cleanup_ddp(self.world_size)
             if self.use_wandb:
@@ -1071,6 +1338,7 @@ class Trainer:
         total_v = 0.0
         total_w = 0.0
         n = 0
+        n_samples = 0
 
         with torch.no_grad():
             for batch in self.val_loader:
@@ -1082,15 +1350,40 @@ class Trainer:
                 total_v += losses["loss_v"].item()
                 total_w += losses["loss_omega"].item()
                 n += 1
+                n_samples += int(batch["t"].shape[0])
 
         if self.world_size > 1:
-            tensors = torch.tensor([total_loss, total_v, total_w, n], device=self.device)
+            tensors = torch.tensor(
+                [total_loss, total_v, total_w, n, n_samples],
+                dtype=torch.float64,
+                device=self.device,
+            )
             dist.all_reduce(tensors)
-            total_loss, total_v, total_w, n = tensors.tolist()
+            total_loss, total_v, total_w, n, n_samples = tensors.tolist()
+
+        if self.cfg["logging"].get("require_exact_eval_coverage", False):
+            expected_samples = len(self.val_loader.dataset)
+            if int(n_samples) != expected_samples:
+                raise RuntimeError(
+                    "validation coverage mismatch: "
+                    f"expected {expected_samples}, evaluated {int(n_samples)}"
+                )
 
         avg_loss = total_loss / max(n, 1)
         avg_v = total_v / max(n, 1)
         avg_w = total_w / max(n, 1)
+
+        metrics = {
+            "val_loss": avg_loss,
+            "val_loss_v": avg_v,
+            "val_loss_omega": avg_w,
+        }
+        _require_finite_metrics(
+            metrics,
+            context=f"validation at step {self.global_step}",
+            device=self.device,
+            world_size=self.world_size,
+        )
 
         if self.is_main:
             print(
@@ -1109,7 +1402,7 @@ class Trainer:
                 )
 
         self.model.train()
-        return {"val_loss": avg_loss, "val_loss_v": avg_v, "val_loss_omega": avg_w}
+        return metrics
 
     @torch.no_grad()
     def _rollout_single_unified(
@@ -1254,13 +1547,19 @@ class Trainer:
         rmsds, cent_dists, frag_rmsds = [], [], []
         n_done = 0
 
-        # Iterate over val dataset (optionally capped by rollout_max_samples).
-        # Under DDP each rank handles indices[rank::world_size] (disjoint
-        # partition, no duplication) — then all_gather below assembles the
-        # full metric arrays.
+        # Iterate over the optionally capped val set. Static graph costs keep
+        # variable-size rollout work balanced across ranks; seeds remain tied
+        # to immutable dataset indices regardless of shard assignment.
         val_ds = self.val_loader.dataset
         n_val = len(val_ds) if max_samples <= 0 else min(len(val_ds), max_samples)
-        for i in range(self.rank, n_val, self.world_size):
+        rollout_indices = _balanced_shard_indices(
+            val_ds,
+            n_items=n_val,
+            num_replicas=self.world_size,
+            rank=self.rank,
+        )
+        progress_every = int(lcfg.get("rollout_progress_every", 0))
+        for local_index, i in enumerate(rollout_indices, start=1):
             data = val_ds[i]
             T_pred, atom_pos_pred, true_pos = self._rollout_single_unified(
                 raw_model,
@@ -1277,6 +1576,14 @@ class Trainer:
             cent_dists.append(centroid_distance(atom_pos_pred, true_pos).item())
             frag_rmsds.append(frag_centroid_rmsd(T_pred, T_target).item())
             n_done += 1
+            if progress_every > 0 and (
+                local_index % progress_every == 0 or local_index == len(rollout_indices)
+            ):
+                print(
+                    f"  [Rollout progress S{self.global_step} rank={self.rank}] "
+                    f"{local_index}/{len(rollout_indices)}",
+                    flush=True,
+                )
 
         if self.world_size > 1:
             gathered: list[tuple[list, list, list]] = [None] * self.world_size  # type: ignore
@@ -1286,9 +1593,10 @@ class Trainer:
             frag_rmsds = [x for shard in gathered for x in shard[2]]
             n_done = len(rmsds)
 
+        if n_done != n_val:
+            raise RuntimeError(f"rollout coverage mismatch: expected {n_val}, evaluated {n_done}")
         if n_done == 0:
-            self.model.train()
-            return {}
+            raise RuntimeError("rollout validation set is empty")
 
         rmsds_t = torch.tensor(rmsds)
         metrics = {
@@ -1301,6 +1609,12 @@ class Trainer:
             "rollout/centroid_dist": torch.tensor(cent_dists).mean().item(),
             "rollout/frag_rmsd": torch.tensor(frag_rmsds).mean().item(),
         }
+        _require_finite_metrics(
+            metrics,
+            context=f"rollout at step {self.global_step}",
+            device=self.device,
+            world_size=self.world_size,
+        )
 
         if self.is_main:
             print(

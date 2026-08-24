@@ -20,7 +20,7 @@ from effdock.inference.docking import load_model
 from effdock.inference.preprocess import build_inference_bundle, load_processed
 from effdock.inference.sampler import sample_unified
 
-DEPLOYED_POSE_TAG = "conf_ligonly_extmatch_n80_s25_sig0p5_pc10"
+RETAINED_EXTMATCH_POSE_TAG = "conf_ligonly_extmatch_n80_s25_sig0p5_pc10"
 
 
 def compute_pose_labels(
@@ -95,7 +95,7 @@ def main(argv: list[str] | None = None) -> None:
     if args.limit is not None:
         indexed_pids = indexed_pids[: args.limit]
 
-    is_deployed_condition = (
+    is_retained_extmatch_condition = (
         args.num_samples == 80
         and args.num_steps == 25
         and args.sigma == 0.5
@@ -104,8 +104,8 @@ def main(argv: list[str] | None = None) -> None:
         and args.schedule_power == 3.0
     )
     pose_tag = args.pose_tag or (
-        DEPLOYED_POSE_TAG
-        if is_deployed_condition
+        RETAINED_EXTMATCH_POSE_TAG
+        if is_retained_extmatch_condition
         else (
             f"ckpt{checkpoint_step}_{args.checkpoint.stem}"
             f"_sig{args.sigma:g}_steps{args.num_steps}_n{args.num_samples}_ligand"

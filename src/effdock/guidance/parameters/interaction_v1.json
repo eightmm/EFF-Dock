@@ -1,19 +1,43 @@
 {
   "name": "EFF-Interaction-v1-diagnostic",
-  "version": "1.3.0",
+  "version": "1.6.0",
   "energy_unit": "kcal/mol",
   "distance_unit": "angstrom",
-  "formula_version": "effdock-interaction-diagnostic-4",
-  "claim": "Differentiable hydrophobic-contact, idealized missing-valence-cone heavy-atom hydrogen-bond, and screened formal-charge-group guidance. This is a pose-guidance diagnostic, not explicit-hydrogen geometry, partial-charge electrostatics, solvation, affinity, free energy, or an external docking-score implementation.",
+  "formula_version": "effdock-interaction-diagnostic-7",
+  "claim": "Differentiable hydrophobic-contact, idealized missing-valence-cone heavy-atom hydrogen-bond, screened formal-charge-group, aromatic, halogen-bond, and profile-dispatched metal-coordination guidance. All seven implemented terms are enabled in the user-requested diagnostic default. Metal attraction is admitted only for a standalone mononuclear site with a profile-supported identity, complete retained coordination shell, one resolved vacancy, and matching geometry; otherwise attraction fails closed while an explicitly profiled repulsion-only site remains traceable. This is a pose-guidance diagnostic, not explicit-hydrogen geometry, partial-charge electrostatics, solvation, affinity, free energy, or an external docking-score implementation.",
   "active_terms": [
     "hydrophobic",
     "hydrogen_bond",
-    "screened_formal_charge"
+    "screened_formal_charge",
+    "pi_stacking",
+    "cation_pi",
+    "halogen_bond",
+    "metal_coordination"
+  ],
+  "supported_energy_terms": [
+    "hydrophobic",
+    "hydrogen_bond",
+    "screened_formal_charge",
+    "pi_stacking",
+    "cation_pi",
+    "halogen_bond",
+    "metal_coordination"
+  ],
+  "trace_only_terms": [
+    "polar_unsatisfied_proxy"
   ],
   "functional_form": {
     "hydrophobic_contact": "q_ij = quintic_switch(r_ij; contact_on, cutoff)",
     "hydrogen_bond_contact": "q_DA = exp(-0.5*((r_DA-r0)/sigma_r)^2) * quintic_switch(r_DA; switch_distance, cutoff) * cone_gate(cos_D; target_D, donor_half_width) * cone_gate(cos_A; target_A, acceptor_half_width) * axis_quality_D * axis_quality_A",
     "screened_formal_charge": "R_a = sum_i(W_ai*x_i); rho_ab = sqrt(||R_a-R_b||^2 + alpha^2); E_ab = (k_e/epsilon_r)*Q_a*Q_b*exp(-kappa*rho_ab)*Q5((r_off^2-||R_a-R_b||^2)/(r_off^2-r_on^2))/rho_ab",
+    "aromatic_ring_geometry": "For ring center C and stored non-collinear ring triplet vectors a,b, n=normalize(cross(a,b)); q_collapse=Q5((||cross(a,b)||^2-(0.25*A_ref)^2)/((0.75*A_ref)^2-(0.25*A_ref)^2)). A fused aromatic system is one saturating site, while each constituent ring retains its own center and normal.",
+    "pi_stacking": "For ligand/protein ring displacement Delta, d2=||Delta||^2, c2=(dot(n_l,n_p))^2, o_l2=d2-(dot(Delta,n_l))^2, o_p2=d2-(dot(Delta,n_p))^2. A_parallel=Q5((c2-0.75)/0.25), A_T=Q5((0.25-c2)/0.25), O=1-(1-S2(o_l2;1.5,2.0))*(1-S2(o_p2;1.5,2.0)), R=S2(d2;4.5,5.5), w=R*O*(A_parallel+A_T)*q_l*q_p; fused-system soft-OR and symmetric site saturation precede E=-epsilon*occupancy.",
+    "cation_pi": "For a declared +1 formal-charge-group center and a neutral carbocyclic aromatic ring, d2 and face offset o2=d2-(dot(Delta,n_ring))^2; w=S2(d2;4.5,6.0)*S2(o2;1.5,2.0)*q_ring. Both ligand-cation/protein-ring and protein-cation/ligand-ring directions are evaluated; fused-system soft-OR and symmetric site saturation precede E=-epsilon*occupancy.",
+    "halogen_bond": "For ligand C-X and protein acceptor A, u_sigma=normalize(x_X-x_C), v=normalize(x_A-x_X), c_sigma=dot(u_sigma,v), s=||x_A-x_X||/(R_vdw(X)+R_vdw(A)); w=S(s;1.00,1.15)*cone_gate(c_sigma;1,40 deg)*acceptor_cone_gate*CX_bond_quality*acceptor_axis_quality. Donor-X soft-OR precedes E=-epsilon*occupancy.",
+    "metal_coordination": "For each admitted metal profile m with one resolved vacant coordination slot, v_m=-normalize(sum_j normalize(R_mj-M_m)); A_mi=exp(-(1-dot(normalize(x_i-M_m),v_m))/tau_theta); Delta_r_mi=||x_i-M_m||-r0_m(element_i); eligible profile-supported donor pairs use E_pair=S(r)*D*(exp(-2*a*Delta_r)-2*A*exp(-a*Delta_r)); q_mi=S_CN(r)*exp(-0.5*((r-r0_m)/sigma_r)^2)*A_mi; CN_m=N_fixed,m+sum_i(q_mi); E_over=k_over*relu(CN_m-CN_target,m)^2; E_slot=k_slot*sum_{i<j}(q_mi*q_mj). Site-specific ineligible ligand atoms receive only bounded short-range repulsion. Profiles with attraction disabled receive repulsion and trace metadata but no Morse attraction.",
+    "metal_non_donor_repulsion": "rho=sqrt(r^2+alpha^2); y=(r_rep/rho)^12; E_non_donor=E_max*y/(1+y)*S(r;2.5,3.0)",
+    "polar_unsatisfied_proxy": "Trace only and dimensionless: B_i=softOR_j S(distance_to_protein_heavy;3.0,4.5); H_i=softOR(valid_hydrogen_bond_weights,admitted_metal_occupancy); u_i=B_i*(1-H_i). It contributes no energy, force, ranking score, or sampler correction.",
+    "squared_distance_switch": "S2(z;a,b)=Q5((b^2-z)/(b^2-a^2)), with Q5 clamped to [0,1]",
     "site_saturation": "q_ij is clamped to [0,1] before q_i = 1 - product_j(1 - (1-delta)*q_ij); E = -epsilon*sum_i(q_i), with ligand hydrophobes or hydrogen-bond donors as the saturated sites",
     "direction_proxy": "axis = normalize(sum_heavy_neighbor(normalize(atom_coordinate - neighbor_coordinate))); the target cosine around this axis is derived from an idealized linear, trigonal, or tetrahedral missing-valence cone",
     "cone_targets": "linear degree 1: 1; trigonal degree 1/2: 0.5/1; tetrahedral degree 1/2/3: 1/3, 1/sqrt(3), 1",
@@ -38,11 +62,402 @@
     "formal_charge_softcore_angstrom": 0.75,
     "formal_charge_switch_distance_angstrom": 8.0,
     "formal_charge_cutoff_angstrom": 10.0,
+    "pi_stacking_epsilon": 0.25,
+    "pi_stacking_distance_on_angstrom": 4.5,
+    "pi_stacking_cutoff_angstrom": 5.5,
+    "aromatic_offset_on_angstrom": 1.5,
+    "aromatic_offset_cutoff_angstrom": 2.0,
+    "pi_stacking_parallel_cosine_squared_on": 0.75,
+    "pi_stacking_t_shaped_cosine_squared_off": 0.25,
+    "cation_pi_epsilon": 0.5,
+    "cation_pi_distance_on_angstrom": 4.5,
+    "cation_pi_cutoff_angstrom": 6.0,
+    "aromatic_area_quality_zero_fraction": 0.25,
+    "aromatic_area_quality_full_fraction": 0.75,
+    "halogen_bond_epsilon": 0.5,
+    "halogen_contact_scale": 1.0,
+    "halogen_cutoff_scale": 1.15,
+    "halogen_sigma_half_width_degrees": 40.0,
+    "halogen_acceptor_half_width_degrees": 45.0,
+    "metal_pair_depth_kcal_mol": 1.5,
+    "metal_morse_a_per_angstrom": 2.0,
+    "metal_alignment_tau": 0.06,
+    "metal_occupancy_sigma_angstrom": 0.3,
+    "metal_pair_switch_distance_angstrom": 3.5,
+    "metal_pair_cutoff_angstrom": 4.5,
+    "metal_cn_switch_distance_angstrom": 2.8,
+    "metal_cn_cutoff_angstrom": 3.4,
+    "metal_overcoordination_k_kcal_mol": 4.0,
+    "metal_slot_k_kcal_mol": 4.0,
+    "metal_non_donor_repulsion_kcal_mol": 10.0,
+    "metal_non_donor_softcore_angstrom": 0.5,
+    "metal_non_donor_radius_angstrom": 1.7,
+    "metal_non_donor_switch_distance_angstrom": 2.5,
+    "metal_non_donor_cutoff_angstrom": 3.0,
+    "polar_proxy_burial_on_angstrom": 3.0,
+    "polar_proxy_burial_cutoff_angstrom": 4.5,
     "direction_epsilon_angstrom": 1e-08,
     "direction_quality_zero_below": 0.1,
     "direction_quality_full_above": 0.4,
     "bond_direction_quality_zero_below_angstrom": 0.1,
     "bond_direction_quality_full_above_angstrom": 0.5
+  },
+  "halogen_bond_vdw_radii_angstrom": {
+    "N": 1.55,
+    "O": 1.52,
+    "S": 1.8,
+    "CL": 1.75,
+    "BR": 1.85,
+    "I": 1.98
+  },
+  "aromatic_ring_typing": {
+    "ligand": "Neutral sanitized five- and six-member aromatic rings, including neutral N/O/S heteroaromatics, are admitted for pi stacking. Charged rings are excluded. Rings are grouped into connected fused systems; centers and normals are evaluated per elementary ring and soft-OR saturated once per fused system. Cation-pi uses the narrower neutral-carbocyclic subset.",
+    "protein_pi_stacking_residues": {
+      "PHE": [
+        "CG",
+        "CD1",
+        "CE1",
+        "CZ",
+        "CE2",
+        "CD2"
+      ],
+      "TYR": [
+        "CG",
+        "CD1",
+        "CE1",
+        "CZ",
+        "CE2",
+        "CD2"
+      ],
+      "TRP_five_member": [
+        "CG",
+        "CD1",
+        "NE1",
+        "CE2",
+        "CD2"
+      ],
+      "TRP_six_member": [
+        "CD2",
+        "CE2",
+        "CZ2",
+        "CH2",
+        "CZ3",
+        "CE3"
+      ],
+      "HIS": [
+        "CG",
+        "ND1",
+        "CE1",
+        "NE2",
+        "CD2"
+      ]
+    },
+    "pi_stacking_histidine_policy": "Neutral HIS, HID, and HIE rings are admitted for pi stacking; explicitly charged HIP is excluded. This geometry-only aromatic admission does not alter hydrogen-bond or charge typing.",
+    "cation_pi_acceptor_policy": "Only neutral carbocyclic aromatic systems are admitted. Protein acceptors are PHE, TYR, and TRP. HIS is excluded because its protonation and pi electrostatics are ambiguous in the current receptor boundary.",
+    "ring_triplet_policy": "Each ring stores one deterministic, non-collinear atom triplet and its input reference cross-product norm A_ref. Coordinate collapse is smoothly suppressed at 0.25 to 0.75 times A_ref.",
+    "aromatic_overlap_policy": "Hydrophobic contact remains the generic carbon-contact baseline and pi stacking is a small orientation-specific correction. Their geometric overlap is traced explicitly, but neither term suppresses the other: atom-site hydrophobic and ring-system pi normalizations are incompatible, and direct suppression can make adding a favorable pi term increase the total energy. Joint ablation is required before activation."
+  },
+  "halogen_bond_typing": {
+    "supported_direction": "ligand C-X donor to protein acceptor",
+    "ligand_donor_policy": "X is neutral Cl, Br, or I with heavy degree one and one single bond to neutral carbon; aromatic and aliphatic carbon are admitted.",
+    "ligand_exclusions": [
+      "fluorine",
+      "free halide",
+      "charged or multivalent halogen",
+      "halogen bonded to N, O, P, or S",
+      "receptor-side halogen donor",
+      "halogen-pi"
+    ],
+    "protein_acceptor_policy": "Reuse strict canonical N/O acceptors and their missing-valence axes; add MET SD as the only sulfur acceptor. Plain HIS, CYS SG, unsupported variants, incomplete geometry, cofactors, and ions fail closed.",
+    "radial_policy": "Distance is normalized by the Bondi van der Waals-radius sum. No radial Gaussian or element-specific epsilon is used; generic physical LJ owns short-range repulsion."
+  },
+  "metal_coordination_typing": {
+    "supported_scope": "Any number of mutually independent active-shell standalone monatomic metal residues. A site receives attraction only when its versioned profile enables attraction and exactly one open coordination slot is resolved from the complete retained receptor/water shell. Other explicitly profiled standalone metals receive bounded all-ligand repulsion and a traced attraction-disabled reason.",
+    "identity_policy": "The PDB residue name and element must exactly match a registry key. This admits standalone monatomic ions only. A metal embedded in heme, corrin, chlorophyll, Fe-S clusters, or another cofactor is not reinterpreted as a naked ion.",
+    "attraction_policy": "Automatic directional attraction is enabled only for strict Zn(II) tetrahedral and Mg(II) octahedral one-vacancy profiles. Ca, Mn, Fe, Co, Ni, and Cu are registered as repulsion-only because a PDB element record alone does not resolve flexible Ca geometry or transition-metal oxidation/geometry. They remain visible in trace metadata rather than being silently omitted.",
+    "receptor_donor_policy": "Static site construction admits close canonical protein O atoms, HIS/HID/HIE ring N atoms, and profile-supported CYS/CYM SG or MET SD atoms. Profile-supported crystallographic water oxygen can complete the Mg shell. Alternate locations, partial occupancy, shared donors, nearby metals, and unsupported close contacts fail closed.",
+    "ligand_donor_policy": "Versioned sanitized-graph N/O acceptors and explicit supported S acceptor SMARTS are typed once. A site-specific N/O/S eligibility mask is then applied from the selected metal profile; an ineligible atom is handled by bounded metal non-donor repulsion, never by a hidden zero pair.",
+    "unsupported": [
+      "metal residue and element identity mismatch",
+      "metal-containing cofactor or cluster",
+      "unregistered standalone metal",
+      "attractive profile receptor donor count other than target coordination minus one",
+      "site geometry outside the profile RMS tolerance",
+      "binuclear, polynuclear, or shared-donor site",
+      "another metal within the profile cluster cutoff",
+      "coordination water under a profile that rejects water",
+      "alternate-location or duplicate receptor donor",
+      "partial occupancy",
+      "bridging donor",
+      "unsupported donor protonation or resonance assignment"
+    ],
+    "pair_masking": "Every admitted metal is absent from generic protein LJ, hydrophobic, hydrogen-bond, and formal-charge masks. Profile-eligible ligand donor pairs at attraction-enabled sites use the directional Morse term. Every other metal-ligand pair receives only the bounded short-range repulsion. Metal Coulomb is inactive.",
+    "activation_policy": "metal_coordination is part of the default interaction profile. If a caller constructs a custom profile that removes it while an active-shell metal is admitted, GuidanceEnergy and trace fail with required_interaction_term_inactive.",
+    "coordinate_policy": "Site typing and profile selection are static. Metal coordinates, ligand distances, directionality, energy, occupancy, coordination/slot penalties, and non-donor repulsion are evaluated with Torch. No external force-field or docking engine is called."
+  },
+  "metal_coordination_profiles": {
+    "ZN": {
+      "atomic_number": 30,
+      "identity_residue": "ZN",
+      "assumed_oxidation_state": "+2",
+      "auto_attraction": true,
+      "attraction_status": "strict_one_vacancy",
+      "target_coordination": 4,
+      "geometries": [
+        "tetrahedral"
+      ],
+      "allowed_ligand_elements": [
+        "N",
+        "O",
+        "S"
+      ],
+      "allowed_receptor_elements": [
+        "N",
+        "O",
+        "S"
+      ],
+      "r0_angstrom": {
+        "N": 2.07,
+        "O": 2.14,
+        "S": 2.33
+      },
+      "receptor_detection_cutoff_angstrom": {
+        "N": 2.5,
+        "O": 2.55,
+        "S": 2.8
+      },
+      "geometry_rms_tolerance_degrees": 25.0,
+      "geometry_ambiguity_margin_degrees": 5.0,
+      "water_policy": "reject",
+      "nearby_metal_cutoff_angstrom": 5.0,
+      "distance_provenance": "Dokmanic et al. 2008 Table 2; Zn imidazole-N, carboxyl-O/hydroxyl-O collapsed to one O target, and Cys-S structural means."
+    },
+    "MG": {
+      "atomic_number": 12,
+      "identity_residue": "MG",
+      "assumed_oxidation_state": "+2",
+      "auto_attraction": true,
+      "attraction_status": "strict_one_vacancy_requires_retained_water_shell",
+      "target_coordination": 6,
+      "geometries": [
+        "octahedral"
+      ],
+      "allowed_ligand_elements": [
+        "O"
+      ],
+      "allowed_receptor_elements": [
+        "O"
+      ],
+      "r0_angstrom": {
+        "N": 0.0,
+        "O": 2.13,
+        "S": 0.0
+      },
+      "receptor_detection_cutoff_angstrom": {
+        "N": 2.55,
+        "O": 2.55,
+        "S": 2.8
+      },
+      "geometry_rms_tolerance_degrees": 22.5,
+      "geometry_ambiguity_margin_degrees": 5.0,
+      "water_policy": "admit_fixed_oxygen",
+      "nearby_metal_cutoff_angstrom": 5.0,
+      "distance_provenance": "Dokmanic et al. 2008 Table 2; Mg carboxyl/hydroxyl/water oxygen structural means."
+    },
+    "CA": {
+      "atomic_number": 20,
+      "identity_residue": "CA",
+      "assumed_oxidation_state": "+2",
+      "auto_attraction": false,
+      "attraction_status": "disabled_flexible_cn6_cn7_geometry",
+      "target_coordination": 0,
+      "geometries": [],
+      "allowed_ligand_elements": [],
+      "allowed_receptor_elements": [
+        "O"
+      ],
+      "r0_angstrom": {
+        "N": 0.0,
+        "O": 2.39,
+        "S": 0.0
+      },
+      "receptor_detection_cutoff_angstrom": {
+        "N": 0.0,
+        "O": 2.85,
+        "S": 0.0
+      },
+      "geometry_rms_tolerance_degrees": 0.0,
+      "geometry_ambiguity_margin_degrees": 0.0,
+      "water_policy": "trace_only",
+      "nearby_metal_cutoff_angstrom": 5.0,
+      "distance_provenance": "Dokmanic et al. 2008 Table 2; attraction disabled because Ca CN6/CN7 geometry is flexible."
+    },
+    "MN": {
+      "atomic_number": 25,
+      "identity_residue": "MN",
+      "assumed_oxidation_state": "unresolved",
+      "auto_attraction": false,
+      "attraction_status": "disabled_oxidation_and_geometry_unresolved",
+      "target_coordination": 0,
+      "geometries": [],
+      "allowed_ligand_elements": [],
+      "allowed_receptor_elements": [
+        "N",
+        "O"
+      ],
+      "r0_angstrom": {
+        "N": 2.2,
+        "O": 2.16,
+        "S": 0.0
+      },
+      "receptor_detection_cutoff_angstrom": {
+        "N": 2.65,
+        "O": 2.6,
+        "S": 0.0
+      },
+      "geometry_rms_tolerance_degrees": 0.0,
+      "geometry_ambiguity_margin_degrees": 0.0,
+      "water_policy": "trace_only",
+      "nearby_metal_cutoff_angstrom": 5.0,
+      "distance_provenance": "Dokmanic et al. 2008 Table 2; attraction disabled because PDB identity does not determine Mn oxidation state."
+    },
+    "FE": {
+      "atomic_number": 26,
+      "identity_residue": "FE",
+      "assumed_oxidation_state": "unresolved",
+      "auto_attraction": false,
+      "attraction_status": "disabled_oxidation_cofactor_and_cluster_ambiguity",
+      "target_coordination": 0,
+      "geometries": [],
+      "allowed_ligand_elements": [],
+      "allowed_receptor_elements": [
+        "N",
+        "O",
+        "S"
+      ],
+      "r0_angstrom": {
+        "N": 2.08,
+        "O": 2.15,
+        "S": 2.31
+      },
+      "receptor_detection_cutoff_angstrom": {
+        "N": 2.55,
+        "O": 2.65,
+        "S": 2.8
+      },
+      "geometry_rms_tolerance_degrees": 0.0,
+      "geometry_ambiguity_margin_degrees": 0.0,
+      "water_policy": "trace_only",
+      "nearby_metal_cutoff_angstrom": 5.0,
+      "distance_provenance": "Dokmanic et al. 2008 Table 2; attraction disabled for unresolved Fe oxidation, heme, and Fe-S chemistry."
+    },
+    "CO": {
+      "atomic_number": 27,
+      "identity_residue": "CO",
+      "assumed_oxidation_state": "unresolved",
+      "auto_attraction": false,
+      "attraction_status": "disabled_oxidation_and_corrinoid_ambiguity",
+      "target_coordination": 0,
+      "geometries": [],
+      "allowed_ligand_elements": [],
+      "allowed_receptor_elements": [
+        "N",
+        "O",
+        "S"
+      ],
+      "r0_angstrom": {
+        "N": 2.07,
+        "O": 2.2,
+        "S": 2.3
+      },
+      "receptor_detection_cutoff_angstrom": {
+        "N": 2.55,
+        "O": 2.7,
+        "S": 2.8
+      },
+      "geometry_rms_tolerance_degrees": 0.0,
+      "geometry_ambiguity_margin_degrees": 0.0,
+      "water_policy": "trace_only",
+      "nearby_metal_cutoff_angstrom": 5.0,
+      "distance_provenance": "Dokmanic et al. 2008 Table 2; attraction disabled for unresolved Co oxidation and corrinoid chemistry."
+    },
+    "NI": {
+      "atomic_number": 28,
+      "identity_residue": "NI",
+      "assumed_oxidation_state": "unresolved",
+      "auto_attraction": false,
+      "attraction_status": "disabled_oxidation_and_cn4_cn6_ambiguity",
+      "target_coordination": 0,
+      "geometries": [],
+      "allowed_ligand_elements": [],
+      "allowed_receptor_elements": [
+        "N",
+        "O",
+        "S"
+      ],
+      "r0_angstrom": {
+        "N": 2.1,
+        "O": 2.14,
+        "S": 2.28
+      },
+      "receptor_detection_cutoff_angstrom": {
+        "N": 2.6,
+        "O": 2.65,
+        "S": 2.8
+      },
+      "geometry_rms_tolerance_degrees": 0.0,
+      "geometry_ambiguity_margin_degrees": 0.0,
+      "water_policy": "trace_only",
+      "nearby_metal_cutoff_angstrom": 5.0,
+      "distance_provenance": "Dokmanic et al. 2008 Table 2; attraction disabled because Ni CN4 and CN6 geometry classes are not resolved by element identity."
+    },
+    "CU": {
+      "atomic_number": 29,
+      "identity_residue": "CU",
+      "assumed_oxidation_state": "unresolved",
+      "auto_attraction": false,
+      "attraction_status": "disabled_oxidation_and_jahn_teller_ambiguity",
+      "target_coordination": 0,
+      "geometries": [],
+      "allowed_ligand_elements": [],
+      "allowed_receptor_elements": [
+        "N",
+        "O",
+        "S"
+      ],
+      "r0_angstrom": {
+        "N": 2.03,
+        "O": 2.2,
+        "S": 2.19
+      },
+      "receptor_detection_cutoff_angstrom": {
+        "N": 2.5,
+        "O": 2.7,
+        "S": 2.75
+      },
+      "geometry_rms_tolerance_degrees": 0.0,
+      "geometry_ambiguity_margin_degrees": 0.0,
+      "water_policy": "trace_only",
+      "nearby_metal_cutoff_angstrom": 5.0,
+      "distance_provenance": "Dokmanic et al. 2008 Table 2; attraction disabled because Cu(I)/Cu(II), CN3/CN4, and Jahn-Teller geometry are unresolved."
+    }
+  },
+  "polar_unsatisfied_proxy_policy": {
+    "status": "trace_only_no_energy_no_force",
+    "reason": "Buried-unsatisfied polarity is a solvation/desolvation statement. The current shell omits complete solvent exposure, water-mediated satisfaction, and not-yet-admitted metal satisfaction, so an energy would create false forces that can expel a ligand from the pocket.",
+    "eligible_sites": "Only already supported ligand N/O donor or acceptor sites are reported.",
+    "satisfaction_sources": [
+      "active directional hydrogen-bond occupancy",
+      "admitted metal-coordination occupancy"
+    ],
+    "forbidden_uses": [
+      "GuidanceEnergy",
+      "atom force",
+      "candidate ranking",
+      "confidence feature",
+      "sampler correction"
+    ],
+    "promotion_gate": "Requires a separately frozen differentiable burial/solvent contract, water policy, complete satisfying-interaction inventory, numerical admission, and internal held-out ablation."
   },
   "ligand_smarts": {
     "donor": [
@@ -62,6 +477,45 @@
     ],
     "hydrophobe": [
       "[#6;+0;!$([#6]~[#7,#8,#9])]"
+    ]
+  },
+  "ligand_pair_smarts": {
+    "halogen_donor": [
+      {
+        "name": "carbon_chlorine",
+        "smarts": "[#6;+0:1]-[Cl;+0;D1:2]",
+        "parent_atom_map": 1,
+        "donor_atom_map": 2
+      },
+      {
+        "name": "carbon_bromine",
+        "smarts": "[#6;+0:1]-[Br;+0;D1:2]",
+        "parent_atom_map": 1,
+        "donor_atom_map": 2
+      },
+      {
+        "name": "carbon_iodine",
+        "smarts": "[#6;+0:1]-[I;+0;D1:2]",
+        "parent_atom_map": 1,
+        "donor_atom_map": 2
+      }
+    ],
+    "metal_sulfur_donor": [
+      {
+        "name": "explicit_thiolate",
+        "smarts": "[S-;D1:1]",
+        "donor_atom_map": 1
+      },
+      {
+        "name": "neutral_terminal_sulfur",
+        "smarts": "[S;+0;H0;D1:1]",
+        "donor_atom_map": 1
+      },
+      {
+        "name": "neutral_divalent_sulfur",
+        "smarts": "[S;+0;H0;D2;!$(S(=O)=O):1]",
+        "donor_atom_map": 1
+      }
     ]
   },
   "ligand_delocalized_charge_groups": [
@@ -162,10 +616,15 @@
     "hydrophobic_typing_asymmetry": "Ligand hydrophobes use a graph SMARTS exclusion around N/O/F, while receptor hydrophobes use a curated canonical residue/atom-name table. This is an intentional representation asymmetry; the two sides share a carbon-only boundary but not one atom-type ontology.",
     "histidine_policy": "Explicit HID/HIE/HIP residue names are typed by their declared tautomer/protonation. Plain HIS has ambiguous protonation, so ND1 and NE2 are excluded from v1 hydrogen-bond candidates and counted in trace metadata.",
     "missing_direction_policy": "A donor or acceptor without a non-degenerate canonical heavy-neighbor direction or a declared linear/trigonal/tetrahedral geometry is excluded from hydrogen-bond pairs.",
-    "direction_geometry_policy": "RDKit hybridization and heavy degree define ligand cone targets. Protein N/O cone targets use canonical atom-name geometry: Lys NZ and Ser/Thr hydroxyl O are tetrahedral; other admitted N/O sites are trigonal. These are idealized heavy-atom cones, not reconstructed hydrogen or lone-pair coordinates."
-    ,"ligand_formal_charge_policy": "The sanitized input molecule supplies integer formal charges and the complete protonation/tautomer boundary. Versioned carboxylate, guanidinium, and amidinium SMARTS collapse recognized resonance-equivalent atoms into one equally weighted group site; remaining nonzero formal charges are explicit atom-centered sites. Group membership cannot overlap and the site-charge sum must equal the input molecular formal charge."
-    ,"protein_formal_charge_policy": "Canonical complete side-chain groups only: ARG +1, LYS +1, ASP -1, GLU -1, and explicitly named HIP +1. HID/HIE are neutral; plain HIS, termini, mapped variants/PTMs, incomplete groups, cofactors, metals, and counterions receive no inferred charge and are reported or rejected by the receptor boundary."
-    ,"formal_charge_site_coordinate": "Each group coordinate is the equally weighted centroid of its declared member atoms. This avoids multiplying one residue charge across resonance-equivalent atoms and distributes the Torch gradient back to members by the same weights."
+    "direction_geometry_policy": "RDKit hybridization and heavy degree define ligand cone targets. Protein N/O cone targets use canonical atom-name geometry: Lys NZ and Ser/Thr hydroxyl O are tetrahedral; other admitted N/O sites are trigonal. These are idealized heavy-atom cones, not reconstructed hydrogen or lone-pair coordinates.",
+    "ligand_formal_charge_policy": "The sanitized input molecule supplies integer formal charges and the complete protonation/tautomer boundary. Versioned carboxylate, guanidinium, and amidinium SMARTS collapse recognized resonance-equivalent atoms into one equally weighted group site; remaining nonzero formal charges are explicit atom-centered sites. Group membership cannot overlap and the site-charge sum must equal the input molecular formal charge.",
+    "protein_formal_charge_policy": "Canonical complete side-chain groups only: ARG +1, LYS +1, ASP -1, GLU -1, and explicitly named HIP +1. HID/HIE are neutral; plain HIS, termini, mapped variants/PTMs, incomplete groups, cofactors, metals, and counterions receive no inferred charge and are reported or rejected by the receptor boundary.",
+    "formal_charge_site_coordinate": "Each group coordinate is the equally weighted centroid of its declared member atoms. This avoids multiplying one residue charge across resonance-equivalent atoms and distributes the Torch gradient back to members by the same weights.",
+    "aromatic_policy": "Aromatic rings and fused-system membership are deterministic static topology from the sanitized ligand graph or canonical PHE/TYR/TRP and neutral HIS/HID/HIE atom-name tables; HIP is excluded. Ring center, normal, face offset, collapse quality, and every energy value are Torch-coordinate computations.",
+    "cation_pi_charge_policy": "Only existing complete formal-charge sites with charge exactly +1 e are cations. No partial charge, protonation, or quadrupole is inferred. Ring acceptors are neutral carbocyclic aromatic systems only.",
+    "halogen_bond_policy": "Only ligand neutral carbon-bound Cl/Br/I donors and strict protein N/O or MET SD acceptors are supported. MET SD uses tetrahedral valence capacity four, expected heavy degree two, and the same missing-valence cone quality machinery.",
+    "metal_coordination_policy": "The versioned profile registry automatically dispatches standalone monatomic ZN, MG, CA, MN, FE, CO, NI, and CU sites. Strict one-vacancy attraction is enabled only for admitted ZN and complete-shell MG sites. CA and unresolved transition-metal identities are repulsion-only with an explicit trace reason. Cofactors, clusters, identity mismatches, and unregistered active-shell metals fail closed. Site detection is static; coordinate-dependent energy and gradients are Torch-only.",
+    "polar_unsatisfied_policy": "polar_unsatisfied_proxy is dimensionless trace metadata only. Missing solvent, water, metal, or direction typing never becomes a hidden zero-energy satisfaction assumption."
   },
   "provenance": {
     "typing_reference": "RDKit SMARTS/FDef chemical-feature model, https://www.rdkit.org/docs/RDKit_Book.html",
@@ -174,7 +633,12 @@
     "hydrogen_bond_distance_basis": "PLIP reports hydrogen bonds up to 4.1 angstrom with a donor-angle criterion; v1 uses a smooth radial cutoff. Because hydrogens are absent, directionality uses broad idealized missing-valence cones rather than treating the opposite heavy-neighbor axis as a hydrogen coordinate.",
     "screened_formal_charge_basis": "Lee, Fitch, and Garcia-Moreno, Protein Science 11 (2002), DOI 10.1110/ps.4700102, motivates a Debye-Huckel-screened pairwise Coulomb diagnostic and the 25 C water dielectric. kappa=0.127 per angstrom is the rounded value for 0.15 M monovalent ionic strength, 298.15 K, and epsilon_r=78.5. The unit-converted Coulomb prefactor is derived from NIST 2022 CODATA constants.",
     "formal_charge_limitations": "This is an input-state formal-charge-group proxy. It omits partial charges, pKa inference, dielectric heterogeneity, desolvation, polarization, receptor relaxation, cofactors, metals, counterions, and ionic-strength variation.",
-    "coefficient_status": "The epsilon and cone-width values are preregistered EFF-Dock diagnostic guidance priors. Axis and bond-quality thresholds were fixed from numerical-stability review before the final frozen Astex traces. They were not fitted to Astex, PoseBusters, crystal energies, RMSD, affinity, or Vina.",
+    "pi_geometry_basis": "PLIP, DOI 10.1093/nar/gkv315, supplies the 5.5 angstrom, 30 degree, and 2 angstrom aromatic-contact precedent. McGaughey et al., DOI 10.1074/jbc.273.25.15458, motivates separation of parallel and edge-to-face protein aromatic geometry.",
+    "cation_pi_basis": "PLIP supplies the 6 angstrom distance precedent. Gallivan and Dougherty, DOI 10.1073/pnas.96.17.9459, supplies the protein cation-pi structural precedent.",
+    "halogen_bond_basis": "The IUPAC definition is DOI 10.1351/PAC-REC-12-05-10. Biomolecular Cl/Br/I distance and angle scope follows Auffinger et al., DOI 10.1073/pnas.0407607101. Bondi radii follow DOI 10.1021/j100785a001. Protein carbonyl directionality is informed by Wilcken et al., DOI 10.1007/s10822-012-9592-8.",
+    "metal_coordination_basis": "MetalPDB 2024, DOI 10.1107/S2059798324003152, supplies coordination-number, geometry, nuclearity, and site-provenance boundaries. Dokmanic et al. 2008, DOI 10.1107/S090744490706595X, supplies high-resolution PDB structural metal-donor distance targets. Zheng et al. 2008, DOI 10.1016/j.jinorgbio.2008.05.006, motivates fail-closed identity, oxidation, and geometry handling. AutoDock4Zn, DOI 10.1021/ci500209e, remains historical precedent for a zinc-specific directional docking term. EFF-Dock's directional Morse depth/width, occupancy, penalties, and bounded repulsion are diagnostic priors and are not copied docking scores or affinity parameters.",
+    "polar_unsatisfied_limitations": "The trace-only proxy is not a solvation, SASA, desolvation, or free-energy model and is forbidden from contributing energy or force.",
+    "coefficient_status": "Hydrophobic, hydrogen-bond, charge, pi, cation-pi, halogen, and metal epsilon/width/penalty values not explicitly identified as published geometry are preregistered EFF-Dock diagnostic guidance priors. Structural metal r0 values are not bond free-energy equilibria. No coefficient was fitted to Astex, PoseBusters, crystal energies, RMSD, affinity, Vina, or AutoDock scores.",
     "external_engine_policy": "No external scoring or force-field engine is used. RDKit is restricted to one-time ligand SMARTS typing; all coordinate-dependent values and gradients are computed in Torch."
   }
 }

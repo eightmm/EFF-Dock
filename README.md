@@ -100,6 +100,24 @@ Exact checkpoint hashes, validity decomposition, and the frozen evaluation
 contract are documented in
 [`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`](docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md).
 
+The portable code paths used by this study are published with the repository:
+
+```bash
+uv run python scripts/prepare_s50_confidence_training_bank.py --help
+uv run python scripts/build_s50_symmetry_rmsd_sidecars.py --help
+uv run python scripts/calibrate_s50_refinement_budget.py --help
+uv run python scripts/refine_s50_confidence_pose_bank.py --help
+uv run python scripts/materialize_s50_refined_confidence_bank.py --help
+uv run python scripts/report_s50_confidence_training.py --help
+```
+
+`configs/train_confidence_s50_symmetry.yaml` reproduces the symmetry-target
+confidence setup. `configs/train_confidence_s50_raw_refined_10k.yaml` defines
+the paired raw/refined continuation with 32 poses from each bank plus one
+mapped-crystal anchor. The scripts require explicit manifests, hashes, paths,
+and output roots; generated banks, checkpoints, and cluster-specific submission
+wrappers are intentionally not stored in Git.
+
 ## Reference-defined redocking diagnostics
 
 The retained N80 confidence stack produced the following frozen-manifest

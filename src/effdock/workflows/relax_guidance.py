@@ -25,19 +25,32 @@ from effdock.geometry.flow_matching import (
     integrate_se3_step,
     sample_prior_rotations,
 )
-from effdock.geometry.se3 import quaternion_to_matrix
-from effdock.guidance import (
-    GuidanceEnergyConfig,
-    InteractionEnergyConfig,
-    PhysicalEnergyConfig,
-    UnsupportedPhysicalChemistryError,
-    build_physical_system,
-    guidance_energy,
-    interaction_contact_stats,
+from effdock.geometry.se3 import (
+    axis_angle_to_quaternion,
+    quaternion_to_matrix,
 )
 from effdock.guidance.diagnostics import fragment_centers
+from effdock.guidance.errors import UnsupportedPhysicalChemistryError
+from effdock.guidance.interaction import (
+    ACTIVE_INTERACTION_TERMS,
+    InteractionEnergyConfig,
+    interaction_contact_stats,
+    interaction_energy,
+    interaction_profile_metadata,
+)
 from effdock.guidance.parameterization import guidance_parameter_identity
-from effdock.guidance.runtime import project_atom_forces
+from effdock.guidance.physical import (
+    PhysicalEnergyConfig,
+    _dihedral,
+    _wrapped_delta,
+    physical_energy,
+)
+from effdock.guidance.runtime import (
+    GuidanceEnergyConfig,
+    guidance_energy,
+    project_atom_forces,
+)
+from effdock.guidance.system import build_physical_system
 from effdock.guidance.topology import build_physical_topology
 from effdock.inference.io import write_traj_pdb, write_traj_sdf
 from effdock.preprocess.fragments import decompose_fragments
@@ -48,7 +61,7 @@ from effdock.workflows.trace_physical import (
     _load_trace_ligand,
 )
 
-RELAXATION_SCHEMA_VERSION = "effdock.guidance_relaxation.v3"
+RELAXATION_SCHEMA_VERSION = "effdock.guidance_relaxation.v4"
 PROTOCOL_ID = "EFFDOCK-CRYSTAL-BASIN-REASSEMBLY-V1"
 PRIOR_RELAXATION_PROTOCOL_ID = "EFFDOCK-GUIDANCE-PRIOR-RELAXATION-V1"
 INITIALIZATION_MODES = (
@@ -56,15 +69,61 @@ INITIALIZATION_MODES = (
     "pocket_gaussian",
     "model_prior",
 )
+RELAXATION_MODES = (
+    "unified",
+    "physical_only",
+    "interaction_only",
+    "guard_only",
+    "guarded_interaction",
+)
+GUARD_PHYSICAL_TERMS = (
+    "ligand_intra_bond",
+    "ligand_intra_angle",
+    "ligand_intra_proper",
+    "ligand_intra_improper",
+    "ligand_intra_lj_repulsive",
+    "ligand_intra_lj_attractive",
+    "protein_ligand_lj_repulsive",
+)
 
 
-def _maximum_active_interaction_cutoff() -> float:
-    config = InteractionEnergyConfig()
-    return max(
-        config.hydrophobic_cutoff,
-        config.hydrogen_bond_cutoff,
-        config.formal_charge_cutoff,
-    )
+def _maximum_active_interaction_cutoff(
+    config: InteractionEnergyConfig = InteractionEnergyConfig(),
+) -> float:
+    """Return the largest coordinate cutoff used by the active energy terms."""
+    cutoffs: list[float] = []
+    active = set(config.active_terms)
+    if "hydrophobic" in active:
+        cutoffs.append(config.hydrophobic_cutoff)
+    if "hydrogen_bond" in active:
+        cutoffs.append(config.hydrogen_bond_cutoff)
+    if "screened_formal_charge" in active:
+        cutoffs.append(config.formal_charge_cutoff)
+    if "pi_stacking" in active:
+        cutoffs.append(config.pi_stacking_cutoff)
+    if "cation_pi" in active:
+        cutoffs.append(config.cation_pi_cutoff)
+    if "halogen_bond" in active:
+        largest_donor = max(
+            config.halogen_vdw_radius_chlorine,
+            config.halogen_vdw_radius_bromine,
+            config.halogen_vdw_radius_iodine,
+        )
+        largest_acceptor = max(
+            config.halogen_vdw_radius_nitrogen,
+            config.halogen_vdw_radius_oxygen,
+            config.halogen_vdw_radius_sulfur,
+        )
+        cutoffs.append(config.halogen_cutoff_scale * (largest_donor + largest_acceptor))
+    if "metal_coordination" in active:
+        cutoffs.extend(
+            (
+                config.metal_pair_cutoff,
+                config.metal_cn_cutoff,
+                config.metal_non_donor_cutoff,
+            )
+        )
+    return max(cutoffs, default=0.0)
 
 
 def _protocol_id_for_initialization(initialization_mode: str) -> str:
@@ -93,6 +152,10 @@ class RigidRelaxationConfig:
     max_backtracks: int = 12
     convergence_displacement_angstrom: float = 1e-5
     convergence_patience: int = 20
+    convergence_energy_absolute_kcal_mol: float | None = None
+    convergence_energy_relative: float | None = None
+    convergence_energy_patience: int = 5
+    convergence_energy_min_steps: int = 20
     energy_increase_tolerance: float = 1e-10
     physical_cutoff_angstrom: float = 8.0
     protein_shell_cutoff_angstrom: float = 13.0
@@ -115,6 +178,7 @@ class RigidRelaxationConfig:
             "max_backtracks",
             "convergence_displacement_angstrom",
             "convergence_patience",
+            "convergence_energy_patience",
             "physical_cutoff_angstrom",
             "protein_shell_cutoff_angstrom",
         )
@@ -123,6 +187,18 @@ class RigidRelaxationConfig:
                 raise ValueError(f"{name} must be positive")
         if not 0 < self.backtrack_factor < 1:
             raise ValueError("backtrack_factor must be in (0,1)")
+        if self.convergence_energy_min_steps < 0:
+            raise ValueError("convergence_energy_min_steps must be nonnegative")
+        energy_tolerances = (
+            self.convergence_energy_absolute_kcal_mol,
+            self.convergence_energy_relative,
+        )
+        if any(value is not None and value < 0 for value in energy_tolerances):
+            raise ValueError("energy convergence tolerances must be nonnegative")
+        if any(value is not None for value in energy_tolerances) and not any(
+            value is not None and value > 0 for value in energy_tolerances
+        ):
+            raise ValueError("enabled energy convergence needs a positive tolerance")
         active_cutoff = max(
             self.physical_cutoff_angstrom,
             _maximum_active_interaction_cutoff(),
@@ -142,6 +218,13 @@ class RigidRelaxationConfig:
         if self.protein_shell_cutoff_angstrom <= active_cutoff:
             raise ValueError("protein shell cutoff must exceed every active guidance cutoff")
 
+    @property
+    def energy_convergence_enabled(self) -> bool:
+        return (
+            self.convergence_energy_absolute_kcal_mol is not None
+            or self.convergence_energy_relative is not None
+        )
+
 
 @dataclass
 class RelaxationRun:
@@ -152,6 +235,20 @@ class RelaxationRun:
     saved_steps: list[int]
     total_backtracks: int
     shell_envelope_valid: bool
+
+
+@dataclass
+class BatchedRelaxationRun:
+    """Fixed-budget, pose-wise-monotone relaxation for paired prior samples."""
+
+    mode: str
+    statuses: list[str]
+    metrics: list[list[dict[str, Any]]]
+    frames: list[Tensor]
+    saved_steps: list[int]
+    total_backtracks: list[int]
+    terminal_steps: list[int]
+    shell_envelope_valid: list[bool]
 
 
 def _fragment_masses(mass: Tensor, fragment_id: Tensor) -> Tensor:
@@ -325,6 +422,129 @@ def make_pocket_prior_fragment_pose(
     return initial_coords, metadata
 
 
+def make_pocket_prior_fragment_batch(
+    fragment_local_coords: Tensor,
+    fragment_id: Tensor,
+    pocket_center: Tensor,
+    *,
+    sigma_angstrom: float,
+    seeds: list[int] | tuple[int, ...],
+    rotation_mode: str,
+) -> tuple[Tensor, list[dict[str, Any]]]:
+    """Stack independently seeded active-sampler priors without changing RNG order."""
+    if not seeds:
+        raise ValueError("seeds must contain at least one value")
+    if len(set(int(seed) for seed in seeds)) != len(seeds):
+        raise ValueError("seeds must be unique")
+    poses: list[Tensor] = []
+    metadata: list[dict[str, Any]] = []
+    for seed in seeds:
+        pose, row = make_pocket_prior_fragment_pose(
+            fragment_local_coords,
+            fragment_id,
+            pocket_center,
+            sigma_angstrom=sigma_angstrom,
+            seed=int(seed),
+            rotation_mode=rotation_mode,
+        )
+        poses.append(pose)
+        metadata.append(row)
+    return torch.stack(poses), metadata
+
+
+def make_crystal_local_fragment_batch(
+    crystal_coords: Tensor,
+    fragment_id: Tensor,
+    *,
+    translation_sigma_angstrom: float,
+    rotation_sigma_degrees: float,
+    seeds: list[int] | tuple[int, ...],
+) -> tuple[Tensor, list[dict[str, Any]]]:
+    """Create paired late-stage fragment priors around the crystal pose.
+
+    This diagnostic prior is deliberately crystal-informed and must never be
+    described as prospective docking. Each fragment receives an independent
+    Gaussian translation and a proper axis-angle rotation.
+    """
+    if crystal_coords.ndim != 2 or crystal_coords.shape[-1] != 3:
+        raise ValueError("crystal_coords must have shape [N,3]")
+    if translation_sigma_angstrom <= 0 or rotation_sigma_degrees <= 0:
+        raise ValueError("local-prior translation and rotation sigmas must be positive")
+    if not seeds or len(set(int(seed) for seed in seeds)) != len(seeds):
+        raise ValueError("seeds must be non-empty and unique")
+
+    fragment_id_cpu = fragment_id.detach().to(device="cpu", dtype=torch.long)
+    crystal_cpu = crystal_coords.detach().to(device="cpu", dtype=torch.float32)
+    local, centers = _fragment_local_coordinates(
+        crystal_cpu,
+        fragment_id_cpu,
+    )
+    n_fragments = centers.shape[0]
+    frag_sizes = torch.bincount(fragment_id_cpu, minlength=n_fragments)
+    poses: list[Tensor] = []
+    metadata: list[dict[str, Any]] = []
+    rotation_sigma_radians = math.radians(float(rotation_sigma_degrees))
+    for seed in seeds:
+        generator = torch.Generator(device="cpu")
+        generator.manual_seed(int(seed))
+        translation_eps = torch.randn(
+            n_fragments,
+            3,
+            generator=generator,
+            dtype=torch.float32,
+        )
+        axis_raw = torch.randn(
+            n_fragments,
+            3,
+            generator=generator,
+            dtype=torch.float32,
+        )
+        axis = axis_raw / axis_raw.norm(dim=-1, keepdim=True).clamp_min(1e-8)
+        angle_eps = torch.randn(
+            n_fragments,
+            generator=generator,
+            dtype=torch.float32,
+        )
+        translation_delta = float(translation_sigma_angstrom) * translation_eps
+        rotation_vector = rotation_sigma_radians * angle_eps.unsqueeze(-1) * axis
+        quaternions = axis_angle_to_quaternion(rotation_vector)
+        quaternions = torch.where(
+            frag_sizes.le(1).unsqueeze(-1),
+            _identity_quaternions(
+                n_fragments,
+                device=torch.device("cpu"),
+                dtype=torch.float32,
+            ),
+            quaternions,
+        )
+        pose = _reconstruct_coordinates(
+            local,
+            fragment_id_cpu,
+            centers + translation_delta,
+            quaternions,
+        )
+        poses.append(
+            pose.to(
+                device=crystal_coords.device,
+                dtype=crystal_coords.dtype,
+            )
+        )
+        metadata.append(
+            {
+                "seed": int(seed),
+                "translation_sigma_angstrom": float(translation_sigma_angstrom),
+                "rotation_sigma_degrees": float(rotation_sigma_degrees),
+                "translation_standard_normal_eps": translation_eps,
+                "rotation_axis_standard_normal_raw": axis_raw,
+                "rotation_angle_standard_normal_eps": angle_eps,
+                "quaternion_scalar_first": quaternions,
+                "crystal_informed": True,
+                "proper_rotations_only": True,
+            }
+        )
+    return torch.stack(poses), metadata
+
+
 def load_explicit_pocket_center(
     path: Path,
     *,
@@ -391,9 +611,11 @@ def _identity_quaternions(
     *,
     device: torch.device,
     dtype: torch.dtype,
+    batch_size: int | None = None,
 ) -> Tensor:
-    result = torch.zeros(n_fragments, 4, device=device, dtype=dtype)
-    result[:, 0] = 1.0
+    shape = (n_fragments, 4) if batch_size is None else (batch_size, n_fragments, 4)
+    result = torch.zeros(shape, device=device, dtype=dtype)
+    result[..., 0] = 1.0
     return result
 
 
@@ -401,8 +623,12 @@ def _fragment_local_coordinates(
     coords: Tensor,
     fragment_id: Tensor,
 ) -> tuple[Tensor, Tensor]:
-    centers = fragment_centers(coords, fragment_id)[0]
-    return coords - centers[fragment_id], centers
+    centers = fragment_centers(coords, fragment_id)
+    if coords.ndim == 2:
+        return coords - centers[0, fragment_id], centers[0]
+    if coords.ndim == 3:
+        return coords - centers[:, fragment_id], centers
+    raise ValueError("coords must have shape [N,3] or [B,N,3]")
 
 
 def _reconstruct_coordinates(
@@ -412,12 +638,21 @@ def _reconstruct_coordinates(
     quaternions: Tensor,
 ) -> Tensor:
     rotation = quaternion_to_matrix(quaternions)
-    rotated = torch.einsum(
-        "nij,nj->ni",
-        rotation[fragment_id],
-        local_coords,
-    )
-    return rotated + translations[fragment_id]
+    if local_coords.ndim == 2:
+        rotated = torch.einsum(
+            "nij,nj->ni",
+            rotation[fragment_id],
+            local_coords,
+        )
+        return rotated + translations[fragment_id]
+    if local_coords.ndim == 3:
+        rotated = torch.einsum(
+            "bnij,bnj->bni",
+            rotation[:, fragment_id],
+            local_coords,
+        )
+        return rotated + translations[:, fragment_id]
+    raise ValueError("local_coords must have shape [N,3] or [B,N,3]")
 
 
 def _clip_vectors(vectors: Tensor, maximum: float) -> Tensor:
@@ -500,6 +735,35 @@ def _pose_metrics(
         cut_bond_max = 0.0
         cut_bond_rmse = 0.0
 
+    chiral_mask = ~topology.improper_planar
+    if topology.improper_index.numel() and bool(chiral_mask.any()):
+        i, j, k, l = topology.improper_index[:, chiral_mask]
+        current_improper = _dihedral(
+            coords[i],
+            coords[j],
+            coords[k],
+            coords[l],
+        )
+        reference_improper = topology.improper_phi0[chiral_mask]
+        improper_delta = _wrapped_delta(
+            current_improper,
+            reference_improper,
+        )
+        current_handedness = torch.sign(torch.sin(current_improper))
+        reference_handedness = torch.sign(torch.sin(reference_improper))
+        chiral_inversion = (
+            current_handedness.ne(reference_handedness)
+            & current_handedness.ne(0)
+            & reference_handedness.ne(0)
+        )
+        chiral_improper_max_error_degrees = float(
+            torch.rad2deg(improper_delta.abs()).max().detach().cpu()
+        )
+        chiral_improper_inversion_count = int(chiral_inversion.sum().item())
+    else:
+        chiral_improper_max_error_degrees = 0.0
+        chiral_improper_inversion_count = 0
+
     distance = (coords.unsqueeze(1) - system.protein_coords.unsqueeze(0)).norm(dim=-1)
     equilibrium = torch.sqrt(topology.uff_x.view(-1, 1) * system.protein_uff_x.view(1, -1))
     ratio = distance / equilibrium.clamp_min(1e-12)
@@ -515,6 +779,8 @@ def _pose_metrics(
         "cut_bond_mean_abs_error_angstrom": cut_bond_mean,
         "cut_bond_max_abs_error_angstrom": cut_bond_max,
         "cut_bond_rmse_angstrom": cut_bond_rmse,
+        "chiral_improper_max_abs_error_degrees": (chiral_improper_max_error_degrees),
+        "chiral_improper_inversion_count": (chiral_improper_inversion_count),
         "minimum_protein_ligand_distance_angstrom": float(distance.min().detach().cpu()),
         "minimum_distance_over_uff_x": float(ratio.min().detach().cpu()),
         "energies": {name: float(value.detach().cpu()) for name, value in components.items()},
@@ -546,11 +812,15 @@ def _pose_metrics(
     return result
 
 
-def _contact_summary(coords: Tensor, system) -> dict[str, Any]:
+def _contact_summary(
+    coords: Tensor,
+    system,
+    interaction_config: InteractionEnergyConfig,
+) -> dict[str, Any]:
     contacts = interaction_contact_stats(
         coords,
         system,
-        InteractionEnergyConfig(),
+        interaction_config,
     )
     hydrophobic = contacts["hydrophobic"]
     ligand_to_protein = contacts["hydrogen_bond"]["ligand_donor_to_protein_acceptor"]
@@ -568,14 +838,72 @@ def _contact_summary(coords: Tensor, system) -> dict[str, Any]:
         "screened_formal_charge_eligibility": formal_charge["eligibility"],
         "screened_formal_charge_active_pairs": int(formal_charge["active_pairs"]),
         "screened_formal_charge_energy_kcal_mol": float(formal_charge["total_energy_kcal_mol"]),
+        "pi_stacking_weight_sum": float(contacts["pi_stacking"]["weight_sum"]),
+        "cation_pi_weight_sum": float(
+            contacts["cation_pi"]["ligand_ring_to_protein_cation"]["weight_sum"]
+            + contacts["cation_pi"]["protein_ring_to_ligand_cation"]["weight_sum"]
+        ),
+        "halogen_bond_weight_sum": float(contacts["halogen_bond"]["weight_sum"]),
+        "metal_coordination_pair_energy_kcal_mol": float(
+            contacts["metal_coordination"]["pair_energy_kcal_mol"]
+        ),
+        "polar_unsatisfied_proxy_sum": float(contacts["polar_unsatisfied_proxy"]["sum"]),
     }
 
 
-def _mode_interaction_config(mode: str) -> InteractionEnergyConfig:
-    if mode == "unified":
-        return InteractionEnergyConfig()
-    if mode == "physical_only":
+def _mode_interaction_config(
+    mode: str,
+    requested: InteractionEnergyConfig | None = None,
+) -> InteractionEnergyConfig:
+    if mode in {"unified", "interaction_only", "guarded_interaction"}:
+        return requested or InteractionEnergyConfig()
+    if mode in {"physical_only", "guard_only"}:
         return InteractionEnergyConfig(active_terms=())
+    raise ValueError(f"unknown relaxation mode: {mode}")
+
+
+def _relaxation_energy(
+    coords: Tensor,
+    system,
+    *,
+    mode: str,
+    physical_config: PhysicalEnergyConfig,
+    interaction_config: InteractionEnergyConfig,
+) -> dict[str, Tensor]:
+    """Evaluate the exact objective declared by a relaxation mode."""
+    if mode == "interaction_only":
+        return interaction_energy(coords, system, interaction_config)
+    if mode in {"guard_only", "guarded_interaction"}:
+        physical = physical_energy(coords, system, physical_config)
+        components = {name: physical[name] for name in GUARD_PHYSICAL_TERMS}
+        if mode == "guarded_interaction":
+            interaction = interaction_energy(coords, system, interaction_config)
+            components.update(
+                {name: value for name, value in interaction.items() if name != "total"}
+            )
+        components["total"] = sum(
+            components.values(),
+            start=coords.new_zeros(coords.shape[0] if coords.ndim == 3 else ()),
+        )
+        return components
+    if mode == "unified":
+        return guidance_energy(
+            coords,
+            system,
+            GuidanceEnergyConfig(
+                physical=physical_config,
+                interaction=interaction_config,
+            ),
+        )
+    if mode == "physical_only":
+        return guidance_energy(
+            coords,
+            system,
+            GuidanceEnergyConfig(
+                physical=physical_config,
+                interaction=InteractionEnergyConfig(active_terms=()),
+            ),
+        )
     raise ValueError(f"unknown relaxation mode: {mode}")
 
 
@@ -587,8 +915,11 @@ def relax_rigid_fragments(
     config: RigidRelaxationConfig,
     mode: str,
     pocket_center: Tensor | None = None,
+    interaction_config: InteractionEnergyConfig | None = None,
 ) -> RelaxationRun:
     """Run monotone, gradient-only rigid-fragment relaxation."""
+    if mode not in RELAXATION_MODES:
+        raise ValueError(f"unknown relaxation mode: {mode!r}")
     device = system.protein_coords.device
     dtype = system.protein_coords.dtype
     crystal_coords = crystal_coords.to(device=device, dtype=dtype)
@@ -600,10 +931,20 @@ def relax_rigid_fragments(
         if (config.initialization_mode != "crystal_tear" and pocket_center is not None)
         else None
     )
-    active_guidance_cutoff = max(
-        config.physical_cutoff_angstrom,
-        _maximum_active_interaction_cutoff(),
+    mode_interaction_config = _mode_interaction_config(
+        mode,
+        interaction_config,
     )
+    shell_interaction_config = interaction_config or InteractionEnergyConfig()
+    interaction_cutoff = _maximum_active_interaction_cutoff(
+        shell_interaction_config,
+    )
+    active_guidance_cutoff = max(
+        config.physical_cutoff_angstrom if mode != "interaction_only" else 0.0,
+        interaction_cutoff,
+    )
+    if config.protein_shell_cutoff_angstrom <= active_guidance_cutoff:
+        raise ValueError("protein shell cutoff must exceed every active relaxation cutoff")
     shell_valid_radius = (
         config.protein_shell_cutoff_angstrom - active_guidance_cutoff
         if metric_pocket_center is not None
@@ -624,11 +965,6 @@ def relax_rigid_fragments(
     physical_config = PhysicalEnergyConfig(
         cutoff=config.physical_cutoff_angstrom,
     )
-    interaction_config = _mode_interaction_config(mode)
-    guidance_config = GuidanceEnergyConfig(
-        physical=physical_config,
-        interaction=interaction_config,
-    )
 
     metrics: list[dict[str, Any]] = []
     frames: list[Tensor] = []
@@ -636,6 +972,7 @@ def relax_rigid_fragments(
     total_backtracks = 0
     status = "max_steps"
     low_displacement_steps = 0
+    low_energy_decrease_steps = 0
     previous_step: dict[str, Any] = {
         "accepted_alpha": None,
         "backtracks": 0,
@@ -654,7 +991,13 @@ def relax_rigid_fragments(
             .detach()
             .requires_grad_(True)
         )
-        components = guidance_energy(work, system, guidance_config)
+        components = _relaxation_energy(
+            work,
+            system,
+            mode=mode,
+            physical_config=physical_config,
+            interaction_config=mode_interaction_config,
+        )
         centers = fragment_centers(work.detach(), fragment_id)
         energy_finite = all(bool(torch.isfinite(value)) for value in components.values())
         atom_force: Tensor | None = None
@@ -710,6 +1053,7 @@ def relax_rigid_fragments(
             row["contacts"] = _contact_summary(
                 work.detach(),
                 system,
+                mode_interaction_config,
             )
             row["fragment_centers_angstrom"] = centers[0].detach().cpu().tolist()
         if not energy_finite:
@@ -751,7 +1095,7 @@ def relax_rigid_fragments(
             proposed_atom_step = (trial_coords - work.detach()).norm(dim=-1).max()
             if float(proposed_atom_step) <= config.max_atom_step_angstrom:
                 break
-            scale = 0.999999 * config.max_atom_step_angstrom / float(proposed_atom_step)
+            scale = 0.999 * config.max_atom_step_angstrom / float(proposed_atom_step)
             translation_step = translation_step * scale
             angular_step = angular_step * scale
         else:
@@ -782,13 +1126,19 @@ def relax_rigid_fragments(
                 trial_quaternion,
             )
             with torch.no_grad():
-                trial_energy = guidance_energy(
+                trial_energy = _relaxation_energy(
                     trial_coords,
                     system,
-                    guidance_config,
+                    mode=mode,
+                    physical_config=physical_config,
+                    interaction_config=mode_interaction_config,
                 )["total"]
             finite = bool(torch.isfinite(trial_energy))
-            nonincreasing = bool(trial_energy <= current_energy + config.energy_increase_tolerance)
+            energy_tolerance = float(config.energy_increase_tolerance) * torch.maximum(
+                torch.ones_like(current_energy),
+                current_energy.abs(),
+            )
+            nonincreasing = bool(trial_energy <= current_energy + energy_tolerance)
             if finite and nonincreasing:
                 accepted = True
                 accepted_alpha = alpha
@@ -825,8 +1175,24 @@ def relax_rigid_fragments(
             low_displacement_steps += 1
         else:
             low_displacement_steps = 0
+        if config.energy_convergence_enabled and step + 1 >= config.convergence_energy_min_steps:
+            energy_scale = max(1.0, float(current_energy.abs().cpu()))
+            energy_threshold = float(
+                config.convergence_energy_absolute_kcal_mol or 0.0
+            ) + float(config.convergence_energy_relative or 0.0) * energy_scale
+            if energy_decrease <= energy_threshold:
+                low_energy_decrease_steps += 1
+            else:
+                low_energy_decrease_steps = 0
+        else:
+            low_energy_decrease_steps = 0
+        convergence_status: str | None = None
         if low_displacement_steps >= config.convergence_patience:
-            status = "converged_displacement"
+            convergence_status = "converged_displacement"
+        elif low_energy_decrease_steps >= config.convergence_energy_patience:
+            convergence_status = "converged_energy_plateau"
+        if convergence_status is not None:
+            status = convergence_status
             final_coords = _reconstruct_coordinates(
                 local_coords,
                 fragment_id,
@@ -835,10 +1201,12 @@ def relax_rigid_fragments(
             ).detach()
             if saved_steps[-1] != step + 1:
                 with torch.no_grad():
-                    final_components = guidance_energy(
+                    final_components = _relaxation_energy(
                         final_coords,
                         system,
-                        guidance_config,
+                        mode=mode,
+                        physical_config=physical_config,
+                        interaction_config=mode_interaction_config,
                     )
                 final_row = {
                     "step": step + 1,
@@ -857,7 +1225,11 @@ def relax_rigid_fragments(
                     "projected_rotation_rms": None,
                     "projected_rotation_max": None,
                     **previous_step,
-                    "contacts": _contact_summary(final_coords, system),
+                    "contacts": _contact_summary(
+                        final_coords,
+                        system,
+                        mode_interaction_config,
+                    ),
                     "fragment_centers_angstrom": (
                         fragment_centers(
                             final_coords,
@@ -902,30 +1274,540 @@ def relax_rigid_fragments(
     )
 
 
+def relax_rigid_fragments_batch(
+    crystal_coords: Tensor,
+    initial_coords: Tensor,
+    system,
+    *,
+    config: RigidRelaxationConfig,
+    mode: str,
+    pocket_center: Tensor | None = None,
+    interaction_config: InteractionEnergyConfig | None = None,
+    collect_every_step_metrics: bool = True,
+    collect_contact_stats: bool = True,
+) -> BatchedRelaxationRun:
+    """Relax independent prior poses in one tensor batch.
+
+    Energies and gradients are vectorized, while line-search acceptance,
+    backtracking counts, convergence, and failure states remain pose-specific.
+    No batch sum or mean is used to decide whether a pose may advance.
+
+    The default diagnostic policy preserves the original dense trace. For
+    production post-refinement, ``collect_every_step_metrics=False`` records
+    only scheduled/final states and avoids per-step host synchronization;
+    transition-detail fields are intentionally left at their initial values in
+    that mode. ``collect_contact_stats=False`` skips contact decomposition and
+    fragment-center serialization without changing coordinate optimization.
+    """
+    if initial_coords.ndim != 3 or initial_coords.shape[-1] != 3:
+        raise ValueError("initial_coords must have shape [B,N,3]")
+    if initial_coords.shape[0] < 2:
+        raise ValueError("batched relaxation requires at least two poses")
+    if mode not in RELAXATION_MODES:
+        raise ValueError(f"unknown relaxation mode: {mode!r}")
+    if config.initialization_mode != "crystal_tear" and pocket_center is None:
+        raise ValueError("pocket_center is required for pocket-prior relaxation")
+
+    device = system.protein_coords.device
+    dtype = system.protein_coords.dtype
+    crystal_coords = crystal_coords.to(device=device, dtype=dtype)
+    initial_coords = initial_coords.to(device=device, dtype=dtype)
+    if initial_coords.shape[1:] != crystal_coords.shape:
+        raise ValueError("every initial pose must match crystal_coords shape")
+    batch_size = initial_coords.shape[0]
+    metric_pocket_center = (
+        pocket_center.to(device=device, dtype=dtype)
+        if (config.initialization_mode != "crystal_tear" and pocket_center is not None)
+        else None
+    )
+    mode_interaction_config = _mode_interaction_config(
+        mode,
+        interaction_config,
+    )
+    shell_interaction_config = interaction_config or InteractionEnergyConfig()
+    interaction_cutoff = _maximum_active_interaction_cutoff(
+        shell_interaction_config,
+    )
+    active_guidance_cutoff = max(
+        config.physical_cutoff_angstrom if mode != "interaction_only" else 0.0,
+        interaction_cutoff,
+    )
+    if config.protein_shell_cutoff_angstrom <= active_guidance_cutoff:
+        raise ValueError("protein shell cutoff must exceed every active relaxation cutoff")
+    shell_valid_radius = (
+        config.protein_shell_cutoff_angstrom - active_guidance_cutoff
+        if metric_pocket_center is not None
+        else None
+    )
+
+    fragment_id = system.topology.fragment_id
+    n_fragments = int(fragment_id.max().item()) + 1
+    frag_sizes = torch.bincount(fragment_id, minlength=n_fragments)
+    local_coords, translations = _fragment_local_coordinates(
+        initial_coords,
+        fragment_id,
+    )
+    quaternions = _identity_quaternions(
+        n_fragments,
+        device=device,
+        dtype=dtype,
+        batch_size=batch_size,
+    )
+    physical_config = PhysicalEnergyConfig(
+        cutoff=config.physical_cutoff_angstrom,
+    )
+    metrics: list[list[dict[str, Any]]] = [[] for _ in range(batch_size)]
+    frames: list[Tensor] = []
+    saved_steps: list[int] = []
+    total_backtracks = torch.zeros(
+        batch_size,
+        device=device,
+        dtype=torch.long,
+    )
+    statuses = ["max_steps"] * batch_size
+    terminal_steps: list[int | None] = [None] * batch_size
+    active = torch.ones(batch_size, device=device, dtype=torch.bool)
+    low_displacement_steps = torch.zeros(
+        batch_size,
+        device=device,
+        dtype=torch.long,
+    )
+    low_energy_decrease_steps = torch.zeros(
+        batch_size,
+        device=device,
+        dtype=torch.long,
+    )
+    shell_envelope_valid_tensor = torch.ones(
+        batch_size,
+        device=device,
+        dtype=torch.bool,
+    )
+    previous_step: list[dict[str, Any]] = [
+        {
+            "accepted_alpha": None,
+            "backtracks": 0,
+            "accepted_max_atom_step_angstrom": None,
+            "energy_decrease": None,
+        }
+        for _ in range(batch_size)
+    ]
+
+    for step in range(config.max_steps + 1):
+        work = (
+            _reconstruct_coordinates(
+                local_coords,
+                fragment_id,
+                translations,
+                quaternions,
+            )
+            .detach()
+            .requires_grad_(True)
+        )
+        components = _relaxation_energy(
+            work,
+            system,
+            mode=mode,
+            physical_config=physical_config,
+            interaction_config=mode_interaction_config,
+        )
+        component_matrix = torch.stack(
+            tuple(components.values()),
+            dim=-1,
+        )
+        energy_finite = torch.isfinite(component_matrix).all(dim=-1)
+        newly_nonfinite_energy = active & ~energy_finite
+        for pose_index in newly_nonfinite_energy.nonzero(as_tuple=False).flatten().tolist():
+            statuses[pose_index] = "nonfinite_energy"
+            terminal_steps[pose_index] = step
+        active = active & energy_finite
+
+        atom_force = torch.zeros_like(work)
+        if bool(active.any()):
+            gradient = torch.autograd.grad(
+                components["total"][active].sum(),
+                work,
+            )[0]
+            atom_force = -gradient
+        force_finite = torch.isfinite(atom_force).all(dim=(-1, -2))
+        newly_nonfinite_force = active & ~force_finite
+        for pose_index in newly_nonfinite_force.nonzero(as_tuple=False).flatten().tolist():
+            statuses[pose_index] = "nonfinite_force"
+            terminal_steps[pose_index] = step
+        active = active & force_finite
+        atom_force = torch.where(
+            active.view(-1, 1, 1),
+            atom_force,
+            torch.zeros_like(atom_force),
+        )
+        centers = fragment_centers(work.detach(), fragment_id)
+        translation_direction, angular_direction = project_atom_forces(
+            atom_force,
+            work.detach(),
+            centers,
+            fragment_id,
+            system.topology.mass,
+        )
+
+        if config.initialization_mode == "crystal_tear":
+            maximum_shell_measure = (
+                work.detach() - crystal_coords.unsqueeze(0)
+            ).norm(dim=-1).amax(dim=-1)
+            within_shell = maximum_shell_measure <= config.tear_distance_angstrom + 1e-8
+        else:
+            if metric_pocket_center is None or shell_valid_radius is None:
+                raise AssertionError("pocket-prior shell metric lacks a center or radius")
+            maximum_shell_measure = (
+                work.detach() - metric_pocket_center.view(1, 1, 3)
+            ).norm(dim=-1).amax(dim=-1)
+            within_shell = maximum_shell_measure <= float(shell_valid_radius) + 1e-8
+        shell_envelope_valid_tensor = shell_envelope_valid_tensor & within_shell
+
+        scheduled_step = step % config.save_every == 0 or step == config.max_steps
+        all_inactive = not bool(active.any())
+        record_metrics = collect_every_step_metrics or scheduled_step or all_inactive
+        should_save = scheduled_step or all_inactive or (
+            collect_every_step_metrics and not bool(active.all())
+        )
+        if record_metrics:
+            for pose_index in range(batch_size):
+                pose_components = {
+                    name: value[pose_index] for name, value in components.items()
+                }
+                row = {
+                    "step": step,
+                    "batch_index": pose_index,
+                    "active": bool(active[pose_index]),
+                    **_pose_metrics(
+                        work[pose_index].detach(),
+                        crystal_coords,
+                        system,
+                        pose_components,
+                        pocket_center=metric_pocket_center,
+                        shell_valid_radius_angstrom=shell_valid_radius,
+                    ),
+                    "force_rms_kcal_mol_angstrom": (
+                        _rms_norm(atom_force[pose_index])
+                        if bool(force_finite[pose_index])
+                        else None
+                    ),
+                    "force_max_kcal_mol_angstrom": (
+                        _max_norm(atom_force[pose_index])
+                        if bool(force_finite[pose_index])
+                        else None
+                    ),
+                    "projected_translation_rms": (
+                        _rms_norm(translation_direction[pose_index])
+                        if bool(force_finite[pose_index])
+                        else None
+                    ),
+                    "projected_translation_max": (
+                        _max_norm(translation_direction[pose_index])
+                        if bool(force_finite[pose_index])
+                        else None
+                    ),
+                    "projected_rotation_rms": (
+                        _rms_norm(angular_direction[pose_index])
+                        if bool(force_finite[pose_index])
+                        else None
+                    ),
+                    "projected_rotation_max": (
+                        _max_norm(angular_direction[pose_index])
+                        if bool(force_finite[pose_index])
+                        else None
+                    ),
+                    **previous_step[pose_index],
+                }
+                if should_save and collect_contact_stats:
+                    row["contacts"] = _contact_summary(
+                        work[pose_index].detach(),
+                        system,
+                        mode_interaction_config,
+                    )
+                    row["fragment_centers_angstrom"] = (
+                        centers[pose_index].detach().cpu().tolist()
+                    )
+                metrics[pose_index].append(row)
+        if should_save:
+            frames.append(work.detach().cpu())
+            saved_steps.append(step)
+        if step == config.max_steps or not bool(active.any()):
+            break
+
+        translation_step = _clip_vectors(
+            config.base_step_size * translation_direction,
+            config.max_translation_step_angstrom,
+        )
+        angular_step = _clip_vectors(
+            config.base_step_size * angular_direction,
+            math.radians(config.max_rotation_step_degrees),
+        )
+        translation_step = torch.where(
+            active.view(-1, 1, 1),
+            translation_step,
+            torch.zeros_like(translation_step),
+        )
+        angular_step = torch.where(
+            active.view(-1, 1, 1),
+            angular_step,
+            torch.zeros_like(angular_step),
+        )
+
+        step_scale = torch.ones(
+            batch_size,
+            device=device,
+            dtype=dtype,
+        )
+        for _ in range(8):
+            trial_translation, trial_quaternion = integrate_se3_step(
+                translations,
+                quaternions,
+                translation_step * step_scale.view(-1, 1, 1),
+                angular_step * step_scale.view(-1, 1, 1),
+                1.0,
+                frag_sizes=frag_sizes,
+            )
+            trial_coords = _reconstruct_coordinates(
+                local_coords,
+                fragment_id,
+                trial_translation,
+                trial_quaternion,
+            )
+            proposed_atom_step = (trial_coords - work.detach()).norm(dim=-1).amax(dim=-1)
+            violation = active & (proposed_atom_step > config.max_atom_step_angstrom)
+            if not bool(violation.any()):
+                break
+            adjustment = (
+                0.999 * config.max_atom_step_angstrom / proposed_atom_step.clamp_min(1e-12)
+            ).clamp(max=1.0)
+            step_scale = torch.where(
+                violation,
+                step_scale * adjustment,
+                step_scale,
+            )
+        else:
+            raise RuntimeError("failed to enforce the batched rigid atom-displacement cap")
+        translation_step = translation_step * step_scale.view(-1, 1, 1)
+        angular_step = angular_step * step_scale.view(-1, 1, 1)
+
+        current_energy = components["total"].detach()
+        energy_tolerance = float(config.energy_increase_tolerance) * torch.maximum(
+            torch.ones_like(current_energy),
+            current_energy.abs(),
+        )
+        accepted = ~active
+        accepted_translation = translations.clone()
+        accepted_quaternion = quaternions.clone()
+        accepted_coords = work.detach().clone()
+        accepted_energy = current_energy.clone()
+        accepted_alpha = torch.zeros(batch_size, device=device, dtype=dtype)
+        accepted_backtracks = torch.zeros(
+            batch_size,
+            device=device,
+            dtype=torch.long,
+        )
+        for backtrack in range(config.max_backtracks + 1):
+            pending = active & ~accepted
+            if not bool(pending.any()):
+                break
+            alpha = config.backtrack_factor**backtrack
+            trial_translation, trial_quaternion = integrate_se3_step(
+                translations,
+                quaternions,
+                translation_step,
+                angular_step,
+                alpha,
+                frag_sizes=frag_sizes,
+            )
+            trial_coords = _reconstruct_coordinates(
+                local_coords,
+                fragment_id,
+                trial_translation,
+                trial_quaternion,
+            )
+            with torch.no_grad():
+                trial_energy = _relaxation_energy(
+                    trial_coords,
+                    system,
+                    mode=mode,
+                    physical_config=physical_config,
+                    interaction_config=mode_interaction_config,
+                )["total"]
+            accept_now = (
+                pending
+                & torch.isfinite(trial_energy)
+                & (trial_energy <= current_energy + energy_tolerance)
+            )
+            accepted_translation = torch.where(
+                accept_now.view(-1, 1, 1),
+                trial_translation,
+                accepted_translation,
+            )
+            accepted_quaternion = torch.where(
+                accept_now.view(-1, 1, 1),
+                trial_quaternion,
+                accepted_quaternion,
+            )
+            accepted_coords = torch.where(
+                accept_now.view(-1, 1, 1),
+                trial_coords,
+                accepted_coords,
+            )
+            accepted_energy = torch.where(
+                accept_now,
+                trial_energy,
+                accepted_energy,
+            )
+            accepted_alpha = torch.where(
+                accept_now,
+                torch.full_like(accepted_alpha, float(alpha)),
+                accepted_alpha,
+            )
+            accepted_backtracks = torch.where(
+                accept_now,
+                torch.full_like(accepted_backtracks, backtrack),
+                accepted_backtracks,
+            )
+            accepted = accepted | accept_now
+
+        failed_line_search = active & ~accepted
+        for pose_index in failed_line_search.nonzero(as_tuple=False).flatten().tolist():
+            statuses[pose_index] = "line_search_failed"
+            terminal_steps[pose_index] = step
+        active = active & accepted
+        failed_backtracks = torch.full_like(
+            accepted_backtracks,
+            config.max_backtracks,
+        )
+        total_backtracks = total_backtracks + torch.where(
+            failed_line_search,
+            failed_backtracks,
+            accepted_backtracks,
+        )
+        maximum_atom_step = (accepted_coords - work.detach()).norm(dim=-1).amax(dim=-1)
+        if bool((active & (maximum_atom_step > config.max_atom_step_angstrom + 1e-10)).any()):
+            raise AssertionError("accepted batched rigid update exceeded atom-displacement cap")
+        translations = accepted_translation.detach()
+        quaternions = accepted_quaternion.detach()
+        energy_decrease = current_energy - accepted_energy
+        if collect_every_step_metrics:
+            for pose_index in range(batch_size):
+                if bool(active[pose_index]):
+                    previous_step[pose_index] = {
+                        "accepted_alpha": float(accepted_alpha[pose_index].detach().cpu()),
+                        "backtracks": int(accepted_backtracks[pose_index].detach().cpu()),
+                        "accepted_max_atom_step_angstrom": float(
+                            maximum_atom_step[pose_index].detach().cpu()
+                        ),
+                        "energy_decrease": float(energy_decrease[pose_index].detach().cpu()),
+                    }
+                else:
+                    previous_step[pose_index] = {
+                        "accepted_alpha": None,
+                        "backtracks": 0,
+                        "accepted_max_atom_step_angstrom": None,
+                        "energy_decrease": None,
+                    }
+        below_convergence = maximum_atom_step < config.convergence_displacement_angstrom
+        low_displacement_steps = torch.where(
+            active & below_convergence,
+            low_displacement_steps + 1,
+            torch.zeros_like(low_displacement_steps),
+        )
+        if (
+            config.energy_convergence_enabled
+            and step + 1 >= config.convergence_energy_min_steps
+        ):
+            energy_threshold = float(
+                config.convergence_energy_absolute_kcal_mol or 0.0
+            ) + float(config.convergence_energy_relative or 0.0) * current_energy.abs().clamp_min(
+                1.0
+            )
+            below_energy_convergence = energy_decrease <= energy_threshold
+            low_energy_decrease_steps = torch.where(
+                active & below_energy_convergence,
+                low_energy_decrease_steps + 1,
+                torch.zeros_like(low_energy_decrease_steps),
+            )
+        else:
+            low_energy_decrease_steps.zero_()
+        converged_displacement = active & (
+            low_displacement_steps >= config.convergence_patience
+        )
+        converged_energy = (
+            active
+            & ~converged_displacement
+            & (low_energy_decrease_steps >= config.convergence_energy_patience)
+        )
+        for pose_index in converged_displacement.nonzero(as_tuple=False).flatten().tolist():
+            statuses[pose_index] = "converged_displacement"
+            terminal_steps[pose_index] = step + 1
+        for pose_index in converged_energy.nonzero(as_tuple=False).flatten().tolist():
+            statuses[pose_index] = "converged_energy_plateau"
+            terminal_steps[pose_index] = step + 1
+        active = active & ~(converged_displacement | converged_energy)
+
+    if saved_steps[-1] != metrics[0][-1]["step"]:
+        final_coords = _reconstruct_coordinates(
+            local_coords,
+            fragment_id,
+            translations,
+            quaternions,
+        ).detach()
+        frames.append(final_coords.cpu())
+        saved_steps.append(int(metrics[0][-1]["step"]))
+
+    shell_envelope_valid = [
+        bool(value) for value in shell_envelope_valid_tensor.detach().cpu().tolist()
+    ]
+    resolved_terminal_steps = [
+        int(metrics[pose_index][-1]["step"]) if terminal_step is None else int(terminal_step)
+        for pose_index, terminal_step in enumerate(terminal_steps)
+    ]
+    return BatchedRelaxationRun(
+        mode=mode,
+        statuses=statuses,
+        metrics=metrics,
+        frames=frames,
+        saved_steps=saved_steps,
+        total_backtracks=[int(value) for value in total_backtracks.detach().cpu().tolist()],
+        terminal_steps=resolved_terminal_steps,
+        shell_envelope_valid=shell_envelope_valid,
+    )
+
+
 def _success_assessment(
     run: RelaxationRun,
     *,
     crystal_minimum_distance_over_uff_x: float,
     initialization_mode: str,
+    pose_threshold_angstrom: float | None = None,
 ) -> dict[str, Any]:
     initial = run.metrics[0]
     final = run.metrics[-1]
     initial_rmsd = float(initial["raw_rmsd_angstrom"])
     final_rmsd = float(final["raw_rmsd_angstrom"])
     reduction = 1.0 - final_rmsd / initial_rmsd if initial_rmsd > 0 else 0.0
-    pose_threshold = 1.0 if initialization_mode == "crystal_tear" else 2.0
+    pose_threshold = (
+        float(pose_threshold_angstrom)
+        if pose_threshold_angstrom is not None
+        else (1.0 if initialization_mode == "crystal_tear" else 2.0)
+    )
+    if pose_threshold <= 0:
+        raise ValueError("pose_threshold_angstrom must be positive")
     pose_recovery = (
         final_rmsd <= pose_threshold
         if initialization_mode == "crystal_tear"
         else final_rmsd < pose_threshold
     )
+    threshold_label = f"{pose_threshold:g}".replace(".", "_")
     pose_gate_name = (
-        "final_raw_rmsd_le_1_angstrom"
+        f"final_raw_rmsd_le_{threshold_label}_angstrom"
         if initialization_mode == "crystal_tear"
-        else "final_raw_rmsd_lt_2_angstrom"
+        else f"final_raw_rmsd_lt_{threshold_label}_angstrom"
     )
     gates = {
-        "finite_and_completed": run.status not in {"nonfinite_energy", "nonfinite_force"},
+        "finite_and_completed": run.status
+        in {"max_steps", "converged_displacement", "converged_energy_plateau"},
         "shell_envelope_valid": run.shell_envelope_valid,
         pose_gate_name: pose_recovery,
         "raw_rmsd_reduction_ge_70_percent": reduction >= 0.70,
@@ -938,6 +1820,9 @@ def _success_assessment(
         "final_clash_not_worse_than_crystal_minus_0_05": (
             float(final["minimum_distance_over_uff_x"])
             >= crystal_minimum_distance_over_uff_x - 0.05
+        ),
+        "final_chiral_improper_inversion_count_eq_0": (
+            int(final.get("chiral_improper_inversion_count", 0)) == 0
         ),
     }
     if initialization_mode == "crystal_tear":
@@ -961,12 +1846,15 @@ def _success_assessment(
         primary_joint_gates = {
             "finite": gates["finite_and_completed"],
             "shell_valid": gates["shell_envelope_valid"],
-            "final_raw_rmsd_lt_2_angstrom": pose_recovery,
+            pose_gate_name: pose_recovery,
             "final_cut_bond_max_error_le_0_2_angstrom": gates[
                 "final_cut_bond_max_error_le_0_2_angstrom"
             ],
             "final_minimum_distance_over_uff_x_ge_0_65": gates[
                 "final_minimum_distance_over_uff_x_ge_0_65"
+            ],
+            "final_chiral_improper_inversion_count_eq_0": gates[
+                "final_chiral_improper_inversion_count_eq_0"
             ],
         }
         primary_joint_success = all(primary_joint_gates.values())
@@ -1062,6 +1950,14 @@ def _run_case(args: argparse.Namespace) -> dict[str, Any]:
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     protocol_id = _protocol_id_for_initialization(args.initialization)
+    requested_interaction_terms = getattr(args, "interaction_terms", None)
+    selected_interaction_config = InteractionEnergyConfig(
+        active_terms=(
+            tuple(requested_interaction_terms)
+            if requested_interaction_terms is not None
+            else InteractionEnergyConfig().active_terms
+        )
+    )
 
     protein_shell_cutoff = args.protein_shell_cutoff
     if protein_shell_cutoff is None:
@@ -1156,7 +2052,7 @@ def _run_case(args: argparse.Namespace) -> dict[str, Any]:
             system,
             GuidanceEnergyConfig(
                 physical=physical_config,
-                interaction=InteractionEnergyConfig(),
+                interaction=selected_interaction_config,
             ),
         )
     crystal_metrics = _pose_metrics(
@@ -1169,7 +2065,9 @@ def _run_case(args: argparse.Namespace) -> dict[str, Any]:
             config.protein_shell_cutoff_angstrom
             - max(
                 config.physical_cutoff_angstrom,
-                _maximum_active_interaction_cutoff(),
+                _maximum_active_interaction_cutoff(
+                    selected_interaction_config,
+                ),
             )
             if pocket_center is not None
             else None
@@ -1178,9 +2076,19 @@ def _run_case(args: argparse.Namespace) -> dict[str, Any]:
     crystal_metrics["contacts"] = _contact_summary(
         crystal_coords,
         system,
+        selected_interaction_config,
     )
 
-    modes = ("unified", "physical_only") if args.mode == "both" else (args.mode,)
+    if args.mode == "both":
+        modes = ("unified", "physical_only")
+    elif args.mode == "interaction_probe":
+        modes = (
+            "interaction_only",
+            "guard_only",
+            "guarded_interaction",
+        )
+    else:
+        modes = (args.mode,)
     runs: dict[str, RelaxationRun] = {}
     for mode in modes:
         runs[mode] = relax_rigid_fragments(
@@ -1190,6 +2098,7 @@ def _run_case(args: argparse.Namespace) -> dict[str, Any]:
             config=config,
             mode=mode,
             pocket_center=pocket_center,
+            interaction_config=selected_interaction_config,
         )
 
     if config.initialization_mode == "crystal_tear":
@@ -1362,7 +2271,9 @@ def _run_case(args: argparse.Namespace) -> dict[str, Any]:
                 config.protein_shell_cutoff_angstrom
                 - max(
                     config.physical_cutoff_angstrom,
-                    _maximum_active_interaction_cutoff(),
+                    _maximum_active_interaction_cutoff(
+                        selected_interaction_config,
+                    ),
                 )
             ),
         }
@@ -1406,12 +2317,19 @@ def _run_case(args: argparse.Namespace) -> dict[str, Any]:
             "torch": torch.__version__,
         },
         "parameter_set": guidance_parameter_identity(),
+        "interaction_profile": interaction_profile_metadata(
+            selected_interaction_config,
+        ),
         "config": asdict(config),
         "initialization": summary_initialization,
         "shell_contract": {
             "construction": shell_construction,
             "active_physical_cutoff_angstrom": (config.physical_cutoff_angstrom),
-            "active_interaction_cutoff_angstrom": (_maximum_active_interaction_cutoff()),
+            "active_interaction_cutoff_angstrom": (
+                _maximum_active_interaction_cutoff(
+                    selected_interaction_config,
+                )
+            ),
             **shell_validity,
             "protein_shell_cutoff_angstrom": (config.protein_shell_cutoff_angstrom),
             "protein_shell_heavy_atoms": int(system.protein_coords.shape[0]),
@@ -1425,9 +2343,14 @@ def _run_case(args: argparse.Namespace) -> dict[str, Any]:
             *initialization_warnings,
             "Raw atom-index RMSD is evaluation-only and never enters optimization.",
             (
-                "Partial-charge electrostatics, solvation, metal coordination, "
-                "and receptor flexibility are absent; screened formal-charge "
-                "groups are active in InteractionGuidance."
+                "Partial-charge electrostatics, solvation, and receptor "
+                "flexibility are absent. Active typed interaction terms are "
+                "recorded in interaction_profile."
+            ),
+            (
+                "interaction_only is an attraction-basin diagnostic and is not "
+                "a chemically valid ligand-reassembly objective. guard modes "
+                "add ligand intra geometry and protein-ligand repulsion."
             ),
             "Vina is not imported, evaluated, or combined.",
         ],
@@ -1525,8 +2448,23 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--mode",
-        choices=("both", "unified", "physical_only"),
+        choices=(
+            "both",
+            "interaction_probe",
+            *RELAXATION_MODES,
+        ),
         default="both",
+    )
+    parser.add_argument(
+        "--interaction-terms",
+        nargs="*",
+        choices=ACTIVE_INTERACTION_TERMS,
+        default=None,
+        help=(
+            "Explicit interaction objective. Omit for all implemented default "
+            "terms; pass the option with no values for no interaction objective. "
+            "physical_only/guard_only always ignore this list."
+        ),
     )
     parser.add_argument("--tear-distance", type=float, default=3.0)
     parser.add_argument("--seed", type=int, default=20260730)

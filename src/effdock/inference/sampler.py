@@ -196,6 +196,43 @@ def build_batched_graph(
     return out
 
 
+def sample_shared_prior_states(
+    num_samples: int,
+    n_fragments: int,
+    frag_sizes: Tensor,
+    *,
+    translation_sigma: float,
+    seed: int,
+) -> tuple[Tensor, Tensor]:
+    """Create a deterministic CPU prior pool reusable across fixed budgets."""
+    if num_samples <= 0 or n_fragments <= 0:
+        raise ValueError("num_samples and n_fragments must be positive")
+    if translation_sigma <= 0:
+        raise ValueError("translation_sigma must be positive")
+    if frag_sizes.shape != (n_fragments,):
+        raise ValueError("frag_sizes must have one entry per fragment")
+    generator = torch.Generator(device="cpu")
+    generator.manual_seed(int(seed))
+    repeated_sizes = frag_sizes.detach().cpu().to(torch.long).repeat(num_samples)
+    translations = float(translation_sigma) * torch.randn(
+        num_samples * n_fragments,
+        3,
+        dtype=torch.float32,
+        generator=generator,
+    )
+    rotations = sample_prior_rotations(
+        num_samples * n_fragments,
+        frag_sizes=repeated_sizes,
+        generator=generator,
+        device=torch.device("cpu"),
+        dtype=torch.float32,
+    )
+    return (
+        translations.view(num_samples, n_fragments, 3),
+        rotations.view(num_samples, n_fragments, 4),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Unified ODE sampler (batched across N samples of one complex)
 # ---------------------------------------------------------------------------
@@ -634,6 +671,7 @@ def parse_sigma_list(spec: str | None, num_samples: int) -> tuple[list[float], l
 
 __all__ = [
     "build_time_grid",
+    "sample_shared_prior_states",
     "sample_unified",
     "sample_unified_multi_sigma",
     "parse_sigma_list",

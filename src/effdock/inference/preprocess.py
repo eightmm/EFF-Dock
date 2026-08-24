@@ -23,8 +23,38 @@ from effdock.preprocess.protein import parse_pocket_atoms
 # ---------------------------------------------------------------------------
 # Ligand loading (SMILES / SDF / MOL2)
 # ---------------------------------------------------------------------------
-def load_ligand(ligand_input: str) -> tuple[Chem.Mol, bool]:
-    """Load ligand from SMILES / SDF / MOL2. Returns (mol, has_pose)."""
+def generate_smiles_conformer(
+    smiles: str,
+    random_seed: int = 0,
+) -> tuple[Chem.Mol, dict[str, int | str]]:
+    """Generate the production SMILES conformer and return its audit metadata."""
+    mol = Chem.MolFromSmiles(smiles)
+    assert mol is not None, f"Invalid SMILES: {smiles}"
+    mol = Chem.AddHs(mol)
+    embed_params = AllChem.ETKDGv3()
+    rdkit_seed = int(random_seed) & 0x7FFFFFFF
+    embed_params.randomSeed = rdkit_seed
+    embed_status = int(AllChem.EmbedMolecule(mol, embed_params))
+    assert embed_status == 0, f"3D embedding failed: {smiles}"
+    mmff_status = int(AllChem.MMFFOptimizeMolecule(mol, maxIters=200))
+    mol = Chem.RemoveHs(mol)
+    return mol, {
+        "recipe": "ETKDGv3_MMFF_200_RemoveHs",
+        "rdkit_seed": rdkit_seed,
+        "embed_status": embed_status,
+        "mmff_status": mmff_status,
+    }
+
+
+def load_ligand(
+    ligand_input: str,
+    random_seed: int = 0,
+) -> tuple[Chem.Mol, bool]:
+    """Load ligand from SMILES / SDF / MOL2. Returns (mol, has_pose).
+
+    ``random_seed`` controls only SMILES conformer generation. It is folded
+    into RDKit's non-negative signed 32-bit range for the C++ API.
+    """
     path = Path(ligand_input)
 
     if path.suffix.lower() == ".sdf" and path.exists():
@@ -40,13 +70,7 @@ def load_ligand(ligand_input: str) -> tuple[Chem.Mol, bool]:
         return mol, True
 
     # SMILES → ETKDG conformer
-    mol = Chem.MolFromSmiles(ligand_input)
-    assert mol is not None, f"Invalid SMILES: {ligand_input}"
-    mol = Chem.AddHs(mol)
-    status = AllChem.EmbedMolecule(mol, AllChem.ETKDGv3())
-    assert status == 0, f"3D embedding failed: {ligand_input}"
-    AllChem.MMFFOptimizeMolecule(mol, maxIters=200)
-    mol = Chem.RemoveHs(mol)
+    mol, _ = generate_smiles_conformer(ligand_input, random_seed=random_seed)
     return mol, False
 
 
@@ -201,6 +225,7 @@ def build_inference_bundle(
 
 
 __all__ = [
+    "generate_smiles_conformer",
     "load_ligand",
     "derive_pocket_center",
     "derive_contact_atom_center",

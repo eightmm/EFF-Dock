@@ -6,9 +6,17 @@ from dataclasses import dataclass
 
 import torch
 from torch import Tensor
+from torch.nn import functional as F
 
 from .parameterization import load_effff_v2
-from .system import PhysicalSystem
+from .system import (
+    _GENERIC_OBSTACLE_CUTOFF,
+    _GENERIC_OBSTACLE_RADIUS,
+    _GENERIC_OBSTACLE_REPULSION_MAX,
+    _GENERIC_OBSTACLE_SOFTCORE,
+    _GENERIC_OBSTACLE_SWITCH_DISTANCE,
+    PhysicalSystem,
+)
 
 
 @dataclass(frozen=True)
@@ -18,7 +26,29 @@ class PhysicalEnergyConfig:
         load_effff_v2()["defaults"]["switch_distance_angstrom"]
     )
     cutoff: float = float(load_effff_v2()["defaults"]["cutoff_angstrom"])
+    protein_ligand_steric_barrier_enabled: bool = bool(
+        load_effff_v2()["defaults"]["protein_ligand_steric_barrier_enabled"]
+    )
+    steric_radius_scale: float = float(
+        load_effff_v2()["defaults"]["steric_radius_scale"]
+    )
+    steric_k: float = float(load_effff_v2()["defaults"]["steric_k"])
+    steric_tau: float = float(
+        load_effff_v2()["defaults"]["steric_tau_angstrom"]
+    )
+    steric_cutoff_margin: float = float(
+        load_effff_v2()["defaults"]["steric_cutoff_margin_angstrom"]
+    )
+    # Dimensionless runtime ablation scale.  The versioned EFF-FF equilibrium
+    # geometry and force constants remain unchanged; this scale applies only
+    # to non-planar (stereochemical) improper restraints.
+    chiral_improper_scale: float = 1.0
     protein_chunk_size: int = 512
+    generic_obstacle_repulsion_max: float = _GENERIC_OBSTACLE_REPULSION_MAX
+    generic_obstacle_softcore: float = _GENERIC_OBSTACLE_SOFTCORE
+    generic_obstacle_radius: float = _GENERIC_OBSTACLE_RADIUS
+    generic_obstacle_switch_distance: float = _GENERIC_OBSTACLE_SWITCH_DISTANCE
+    generic_obstacle_cutoff: float = _GENERIC_OBSTACLE_CUTOFF
 
     def __post_init__(self) -> None:
         if self.softcore <= 0:
@@ -27,6 +57,31 @@ class PhysicalEnergyConfig:
             raise ValueError("require 0 < switch_distance < cutoff")
         if self.protein_chunk_size <= 0:
             raise ValueError("protein_chunk_size must be positive")
+        if not isinstance(self.protein_ligand_steric_barrier_enabled, bool):
+            raise ValueError("protein_ligand_steric_barrier_enabled must be bool")
+        for name in (
+            "steric_radius_scale",
+            "steric_tau",
+            "steric_cutoff_margin",
+        ):
+            if getattr(self, name) <= 0:
+                raise ValueError(f"{name} must be positive")
+        if self.steric_k < 0:
+            raise ValueError("steric_k must be non-negative")
+        if self.chiral_improper_scale < 0:
+            raise ValueError("chiral_improper_scale must be non-negative")
+        for name in (
+            "generic_obstacle_repulsion_max",
+            "generic_obstacle_softcore",
+            "generic_obstacle_radius",
+        ):
+            if getattr(self, name) <= 0:
+                raise ValueError(f"{name} must be positive")
+        if not 0 < self.generic_obstacle_switch_distance < self.generic_obstacle_cutoff:
+            raise ValueError(
+                "require 0 < generic_obstacle_switch_distance < "
+                "generic_obstacle_cutoff"
+            )
 
 
 def _as_batch(coords: Tensor) -> tuple[Tensor, bool]:
@@ -110,6 +165,26 @@ def _lj_components(
     return repulsive, attractive
 
 
+def _steric_barrier(
+    distance: Tensor,
+    ligand_vdw_radius: Tensor,
+    protein_vdw_radius: Tensor,
+    *,
+    config: PhysicalEnergyConfig,
+) -> Tensor:
+    """Compact smooth vdW-overlap barrier for protein-ligand heavy atoms."""
+    safe_distance = float(config.steric_radius_scale) * (
+        ligand_vdw_radius.view(1, -1, 1)
+        + protein_vdw_radius.view(1, 1, -1)
+    )
+    tau = float(config.steric_tau)
+    penetration = tau * F.softplus((safe_distance - distance) / tau)
+    outer = safe_distance + float(config.steric_cutoff_margin)
+    u = ((outer - distance) / float(config.steric_cutoff_margin)).clamp(0, 1)
+    compact_switch = u.pow(3) * (10.0 - 15.0 * u + 6.0 * u.square())
+    return 0.5 * float(config.steric_k) * penetration.square() * compact_switch
+
+
 def physical_energy(
     coords: Tensor,
     system: PhysicalSystem,
@@ -170,7 +245,7 @@ def physical_energy(
         components["ligand_intra_improper"] = torch.where(
             topology.improper_planar.unsqueeze(0),
             planar,
-            harmonic,
+            float(config.chiral_improper_scale) * harmonic,
         ).sum(dim=1)
     else:
         components["ligand_intra_improper"] = _zero(batched)
@@ -196,6 +271,7 @@ def physical_energy(
 
     pl_repulsive = _zero(batched)
     pl_attractive = _zero(batched)
+    pl_steric_barrier = _zero(batched)
     protein_coords = system.protein_coords
     for start in range(0, protein_coords.shape[0], config.protein_chunk_size):
         stop = min(start + config.protein_chunk_size, protein_coords.shape[0])
@@ -218,8 +294,59 @@ def physical_energy(
         )
         pl_repulsive = pl_repulsive + rep.sum(dim=(1, 2))
         pl_attractive = pl_attractive + attr.sum(dim=(1, 2))
+        if config.protein_ligand_steric_barrier_enabled and config.steric_k > 0:
+            steric = _steric_barrier(
+                distance,
+                topology.vdw_radius,
+                system.protein_vdw_radius[start:stop],
+                config=config,
+            )
+            pl_steric_barrier = pl_steric_barrier + steric.sum(dim=(1, 2))
     components["protein_ligand_lj_repulsive"] = pl_repulsive
     components["protein_ligand_lj_attractive"] = pl_attractive
+    components["protein_ligand_steric_barrier"] = pl_steric_barrier
+
+    obstacle_count = int(system.geometry_obstacle_coords.shape[0])
+    if obstacle_count:
+        generic_mask = system.geometry_obstacle_is_generic
+        uff_mask = ~generic_mask
+        if bool(uff_mask.any()):
+            obstacle_coords = system.geometry_obstacle_coords[uff_mask]
+            distance = _pairwise_distance(batched, obstacle_coords)
+            x_ij = torch.sqrt(
+                topology.uff_x.view(1, -1, 1)
+                * system.geometry_obstacle_uff_x[uff_mask].view(1, 1, -1)
+            )
+            d_ij = torch.sqrt(
+                topology.uff_d.view(1, -1, 1)
+                * system.geometry_obstacle_uff_d[uff_mask].view(1, 1, -1)
+            )
+            repulsive, _ = _lj_components(
+                distance,
+                x_ij,
+                d_ij,
+                scale=torch.ones_like(distance),
+                config=config,
+            )
+            components["receptor_geometry_obstacle_uff_repulsive"] = repulsive.sum(
+                dim=(1, 2)
+            )
+        if bool(generic_mask.any()):
+            obstacle_coords = system.geometry_obstacle_coords[generic_mask]
+            distance = _pairwise_distance(batched, obstacle_coords)
+            rho = (
+                distance.square() + float(config.generic_obstacle_softcore) ** 2
+            ).sqrt()
+            ratio = (float(config.generic_obstacle_radius) / rho).pow(12)
+            bounded = ratio / (1.0 + ratio)
+            switch = _switch(
+                distance,
+                config.generic_obstacle_switch_distance,
+                config.generic_obstacle_cutoff,
+            )
+            components["receptor_geometry_obstacle_generic_repulsive"] = (
+                float(config.generic_obstacle_repulsion_max) * bounded * switch
+            ).sum(dim=(1, 2))
     components["total"] = sum(components.values(), start=_zero(batched))
 
     if squeeze:

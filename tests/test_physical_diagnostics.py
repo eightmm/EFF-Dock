@@ -22,6 +22,7 @@ from effdock.guidance.interaction import (  # noqa: E402
     interaction_energy,
     interaction_profile_metadata,
     metal_coordination_v0_contract,
+    metal_coordination_v1_contract,
 )
 from effdock.guidance.parameterization import (  # noqa: E402
     element_parameters,
@@ -41,11 +42,15 @@ from effdock.workflows import trace_physical  # noqa: E402
 from effdock.workflows.relax_guidance import (  # noqa: E402
     RelaxationRun,
     RigidRelaxationConfig,
+    _relaxation_energy,
     _success_assessment,
     load_explicit_pocket_center,
+    make_crystal_local_fragment_batch,
+    make_pocket_prior_fragment_batch,
     make_pocket_prior_fragment_pose,
     make_torn_fragment_pose,
     relax_rigid_fragments,
+    relax_rigid_fragments_batch,
 )
 
 
@@ -89,6 +94,7 @@ def _butane_system() -> tuple[torch.Tensor, PhysicalSystem]:
         protein_atomic_numbers=protein_atomic_numbers,
         protein_uff_x=protein_parameters.uff_x,
         protein_uff_d=protein_parameters.uff_d,
+        protein_vdw_radius=protein_parameters.vdw_radius,
         parameter_set={"name": "test", "version": "test"},
         protein_source_atoms=2,
         interaction_topology=InteractionTopology(
@@ -434,7 +440,7 @@ def test_pocket_prior_shell_records_radius_and_invalidates_run() -> None:
 def test_pocket_prior_success_uses_exact_frozen_joint_gate() -> None:
     run = RelaxationRun(
         mode="unified",
-        status="line_search_failed",
+        status="max_steps",
         metrics=[
             {
                 "step": 0,
@@ -475,6 +481,50 @@ def test_pocket_prior_success_uses_exact_frozen_joint_gate() -> None:
     )
     assert boundary["primary_joint_success"] is False
     assert boundary["pose_recovery"] is False
+
+    run.status = "line_search_failed"
+    numerical_failure = _success_assessment(
+        run,
+        crystal_minimum_distance_over_uff_x=1.0,
+        initialization_mode="model_prior",
+    )
+    assert numerical_failure["gates"]["finite_and_completed"] is False
+    assert numerical_failure["primary_joint_success"] is False
+
+
+def test_local_prior_success_uses_one_angstrom_threshold() -> None:
+    run = RelaxationRun(
+        mode="guarded_interaction",
+        status="max_steps",
+        metrics=[
+            {
+                "step": 0,
+                "raw_rmsd_angstrom": 1.5,
+                "cut_bond_max_abs_error_angstrom": 0.0,
+                "minimum_distance_over_uff_x": 0.8,
+            },
+            {
+                "step": 1,
+                "raw_rmsd_angstrom": 1.1,
+                "cut_bond_max_abs_error_angstrom": 0.0,
+                "minimum_distance_over_uff_x": 0.8,
+            },
+        ],
+        frames=[],
+        saved_steps=[],
+        total_backtracks=0,
+        shell_envelope_valid=True,
+    )
+    assessment = _success_assessment(
+        run,
+        crystal_minimum_distance_over_uff_x=0.8,
+        initialization_mode="model_prior",
+        pose_threshold_angstrom=1.0,
+    )
+
+    assert assessment["pose_recovery_threshold_angstrom"] == 1.0
+    assert assessment["gates"]["final_raw_rmsd_lt_1_angstrom"] is False
+    assert assessment["primary_joint_success"] is False
 
 
 def test_nonfinite_initial_energy_keeps_failure_metric_and_frame(
@@ -559,6 +609,260 @@ def test_rigid_fragment_relaxation_descends_energy_without_deformation() -> None
                 atol=1e-10,
                 rtol=1e-10,
             )
+
+
+def test_pocket_prior_batch_preserves_per_seed_sampler_draws() -> None:
+    crystal, system = _butane_system()
+    fragment_id = system.topology.fragment_id
+    local = crystal - fragment_centers(crystal, fragment_id)[0, fragment_id]
+    seeds = [20260731, 20260732]
+    batched, metadata = make_pocket_prior_fragment_batch(
+        local.to(torch.float32),
+        fragment_id,
+        torch.tensor([1.0, 2.0, 3.0]),
+        sigma_angstrom=0.5,
+        seeds=seeds,
+        rotation_mode="uniform",
+    )
+
+    assert batched.shape == (2, 4, 3)
+    assert len(metadata) == 2
+    for batch_index, seed in enumerate(seeds):
+        expected, expected_metadata = make_pocket_prior_fragment_pose(
+            local.to(torch.float32),
+            fragment_id,
+            torch.tensor([1.0, 2.0, 3.0]),
+            sigma_angstrom=0.5,
+            seed=seed,
+            rotation_mode="uniform",
+        )
+        torch.testing.assert_close(batched[batch_index], expected)
+        torch.testing.assert_close(
+            metadata[batch_index]["standard_normal_translation_eps"],
+            expected_metadata["standard_normal_translation_eps"],
+        )
+
+
+def test_crystal_local_prior_batch_is_seeded_and_fragment_rigid() -> None:
+    crystal, system = _butane_system()
+    fragment_id = system.topology.fragment_id
+    seeds = [20260731, 20260732]
+    batched, metadata = make_crystal_local_fragment_batch(
+        crystal,
+        fragment_id,
+        translation_sigma_angstrom=0.5,
+        rotation_sigma_degrees=15.0,
+        seeds=seeds,
+    )
+    repeated, repeated_metadata = make_crystal_local_fragment_batch(
+        crystal,
+        fragment_id,
+        translation_sigma_angstrom=0.5,
+        rotation_sigma_degrees=15.0,
+        seeds=seeds,
+    )
+
+    torch.testing.assert_close(batched, repeated)
+    assert len(metadata) == len(repeated_metadata) == 2
+    for pose in batched:
+        for fragment in range(int(fragment_id.max()) + 1):
+            mask = fragment_id == fragment
+            torch.testing.assert_close(
+                torch.pdist(pose[mask]),
+                torch.pdist(crystal[mask]),
+                atol=1e-6,
+                rtol=1e-6,
+            )
+
+
+def test_guard_objective_excludes_protein_ligand_attraction() -> None:
+    crystal, system = _butane_system()
+    config = PhysicalEnergyConfig()
+    components = _relaxation_energy(
+        crystal,
+        system,
+        mode="guard_only",
+        physical_config=config,
+        interaction_config=InteractionEnergyConfig(active_terms=()),
+    )
+
+    assert "protein_ligand_lj_repulsive" in components
+    assert "protein_ligand_lj_attractive" not in components
+    assert all(
+        name.startswith("ligand_intra_") or name == "protein_ligand_lj_repulsive" or name == "total"
+        for name in components
+    )
+    expected = sum(
+        (value for name, value in components.items() if name != "total"),
+        start=components["total"].new_zeros(()),
+    )
+    torch.testing.assert_close(components["total"], expected)
+
+
+def test_batched_relaxation_matches_independent_pose_loops() -> None:
+    crystal, system = _butane_system()
+    first, _ = make_torn_fragment_pose(
+        crystal,
+        system.topology.fragment_id,
+        system.topology.mass,
+        distance_angstrom=0.75,
+        seed=20260731,
+    )
+    second, _ = make_torn_fragment_pose(
+        crystal,
+        system.topology.fragment_id,
+        system.topology.mass,
+        distance_angstrom=0.75,
+        seed=20260732,
+    )
+    initial = torch.stack((first, second))
+    config = RigidRelaxationConfig(
+        initialization_mode="crystal_tear",
+        tear_distance_angstrom=0.75,
+        max_steps=3,
+        save_every=1,
+        protein_shell_cutoff_angstrom=11.0,
+    )
+    batched = relax_rigid_fragments_batch(
+        crystal,
+        initial,
+        system,
+        config=config,
+        mode="physical_only",
+    )
+    independent = [
+        relax_rigid_fragments(
+            crystal,
+            pose,
+            system,
+            config=config,
+            mode="physical_only",
+        )
+        for pose in initial
+    ]
+
+    assert batched.statuses == [run.status for run in independent]
+    assert batched.total_backtracks == [run.total_backtracks for run in independent]
+    assert batched.saved_steps == independent[0].saved_steps
+    assert len(batched.frames) == len(independent[0].frames)
+    for frame_index, frame in enumerate(batched.frames):
+        for pose_index, run in enumerate(independent):
+            torch.testing.assert_close(
+                frame[pose_index],
+                run.frames[frame_index],
+                atol=1e-9,
+                rtol=1e-9,
+            )
+    for pose_metrics in batched.metrics:
+        energies = [float(row["energy_groups"]["combined"]) for row in pose_metrics]
+        assert all(right <= left + 1e-9 for left, right in zip(energies, energies[1:]))
+
+
+def test_sparse_batched_diagnostics_preserve_coordinates_and_solver_outcomes() -> None:
+    crystal, system = _butane_system()
+    poses = [
+        make_torn_fragment_pose(
+            crystal,
+            system.topology.fragment_id,
+            system.topology.mass,
+            distance_angstrom=0.75,
+            seed=seed,
+        )[0]
+        for seed in (20260731, 20260732)
+    ]
+    initial = torch.stack(poses)
+    config = RigidRelaxationConfig(
+        initialization_mode="crystal_tear",
+        tear_distance_angstrom=0.75,
+        max_steps=3,
+        save_every=2,
+        protein_shell_cutoff_angstrom=11.0,
+    )
+    dense = relax_rigid_fragments_batch(
+        crystal,
+        initial,
+        system,
+        config=config,
+        mode="physical_only",
+    )
+    sparse = relax_rigid_fragments_batch(
+        crystal,
+        initial,
+        system,
+        config=config,
+        mode="physical_only",
+        collect_every_step_metrics=False,
+        collect_contact_stats=False,
+    )
+
+    assert sparse.statuses == dense.statuses
+    assert sparse.total_backtracks == dense.total_backtracks
+    assert sparse.terminal_steps == dense.terminal_steps
+    assert sparse.shell_envelope_valid == dense.shell_envelope_valid
+    assert sparse.saved_steps == dense.saved_steps == [0, 2, 3]
+    assert [[row["step"] for row in rows] for rows in sparse.metrics] == [
+        [0, 2, 3],
+        [0, 2, 3],
+    ]
+    assert [[row["step"] for row in rows] for rows in dense.metrics] == [
+        [0, 1, 2, 3],
+        [0, 1, 2, 3],
+    ]
+    for sparse_frame, dense_frame in zip(sparse.frames, dense.frames, strict=True):
+        torch.testing.assert_close(sparse_frame, dense_frame, atol=1e-9, rtol=1e-9)
+    for sparse_rows, dense_rows in zip(sparse.metrics, dense.metrics, strict=True):
+        for sparse_row, dense_row in zip(
+            sparse_rows,
+            (dense_rows[0], dense_rows[2], dense_rows[3]),
+            strict=True,
+        ):
+            assert "contacts" not in sparse_row
+            assert "fragment_centers_angstrom" not in sparse_row
+            assert sparse_row["energy_groups"] == dense_row["energy_groups"]
+            assert sparse_row["raw_rmsd_angstrom"] == dense_row["raw_rmsd_angstrom"]
+
+
+def test_batched_energy_plateau_stops_each_pose_after_minimum_and_patience() -> None:
+    crystal, system = _butane_system()
+    initial = torch.stack(
+        [
+            make_torn_fragment_pose(
+                crystal,
+                system.topology.fragment_id,
+                system.topology.mass,
+                distance_angstrom=0.75,
+                seed=seed,
+            )[0]
+            for seed in (20260731, 20260732)
+        ]
+    )
+    config = RigidRelaxationConfig(
+        initialization_mode="crystal_tear",
+        tear_distance_angstrom=0.75,
+        max_steps=6,
+        save_every=2,
+        convergence_displacement_angstrom=1e-30,
+        convergence_patience=100,
+        convergence_energy_absolute_kcal_mol=1e12,
+        convergence_energy_relative=0.0,
+        convergence_energy_patience=2,
+        convergence_energy_min_steps=2,
+        protein_shell_cutoff_angstrom=11.0,
+    )
+    run = relax_rigid_fragments_batch(
+        crystal,
+        initial,
+        system,
+        config=config,
+        mode="physical_only",
+        collect_every_step_metrics=False,
+        collect_contact_stats=False,
+    )
+
+    assert run.statuses == ["converged_energy_plateau"] * 2
+    assert run.terminal_steps == [3, 3]
+    assert run.saved_steps == [0, 2, 3]
+    assert run.shell_envelope_valid == [True, True]
 
 
 def _pdb_atom_line(
@@ -653,13 +957,20 @@ def test_trace_reports_per_term_force_and_normalized_contact() -> None:
     assert row["protein_ligand_contacts"]["minimum_distance_over_uff_x"] > 0
 
 
-def test_interaction_layer_is_active_and_metal_remains_contract_only() -> None:
+def test_interaction_layer_default_enables_every_implemented_term() -> None:
     coords, system = _butane_system()
+    combined_identity = guidance_parameter_identity()
+    assert combined_identity["version"] == "1.6.0"
+    assert combined_identity["formula_version"] == "physical-v2.2_plus_interaction-v1.6"
     components = interaction_energy(coords, system)
     assert set(components) == {
         "interaction_hydrophobic",
         "interaction_hydrogen_bond",
         "interaction_screened_formal_charge",
+        "interaction_pi_stacking",
+        "interaction_cation_pi",
+        "interaction_halogen_bond",
+        "interaction_metal_coordination",
         "total",
     }
     assert float(components["total"]) == pytest.approx(0.0)
@@ -669,17 +980,29 @@ def test_interaction_layer_is_active_and_metal_remains_contract_only() -> None:
         "hydrophobic",
         "hydrogen_bond",
         "screened_formal_charge",
+        "pi_stacking",
+        "cation_pi",
+        "halogen_bond",
+        "metal_coordination",
     ]
-    assert "metal_coordination" in metadata["inactive_terms"]
+    assert metadata["inactive_terms"] == []
     assert metadata["vina"] == "excluded_from_guidance"
     metal = metal_coordination_v0_contract()
-    assert metal["status"] == "contract_only_inactive"
+    assert metal["status"] == "superseded_by_profile_dispatched_v1"
     assert metal["supported_scope"]["metal"] == "Zn(II)"
     assert metal["supported_scope"]["fixed_receptor_donors"] == 3
     assert "directional_attraction" in metal["pair_energy"]["trace_components"][1]
     assert metal["pair_masking"]["active_metal_donor_pair"].startswith("replace")
-    with pytest.raises(ValueError, match="unsupported InteractionGuidance"):
-        InteractionEnergyConfig(active_terms=("metal_coordination",))
+    current_metal = metal_coordination_v1_contract()
+    assert current_metal["status"] == "user_requested_default_on_diagnostic"
+    assert current_metal["attraction_enabled_profiles"] == ["ZN", "MG"]
+    assert {"CA", "MN", "FE", "CO", "NI", "CU"} == set(
+        current_metal["repulsion_only_profiles"]
+    )
+    metal_only = InteractionEnergyConfig(active_terms=("metal_coordination",))
+    metal_components = interaction_energy(coords, system, metal_only)
+    assert set(metal_components) == {"interaction_metal_coordination", "total"}
+    assert float(metal_components["total"]) == pytest.approx(0.0)
 
 
 def test_fragment_force_projection_is_se3_equivariant() -> None:
@@ -1017,6 +1340,8 @@ def test_trace_shell_includes_crystal_perturbation_coordinates(tmp_path) -> None
     )
     report = trace_physical.build_trace_report(args)
 
+    assert report["schema_version"] == "effdock.guidance_trace.v4"
+    assert report["protocol_id"] == "EFFDOCK-GUIDANCE-DIAGNOSTIC-V4"
     assert report["system"]["protein_shell_heavy_atoms"] == 2
     assert report["system"]["term_counts"]["protein_ligand_pairs"] == 8
     assert report["system"]["topology_reference_sha256"]
@@ -1230,6 +1555,13 @@ def test_protein_ligand_energy_is_independent_of_shell_and_chunk_layout() -> Non
                 far_parameters.uff_d[17:],
             )
         ),
+        protein_vdw_radius=torch.cat(
+            (
+                far_parameters.vdw_radius[:17],
+                shell_system.protein_vdw_radius,
+                far_parameters.vdw_radius[17:],
+            )
+        ),
         parameter_set=shell_system.parameter_set,
         protein_source_atoms=42,
     )
@@ -1247,6 +1579,7 @@ def test_protein_ligand_energy_is_independent_of_shell_and_chunk_layout() -> Non
     for term in (
         "protein_ligand_lj_repulsive",
         "protein_ligand_lj_attractive",
+        "protein_ligand_steric_barrier",
         "total",
     ):
         torch.testing.assert_close(
