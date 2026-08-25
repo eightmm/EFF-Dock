@@ -1,8 +1,9 @@
 # Evaluation contract
 
-External benchmarks are PoseBusters v2 and Astex Diverse. Their raw
-structures stay ignored locally, while snapshot identity, molecule mappings,
-and target-independent pocket definitions must be frozen in manifests.
+External evaluations include PoseBusters v2, Astex Diverse, and the OpenBind
+EV-A71 2A benchmark. Their raw structures stay ignored locally, while snapshot
+identity, molecule mappings, denominator rules, and pocket definitions must be
+frozen in manifests.
 
 Until target-independent centers are supplied, the compatibility benchmark in
 `BENCHMARK_PROTOCOL.md` is reported separately as a reference-defined
@@ -53,6 +54,26 @@ defaults. Its internal rule selected U25k, while U50k is the terminal state;
 both require explicit checkpoint paths. Their Astex/PoseBusters comparison is
 repeated-use and descriptive and cannot promote either checkpoint. Exact
 metrics and hashes are in `S50_SYMMETRY_CONFIDENCE_RESULTS.md`.
+
+The frozen stack was also run on the recent and target-family cohorts
+defined in
+[`EXTERNAL_TEMPORAL_BENCHMARKS.md`](EXTERNAL_TEMPORAL_BENCHMARKS.md). PhiBench
+is an EFF-Dock-derived cohort, FoldBench is a pocket-redocking adaptation, and
+the clean 860-complex OpenBind cohort is a target-family characterization. The
+exact protocol and completed results are in
+[`EXTERNAL_TEMPORAL_GUIDED_REFINED_PROTOCOL.md`](EXTERNAL_TEMPORAL_GUIDED_REFINED_PROTOCOL.md)
+and
+[`EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md`](EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md).
+
+The OpenBind result is a separate official-style aggregation over the public
+filtered scaffold-only denominator. It ranks the frozen refined candidates by
+U25k confidence and reports Top-1/5/25 any-pose success using PoseBusters 0.6.5
+pass-all validity, OpenStructure 2.11.1 BiSyRMSD `<=2 A`, and LDDT-PLI
+`>=0.8`. Missing predictions remain failures. OpenBind's public comparison is
+Top-25; it must not be presented as a Top-1 selector leaderboard. The exact
+contract and results are in
+[`OPENBIND_OFFICIAL_TOP25_PROTOCOL.md`](OPENBIND_OFFICIAL_TOP25_PROTOCOL.md) and
+[`OPENBIND_OFFICIAL_TOP25_RESULTS.md`](OPENBIND_OFFICIAL_TOP25_RESULTS.md).
 
 ## Archived Vina-guided sampling (inactive)
 

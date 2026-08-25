@@ -106,6 +106,36 @@ Exact checkpoint hashes, validity decomposition, and the frozen evaluation
 contract are documented in
 [`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`](docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md).
 
+The same frozen N100/S10 guided/refined stack was run without retuning on
+recent external pocket-redocking cohorts:
+
+| Dataset | N | Raw Top-1 <2 A | Refined Top-1 <2 A | Refined joint PB-valid + <2 A |
+|---|---:|---:|---:|---:|
+| PhiBench derived | 203 | 60.59% | 60.10% | 55.67% |
+| FoldBench P-L adaptation | 66 | 59.09% | 65.15% | 62.12% |
+| OpenBind clean non-covalent | 860 | 44.65% | 50.23% | 49.77% |
+
+These are descriptive pocket-redocking adaptations; PhiBench and FoldBench are
+not claimed as native author-leaderboard reproductions. Cohort provenance,
+exact counts, validity, and artifact hashes are in
+[`docs/EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md`](docs/EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md).
+
+The same guided/refined inference stack has also been aggregated under the
+public OpenBind filtered scaffold-only Top-25 contract (`N=802`, with 16
+missing EFF-Dock predictions counted as failures):
+
+| Rank budget | PB-valid + BiSyRMSD <=2 A | + LDDT-PLI >=0.8 |
+|---|---:|---:|
+| Top-1 | 406/802 (50.62%) | 338/802 (42.14%) |
+| Top-5 | 592/802 (73.82%) | 500/802 (62.34%) |
+| Top-25 | **694/802 (86.53%)** | **581/802 (72.44%)** |
+
+OpenBind's cross-method figure is an any-pose Top-25 comparison, not a
+deployable Top-1 benchmark. Exact denominator construction, PoseBusters 0.6.5
+validity, OpenStructure 2.11.1 BiSyRMSD/LDDT-PLI commands, public comparison
+values, and artifact hashes are documented in
+[`docs/OPENBIND_OFFICIAL_TOP25_RESULTS.md`](docs/OPENBIND_OFFICIAL_TOP25_RESULTS.md).
+
 The portable code paths used by this study are published with the repository:
 
 ```bash
@@ -134,6 +164,6 @@ Raw data, generated outputs, and historical migration material stay local and
 are ignored by Git. The active package, configs, tests, documentation, and
 retained weights form the published interface.
 
-See [`PROJECT.md`](PROJECT.md) for the scientific and engineering contract,
-[`docs/STRUCTURE.md`](docs/STRUCTURE.md) for the repository layout, and
+See [`docs/STRUCTURE.md`](docs/STRUCTURE.md) for the repository layout,
+[`docs/EVALUATION.md`](docs/EVALUATION.md) for the evaluation contract, and
 [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) for reproducibility notes.
