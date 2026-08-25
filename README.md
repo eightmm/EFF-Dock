@@ -102,6 +102,10 @@ documented in
 [`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`](docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md).
 The score-only U50 reporting override for the additional cohorts is frozen in
 [`docs/EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md`](docs/EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md).
+Primary-source results for SurfDock, SigmaDock, Matcha, PocketXMol,
+DiffDock-Pocket RL, AlphaFold 3, classical dockers, legacy PB `N=428`, and
+denominator-mismatched recent reports are separated and recorded in
+[`docs/LITERATURE_BENCHMARK_COMPARISON.md`](docs/LITERATURE_BENCHMARK_COMPARISON.md).
 
 The same frozen N100/S10 guided/refined stack was run without retuning on
 recent external pocket-redocking cohorts:

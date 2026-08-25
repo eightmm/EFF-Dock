@@ -32,6 +32,33 @@ denominators, and validity definition are in the
 complete training and external results are in the
 [`S50 symmetry-confidence results`](S50_SYMMETRY_CONFIDENCE_RESULTS.md).
 
+## Reported literature context
+
+The table below is a compact snapshot of recent primary-source reports. It is
+not a controlled leaderboard: pocket information, receptor input, candidate
+count, ranking, minimization, RMSD code, and PoseBusters version differ.
+`Joint` means that the selected pose satisfies both the source's 2 A RMSD
+criterion and its PB-valid definition.
+
+| Dataset | Method | Top-1 RMSD (%) | Top-1 joint (%) | Important setting difference |
+|---|---|---:|---:|---|
+| Astex `N=85` | SurfDock | 95.29 | 91.76 | minimized |
+| Astex `N=85` | SigmaDock | 90.60 | 90.60 | N40, energy/PB ranker |
+| Astex `N=85` | Matcha | 85.90 | 82.40 | blind; GNINA minimization/filter/ranking |
+| Astex `N=85` | **EFF-Dock U50k** | **85.88** | **81.18** | N100/S10, guidance + adaptive refinement |
+| PBv2 `N=308` | AlphaFold 3 | 93.20 | 84.40 | co-folding, pocket specified |
+| PBv2 `N=308` | PocketXMol self-ranking | NR | 84.70 | source reports PBv2 joint only |
+| PBv2 `N=308` | **EFF-Dock U50k** | **84.09** | **81.17** | N100/S10, guidance + adaptive refinement |
+| PBv2 `N=308` | SigmaDock | 80.50 | 79.90 | N40, energy/PB ranker |
+| PBv2 `N=308` | DiffDock-Pocket RL++ | 80.20 | 78.20 | Smina/Vina minimization + GNINA reranking |
+| PBv2 `N=308` | Matcha | 65.90 | 63.00 | blind; GNINA minimization/filter/ranking |
+
+The complete Astex, PBv2, legacy PB `N=428`, denominator-mismatched
+`N=306`, and OpenBind cross-method tables are in the
+[`literature benchmark comparison`](LITERATURE_BENCHMARK_COMPARISON.md).
+The machine-readable plotting subset is
+[`LITERATURE_RMSD_COMPARISON.json`](LITERATURE_RMSD_COMPARISON.json).
+
 ## Recent and target-family cohorts
 
 Protocol: `EFFDOCK-EXTERNAL-TEMPORAL-GUIDED-REFINED-V1`

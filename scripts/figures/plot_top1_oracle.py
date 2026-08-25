@@ -182,7 +182,7 @@ def main() -> None:
             edgecolor=ORACLE_EDGE,
             linewidth=0.8,
             hatch="///",
-            label="EFF-Dock Oracle-80",
+            label="EFF-Dock Oracle-100",
         ),
     )
     axes[1].legend(
