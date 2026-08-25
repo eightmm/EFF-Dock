@@ -98,5 +98,8 @@ The exact external contract is in
   checkpoint-selection rule.
 - Preserve U50k `latest.pt` as the terminal training state and as the immutable
   initialization for the separately registered raw+refined continuation.
+- Use U50k for the current N100/S10, sigma-2 guided/refined benchmark-reporting
+  tables. This reporting convention was chosen after external results were
+  opened, so it is descriptive and does not replace the internal U25 decision.
 - Do not promote either checkpoint into `weights/` or change public defaults
   from these repeated-use results alone.

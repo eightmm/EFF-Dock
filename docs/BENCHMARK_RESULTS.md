@@ -13,22 +13,21 @@ Protocol: `EFFDOCK-S50-SYMMETRY-CONFIDENCE-REFINED-EXTERNAL-V1`
 The frozen candidate bank contains 100 poses for every Astex Diverse (`N=85`)
 and PoseBusters v2 (`N=308`) complex. Candidates use 10 ODE steps, translation
 prior `sigma=2`, normalized direct-drift GuidanceEnergy with `eta=2`, and the
-adaptive in-repository physical refinement. U25k is the checkpoint selected by
-the registered internal PLINDER rule; U50k is the terminal checkpoint and is
-shown only as a descriptive comparison.
+adaptive in-repository physical refinement. Current reporting uses the
+terminal U50k confidence checkpoint.
 
-| Dataset/stage | U25k Top-1 <2A | U50k Top-1 <2A | U25k joint valid+<2A | U50k joint valid+<2A |
-|---|---:|---:|---:|---:|
-| Astex raw | 68/85 (80.00%) | 70/85 (82.35%) | n/a | n/a |
-| Astex refined | 72/85 (84.71%) | 73/85 (85.88%) | 68/85 (80.00%) | 69/85 (81.18%) |
-| PoseBusters raw | 234/308 (75.97%) | 241/308 (78.25%) | n/a | 175/308 (56.82%) |
-| PoseBusters refined | 250/308 (81.17%) | 259/308 (84.09%) | 239/308 (77.60%) | 250/308 (81.17%) |
+| Dataset | N | Raw Top-1 <2A | Refined Top-1 <2A | Refined oracle <2A | Refined PB-valid | Refined joint valid+<2A |
+|---|---:|---:|---:|---:|---:|---:|
+| Astex Diverse | 85 | 70/85 (82.35%) | 73/85 (85.88%) | 82/85 (96.47%) | 80/85 (94.12%) | 69/85 (81.18%) |
+| PoseBusters v2 | 308 | 241/308 (78.25%) | 259/308 (84.09%) | 295/308 (95.78%) | 289/308 (93.83%) | 250/308 (81.17%) |
 
 Top-1 is the stable argmin of confidence-predicted RMSD. RMSD is
 symmetry-aware, no-alignment heavy-atom RMSD `<2 A`. `joint` requires the same
 selected pose to satisfy RMSD and all 27 non-RMSD PoseBusters 0.6.5 `redock`
-checks. The exact checkpoint hashes, candidate information boundary, adaptive
-stopping equation, selector, denominators, and validity definition are in the
+checks. The registered internal PLINDER rule selected U25k; U50 is a post-hoc
+reporting convention and does not rewrite that selection. The exact checkpoint
+hashes, candidate information boundary, adaptive stopping equation, selector,
+denominators, and validity definition are in the
 [`S50 refined external protocol`](S50_SYMMETRY_CONFIDENCE_REFINED_EXTERNAL_PROTOCOL.md);
 complete training and external results are in the
 [`S50 symmetry-confidence results`](S50_SYMMETRY_CONFIDENCE_RESULTS.md).
@@ -47,12 +46,12 @@ below.
 
 | Dataset | N | Raw Top-1 <2A | Refined Top-1 <2A | Refined oracle <2A | Refined PB-valid | Refined joint valid+<2A |
 |---|---:|---:|---:|---:|---:|---:|
-| PhiBench derived | 203 | 123/203 (60.59%) | 122/203 (60.10%) | 179/203 (88.18%) | 185/203 (91.13%) | 113/203 (55.67%) |
-| FoldBench P-L adaptation | 66 | 39/66 (59.09%) | 43/66 (65.15%) | 58/66 (87.88%) | 61/66 (92.42%) | 41/66 (62.12%) |
-| OpenBind clean non-covalent | 860 | 384/860 (44.65%) | 432/860 (50.23%) | 773/860 (89.88%) | 853/860 (99.19%) | 428/860 (49.77%) |
+| PhiBench derived | 203 | 125/203 (61.58%) | 132/203 (65.02%) | 179/203 (88.18%) | 186/203 (91.63%) | 122/203 (60.10%) |
+| FoldBench P-L adaptation | 66 | 43/66 (65.15%) | 41/66 (62.12%) | 58/66 (87.88%) | 61/66 (92.42%) | 40/66 (60.61%) |
+| OpenBind clean non-covalent | 860 | 414/860 (48.14%) | 445/860 (51.74%) | 773/860 (89.88%) | 847/860 (98.49%) | 438/860 (50.93%) |
 
-Top-1 is the frozen U25k confidence selection; oracle is the best of the same
-100 refined candidates and is not deployable. RMSD is symmetry-aware,
+Top-1 is the stable U50k confidence selection; oracle is the best of the same
+100 candidates and is not deployable. RMSD is symmetry-aware,
 no-alignment heavy-atom RMSD `<2 A`. PB-valid requires all 27 non-RMSD
 PoseBusters 0.6.5 `redock` checks, and joint requires validity and RMSD success
 for the same confidence-selected pose. Raw structures and pose-level outputs
@@ -60,6 +59,8 @@ remain outside Git. Dataset provenance and cohort construction are in the
 [`external benchmark registry`](EXTERNAL_TEMPORAL_BENCHMARKS.md), the frozen
 measurement contract is in the
 [`guided/refined protocol`](EXTERNAL_TEMPORAL_GUIDED_REFINED_PROTOCOL.md), and
+the U50 score-only reporting override is in the
+[`U50 reporting protocol`](EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md). The
 full counts and artifact hashes are in the
 [`guided/refined results`](EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md).
 
@@ -71,13 +72,13 @@ The same N100/S10, sigma-2, eta-2 guided and adaptively refined inference stack
 was re-aggregated under the public OpenBind `filtered=True,
 scaffold_only=True` contract. The denominator is 802 complexes; EFF-Dock has
 predictions for 786, and all 16 missing predictions remain in the denominator
-as failures.
+as failures. Candidates are ranked by the U50k confidence checkpoint.
 
 | Rank budget | Any PB-valid | PB-valid + BiSyRMSD <=2 A | + LDDT-PLI >=0.8 |
 |---|---:|---:|---:|
-| Top-1 | 779/802 (97.13%) | 406/802 (50.62%) | 338/802 (42.14%) |
-| Top-5 | 786/802 (98.00%) | 592/802 (73.82%) | 500/802 (62.34%) |
-| Top-25 | 786/802 (98.00%) | **694/802 (86.53%)** | **581/802 (72.44%)** |
+| Top-1 | 773/802 (96.38%) | 417/802 (52.00%) | 359/802 (44.76%) |
+| Top-5 | 786/802 (98.00%) | 603/802 (75.19%) | 511/802 (63.72%) |
+| Top-25 | 786/802 (98.00%) | **695/802 (86.66%)** | **581/802 (72.44%)** |
 
 OpenBind's public cross-method figure is an any-pose Top-25 endpoint rather
 than a deployable Top-1 selector comparison. EFF-Dock Top-1 is reported above
@@ -86,7 +87,9 @@ The complete method comparison, source-table provenance, hashes, and claim
 boundary are in the
 [`OpenBind official-style results`](OPENBIND_OFFICIAL_TOP25_RESULTS.md); the
 frozen metric contract is in the
-[`OpenBind official-style protocol`](OPENBIND_OFFICIAL_TOP25_PROTOCOL.md).
+[`OpenBind official-style protocol`](OPENBIND_OFFICIAL_TOP25_PROTOCOL.md), with
+the selector-only U50 override in the
+[`U50 reporting addendum`](OPENBIND_OFFICIAL_TOP25_U50_PROTOCOL.md).
 
 ## Physical-selector compatibility baseline
 

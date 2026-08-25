@@ -5,6 +5,11 @@ Protocol ID: `EFFDOCK-OPENBIND-OFFICIAL-TOP25-V1`
 Status: frozen before the Top-25 PoseBusters or OpenStructure outcomes were
 inspected.
 
+This file preserves the original U25-ranked aggregation contract. Current
+public reporting changes only the confidence ranking to U50 and reruns the
+pose-level evaluators under
+[`OPENBIND_OFFICIAL_TOP25_U50_PROTOCOL.md`](OPENBIND_OFFICIAL_TOP25_U50_PROTOCOL.md).
+
 ## Scope and claim boundary
 
 This protocol re-aggregates a completed EFF-Dock pocket-redocking run under the

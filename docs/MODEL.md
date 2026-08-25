@@ -61,8 +61,10 @@ trained pose-level heads against symmetry-aware no-alignment RMSD. Its internal
 validation rule selected U25k `best.pt` (58.45% Top-1 `<2A`); U50k
 `latest.pt` (56.81%) is the terminal continuation state. Both remain
 experimental files under ignored `outputs/` and require an explicit checkpoint
-override. See `docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md` for exact hashes and
-the repeated-use evaluation boundary.
+override. Current guided/refined benchmark reporting uses U50, while retaining
+the U25 internal selection as historical provenance. See
+`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md` for exact hashes and the repeated-use
+evaluation boundary.
 
 Preparation defaults to the matched N80/S25/sigma0.5/pocket10 sampling
 distribution. Existing shards are skipped unless `--overwrite` is explicitly

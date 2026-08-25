@@ -4,6 +4,11 @@ Protocol ID: `EFFDOCK-EXTERNAL-TEMPORAL-GUIDED-REFINED-V1`
 
 Status: frozen before smoke or benchmark outcomes were inspected.
 
+This file preserves the original U25-ranked run. Current public benchmark
+reporting reuses its immutable sampling/refinement banks and changes only the
+confidence ledger to U50 under
+[`EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md`](EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md).
+
 ## Scope and claim boundary
 
 This is one descriptive EFF-Dock pocket-redocking run on three newly prepared

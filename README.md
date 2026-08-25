@@ -84,51 +84,49 @@ Checksums, compatibility notes, and the confidence model card are in
 [`weights/CONFIDENCE_MODEL_CARD.md`](weights/CONFIDENCE_MODEL_CARD.md).
 
 The later S50/sigma-2 symmetry-confidence experiment is complete but remains
-an unpromoted research result. The registered internal PLINDER rule selected
-U25k (`58.45%` Top-1 `<2A`; U50k `56.81%`), while repeated-use external
-characterization consistently favored U50k on the same frozen sigma-2 N100
-Astex/PoseBusters candidate banks:
+an unpromoted research result. Current benchmark reporting uses the terminal
+U50k checkpoint on the frozen sigma-2 N100 candidate banks:
 
-| Dataset/stage | U25k Top-1 <2A | U50k Top-1 <2A | U25k joint valid+<2A | U50k joint valid+<2A |
-|---|---:|---:|---:|---:|
-| Astex raw | 80.00% | 82.35% | n/a | n/a |
-| Astex refined | 84.71% | 85.88% | 80.00% | 81.18% |
-| PoseBusters raw | 75.97% | 78.25% | n/a | 56.82% |
-| PoseBusters refined | 81.17% | 84.09% | 77.60% | 81.17% |
+| Dataset | N | Raw Top-1 <2A | Refined Top-1 <2A | Refined oracle <2A | Refined PB-valid | Refined joint valid+<2A |
+|---|---:|---:|---:|---:|---:|---:|
+| Astex Diverse | 85 | 70/85 (82.35%) | 73/85 (85.88%) | 82/85 (96.47%) | 80/85 (94.12%) | 69/85 (81.18%) |
+| PoseBusters v2 | 308 | 241/308 (78.25%) | 259/308 (84.09%) | 295/308 (95.78%) | 289/308 (93.83%) | 250/308 (81.17%) |
 
-These Astex/PoseBusters results are descriptive external evaluations, not an
-absence of external testing. Because both benchmarks had already been opened,
-they cannot override the preregistered internal checkpoint selection or alone
-promote U25k/U50k into the public deployment defaults. U25k remains the
-internally selected `best.pt`; U50k remains the terminal `latest.pt` and the
-more promising deployment candidate under this repeated-use characterization.
-Exact checkpoint hashes, validity decomposition, and the frozen evaluation
-contract are documented in
+These Astex/PoseBusters results are descriptive external evaluations. The
+registered internal PLINDER rule selected U25k (`58.45%` Top-1 `<2A`; U50k
+`56.81%`), and that historical selection is not rewritten. U50k is used here
+as the project reporting convention after external outcomes were opened; this
+does not by itself promote the checkpoint into public deployment defaults.
+Exact checkpoint hashes, validity decomposition, and evaluation boundaries are
+documented in
 [`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`](docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md).
+The score-only U50 reporting override for the additional cohorts is frozen in
+[`docs/EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md`](docs/EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md).
 
 The same frozen N100/S10 guided/refined stack was run without retuning on
 recent external pocket-redocking cohorts:
 
 | Dataset | N | Raw Top-1 <2 A | Refined Top-1 <2 A | Refined joint PB-valid + <2 A |
 |---|---:|---:|---:|---:|
-| PhiBench derived | 203 | 60.59% | 60.10% | 55.67% |
-| FoldBench P-L adaptation | 66 | 59.09% | 65.15% | 62.12% |
-| OpenBind clean non-covalent | 860 | 44.65% | 50.23% | 49.77% |
+| PhiBench derived | 203 | 61.58% | 65.02% | 60.10% |
+| FoldBench P-L adaptation | 66 | 65.15% | 62.12% | 60.61% |
+| OpenBind clean non-covalent | 860 | 48.14% | 51.74% | 50.93% |
 
 These are descriptive pocket-redocking adaptations; PhiBench and FoldBench are
 not claimed as native author-leaderboard reproductions. Cohort provenance,
-exact counts, validity, and artifact hashes are in
+exact U50-selected counts, validity, and artifact hashes are in
 [`docs/EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md`](docs/EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md).
 
-The same guided/refined inference stack has also been aggregated under the
-public OpenBind filtered scaffold-only Top-25 contract (`N=802`, with 16
-missing EFF-Dock predictions counted as failures):
+The same guided/refined inference stack has also been ranked with U50k
+confidence and aggregated under the public OpenBind filtered scaffold-only
+Top-25 contract (`N=802`, with 16 missing EFF-Dock predictions counted as
+failures):
 
 | Rank budget | PB-valid + BiSyRMSD <=2 A | + LDDT-PLI >=0.8 |
 |---|---:|---:|
-| Top-1 | 406/802 (50.62%) | 338/802 (42.14%) |
-| Top-5 | 592/802 (73.82%) | 500/802 (62.34%) |
-| Top-25 | **694/802 (86.53%)** | **581/802 (72.44%)** |
+| Top-1 | 417/802 (52.00%) | 359/802 (44.76%) |
+| Top-5 | 603/802 (75.19%) | 511/802 (63.72%) |
+| Top-25 | **695/802 (86.66%)** | **581/802 (72.44%)** |
 
 OpenBind's cross-method figure is an any-pose Top-25 comparison, not a
 deployable Top-1 benchmark. Exact denominator construction, PoseBusters 0.6.5
