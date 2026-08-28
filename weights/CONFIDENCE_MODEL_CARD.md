@@ -12,10 +12,13 @@
 ## Intended use
 
 Rank multiple poses generated for the same receptor/ligand/explicit-pocket
-complex. The matched preset is 80 poses, 25 ODE steps, translation sigma 0.5,
-and a 10A protein crop. The model predicts pose RMSD and success plus per-atom
-displacement/success heads; these are ranking signals and are not claimed to be
-calibrated across datasets or sampling distributions.
+complex. This checkpoint's training-matched preset was 80 poses, 25 ODE steps,
+translation sigma 0.5, and a 10A protein crop. The public `dock` and `evaluate`
+commands now use 100 poses, 10 ODE steps, and sigma 2.0 by default with the same
+10A crop. This is an explicit candidate-distribution shift. The model predicts
+pose RMSD and success plus per-atom displacement/success heads; these are
+ranking signals and are not claimed to be calibrated across datasets or
+sampling distributions.
 
 The frozen historical composite selector is
 `pair_gate_density_rank_vote_plclash_ambig`. It combines the learned heads with
@@ -41,11 +44,22 @@ PoseBusters v2 with the frozen composite selector. Those values are diagnostic,
 not prospective screening claims. Active frozen-manifest results and their
 failure/rescue records live in `docs/BENCHMARK_RESULTS.md`.
 
-The completed active N80 rerun reached composite <2A rates of 78.82% on Astex,
-72.73% on PoseBusters, and 68.42% on CASF. Same-candidate pure confidence was
-76.47%, 73.05%, and 69.47%, respectively. The checkpoint remains the selected
+The completed active N80 rerun reached composite <2A rates of 78.82% on Astex
+and 72.73% on PoseBusters. Same-candidate pure confidence was 76.47% and
+73.05%, respectively. The checkpoint remains the selected
 confidence model; the composite selector is retained for reproducibility but
 did not consistently improve the learned RMSD head.
+
+## Experimental S50 successor
+
+A later internal PLINDER study retrained this confidence model on the frozen
+S50 N100/S10/sigma-2 bank using symmetry-aware no-alignment RMSD. Its selected
+U25k checkpoint reached 58.45% Top-1 `<2A` on 1,035 internal validation
+complexes; the terminal U50k checkpoint reached 56.81%. These checkpoints are
+preserved under ignored `outputs/` and are not packaged release artifacts, so
+they do not change this model card's default checkpoint or intended-use
+contract. Exact hashes, slices, and repeated-use external diagnostics are in
+`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`.
 
 ## Limitations
 

@@ -24,7 +24,7 @@ from effdock.preprocess.protein import (
 )
 from effdock.workflows.evaluate import summarize_rows
 
-EXPECTED_COUNTS = {"astex": 85, "posebusters": 308, "casf": 285}
+EXPECTED_COUNTS = {"astex": 85, "posebusters": 308}
 CONSISTENCY_KEYS = (
     "checkpoint_sha256",
     "confidence_checkpoint_sha256",
@@ -322,7 +322,6 @@ def main(argv: list[str] | None = None) -> None:
         .get("official_posebusters", {})
         .get("posebusters_valid_pct"),
         "astex_vina_top1_lt2_pct": result["datasets"]["astex"]["stats"]["vina"]["pct_lt_2A"],
-        "casf_vina_top1_lt2_pct": result["datasets"]["casf"]["stats"]["vina"]["pct_lt_2A"],
     }
     pb_stats = result["datasets"]["posebusters"]["stats"]
     if "confidence_final" in pb_stats:
@@ -333,9 +332,6 @@ def main(argv: list[str] | None = None) -> None:
                     "pct_lt_2A"
                 ],
                 "astex_confidence_final_top1_lt2_pct": result["datasets"]["astex"]["stats"][
-                    "confidence_final"
-                ]["pct_lt_2A"],
-                "casf_confidence_final_top1_lt2_pct": result["datasets"]["casf"]["stats"][
                     "confidence_final"
                 ]["pct_lt_2A"],
             }

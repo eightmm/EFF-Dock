@@ -19,6 +19,7 @@ class ElementTensorParameters:
     mass: Tensor
     uff_x: Tensor
     uff_d: Tensor
+    vdw_radius: Tensor
 
 
 @lru_cache(maxsize=1)
@@ -67,8 +68,8 @@ def guidance_parameter_identity() -> dict[str, object]:
     return {
         **payload,
         "name": "EFF-Dock-Guidance",
-        "version": "1.1.0",
-        "formula_version": "physical-v2_plus_interaction-v1.3",
+        "version": "1.6.0",
+        "formula_version": "physical-v2.2_plus_interaction-v1.6",
         "sha256": sha256(canonical).hexdigest(),
         "energy_unit": "kcal/mol",
         "distance_unit": "angstrom",
@@ -107,6 +108,7 @@ def element_parameters(
         mass=values("mass"),
         uff_x=values("uff_x"),
         uff_d=values("uff_d"),
+        vdw_radius=values("vdw_radius"),
     )
 
 

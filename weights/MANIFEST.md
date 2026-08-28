@@ -20,3 +20,9 @@ The confidence checkpoint is safely loaded with `weights_only=True` plus the
 explicit `pathlib.PosixPath` allowlist required by its retained argument
 metadata. The hard-pair fine-tunes remain historical because they did not beat
 this step-42500 checkpoint on the frozen validation subset.
+
+The completed S50/sigma-2 symmetry-confidence study produced an internally
+selected U25k checkpoint and a terminal U50k checkpoint, but neither has been
+copied into `weights/` or made a public default. Their immutable output hashes
+and evaluation boundary are recorded in
+`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`.

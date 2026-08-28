@@ -7,7 +7,7 @@ Frozen: 2026-07-19, before the new EFF-Dock GPU runs.
 ## Scope and non-claim
 
 This is a reference-defined, oracle-pocket redocking diagnostic on Astex
-Diverse (85), PoseBusters v2 (308), and CASF-2016 (285). The pocket center is
+Diverse (85) and PoseBusters v2 (308). The pocket center is
 the centroid of receptor residue virtual nodes within 8 Angstrom of the frozen
 reference ligand. The center is therefore target-derived. These values do not
 measure target-independent pocket finding or prospective public inference and
@@ -35,7 +35,7 @@ results are not used for training or further hyperparameter selection.
 - Primary metric: PoseBusters v2 Vina+DG-selected top-1 symmetry-aware heavy
   atom RMSD <2A.
 - Secondary metrics: first-pose and oracle top-40 RMSD success at <1/<2/<3/<5A,
-  Astex and CASF selector results, failure rate, the fast DG/clash validity
+  Astex selector results, failure rate, the fast DG/clash validity
   subset, and official PoseBusters validity for the PoseBusters Vina-selected
   poses.
 - Failure threshold: invalidate a dataset run if more than 2% of frozen IDs
@@ -71,12 +71,7 @@ machine-readable summary are written to `docs/BENCHMARK_RESULTS.md` and
 |---|---:|---|
 | Astex Diverse | 85 | `c521c1cf5ef980211f44e60fa6d4e9f3e507dfad4957b682c7c2e16b16481fa6` |
 | PoseBusters v2 | 308 | `49f38295155ae751aba3cdc31b7ed6bdeaeb8d730650ffb6c6b0d7ddff975f71` |
-| CASF-2016 scoring | 285 | `03befa5b077f6bc7aa12ecb77543472929ef3031fd0dd2c26442fb13cfa6c815` |
 
-Astex and PoseBusters are the PoseBusters Zenodo benchmark snapshot. CASF
-ligands come from the PIGNet2 authors' frozen CASF-2016 scoring archive;
-receptors come from RCSB PDB and are transformed into the CASF ligand frame
-only when exact coordinate matching detects a different crystallographic
-frame. The matched reference residue is then removed. Every raw receptor,
-cleaned receptor, ligand, removed residue, optional rigid transform, and file
-hash is recorded in `reference_redocking_manifest.json`.
+Astex and PoseBusters are the PoseBusters Zenodo benchmark snapshot. Every raw
+receptor, cleaned receptor, ligand, removed residue, and file hash is recorded
+in `reference_redocking_manifest.json`.

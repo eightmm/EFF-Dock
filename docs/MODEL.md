@@ -56,13 +56,27 @@ uv run eff-dock confidence prepare \
 uv run eff-dock confidence train --config configs/train_confidence.yaml
 ```
 
+A separate S50 N100/S10/sigma-2 experiment warm-started these weights and
+trained pose-level heads against symmetry-aware no-alignment RMSD. Its internal
+validation rule selected U25k `best.pt` (58.45% Top-1 `<2A`); U50k
+`latest.pt` (56.81%) is the terminal continuation state. Both remain
+experimental files under ignored `outputs/` and require an explicit checkpoint
+override. Current guided/refined benchmark reporting uses U50, while retaining
+the U25 internal selection as historical provenance. See
+`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md` for exact hashes and the repeated-use
+evaluation boundary.
+
 Preparation defaults to the matched N80/S25/sigma0.5/pocket10 sampling
 distribution. Existing shards are skipped unless `--overwrite` is explicitly
 given; each success, skip, and failure is appended to a JSONL manifest.
 
-On the completed active three-dataset diagnostic, pure predicted-RMSD ranking
-was slightly stronger overall than the frozen composite (488 versus 486 <2A
-successes among 678 complexes). The composite is retained for exact historical
+That confidence-preparation default preserves the retained checkpoint's
+training provenance. It is distinct from public inference: `eff-dock dock` and
+`eff-dock evaluate` default to N100/S10/sigma2 with a 10A pocket crop.
+
+On the completed active Astex/PoseBusters diagnostic, pure predicted-RMSD
+ranking produced 290 <2A successes versus 291 for the frozen composite among
+393 complexes. The composite is retained for exact historical
 reproducibility and remains an explicit selector, but is not evidence of a
 universally better ranking policy.
 

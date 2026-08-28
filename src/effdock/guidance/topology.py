@@ -23,6 +23,7 @@ class PhysicalTopology:
     mass: Tensor
     uff_x: Tensor
     uff_d: Tensor
+    vdw_radius: Tensor
     bond_index: Tensor
     bond_r0: Tensor
     bond_k: Tensor
@@ -51,6 +52,7 @@ class PhysicalTopology:
         integer_names = {
             "atomic_numbers",
             "fragment_id",
+            "vdw_radius",
             "bond_index",
             "angle_index",
             "proper_index",
@@ -325,6 +327,7 @@ def build_physical_topology(mol: Chem.Mol, fragment_id: Tensor) -> PhysicalTopol
         mass=atom_params.mass,
         uff_x=atom_params.uff_x,
         uff_d=atom_params.uff_d,
+        vdw_radius=atom_params.vdw_radius,
         bond_index=_index_tensor(bond_rows, 2),
         bond_r0=torch.tensor(bond_r0, dtype=torch.float64),
         bond_k=torch.tensor(bond_k, dtype=torch.float64),

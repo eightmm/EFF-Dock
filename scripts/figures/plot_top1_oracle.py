@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Patch
 
-
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SUMMARY = ROOT / "outputs/benchmarks/confidence/summary.json"
 DEFAULT_LITERATURE = ROOT / "docs/LITERATURE_RMSD_COMPARISON.json"
@@ -183,7 +182,7 @@ def main() -> None:
             edgecolor=ORACLE_EDGE,
             linewidth=0.8,
             hatch="///",
-            label="EFF-Dock Oracle-80",
+            label="EFF-Dock Oracle-100",
         ),
     )
     axes[1].legend(

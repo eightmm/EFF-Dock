@@ -207,15 +207,15 @@ def compute_centroid_dist(pred: torch.Tensor, ref: torch.Tensor) -> float:
     return float(centroid_distance(pred, ref))
 
 
-def compute_pose_rmsd(
+def compute_pose_rmsd_with_method(
     pose: torch.Tensor,
     ref_pos: torch.Tensor,
     pocket_center: torch.Tensor,
     dock_idx: list[int],
     mol_dock: Chem.Mol,
     mol_ref: Chem.Mol,
-) -> float:
-    """Symmetry-aware heavy-atom RMSD (no alignment).
+) -> tuple[float, str]:
+    """Return pose RMSD and the exact symmetry/fallback calculation path.
 
     Uses RDKit ``rdMolAlign.CalcRMS`` when topology matches; otherwise falls
     back to index-based RMSD on the matched atom subset.
@@ -227,11 +227,37 @@ def compute_pose_rmsd(
             pose_abs = pose + pocket_center
             for i in range(mol_dock.GetNumAtoms()):
                 conf.SetAtomPosition(i, pose_abs[i].tolist())
-            return rdMolAlign.CalcRMS(mol_pose, mol_ref)
+            return (
+                float(rdMolAlign.CalcRMS(mol_pose, mol_ref)),
+                "rdkit_calc_rms_symmetry_no_align",
+            )
         except Exception:
             pass
     dock_idx_t = torch.as_tensor(dock_idx, dtype=torch.long)
-    return compute_rmsd(pose.index_select(0, dock_idx_t), ref_pos)
+    return (
+        compute_rmsd(pose.index_select(0, dock_idx_t), ref_pos),
+        "mapped_index_fallback",
+    )
+
+
+def compute_pose_rmsd(
+    pose: torch.Tensor,
+    ref_pos: torch.Tensor,
+    pocket_center: torch.Tensor,
+    dock_idx: list[int],
+    mol_dock: Chem.Mol,
+    mol_ref: Chem.Mol,
+) -> float:
+    """Compatibility wrapper returning only the pose RMSD value."""
+    value, _ = compute_pose_rmsd_with_method(
+        pose,
+        ref_pos,
+        pocket_center,
+        dock_idx,
+        mol_dock,
+        mol_ref,
+    )
+    return value
 
 
 def _strip_charges(mol: Chem.Mol) -> Chem.Mol:

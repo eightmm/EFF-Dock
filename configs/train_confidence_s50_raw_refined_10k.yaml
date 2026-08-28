@@ -1,0 +1,95 @@
+# Paired continuation on the same complexes: 32 raw S50 candidates,
+# 32 refined candidates, and one exact mapped-crystal anchor per update.
+model:
+  model_type: docking_graph_pose_confidence
+  hidden_dim: 384
+  hidden_vec_dim: 32
+  l2_dim: 16
+  l2o_dim: 16
+  n_rbf: 32
+  sh_lmax: 2
+  contact_cutoff: 5.0
+
+training:
+  max_steps: 10000
+  use_muon: true
+  muon_lr: 2.0e-4
+  lr: 3.0e-6
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  scheduler_type: warmup_stable_cosine
+  warmup_ratio: 0.02
+  cooldown_ratio: 0.5
+  min_lr_ratio: 0.05
+  gradient_accumulation_steps: 1
+
+loss:
+  atom_weight: 0.2
+  atom_bce_weight: 0.2
+  pose_weight: 0.3
+  pose_bce_weight: 0.4
+  rank_weight: 0.1
+  listwise_weight: 0.0
+  listwise_tau: 1.0
+  listwise_pred_temp: 1.0
+  success_listwise_weight: 1.0
+  success_listwise_margin: 0.2
+  success_threshold: 2.0
+  rank_margin: 0.05
+  min_rank_gap: 0.3
+
+confidence:
+  # The refined bank is primary so validation measures the deployment domain.
+  split_file: __REQUIRED_FILTERED_SPLIT__
+  processed_dir: __REQUIRED_REFINED_BANK_ROOT__
+  bank_manifest: __REQUIRED_REFINED_BANK_MANIFEST__
+  bank_manifest_sha256: __REQUIRED_REFINED_BANK_MANIFEST_SHA256__
+  training_target: pose_rmsd_symmetry_no_align
+  train_pose_target_manifest: __REQUIRED_REFINED_SYMMETRY_TARGET_MANIFEST__
+  train_pose_target_manifest_sha256: __REQUIRED_REFINED_SYMMETRY_TARGET_MANIFEST_SHA256__
+  pose_tag: s50_n100_s10_sig2_latep3_pc10_rdkitseed0_refine100
+
+  # The raw bank contributes an equal 32-pose sample for every same-ID complex.
+  train_aux_bank_manifest: __REQUIRED_RAW_BANK_MANIFEST__
+  train_aux_bank_manifest_sha256: __REQUIRED_RAW_BANK_MANIFEST_SHA256__
+  train_aux_pose_tag: s50_n100_s10_sig2_latep3_pc10_rdkitseed0
+  train_aux_pose_target_manifest: __REQUIRED_RAW_SYMMETRY_TARGET_MANIFEST__
+  train_aux_pose_target_manifest_sha256: __REQUIRED_RAW_SYMMETRY_TARGET_MANIFEST_SHA256__
+
+  out_dir: outputs/eff-dock/confidence-s50-raw-refined
+  run_name: effdock-confidence-s50-raw-refined
+  use_wandb: false
+  eval_on_start: true
+  batch_complexes: 1
+  num_workers: 4
+  train_limit: null
+  val_limit: null
+  hidden: 512
+  num_layers: 4
+  n_rbf: 32
+  sh_lmax: 2
+  cond_dim: 128
+  contact_cutoff: 5.0
+  pose_readout: global_contact_attention
+  dropout: 0.1
+  max_protein_atoms: 1024
+  # Interpreted as 64 candidate poses total; paired mode samples 32 per bank
+  # and appends one zero-RMSD crystal anchor, yielding 65 poses in the batch.
+  max_train_poses_per_complex: 64
+  max_val_poses_per_complex: 100
+  pose_sample_strategy: stratified
+  protein_crop_mode: center
+  protein_contact_cutoff: 5.0
+  protein_crop_cutoff: 10.0
+  protein_crop_cutoff_min: 10.0
+  protein_crop_cutoff_max: 10.0
+  protein_crop_jitter_sigma: 0.0
+  protein_crop_jitter_max: 0.0
+  stochastic_crop: false
+  eval_target: pose_rmsd_symmetry_no_align
+  eval_every: 2000
+  eval_complexes: null
+  best_metric: eval_top1_lt2
+  best_metric_mode: max
+  save_every: 500
+  seed: 45

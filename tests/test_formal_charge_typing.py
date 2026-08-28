@@ -262,8 +262,8 @@ def test_new_charge_fields_have_safe_empty_defaults_and_hash() -> None:
     assert counts["formal_charge_candidate_pairs"] == 0
 
     parameter_identity = interaction_parameter_identity()
-    assert parameter_identity["version"] == "1.3.0"
-    assert parameter_identity["formula_version"] == "effdock-interaction-diagnostic-4"
+    assert parameter_identity["version"] == "1.6.0"
+    assert parameter_identity["formula_version"] == "effdock-interaction-diagnostic-7"
     assert len(parameter_identity["sha256"]) == 64
 
 

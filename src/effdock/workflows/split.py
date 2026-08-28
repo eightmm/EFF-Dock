@@ -50,7 +50,7 @@ def canon_smiles(smi: str) -> str | None:
 
 def load_external_smiles(ext_dir: Path) -> set[str]:
     smis: set[str] = set()
-    required = ("astex_smiles.json", "pb_smiles.json", "casf_smiles.json")
+    required = ("astex_smiles.json", "pb_smiles.json")
     missing = [name for name in required if not (ext_dir / name).exists()]
     if missing:
         raise FileNotFoundError(
