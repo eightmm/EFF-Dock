@@ -41,8 +41,33 @@ data/splits/manifest.json
 
 # Outputs
 outputs/
+.effdock_execution_capsules/
 wandb/
 *.log
+
+# External benchmark implementations, isolated environments, and weights.
+/external_models/
+
+# Model-local external benchmark workspaces.  Keep only reproducible uv
+# manifests and documentation under version control.
+/others/*/.venv/
+/others/*/.cache/
+/others/*/upstream
+/others/*/weights
+/others/*/bin/
+/others/*/logs/
+/others/*/state/
+/others/logs/
+
+# Upstream SurfDock/APBS caches accidentally written at repository root.
+/.p.npy
+/.score.npy
+/.so3_*.npy
+/io.mc
+
+# Reproducible benchmark intermediates; the merged, strict reports are tracked.
+docs/GUIDANCE_BUDGET1000_FULL_COHORT_ASTEX.json
+docs/GUIDANCE_BUDGET1000_FULL_COHORT_POSEBUSTERS.json
 
 # IDE
 .vscode/
@@ -66,8 +91,14 @@ Thumbs.db
 CLAUDE.md
 AGENTS.md
 
+# Private project planning and manuscript sources
+/PROJECT.md
+/paper/
+
 # OMC artifacts
 .omc/
+.agents/
+.codex/
 *.pdf
 /archive/
 data/

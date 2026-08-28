@@ -1,0 +1,48 @@
+[project]
+name = "eff-dock-external-interformer"
+version = "0.0.0"
+description = "Isolated Interformer inference environment for EFF-Dock benchmarking"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "biopython==1.84",
+  "einops==0.8.0",
+  "joblib==1.4.2",
+  "lmdb==1.5.1",
+  "ninja==1.11.1.1",
+  "numpy==1.26.4",
+  "numpydoc==1.8.0",
+  "oddt==0.7",
+  "openbabel-wheel>=3.1.1,<4",
+  "pandas==2.2.2",
+  "plip==3.0.1",
+  "posebusters==0.2.16",
+  "pytorch-lightning==2.2.4",
+  "pyyaml==6.0.1",
+  "rdkit==2024.3.5",
+  "scikit-learn==1.5.1",
+  "scipy==1.14.0",
+  "setuptools==69.5.1",
+  "tabulate==0.9.0",
+  "tensorboard==2.17.0",
+  "tensorboardx==2.6.2.2",
+  "torch==2.4.0",
+  "torchmetrics==1.4.1",
+  "tqdm==4.66.4",
+  "wheel==0.43.0",
+]
+
+[tool.uv]
+package = false
+link-mode = "copy"
+override-dependencies = ["openbabel; python_version < '3.0'"]
+
+[tool.uv.extra-build-dependencies]
+oddt = ["six==1.16.0"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu118" }
+
+[[tool.uv.index]]
+name = "pytorch-cu118"
+url = "https://download.pytorch.org/whl/cu118"
+explicit = true
