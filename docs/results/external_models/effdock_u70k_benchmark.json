@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "comparison_scope": "supplied_pocket_only",
+  "protocol_id": "EFFDOCK-S50-RAW-REFINED-CONFIDENCE-EXTERNAL-V1",
+  "claim_boundary": "Repeated-use Astex/PoseBusters descriptive comparison; external outcomes did not select the checkpoint.",
+  "stack": {
+    "docking_checkpoint": "weights/effdock_docking_early_time_t0p10_50k.pt",
+    "docking_checkpoint_sha256": "65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6",
+    "confidence_checkpoint": "weights/effdock_confidence_s50_raw_refined_u70k.pt",
+    "confidence_checkpoint_sha256": "ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638",
+    "samples": 100,
+    "ode_steps": 10,
+    "translation_sigma": 2.0,
+    "pocket_cutoff_A": 10.0,
+    "time_schedule": "late_power_3",
+    "selector": "stable_minimum_predicted_symmetry_aware_rmsd",
+    "refinement": "deterministic_in_repo_physical_autograd_step_100"
+  },
+  "source_report": {
+    "path": "outputs/benchmarks/s50_raw_refined_confidence_external_runs/4184b0087a19d1138d578b123fb11ba4658fa149bf2d8087f8dd96c4beb4d4dc/report.json",
+    "sha256": "ed65159344ad1c320bc8b81c01e809880a3e0a54120914bc35682f7ec9591946"
+  },
+  "datasets": {
+    "astex": {
+      "name": "Astex Diverse",
+      "n": 85,
+      "raw_top1_lt2": {"count": 69, "pct": 81.17647058823529},
+      "refined_top1_lt2": {"count": 73, "pct": 85.88235294117646},
+      "refined_oracle_lt2": {"count": 82, "pct": 96.47058823529412},
+      "refined_pb_valid": {"count": 80, "pct": 94.11764705882354},
+      "refined_joint_lt2_pb_valid": {"count": 69, "pct": 81.17647058823529}
+    },
+    "posebusters": {
+      "name": "PoseBusters v2",
+      "n": 308,
+      "raw_top1_lt2": {"count": 241, "pct": 78.24675324675324},
+      "refined_top1_lt2": {"count": 259, "pct": 84.0909090909091},
+      "refined_oracle_lt2": {"count": 295, "pct": 95.77922077922078},
+      "refined_pb_valid": {"count": 293, "pct": 95.12987012987013},
+      "refined_joint_lt2_pb_valid": {"count": 250, "pct": 81.16883116883118}
+    }
+  }
+}

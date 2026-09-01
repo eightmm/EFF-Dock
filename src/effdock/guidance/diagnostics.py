@@ -25,7 +25,7 @@ from .runtime import (
 )
 from .system import PhysicalSystem
 
-TRACE_SCHEMA_VERSION = "effdock.guidance_trace.v4"
+TRACE_SCHEMA_VERSION = "effdock.guidance_trace.v6"
 
 
 @dataclass(frozen=True)

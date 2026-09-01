@@ -87,6 +87,61 @@ def _atomic_torch_save(path: Path, payload: Any) -> None:
         attempt.unlink(missing_ok=True)
 
 
+def _refinement_implementation() -> dict[str, Any]:
+    """Snapshot the implementation once for a worker process.
+
+    The guidance provenance helper hashes files on disk.  A long-running shard
+    must not let unrelated edits to repository metadata change the identity of
+    later records after the executable modules have already been imported.
+    """
+    return {
+        "guidance": guidance_implementation_identity(),
+        "parameters": guidance_parameter_identity(),
+        "torch": torch.__version__,
+    }
+
+
+def _semantic_implementation_contract(identity: dict[str, Any]) -> dict[str, Any]:
+    """Return the runtime-relevant portion of a recorded implementation.
+
+    Historical V2 shards called ``guidance_implementation_identity`` once per
+    complex.  That helper re-read ``pyproject.toml`` even though the worker had
+    already imported its executable modules.  Repository packaging edits could
+    therefore change only that file hash and the derived guidance digest inside
+    otherwise identical records.  Keep every executable/runtime/parameter
+    field exact while excluding only those two observational metadata fields.
+    """
+    if not isinstance(identity, dict):
+        raise RefinedBankError("invalid refinement implementation identity")
+    guidance = identity.get("guidance")
+    project_inputs = guidance.get("project_inputs") if isinstance(guidance, dict) else None
+    if not isinstance(guidance, dict) or not isinstance(project_inputs, dict):
+        raise RefinedBankError("invalid guidance implementation identity")
+    for label, value in (
+        ("guidance sha256", guidance.get("sha256")),
+        ("pyproject.toml sha256", project_inputs.get("pyproject.toml")),
+    ):
+        if not isinstance(value, str) or len(value) != 64:
+            raise RefinedBankError(f"invalid {label}")
+        try:
+            int(value, 16)
+        except ValueError as exc:
+            raise RefinedBankError(f"invalid {label}") from exc
+    normalized_guidance = {
+        key: value
+        for key, value in guidance.items()
+        if key not in {"sha256", "project_inputs"}
+    }
+    normalized_guidance["project_inputs"] = {
+        key: value for key, value in project_inputs.items() if key != "pyproject.toml"
+    }
+    return {
+        "guidance": normalized_guidance,
+        "parameters": identity.get("parameters"),
+        "torch": identity.get("torch"),
+    }
+
+
 def _tensor_sha256(value: torch.Tensor) -> str:
     array = value.detach().cpu().to(torch.float32).contiguous().numpy()
     digest = hashlib.sha256()
@@ -261,7 +316,11 @@ def _refinement_config() -> RigidRelaxationConfig:
 
 
 def _refine_one(
-    raw_record: dict[str, Any], frozen_record: dict[str, Any], *, device: torch.device
+    raw_record: dict[str, Any],
+    frozen_record: dict[str, Any],
+    *,
+    device: torch.device,
+    implementation: dict[str, Any],
 ) -> dict[str, Any]:
     raw_path = Path(str(raw_record["pt_path"])).resolve(strict=True)
     if file_sha256(raw_path) != raw_record["pt_sha256"]:
@@ -358,11 +417,7 @@ def _refine_one(
         "receptor_policy": "geometry_only",
         "processed_receptor_reconstruction": "patom_token_to_synthetic_pdb_v2",
         "solver_config": asdict(config),
-        "implementation": {
-            "guidance": guidance_implementation_identity(),
-            "parameters": guidance_parameter_identity(),
-            "torch": torch.__version__,
-        },
+        "implementation": implementation,
         "pose_atom_coords_refined": refined,
         "refined_pose_ensemble_sha256": _tensor_sha256(refined),
         "terminal_statuses": statuses,
@@ -435,8 +490,7 @@ def preflight(args: argparse.Namespace) -> None:
         },
         "generic_receptor_record_count": generic_receptor_records,
         "implementation": {
-            "guidance": guidance_implementation_identity(),
-            "parameters": guidance_parameter_identity(),
+            **_refinement_implementation(),
             "worker_sha256": file_sha256(Path(__file__)),
         },
     }
@@ -480,6 +534,7 @@ def generate_shard(args: argparse.Namespace) -> None:
     device = torch.device(args.device)
     if device.type == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA refinement requested but CUDA is unavailable")
+    implementation = _refinement_implementation()
     output_records: list[dict[str, Any]] = []
     for index, raw_record in enumerate(records, start=1):
         sample_id = str(raw_record["sample_key"])
@@ -493,7 +548,12 @@ def generate_shard(args: argparse.Namespace) -> None:
             ):
                 raise RefinedBankError(f"{sample_id}: existing refined payload mismatch")
         else:
-            payload = _refine_one(raw_record, frozen_by_id[sample_id], device=device)
+            payload = _refine_one(
+                raw_record,
+                frozen_by_id[sample_id],
+                device=device,
+                implementation=implementation,
+            )
             _atomic_torch_save(path, payload)
         output_records.append(
             {
@@ -542,7 +602,28 @@ def aggregate(args: argparse.Namespace) -> None:
     manifest_path = output_root / "manifest.json"
     if manifest_path.exists():
         raise FileExistsError(f"refusing to overwrite {manifest_path}")
+    preflight_path = output_root.parent / "preflight.json"
+    preflight = _load_json(preflight_path)
+    if (
+        preflight.get("protocol_id") != PROTOCOL_ID
+        or preflight.get("status") != "complete_label_free"
+        or not isinstance(preflight.get("implementation"), dict)
+    ):
+        raise RefinedBankError(f"invalid refinement preflight: {preflight_path}")
+    preflight_implementation = preflight["implementation"]
+    expected_implementation = {
+        "guidance": preflight_implementation.get("guidance"),
+        "parameters": preflight_implementation.get("parameters"),
+        "torch": preflight_implementation.get("torch")
+        or preflight_implementation.get("guidance", {})
+        .get("runtime_versions", {})
+        .get("torch_runtime"),
+    }
+    expected_semantic_contract = _semantic_implementation_contract(
+        expected_implementation
+    )
     all_records: list[dict[str, Any]] = []
+    implementation_identities: list[dict[str, Any]] = []
     shard_summaries: list[dict[str, Any]] = []
     for split, num_shards in (("train", args.train_shards), ("val", args.val_shards)):
         for shard_index in range(num_shards):
@@ -581,6 +662,7 @@ def aggregate(args: argparse.Namespace) -> None:
                     or _tensor_sha256(coords) != record["refined_pose_ensemble_sha256"]
                 ):
                     raise RefinedBankError(f"invalid refined payload: {pt_path}")
+                implementation_identities.append(payload.get("implementation"))
                 all_records.append(record)
             shard_summaries.append({"path": str(path.resolve()), "sha256": file_sha256(path)})
     source_records = sorted(
@@ -591,12 +673,16 @@ def aggregate(args: argparse.Namespace) -> None:
         row["sample_key"] for row in source_records
     ]:
         raise RefinedBankError("refined manifest does not cover the exact raw bank")
-    implementation_identities: list[dict[str, Any]] = []
-    for record in observed_records:
-        payload = torch.load(record["pt_path"], map_location="cpu", weights_only=False)
-        implementation_identities.append(payload["implementation"])
-    if any(identity != implementation_identities[0] for identity in implementation_identities[1:]):
-        raise RefinedBankError("refinement implementation changed across records")
+    identity_counts: Counter[str] = Counter()
+    guidance_sha_counts: Counter[str] = Counter()
+    pyproject_sha_counts: Counter[str] = Counter()
+    for identity in implementation_identities:
+        if _semantic_implementation_contract(identity) != expected_semantic_contract:
+            raise RefinedBankError("refinement runtime implementation changed across records")
+        identity_counts[hashlib.sha256(_canonical_bytes(identity)).hexdigest()] += 1
+        guidance = identity["guidance"]
+        guidance_sha_counts[str(guidance["sha256"])] += 1
+        pyproject_sha_counts[str(guidance["project_inputs"]["pyproject.toml"])] += 1
     inventory: dict[str, Any] = {}
     for split in ("train", "val"):
         ids = [row["sample_key"] for row in observed_records if row["split"] == split]
@@ -623,7 +709,14 @@ def aggregate(args: argparse.Namespace) -> None:
             "protein_shell_angstrom": PROTEIN_SHELL,
             "solver": asdict(_refinement_config()),
         },
-        "implementation": implementation_identities[0],
+        "implementation": expected_implementation,
+        "implementation_observation": {
+            "policy": "runtime_exact_pyproject_metadata_normalized_to_preflight_v1",
+            "record_count": len(implementation_identities),
+            "full_identity_sha256_counts": dict(sorted(identity_counts.items())),
+            "guidance_sha256_counts": dict(sorted(guidance_sha_counts.items())),
+            "pyproject_sha256_counts": dict(sorted(pyproject_sha_counts.items())),
+        },
         "inventory": inventory,
         "records": observed_records,
         "shard_summaries": shard_summaries,

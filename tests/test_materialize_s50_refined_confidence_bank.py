@@ -7,6 +7,7 @@ import pytest
 import torch
 
 from scripts import materialize_s50_refined_confidence_bank as materialize
+from scripts import prepare_s50_confidence_training_bank as bank_builder
 from scripts.materialize_s50_refined_confidence_bank import (
     REFINED_MANIFEST_SCHEMA,
     REFINED_PROTOCOL_ID,
@@ -153,3 +154,33 @@ def test_materializer_adds_exact_crystal_anchor(
         payload["lig_atom_coords_crystal_centered"],
     )
     assert payload["crystal_anchor_rmsd_method"] == "exact_mapped_reference_zero"
+
+
+def test_hidden_extraction_accepts_single_crystal_anchor(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_extract(
+        _model,
+        _graph,
+        _ligand_data,
+        _inference_meta,
+        poses,
+        **_kwargs,
+    ):
+        return {
+            "h_lig_node": torch.zeros(poses.shape[0], 3, 8),
+            "lig_node_type": torch.zeros(3, dtype=torch.long),
+        }
+
+    monkeypatch.setattr(bank_builder, "extract_t1_ligand_irreps", fake_extract)
+    result = bank_builder._extract_hidden_chunked(
+        torch.nn.Identity(),
+        {},
+        {},
+        {},
+        torch.zeros(1, 2, 3),
+        device=torch.device("cpu"),
+        hidden_chunk_size=1,
+    )
+
+    assert result["h_lig_node"].shape == (1, 3, 8)

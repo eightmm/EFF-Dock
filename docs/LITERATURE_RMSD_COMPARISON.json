@@ -1,85 +1,63 @@
 {
-  "schema_version": 2,
-  "last_source_audit": "2026-08-26",
-  "metric": "source-reported top-1 symmetry-aware ligand RMSD success at the 2 Angstrom threshold",
+  "comparison_scope": "supplied_pocket_only",
+  "metric": "reported top-1 fraction with symmetry-aware ligand RMSD < 2 Angstrom",
   "astex": {
     "name": "Astex Diverse",
     "n": 85,
     "values": [
-      {"method": "SurfDock + minimization", "value": 95.29, "joint_value": 91.76, "family": "learned", "setting": "pocket/holo; minimized", "source": "SurfDock"},
-      {"method": "Uni-Mol Docking V2", "value": 95.29, "joint_value": null, "family": "learned", "setting": "pocket specified", "source": "Uni-Mol Docking V2"},
-      {"method": "SurfDock (unminimized)", "value": 92.86, "joint_value": 63.10, "family": "learned", "setting": "pocket/holo; unminimized", "source": "SurfDock"},
-      {"method": "SigmaDock", "value": 90.60, "joint_value": 90.60, "family": "learned", "setting": "pocket; 40 seeds; energy/PB ranker", "source": "SigmaDock"},
-      {"method": "Matcha (blind)", "value": 85.90, "joint_value": 82.40, "family": "learned", "setting": "blind; GNINA minimization/filter/ranking", "source": "Matcha"},
-      {"method": "DiffDock-L", "value": 85.19, "joint_value": 77.78, "family": "learned", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "GNINA", "value": 83.53, "joint_value": 80.00, "family": "classical", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "GLIDE SP", "value": 83.53, "joint_value": 81.18, "family": "classical", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "KarmaDock", "value": 74.12, "joint_value": 0.00, "family": "learned", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "DiffDock", "value": 71.76, "joint_value": 47.06, "family": "learned", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "GOLD", "value": 67.06, "joint_value": 63.53, "family": "classical", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "Smina", "value": 64.29, "joint_value": 64.29, "family": "classical", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "TankBind", "value": 58.82, "joint_value": 5.88, "family": "learned", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "AutoDock Vina", "value": 57.65, "joint_value": 56.47, "family": "classical", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "Uni-Mol", "value": 44.71, "joint_value": 11.76, "family": "learned", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "DeepDock", "value": 34.52, "joint_value": 11.76, "family": "learned", "setting": "SurfDock source-data reproduction", "source": "SurfDock"},
-      {"method": "EquiBind", "value": 7.06, "joint_value": 1.18, "family": "learned", "setting": "SurfDock source-data reproduction", "source": "SurfDock"}
+      {"method": "SurfDock + minimization", "value": 95.29, "family": "learned"},
+      {"method": "Uni-Mol Docking V2", "value": 95.29, "family": "learned"},
+      {"method": "SigmaDock", "value": 90.60, "family": "learned"},
+      {"method": "GNINA", "value": 83.53, "family": "classical"},
+      {"method": "KarmaDock", "value": 74.12, "family": "learned"},
+      {"method": "GOLD", "value": 67.00, "family": "classical"},
+      {"method": "Vina", "value": 58.00, "family": "classical"},
+      {"method": "Uni-Mol", "value": 45.00, "family": "learned"},
+      {"method": "DeepDock", "value": 35.00, "family": "learned"}
     ],
-    "additional_configurations": [
-      {"method": "KarmaDock (force-field)", "value": 69.41, "joint_value": 3.53, "family": "learned", "source": "SurfDock"},
-      {"method": "KarmaDock (aligned)", "value": 68.24, "joint_value": 11.76, "family": "learned", "source": "SurfDock"}
+    "excluded_non_pocket": [
+      {"method": "Matcha (blind)", "value": 85.90, "family": "learned"},
+      {"method": "DiffDock-L", "value": 85.19, "family": "learned"},
+      {"method": "DiffDock", "value": 72.00, "family": "learned"},
+      {"method": "TankBind", "value": 59.00, "family": "learned"}
     ]
   },
   "posebusters": {
     "name": "PoseBusters v2",
     "n": 308,
     "values": [
-      {"method": "AlphaFold 3 (pocket specified)", "value": 93.20, "joint_value": 84.40, "family": "learned", "setting": "co-folding; 2019 cutoff; pocket specified", "source": "AlphaFold 3"},
-      {"method": "SigmaDock", "value": 80.50, "joint_value": 79.90, "family": "learned", "setting": "pocket; 40 seeds; energy/PB ranker", "source": "SigmaDock"},
-      {"method": "DiffDock-Pocket RL++", "value": 80.20, "value_std": 1.20, "joint_value": 78.20, "joint_value_std": 1.00, "oracle_value": 88.50, "oracle_value_std": 0.90, "joint_oracle_value": 87.70, "joint_oracle_value_std": 0.90, "family": "learned", "setting": "pocket; RL; Smina/Vina minimization; GNINA reranking", "source": "RLDiff"},
-      {"method": "GNINA", "value": 73.70, "joint_value": 72.40, "family": "classical", "setting": "pocket; hybrid search/ranking", "source": "RLDiff"},
-      {"method": "DiffDock-Pocket RL", "value": 69.00, "value_std": 2.80, "joint_value": 58.80, "joint_value_std": 1.70, "oracle_value": 84.80, "oracle_value_std": 0.40, "joint_oracle_value": 79.90, "joint_oracle_value_std": 0.30, "family": "learned", "setting": "pocket; RL; no external refinement", "source": "RLDiff"},
-      {"method": "DiffDock-Pocket", "value": 66.80, "value_std": 0.50, "joint_value": 46.20, "joint_value_std": 1.00, "oracle_value": 78.00, "oracle_value_std": 1.40, "joint_oracle_value": 66.10, "joint_oracle_value_std": 0.70, "family": "learned", "setting": "pocket; no external refinement", "source": "RLDiff"},
-      {"method": "Matcha (blind)", "value": 65.90, "joint_value": 63.00, "family": "learned", "setting": "blind; GNINA minimization/filter/ranking", "source": "Matcha"},
-      {"method": "AutoDock Vina", "value": 59.70, "joint_value": 58.10, "family": "classical", "setting": "pocket", "source": "AlphaFold 3/RLDiff"},
-      {"method": "GOLD", "value": 58.10, "joint_value": 54.20, "family": "classical", "setting": "pocket", "source": "RLDiff"},
-      {"method": "Matcha-lite (blind)", "value": 54.20, "joint_value": 51.30, "family": "learned", "setting": "blind; 10 poses; two stages", "source": "Matcha"},
-      {"method": "RapidDock (blind)", "value": 52.10, "joint_value": null, "family": "learned", "setting": "blind", "source": "RapidDock"},
-      {"method": "Re-Dock", "value": 50.70, "joint_value": 32.80, "family": "classical", "setting": "pocket", "source": "SigmaDock"},
-      {"method": "DiffDock-L", "value": 50.00, "joint_value": null, "family": "learned", "setting": "blind; original author report", "source": "DiffDock-L"},
-      {"method": "DiffDock", "value": 38.00, "joint_value": 12.30, "family": "learned", "setting": "holo receptor", "source": "RLDiff"},
-      {"method": "Uni-Mol", "value": 21.80, "joint_value": 1.90, "family": "learned", "setting": "pocket", "source": "AlphaFold 3"},
-      {"method": "DeepDock", "value": 19.50, "joint_value": 5.20, "family": "learned", "setting": "pocket", "source": "AlphaFold 3/RLDiff"},
-      {"method": "TankBind", "value": 15.90, "joint_value": 3.20, "family": "learned", "setting": "holo receptor", "source": "AlphaFold 3"},
-      {"method": "EquiBind", "value": 1.90, "joint_value": 0.00, "family": "learned", "setting": "holo receptor", "source": "AlphaFold 3/RLDiff"}
+      {"method": "PocketXMol (self-ranking)", "value": 84.70, "family": "learned"},
+      {"method": "PocketXMol (tuned ranker)", "value": 84.40, "family": "learned"},
+      {"method": "SigmaDock", "value": 80.50, "family": "learned"},
+      {"method": "Vina", "value": 59.70, "family": "classical"},
+      {"method": "GOLD", "value": 58.10, "family": "classical"},
+      {"method": "Re-Dock", "value": 50.70, "family": "classical"},
+      {"method": "Uni-Mol", "value": 21.80, "family": "learned"},
+      {"method": "DeepDock", "value": 19.50, "family": "learned"}
     ],
-    "joint_only_values": [
-      {"method": "PocketXMol (self-ranking)", "joint_value": 84.70, "family": "learned", "setting": "pocket; 100 poses", "source": "PocketXMol"},
-      {"method": "PocketXMol (tuned ranker)", "joint_value": 84.40, "family": "learned", "setting": "pocket; 100 poses", "source": "PocketXMol"}
-    ],
-    "near_comparable_values": [
-      {"method": "nvDock", "n": 306, "value": 81.85, "joint_value": null, "oracle_value": 94.51, "family": "learned", "setting": "pocket all-atom; confidence ranking", "source": "nvDock"},
-      {"method": "ArtiDock", "n": 306, "value": 78.00, "joint_value": null, "family": "learned", "setting": "pocket all-atom; two PBv2 entries omitted", "source": "nvDock", "denominator_source": "ArtiDock"}
+    "excluded_non_pocket": [
+      {"method": "AlphaFold 3", "value": 84.40, "family": "learned"},
+      {"method": "Matcha (blind)", "value": 60.00, "family": "learned"},
+      {"method": "RapidDock (blind)", "value": 52.10, "family": "learned"},
+      {"method": "DiffDock-L", "value": 50.00, "family": "learned"},
+      {"method": "DiffDock", "value": 38.00, "family": "learned"},
+      {"method": "TankBind", "value": 15.90, "family": "learned"}
     ]
   },
   "sources": {
     "SigmaDock": "https://arxiv.org/abs/2511.04854",
-    "PocketXMol": "https://doi.org/10.1016/j.cell.2026.01.003",
+    "PocketXMol": "https://www.biorxiv.org/content/10.1101/2024.10.17.618827v2",
     "AlphaFold 3": "https://www.nature.com/articles/s41586-024-07487-w",
     "SurfDock": "https://www.nature.com/articles/s41592-024-02516-y",
     "Uni-Mol Docking V2": "https://arxiv.org/abs/2405.11769",
     "Matcha": "https://arxiv.org/abs/2510.14586",
-    "RLDiff": "https://doi.org/10.64898/2026.03.25.714128",
-    "DiffDock-L": "https://proceedings.iclr.cc/paper_files/paper/2024/file/db334db287337b2a365120b524300ef3-Paper-Conference.pdf",
-    "RapidDock": "https://arxiv.org/abs/2411.00004",
-    "nvDock": "https://huggingface.co/nvidia/nvDock",
-    "ArtiDock": "https://doi.org/10.1021/acs.jcim.5c02777"
+    "RapidDock": "https://arxiv.org/abs/2411.00004"
   },
   "notes": [
-    "The values array contains only rows with a source-reported pure RMSD endpoint and is consumed by plot_top1_oracle.py.",
-    "PocketXMol PBv2 values are joint RMSD-and-PB-valid endpoints, not pure RMSD values, so they are stored separately in joint_only_values.",
-    "AlphaFold 3 pocket-specified PBv2 reports 93.2 percent pure RMSD success and 84.4 percent joint success; the old JSON incorrectly used the joint value as pure RMSD.",
-    "Matcha full-set PBv2 is 65.9 percent pure RMSD success and 63.0 percent joint success in the current paper figure.",
-    "Values on the older 428-target PoseBusters benchmark and denominator-mismatched 306-target reports are excluded from the main values array.",
-    "Reported protocols, candidate counts, training sets, pocket inputs, post-processing, RMSD code, and PoseBusters versions differ across papers."
+    "PoseBusters v2 contains 308 targets; values on the older 428-target PoseBusters benchmark are excluded.",
+    "Primary values are restricted to methods that consume a supplied pocket; blind, full-receptor, pocket-prediction, and co-folding rows are retained only in excluded_non_pocket and are never plotted.",
+    "PoseBench 2026 co-folding results use a 130-target post-2021 PoseBusters v2 subset and are not mixed into the full 308-target panel.",
+    "PocketVina is excluded because its reported Astex value uses best-RMSD selection rather than a deployable top-1 selector.",
+    "Reported protocols, candidate counts, training sets, pocket inputs, and post-processing differ across papers."
   ]
 }

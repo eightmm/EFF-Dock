@@ -1183,7 +1183,7 @@ def _extract_hidden_chunked(
     if ligand_node_type is None:
         raise BankContractError("hidden extraction produced no chunks")
     hidden = torch.cat(chunks, dim=0)
-    if hidden.shape[0] != NUM_SAMPLES or not bool(torch.isfinite(hidden).all()):
+    if hidden.shape[0] != poses.shape[0] or not bool(torch.isfinite(hidden).all()):
         raise BankContractError("hidden extraction produced invalid features")
     return {"h_lig_node": hidden, "lig_node_type": ligand_node_type}
 

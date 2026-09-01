@@ -51,13 +51,15 @@ def canon_smiles(smi: str) -> str | None:
 def load_external_smiles(ext_dir: Path) -> set[str]:
     smis: set[str] = set()
     required = ("astex_smiles.json", "pb_smiles.json")
+    optional = ("phibench_smiles.json", "foldbench_smiles.json", "openbind_smiles.json")
     missing = [name for name in required if not (ext_dir / name).exists()]
     if missing:
         raise FileNotFoundError(
             "strict split requires frozen SMILES for every benchmark; missing: "
             + ", ".join(str(ext_dir / name) for name in missing)
         )
-    for name in required:
+    mapping_names = [*required, *(name for name in optional if (ext_dir / name).exists())]
+    for name in mapping_names:
         p = ext_dir / name
         with open(p) as f:
             d = json.load(f)
@@ -66,7 +68,11 @@ def load_external_smiles(ext_dir: Path) -> set[str]:
             c = canon_smiles(s)
             if c:
                 smis.add(c)
-    log.info("external test canonical SMILES: %d", len(smis))
+    log.info(
+        "external test canonical SMILES: %d from %s",
+        len(smis),
+        ", ".join(mapping_names),
+    )
     return smis
 
 

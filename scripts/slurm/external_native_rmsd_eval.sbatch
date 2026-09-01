@@ -1,0 +1,1 @@
+../../benchmarks/external_models/slurm/external_native_rmsd_eval.sbatch

@@ -2,7 +2,7 @@
 
 Protocol ID: `EFFDOCK-S50-SYMMETRY-CONFIDENCE-TRAINING-V1`
 
-Status: completed. The four-GPU recovery run reached U50,000 with a
+Status: completed. The four-GPU recovery job `56642` reached U50,000 with a
 complete 1,035-complex validation ledger at every registered 5,000-update
 look. The result is an internal, repeated-PLINDER model-selection study; it is
 not an independent external-generalization claim.
@@ -67,7 +67,7 @@ remains the packaged compatibility model.
 
 ## Repeated-use external characterization
 
-The frozen external run compared U1.5k, U25k, and U50k on the same frozen
+Jobs `57911`-`57913` compared U1.5k, U25k, and U50k on the same frozen
 sigma-2 N100 Astex/PoseBusters candidates before and after deterministic
 step-100 refinement. This is descriptive because both benchmarks had already
 been opened; it cannot select a checkpoint.
@@ -98,8 +98,5 @@ The exact external contract is in
   checkpoint-selection rule.
 - Preserve U50k `latest.pt` as the terminal training state and as the immutable
   initialization for the separately registered raw+refined continuation.
-- Use U50k for the current N100/S10, sigma-2 guided/refined benchmark-reporting
-  tables. This reporting convention was chosen after external results were
-  opened, so it is descriptive and does not replace the internal U25 decision.
 - Do not promote either checkpoint into `weights/` or change public defaults
   from these repeated-use results alone.

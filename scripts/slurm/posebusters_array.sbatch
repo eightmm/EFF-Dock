@@ -19,11 +19,13 @@ mkdir -p outputs/benchmarks/logs
 : "${EFFDOCK_NUM_SHARDS:?set EFFDOCK_NUM_SHARDS}"
 
 run_name=${EFFDOCK_PB_RUN_NAME:-effdock-redock-ema-n40-s25-v1-posebusters}
+input_dir=${EFFDOCK_PB_INPUT_DIR:-outputs/benchmarks/raw}
 pose_dir=${EFFDOCK_PB_POSE_DIR:-outputs/benchmarks/raw/poses/posebusters/vina}
 output_dir=${EFFDOCK_PB_OUTPUT_DIR:-outputs/benchmarks/posebusters_official}
 selector=${EFFDOCK_PB_SELECTOR:-effdock_torch_vina_plus_dg}
 
 uv run python -m effdock.workflows.posebusters_report \
+  --input-dir "$input_dir" \
   --num-shards "$EFFDOCK_NUM_SHARDS" \
   --shard-index "$SLURM_ARRAY_TASK_ID" \
   --run-name "$run_name" \

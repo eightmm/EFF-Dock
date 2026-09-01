@@ -52,8 +52,9 @@ def load_ligand(
 ) -> tuple[Chem.Mol, bool]:
     """Load ligand from SMILES / SDF / MOL2. Returns (mol, has_pose).
 
-    ``random_seed`` controls only SMILES conformer generation. It is folded
-    into RDKit's non-negative signed 32-bit range for the C++ API.
+    ``random_seed`` controls only SMILES conformer generation.  It is folded
+    into RDKit's non-negative signed 32-bit range so per-complex experiment
+    seeds remain deterministic without overflowing the C++ API.
     """
     path = Path(ligand_input)
 

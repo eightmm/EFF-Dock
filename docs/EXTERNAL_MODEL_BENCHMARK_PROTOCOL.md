@@ -11,9 +11,11 @@ recorded site information, pose generation, scoring, and refinement.
   (`N=308`).
 - Keep the official full denominator. Preparation or inference failures count as
   failures; they are not dropped from the denominator.
-- Exclude co-folding methods from the primary docking comparison.
+- Restrict the primary comparison to methods that consume the supplied pocket
+  or a cognate-ligand-defined pocket. Exclude blind/full-receptor docking,
+  learned pocket discovery, and co-folding methods from tables and plots.
 - Use released source code and released checkpoints at the revisions recorded in
-  `configs/external_models.json`.
+  `benchmarks/external_models/models.json`.
 - Keep each upstream environment isolated. Do not install external-model
   dependencies into EFF-Dock's `.venv`.
 - Preserve native pose generation and native ranking as one reported arm. Add a
@@ -35,9 +37,10 @@ Every run row must contain these fields:
 | `refinement` | `none`, `geometry_projection`, `classical_minimization`, `learned_refinement`, or `in_repo_physical_gradient` |
 | `family` | Derived `Classical`, `Hybrid`, or `DL` label for this exact arm |
 
-`blind_site` here means holo full-receptor blind-site redocking unless a run
-explicitly declares an apo/predicted receptor. It must not be described as apo
-docking.
+`blind_site` is retained only to classify historical/archival runs. Such arms
+are never primary comparisons and must carry `primary_comparison: false` plus
+an `exclusion_reason`. They must not be described as pocket-conditioned or
+rendered in comparison figures.
 
 ## Family decision rule
 
@@ -60,7 +63,6 @@ Examples:
 | Arm | Pose | Score | Refine | Family |
 |---|---|---|---|---|
 | Vina | classical search | Vina | none | Classical |
-| Vina using a DiffDock-predicted site | classical search | Vina | none | Hybrid |
 | GNINA | classical search | CNN | none | Hybrid |
 | DiffDock-Pocket | learned diffusion | learned confidence | none | DL |
 | SigmaDock + Vinardo | learned diffusion | Vinardo | none | Hybrid |
@@ -68,16 +70,17 @@ Examples:
 | DiffBindFR + smina | learned diffusion | smina | smina minimization | Hybrid |
 | SurfDock | learned diffusion | learned MDN | none | DL |
 | SurfDock + force optimization | learned diffusion | learned MDN | force-field minimization | Hybrid |
-| FABind + post-optimization | learned regression | none | intraligand geometry projection | Hybrid |
-| EFF-Dock ODE + U50k | learned flow | learned confidence | none | DL |
-| EFF-Dock + physical guidance/refinement + U50k | learned flow | learned confidence | in-repo physical gradient | Hybrid |
+| EFF-Dock raw + U70k | learned flow | learned confidence | none | DL |
+| EFF-Dock + physical refinement + U70k | learned flow | learned confidence | in-repo physical gradient | Hybrid |
 
 ## Fair-comparison arms
 
+- Admit only `site_information: pocket_supplied` arms. A predicted pocket is a
+  different task and cannot be made comparable by using the same dataset.
 - Main fixed-compute arms: `S10 N100` and `S25 N40`, both with total model NFE
   budget 1000.
-- Top-1 uses each declared scoring engine. EFF-Dock uses the U50k confidence
-  checkpoint unless an ablation explicitly says otherwise.
+- Top-1 uses each declared scoring engine. EFF-Dock uses the promoted raw+refined
+  U70k confidence checkpoint unless an ablation explicitly says otherwise.
 - Oracle@40 is reported only when the method actually emitted at least 40 valid
   candidate poses. Do not fabricate Oracle@40 for deterministic single-pose
   methods.
@@ -85,6 +88,39 @@ Examples:
   interface permits it. Preserve per-seed rows before computing mean/variation.
 - Report both RMSD-only success (`RMSD < 2 A`) and Joint success
   (`RMSD < 2 A` and all official PoseBusters checks pass).
+
+## Runtime-stage schema
+
+Accuracy arms preserve each model's native end-to-end pipeline, but runtime is
+also recorded by stage. The mandatory order is `preprocess -> pose generation
+-> minimization/refinement -> score computation -> reranking -> serialization`.
+An absent stage is recorded as `none`, not silently merged into its neighbor.
+Official RMSD and PoseBusters evaluation are separate evaluation costs.
+
+EFF-Dock additionally splits pose generation into prior construction, learned
+ODE model/integration, and in-ODE physical-guidance energy/gradient/projection.
+Post-ODE autograd refinement is the minimization/refinement stage. U70k
+confidence forward is score computation; its cluster-free selector and stable
+sorting are reranking. Guided and unguided runs may provide a paired overhead,
+but that subtraction does not replace direct per-call guidance timing.
+The promoted benchmark stack reported here has in-ODE guidance disabled; its
+physical stage is the separately declared post-ODE deterministic refinement.
+
+The stages also have independent immutable artifacts. Pose generation writes a
+raw pose bank with stable `complex_id`, `sample_index`, seed/prior identity, and
+coordinate hash. Refinement consumes that bank and writes a second bank while
+preserving every candidate index. Confidence writes a score ledger keyed by the
+same candidate identity; reranking writes selected indices/order only and never
+rewrites coordinates. This permits raw-confidence, same-index-refined, and
+refined-then-reselected results to be reconstructed without regenerating poses.
+Stage summaries record their input artifact hashes and refuse partial or
+mismatched banks.
+
+When an upstream binary genuinely fuses stages, keep one explicitly labelled
+fused timing row rather than estimating unsupported components. Every timing
+row records device/resource class, allocated accelerators, actual candidate
+count, seconds per pose, seconds per frozen-denominator complex, repeat values,
+mean, sample SD, and queue-free parallel critical-path latency where observable.
 
 ## Installation and provenance
 
@@ -96,7 +132,7 @@ may seed an initial source/weight link, but it is not an active shared Python
 environment.
 
 ```bash
-MODEL=surfdock sbatch scripts/slurm/others_uv_sync.sbatch
+MODEL=surfdock sbatch benchmarks/external_models/slurm/others_uv_sync.sbatch
 bash scripts/others/run_model.sh surfdock python -c \
   'import torch; print(torch.__version__)'
 ```
@@ -121,7 +157,7 @@ basename-referenced PQR, and keeps SO(3)/torsion lookup arrays in the model's
 ignored cache. These corrections do not change weights, diffusion equations,
 ranking, or refinement policy.
 
-FABind checkpoints are accepted only after Git-LFS materialization. A checked
+For the archived, non-comparison FABind runtime, checkpoints are accepted only after Git-LFS materialization. A checked
 out pointer file is not a weight: `best_model.bin` must be exactly `145251173`
 bytes and match SHA-256
 `549d6f1cef6f8fcbc0c068afa572fa99df58886440f67a124c3bb0fbebe09622`,
@@ -145,7 +181,7 @@ and Cython below 3. Its `--no_error_correction` arm uses a fail-closed PyMOL
 import shim because supplied crystal ligands do not call PyMOL and no compatible
 Python 3.9 uv wheel exists.
 
-The not-yet-migrated PoseBench DiffDock archive compiles an OpenFold CUDA extension
+The archived, non-comparison PoseBench DiffDock runtime compiles an OpenFold CUDA extension
 against CUDA 11.8 but leaves the host compiler unconstrained. CUDA 11.8 rejects
 the cluster's GCC 13. The installer deterministically splits the upstream conda
 and pip phases, adds environment-local `gcc_linux-64==11` and
@@ -158,8 +194,9 @@ inference is a separate later gate and is not implied by a successful install.
 
 ## Plot encoding
 
-Order methods by supplied-pocket arms first, then draw a vertical dashed divider
-before blind-site/full-receptor arms. Use family color only:
+Render supplied-pocket arms only. Do not draw or reserve space for
+blind-site/full-receptor, pocket-prediction, or co-folding arms. Use family
+color only:
 
 - Classical: pastel mint
 - Hybrid: pastel peach

@@ -498,7 +498,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help='Multi-sigma inference. "2,3,4,5" splits --num_samples '
-        'across values; "2:10,3:10,4:20" gives explicit counts.',
+        'across values; explicit counts such as "2:25,3:25,4:50" must '
+        'sum to --num-samples.',
     )
     parser.add_argument("--num-samples", type=int, default=DEFAULT_NUM_SAMPLES)
     parser.add_argument("--seed", type=int, default=None)

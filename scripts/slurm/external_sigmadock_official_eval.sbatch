@@ -1,0 +1,1 @@
+../../benchmarks/external_models/slurm/external_sigmadock_official_eval.sbatch

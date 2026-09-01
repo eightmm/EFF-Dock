@@ -14,6 +14,7 @@ import torch
 from rdkit import rdBase
 
 from effdock.guidance import (
+    ACTIVE_INTERACTION_TERMS,
     TRACE_SCHEMA_VERSION,
     InteractionEnergyConfig,
     PhysicalEnergyConfig,
@@ -35,6 +36,8 @@ from effdock.preprocess.ligand import (
     ligand_graph_identity,
     load_molecule,
 )
+
+TRACE_PROTOCOL_ID = "EFFDOCK-GUIDANCE-DIAGNOSTIC-V5"
 
 
 def _file_sha256(path: Path) -> str:
@@ -320,12 +323,41 @@ def build_trace_report(args: argparse.Namespace) -> dict[str, object]:
             if results_frame == "pocket_centered":
                 saved_coords = saved_coords + pocket_center.view(1, 3)
             near_parts.append(saved_coords)
-    interaction_config = InteractionEnergyConfig()
+    requested_interaction_terms = getattr(args, "interaction_terms", None)
+    interaction_config = InteractionEnergyConfig(
+        active_terms=(
+            tuple(requested_interaction_terms)
+            if requested_interaction_terms is not None
+            else InteractionEnergyConfig().active_terms
+        )
+    )
+    interaction_cutoffs = {
+        "hydrophobic": interaction_config.hydrophobic_cutoff,
+        "hydrogen_bond": interaction_config.hydrogen_bond_cutoff,
+        "screened_formal_charge": interaction_config.formal_charge_cutoff,
+        "pi_stacking": interaction_config.pi_stacking_cutoff,
+        "cation_pi": interaction_config.cation_pi_cutoff,
+        "halogen_bond": interaction_config.halogen_cutoff_scale
+        * max(
+            interaction_config.halogen_vdw_radius_nitrogen,
+            interaction_config.halogen_vdw_radius_oxygen,
+            interaction_config.halogen_vdw_radius_sulfur,
+        )
+        + interaction_config.halogen_cutoff_scale
+        * max(
+            interaction_config.halogen_vdw_radius_chlorine,
+            interaction_config.halogen_vdw_radius_bromine,
+            interaction_config.halogen_vdw_radius_iodine,
+        ),
+        "metal_coordination": max(
+            interaction_config.metal_pair_cutoff,
+            interaction_config.metal_cn_cutoff,
+            interaction_config.metal_non_donor_cutoff,
+        ),
+    }
     required_shell_cutoff = max(
         args.nonbonded_cutoff,
-        interaction_config.hydrophobic_cutoff,
-        interaction_config.hydrogen_bond_cutoff,
-        interaction_config.formal_charge_cutoff,
+        *(interaction_cutoffs[term] for term in interaction_config.active_terms),
     )
     if args.protein_cutoff < required_shell_cutoff:
         raise ValueError(
@@ -422,8 +454,12 @@ def build_trace_report(args: argparse.Namespace) -> dict[str, object]:
     warnings = [
         "This parameter set is diagnostic and is not AMBER, GAFF, OpenFF, UFF, or MMFF.",
         "Crystal values are diagnostics only and must not enter inference or tuning.",
-        "Hydrophobic, hydrogen-bond, and screened formal-charge values are pose-guidance terms, not affinity or free energy.",
-        "Partial-charge electrostatics, solvation, metal coordination, and receptor flexibility are absent.",
+        "Every interaction value is a pose-guidance diagnostic, not affinity or free energy.",
+        "The vdW steric barrier is a default-on diagnostic guard with PLINDER-unfitted initial constants, not a production-admitted force field term.",
+        "Partial-charge electrostatics, solvation, and receptor flexibility are absent.",
+        "All seven implemented interaction terms are enabled in the user-requested diagnostic default; this is not production-sampler admission.",
+        "Metal attraction is profile- and geometry-gated; ambiguous standalone metals are repulsion-only and cofactors or clusters fail closed.",
+        "The polar-unsatisfied value is a unitless trace-only proxy and contributes no energy or force.",
         "Vina code is retained elsewhere for legacy evaluation but is excluded from GuidanceEnergy.",
     ]
     if system.excluded_nonprotein_atoms:
@@ -451,7 +487,7 @@ def build_trace_report(args: argparse.Namespace) -> dict[str, object]:
     report: dict[str, object] = {
         "schema_version": TRACE_SCHEMA_VERSION,
         "created_utc": datetime.now(UTC).isoformat(),
-        "protocol_id": "EFFDOCK-GUIDANCE-DIAGNOSTIC-V4",
+        "protocol_id": TRACE_PROTOCOL_ID,
         "status": "diagnostic_only",
         "supported": True,
         "implementation": _implementation_identity(),
@@ -500,6 +536,12 @@ def build_trace_report(args: argparse.Namespace) -> dict[str, object]:
                     "ligand_intra_lj_attractive",
                     "protein_ligand_lj_repulsive",
                     "protein_ligand_lj_attractive",
+                    *(
+                        ["protein_ligand_steric_barrier"]
+                        if energy_config.protein_ligand_steric_barrier_enabled
+                        and energy_config.steric_k > 0
+                        else []
+                    ),
                 ],
                 "inactive_terms": {
                     "electrostatic": (
@@ -509,11 +551,12 @@ def build_trace_report(args: argparse.Namespace) -> dict[str, object]:
                     ),
                     "solvation": "no admitted self-contained solvation model",
                     "metal_coordination": (
-                        "owned by InteractionGuidance; Zn(II) V0 is contract-only"
+                        "owned by InteractionGuidance; profile-dispatched metal "
+                        "coordination is enabled in the diagnostic default"
                     ),
                 },
             },
-            "interaction": interaction_profile_metadata(),
+            "interaction": interaction_profile_metadata(interaction_config),
         },
         "energy_config": {
             "physical": asdict(energy_config),
@@ -556,6 +599,10 @@ def build_trace_report(args: argparse.Namespace) -> dict[str, object]:
             "protein_ligand_lj_attractive": (
                 "UFF-style dispersion attraction; not affinity or hydrogen-bond score"
             ),
+            "protein_ligand_steric_barrier": (
+                "compact smooth repulsion from overlap with versioned vdW-radius "
+                "safety shells; diagnostic guard, not PoseBusters emulation"
+            ),
             "ligand_intra_improper": (
                 "periodic planarity or input-stereochemistry restraint; "
                 "no AMBER/GAFF compatibility claim"
@@ -572,6 +619,26 @@ def build_trace_report(args: argparse.Namespace) -> dict[str, object]:
                 "Debye-Huckel-screened canonical formal-charge-group "
                 "interaction; not partial-charge electrostatics, solvation, "
                 "affinity, or free energy"
+            ),
+            "interaction_pi_stacking": (
+                "distance, offset, and parallel-or-T-shaped aromatic-system "
+                "occupancy with fused-system saturation"
+            ),
+            "interaction_cation_pi": (
+                "directional contact between an exact +1 formal-charge site "
+                "and a neutral carbocyclic aromatic system"
+            ),
+            "interaction_halogen_bond": (
+                "ligand C-Cl/Br/I sigma-hole geometry to a strictly typed "
+                "protein N/O or MET-SD acceptor"
+            ),
+            "interaction_metal_coordination": (
+                "profile-dispatched standalone-metal directional Morse or "
+                "repulsion-only diagnostic with occupancy and site-specific masking"
+            ),
+            "polar_unsatisfied_proxy": (
+                "unitless burial times one-minus-polar-satisfaction trace; "
+                "never included in energy or force"
             ),
             "total": ("unified GuidanceEnergy = PhysicalEnergy + InteractionEnergy; Vina excluded"),
         },
@@ -607,6 +674,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--nonbonded-cutoff", type=float, default=8.0)
     parser.add_argument("--protein-chunk-size", type=int, default=512)
     parser.add_argument(
+        "--interaction-terms",
+        nargs="*",
+        choices=ACTIVE_INTERACTION_TERMS,
+        default=None,
+        help=(
+            "Explicit callable interaction terms for this diagnostic trace. "
+            "Omit the option for all implemented default terms; pass the option "
+            "with no values for physical-only tracing."
+        ),
+    )
+    parser.add_argument(
         "--perturbations",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -632,10 +710,7 @@ def _print_summary(report: dict[str, object], output: Path) -> None:
         f"fragments={system['ligand_fragments']} "
         f"protein_shell_atoms={system['protein_shell_heavy_atoms']}"
     )
-    print(
-        f"  {'pose':<26}{'total':>14}{'physical':>14}"
-        f"{'hydrophobe':>14}{'H-bond':>14}{'formal-q':>14}"
-    )
+    print(f"  {'pose':<26}{'total':>14}{'physical':>14}{'interaction':>14}")
     for row in report["rows"]:
         energies = row["energies"]
         label = row["pose_kind"]
@@ -645,9 +720,7 @@ def _print_summary(report: dict[str, object], output: Path) -> None:
             f"  {label:<26}"
             f"{energies['total']:>14.4f}"
             f"{row['energy_groups']['physical']:>14.4f}"
-            f"{energies['interaction_hydrophobic']:>14.4f}"
-            f"{energies['interaction_hydrogen_bond']:>14.4f}"
-            f"{energies['interaction_screened_formal_charge']:>14.4f}"
+            f"{row['energy_groups']['interaction']:>14.4f}"
         )
 
 
@@ -656,10 +729,18 @@ def main(argv: list[str] | None = None) -> None:
     try:
         report = build_trace_report(args)
     except UnsupportedPhysicalChemistryError as exc:
+        requested_interaction_terms = getattr(args, "interaction_terms", None)
+        interaction_config = InteractionEnergyConfig(
+            active_terms=(
+                tuple(requested_interaction_terms)
+                if requested_interaction_terms is not None
+                else InteractionEnergyConfig().active_terms
+            )
+        )
         report = {
             "schema_version": TRACE_SCHEMA_VERSION,
             "created_utc": datetime.now(UTC).isoformat(),
-            "protocol_id": "EFFDOCK-GUIDANCE-DIAGNOSTIC-V4",
+            "protocol_id": TRACE_PROTOCOL_ID,
             "status": "unsupported",
             "supported": False,
             "implementation": _implementation_identity(),
@@ -673,7 +754,7 @@ def main(argv: list[str] | None = None) -> None:
             "parameter_set": guidance_parameter_identity(),
             "guidance_layers": {
                 "physical": {"status": "unsupported"},
-                "interaction": interaction_profile_metadata(),
+                "interaction": interaction_profile_metadata(interaction_config),
             },
             "failure": exc.as_dict(),
             "rows": [],

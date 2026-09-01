@@ -11,12 +11,14 @@ Chem = pytest.importorskip("rdkit.Chem")
 
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
+from effdock.workflows.guidance_budget_posebusters_report import (  # noqa: E402
+    VALIDITY_CHECKS,
+)
 from effdock.workflows.guidance_pl_valid import (  # noqa: E402
     COFACTOR_AND_WATER_CHECKS,
     PL_VALIDITY_CHECKS,
     is_pl_valid,
 )
-from effdock.workflows.posebusters_report import VALIDITY_CHECKS  # noqa: E402
 from scripts.evaluate_guidance_sdf_post_refinement_posebusters import (  # noqa: E402
     validate_pb_row,
 )

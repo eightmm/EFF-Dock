@@ -23,12 +23,12 @@ shard_index=${SLURM_ARRAY_TASK_ID:-0}
 limit=${EFFDOCK_CONFIDENCE_PREPARE_LIMIT:-1000}
 start=$((shard_index * limit))
 split=${EFFDOCK_CONFIDENCE_PREPARE_SPLIT:-train}
-checkpoint=${EFFDOCK_DOCKING_CHECKPOINT:-weights/effdock_geometry_ft_100k_best.pt}
+checkpoint=${EFFDOCK_DOCKING_CHECKPOINT:-weights/effdock_docking_early_time_t0p10_50k.pt}
 config=${EFFDOCK_DOCKING_CONFIG:-configs/train.yaml}
-pose_tag=${EFFDOCK_CONFIDENCE_POSE_TAG:-conf_ligonly_extmatch_n80_s25_sig0p5_pc10}
-num_samples=${EFFDOCK_CONFIDENCE_PREPARE_NUM_SAMPLES:-80}
-num_steps=${EFFDOCK_CONFIDENCE_PREPARE_NUM_STEPS:-25}
-sigma=${EFFDOCK_CONFIDENCE_PREPARE_SIGMA:-0.5}
+pose_tag=${EFFDOCK_CONFIDENCE_POSE_TAG:-s50_n100_s10_sig2_pc10}
+num_samples=${EFFDOCK_CONFIDENCE_PREPARE_NUM_SAMPLES:-100}
+num_steps=${EFFDOCK_CONFIDENCE_PREPARE_NUM_STEPS:-10}
+sigma=${EFFDOCK_CONFIDENCE_PREPARE_SIGMA:-2.0}
 pocket_cutoff=${EFFDOCK_CONFIDENCE_PREPARE_POCKET_CUTOFF:-10}
 output_args=()
 if [[ -n "${EFFDOCK_CONFIDENCE_PREPARE_OUTPUT_ROOT:-}" ]]; then

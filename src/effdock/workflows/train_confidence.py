@@ -9,6 +9,8 @@ import hashlib
 import json
 import os
 import random
+import sys
+import time
 from collections.abc import Iterator
 from contextlib import nullcontext
 from datetime import timedelta
@@ -70,6 +72,92 @@ REFINED_BANK_SETTINGS = {
     "refinement_receptor_policy": "geometry_only",
 }
 ALLOWED_BANK_SETTINGS = (BANK_SETTINGS, REFINED_BANK_SETTINGS)
+
+
+def _env_flag(name: str) -> bool:
+    value = os.environ.get(name, "").strip().lower()
+    if value in {"", "0", "false", "no", "off"}:
+        return False
+    if value in {"1", "true", "yes", "on"}:
+        return True
+    raise ValueError(f"{name} must be a boolean flag, got {value!r}")
+
+
+def _training_trace_summary(item: dict[str, Any]) -> dict[str, Any]:
+    """Return bounded, JSON-safe shape/value diagnostics for one train item."""
+    summary: dict[str, Any] = {
+        "pid": str(item.get("pid", "")),
+        "system_id": str(item.get("system_id", "")),
+    }
+    pose_coords = item.get("pose_atom_coords")
+    pose_rmsd = item.get("pose_rmsd")
+    components = item.get("pose_bank_component")
+    graph = item.get("graph")
+
+    if torch.is_tensor(pose_coords):
+        coords = pose_coords.detach().cpu().to(torch.float32)
+        summary.update(
+            {
+                "pose_shape": list(coords.shape),
+                "pose_finite": bool(torch.isfinite(coords).all()),
+                "pose_abs_max": float(coords.abs().max()) if coords.numel() else 0.0,
+            }
+        )
+    if torch.is_tensor(pose_rmsd):
+        rmsd = pose_rmsd.detach().cpu().to(torch.float32).reshape(-1)
+        summary.update(
+            {
+                "rmsd_finite": bool(torch.isfinite(rmsd).all()),
+                "rmsd_min": float(rmsd.min()) if rmsd.numel() else None,
+                "rmsd_median": float(rmsd.median()) if rmsd.numel() else None,
+                "rmsd_max": float(rmsd.max()) if rmsd.numel() else None,
+            }
+        )
+    if torch.is_tensor(components):
+        counts = torch.bincount(components.detach().cpu().to(torch.long), minlength=3)
+        summary["pose_components"] = {
+            "refined": int(counts[0]),
+            "raw": int(counts[1]),
+            "crystal": int(counts[2]),
+        }
+    if isinstance(graph, dict):
+        node_coords = graph.get("node_coords")
+        edge_index = graph.get("edge_index")
+        if torch.is_tensor(node_coords):
+            summary["graph_nodes"] = int(node_coords.shape[0])
+        if torch.is_tensor(edge_index):
+            summary["graph_edges"] = int(edge_index.shape[1])
+        for name in ("num_lig_atom", "num_lig_frag", "num_prot_atom", "num_prot_res"):
+            value = graph.get(name)
+            if torch.is_tensor(value) and value.numel() == 1:
+                summary[name] = int(value.item())
+
+        prot_slice = graph.get("prot_atom_slice")
+        if (
+            torch.is_tensor(pose_coords)
+            and torch.is_tensor(node_coords)
+            and torch.is_tensor(prot_slice)
+            and prot_slice.numel() == 2
+            and pose_coords.ndim == 3
+        ):
+            start, end = (int(value) for value in prot_slice.detach().cpu().tolist())
+            prot_coords = node_coords.detach().cpu().to(torch.float32)[start:end]
+            coords = pose_coords.detach().cpu().to(torch.float32)
+            if coords.numel() and prot_coords.numel():
+                contacts = (torch.cdist(coords, prot_coords.unsqueeze(0)) <= 5.0).sum((1, 2))
+                summary.update(
+                    {
+                        "contacts_le5_min": int(contacts.min()),
+                        "contacts_le5_mean": float(contacts.to(torch.float32).mean()),
+                        "contacts_le5_max": int(contacts.max()),
+                    }
+                )
+    return summary
+
+
+def _trace_sync(device: torch.device) -> None:
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
 
 
 def _sha256_file(path: Path) -> str:
@@ -1410,10 +1498,19 @@ def main(argv: list[str] | None = None) -> None:
 
     rank, local_rank, world_size = setup_ddp()
     is_main = rank == 0
+    trace_batches = _env_flag("EFFDOCK_CONFIDENCE_TRACE_BATCHES")
 
     random.seed(args.seed + rank)
     torch.manual_seed(args.seed + rank)
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    # Synchronous loading already returns the batch on the training process.
+    # Pinning its nested variable-size tensors in that same process can block
+    # one DDP rank indefinitely while its peer waits in a collective.
+    pin_memory = (
+        device.type == "cuda"
+        and args.num_workers > 0
+        and not _env_flag("EFFDOCK_CONFIDENCE_DISABLE_PIN_MEMORY")
+    )
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     paired_training = aux_bank_provenance is not None
@@ -1528,7 +1625,7 @@ def main(argv: list[str] | None = None) -> None:
         sampler=train_sampler,
         num_workers=args.num_workers,
         collate_fn=collate_complexes,
-        pin_memory=device.type == "cuda",
+        pin_memory=pin_memory,
         persistent_workers=args.num_workers > 0,
     )
     val_loader = DataLoader(
@@ -1537,7 +1634,7 @@ def main(argv: list[str] | None = None) -> None:
         shuffle=False,
         num_workers=args.num_workers,
         collate_fn=collate_complexes,
-        pin_memory=device.type == "cuda",
+        pin_memory=pin_memory,
         persistent_workers=args.num_workers > 0,
     )
 
@@ -1687,7 +1784,8 @@ def main(argv: list[str] | None = None) -> None:
             f"batch_complexes_per_rank={args.batch_complexes} "
             f"gradient_accumulation_steps={args.gradient_accumulation_steps} "
             f"effective_global_batch_complexes="
-            f"{args.batch_complexes * args.gradient_accumulation_steps * world_size}",
+            f"{args.batch_complexes * args.gradient_accumulation_steps * world_size} "
+            f"pin_memory={pin_memory}",
             flush=True,
         )
         print(
@@ -1944,17 +2042,54 @@ def main(argv: list[str] | None = None) -> None:
                 opt.zero_grad(set_to_none=True)
             logs: dict[str, float] = {}
             for accumulation_index in range(args.gradient_accumulation_steps):
+                next_step = step + 1
+                load_started = time.perf_counter()
+                if trace_batches:
+                    print(
+                        f"[Trace rank={rank} U{next_step} stage=batch_wait_start] "
+                        f"accumulation_index={accumulation_index}",
+                        flush=True,
+                    )
                 try:
-                    batch = next(train_iter)
-                except StopIteration:
-                    epoch += 1
-                    if train_sampler is not None:
-                        train_sampler.set_epoch(epoch)
-                    train_iter = iter(train_loader)
-                    batch = next(train_iter)
+                    try:
+                        batch = next(train_iter)
+                    except StopIteration:
+                        epoch += 1
+                        if train_sampler is not None:
+                            train_sampler.set_epoch(epoch)
+                        train_iter = iter(train_loader)
+                        batch = next(train_iter)
+                except Exception as exc:
+                    # A rank-local dataset failure otherwise leaves its peers
+                    # blocked in the next DDP collective with no useful error.
+                    print(
+                        f"[DataError rank={rank} U{next_step}] "
+                        f"{type(exc).__name__}: {exc}",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                    raise
+
+                if trace_batches:
+                    print(
+                        f"[Trace rank={rank} U{next_step} stage=batch_loaded] "
+                        f"load_s={time.perf_counter() - load_started:.6f} "
+                        f"items={len(batch)}",
+                        flush=True,
+                    )
 
                 denominator = len(batch) * args.gradient_accumulation_steps
                 for raw_index, raw in enumerate(batch):
+                    if trace_batches:
+                        print(
+                            f"[Trace rank={rank} U{next_step} stage=item] "
+                            + json.dumps(
+                                _training_trace_summary(raw),
+                                sort_keys=True,
+                                separators=(",", ":"),
+                            ),
+                            flush=True,
+                        )
                     should_sync = (
                         accumulation_index == args.gradient_accumulation_steps - 1
                         and raw_index == len(batch) - 1
@@ -1965,19 +2100,75 @@ def main(argv: list[str] | None = None) -> None:
                         else model.no_sync()
                     )
                     with sync_context:
+                        if trace_batches:
+                            _trace_sync(device)
+                            stage_started = time.perf_counter()
                         item = to_device(raw, device)
+                        if trace_batches:
+                            _trace_sync(device)
+                            print(
+                                f"[Trace rank={rank} U{next_step} stage=to_device_done] "
+                                f"elapsed_s={time.perf_counter() - stage_started:.6f}",
+                                flush=True,
+                            )
+                            stage_started = time.perf_counter()
                         out = model(item)
+                        if trace_batches:
+                            _trace_sync(device)
+                            print(
+                                f"[Trace rank={rank} U{next_step} stage=forward_done] "
+                                f"elapsed_s={time.perf_counter() - stage_started:.6f}",
+                                flush=True,
+                            )
+                            stage_started = time.perf_counter()
                         losses = pose_confidence_loss(out, item, **loss_kwargs)
                         loss = losses["loss"] / denominator
+                        if trace_batches:
+                            _trace_sync(device)
+                            print(
+                                f"[Trace rank={rank} U{next_step} stage=loss_done] "
+                                f"elapsed_s={time.perf_counter() - stage_started:.6f} "
+                                f"loss={float(loss.detach().item()):.8f}",
+                                flush=True,
+                            )
+                            stage_started = time.perf_counter()
                         loss.backward()
+                        if trace_batches:
+                            _trace_sync(device)
+                            print(
+                                f"[Trace rank={rank} U{next_step} stage=backward_done] "
+                                f"elapsed_s={time.perf_counter() - stage_started:.6f}",
+                                flush=True,
+                            )
                     for key, value in losses.items():
                         logs[key] = logs.get(key, 0.0) + float(value.detach().item()) / denominator
+            if trace_batches:
+                _trace_sync(device)
+                stage_started = time.perf_counter()
             grad_norm = torch.nn.utils.clip_grad_norm_(raw_model.parameters(), args.max_grad_norm)
+            if trace_batches:
+                _trace_sync(device)
+                print(
+                    f"[Trace rank={rank} U{step + 1} stage=clip_done] "
+                    f"elapsed_s={time.perf_counter() - stage_started:.6f} "
+                    f"grad_norm={float(grad_norm):.8f}",
+                    flush=True,
+                )
+                stage_started = time.perf_counter()
             for opt in optimizers:
                 opt.step()
+            if trace_batches:
+                _trace_sync(device)
+                print(
+                    f"[Trace rank={rank} U{step + 1} stage=optimizer_done] "
+                    f"elapsed_s={time.perf_counter() - stage_started:.6f}",
+                    flush=True,
+                )
             for sched in schedulers:
                 sched.step()
             step += 1
+            if trace_batches:
+                print(f"[Trace rank={rank} U{step} stage=update_complete]", flush=True)
 
             if is_main and (step == 1 or step % 20 == 0):
                 lr_vals = [opt.param_groups[0]["lr"] for opt in optimizers]

@@ -5,8 +5,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from collections import defaultdict
 from pathlib import Path
 
+import numpy as np
 import torch
 
 from effdock.evaluation.benchmark import detect_complex_files, load_ligand
@@ -20,6 +22,52 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _pdb_xyz(line: str) -> np.ndarray | None:
+    try:
+        return np.asarray(
+            [float(line[30:38]), float(line[38:46]), float(line[46:54])], dtype=float
+        )
+    except ValueError:
+        return None
+
+
+def strip_reference_ligand(pdb_text: str, ligand_xyz: np.ndarray) -> tuple[str, list[str]]:
+    """Remove receptor residues whose coordinates match a reference ligand."""
+    residue_lines: dict[tuple[str, str, str, str], list[str]] = defaultdict(list)
+    for line in pdb_text.splitlines(keepends=True):
+        if line.startswith(("ATOM", "HETATM")):
+            key = (line[21], line[22:26], line[26], line[17:20].strip())
+            residue_lines[key].append(line)
+
+    remove: set[tuple[str, str, str, str]] = set()
+    for key, lines in residue_lines.items():
+        coords = [coord for line in lines if (coord := _pdb_xyz(line)) is not None]
+        if len(coords) < 3:
+            continue
+        distances = np.linalg.norm(
+            np.asarray(coords)[:, None, :] - ligand_xyz[None, :, :], axis=2
+        )
+        matched = int((distances.min(axis=1) < 0.30).sum())
+        if matched >= 3 and matched / len(coords) >= 0.5:
+            remove.add(key)
+
+    if not remove:
+        raise ValueError("no RCSB residue matched the reference ligand")
+
+    kept: list[str] = []
+    for line in pdb_text.splitlines(keepends=True):
+        if line.startswith(("ATOM", "HETATM")):
+            key = (line[21], line[22:26], line[26], line[17:20].strip())
+            if key in remove:
+                continue
+        kept.append(line)
+    labels = [
+        f"{chain}:{number.strip()}{icode.strip()}:{name}"
+        for chain, number, icode, name in sorted(remove)
+    ]
+    return "".join(kept), labels
 
 
 def freeze_reference_centers(

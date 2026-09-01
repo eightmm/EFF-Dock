@@ -17,10 +17,8 @@ from typing import Any
 import pandas as pd
 from posebusters import PoseBusters
 
-from effdock.workflows.posebusters_report import (
-    VALIDITY_CHECKS,
-    require_posebusters_runtime_version,
-)
+from effdock.workflows.guidance_budget_posebusters_report import VALIDITY_CHECKS
+from effdock.workflows.posebusters_report import require_posebusters_runtime_version
 
 PROTOCOL_ID = "EFFDOCK-GUIDANCE-SDF-POST-REFINEMENT-PB-V1"
 

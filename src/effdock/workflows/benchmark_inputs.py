@@ -114,6 +114,9 @@ def _legacy_mapping(
     names = {
         "astex": "astex_smiles.json",
         "posebusters": "pb_smiles.json",
+        "phibench": "phibench_smiles.json",
+        "foldbench": "foldbench_smiles.json",
+        "openbind": "openbind_smiles.json",
     }
     try:
         mapping_path = external_dir / names[dataset]

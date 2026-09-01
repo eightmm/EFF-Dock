@@ -12,6 +12,7 @@ commands:
   data prepare    preprocess PLINDER complexes
   data split      create the strict train/validation split
   data benchmark  prepare frozen external redocking inputs
+  data external   normalize PhiBench, FoldBench, and OpenBind inputs
   train           train or resume EFF-Dock
   confidence prepare generate labeled pose shards for confidence training
   confidence train train or resume the learned pose-confidence model
@@ -69,6 +70,10 @@ def _resolve(command: str, data_command: str | None = None) -> Callable[[list[st
         from effdock.workflows.benchmark_data import main
 
         return main
+    if command == "data" and data_command == "external":
+        from effdock.workflows.external_benchmark_data import main
+
+        return main
     raise ValueError(f"unknown command: {' '.join(x for x in (command, data_command) if x)}")
 
 
@@ -83,7 +88,7 @@ def main(argv: list[str] | None = None) -> None:
     if command in {"data", "confidence", "physical"}:
         if not args or args[0] in {"-h", "--help"}:
             if command == "data":
-                print("usage: eff-dock data {curate,prepare,split,benchmark} [options]")
+                print("usage: eff-dock data {curate,prepare,split,benchmark,external} [options]")
             elif command == "confidence":
                 print("usage: eff-dock confidence {prepare,train} [options]")
             else:

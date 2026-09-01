@@ -723,6 +723,17 @@ class PairedLigandPoseConfidenceDataset(Dataset):
         "frag_sizes",
         "pocket_center_used",
     )
+    # The refined bank rebuilds the same deployment graph from serialized
+    # float32 coordinates.  Derived distances can therefore differ by a few
+    # float32 ULPs even when topology and coordinates are unchanged.
+    _FLOAT_RTOL = 1e-5
+    _FLOAT_ATOL = 1e-5
+    # The auxiliary graph is never returned or consumed by the model. Its
+    # edge_ref_dist is independently regenerated and can differ numerically
+    # even when node coordinates and topology are identical. Validate its
+    # representation, but compare values only for fields that enter the
+    # returned primary graph contract.
+    _AUXILIARY_DERIVED_VALUE_KEYS = frozenset({"edge_ref_dist"})
 
     def __init__(
         self,
@@ -742,12 +753,28 @@ class PairedLigandPoseConfidenceDataset(Dataset):
     def __len__(self) -> int:
         return len(self.pids)
 
-    @staticmethod
-    def _same_tensor(left: torch.Tensor, right: torch.Tensor) -> bool:
+    @classmethod
+    def _same_tensor(
+        cls,
+        left: torch.Tensor,
+        right: torch.Tensor,
+        *,
+        rtol: float | None = None,
+        atol: float | None = None,
+    ) -> bool:
         if left.shape != right.shape or left.dtype != right.dtype:
             return False
         if left.is_floating_point():
-            return bool(torch.allclose(left, right, rtol=1e-6, atol=1e-6))
+            rtol = cls._FLOAT_RTOL if rtol is None else float(rtol)
+            atol = cls._FLOAT_ATOL if atol is None else float(atol)
+            return bool(
+                torch.allclose(
+                    left,
+                    right,
+                    rtol=rtol,
+                    atol=atol,
+                )
+            )
         return bool(torch.equal(left, right))
 
     @classmethod
@@ -765,8 +792,36 @@ class PairedLigandPoseConfidenceDataset(Dataset):
             right = auxiliary[key]
             if not torch.is_tensor(left) or not torch.is_tensor(right):
                 raise ValueError(f"{pid}: paired pose-bank graph field {key!r} is not a tensor")
-            if not cls._same_tensor(left, right):
-                raise ValueError(f"{pid}: paired pose-bank graph field {key!r} differs")
+            if key in cls._AUXILIARY_DERIVED_VALUE_KEYS:
+                if left.shape != right.shape or left.dtype != right.dtype:
+                    raise ValueError(
+                        f"{pid}: paired pose-bank graph field {key!r} "
+                        "shape or dtype differs"
+                    )
+                if left.is_floating_point() and (
+                    not bool(torch.isfinite(left).all())
+                    or not bool(torch.isfinite(right).all())
+                ):
+                    raise ValueError(
+                        f"{pid}: paired pose-bank graph field {key!r} must be finite"
+                    )
+                continue
+            rtol, atol = cls._FLOAT_RTOL, cls._FLOAT_ATOL
+            if not cls._same_tensor(left, right, rtol=rtol, atol=atol):
+                detail = ""
+                if (
+                    left.shape == right.shape
+                    and left.dtype == right.dtype
+                    and left.is_floating_point()
+                ):
+                    max_abs_diff = float((left - right).abs().max().item())
+                    detail = (
+                        f" (max_abs_diff={max_abs_diff:.9g}, "
+                        f"rtol={rtol:g}, atol={atol:g})"
+                    )
+                raise ValueError(
+                    f"{pid}: paired pose-bank graph field {key!r} differs{detail}"
+                )
 
     def __getitem__(self, index: int) -> dict[str, Any]:
         primary = self.primary[index]

@@ -3,7 +3,7 @@ set -euo pipefail
 
 model=${1:-${MODEL:-}}
 if [[ -z "$model" ]]; then
-  echo "usage: $0 <surfdock|diffbindfr|interformer>" >&2
+  echo "usage: $0 <sigmadock|surfdock|diffbindfr|interformer>" >&2
   exit 2
 fi
 
@@ -15,7 +15,7 @@ python="$model_root/.venv/bin/python"
 uv_cache="$model_root/.cache/uv"
 
 case "$model" in
-  surfdock|diffbindfr|interformer) ;;
+  sigmadock|surfdock|diffbindfr|interformer) ;;
   *)
     echo "unsupported model-local uv project: $model" >&2
     exit 2
@@ -52,6 +52,7 @@ if [[ "$actual_revision" != "$expected_revision" ]]; then
 fi
 
 case "$model" in
+  sigmadock) weight_target=../../external_models/weights/sigmadock ;;
   surfdock) weight_target=upstream/model_weights ;;
   diffbindfr) weight_target=upstream/DiffBindFR/weights ;;
   interformer) weight_target=upstream/checkpoints ;;
@@ -61,12 +62,46 @@ if [[ ! -e "$model_root/weights" && ! -L "$model_root/weights" ]]; then
 fi
 [[ -d "$model_root/weights" ]] || { echo "missing weights: $model_root/weights" >&2; exit 2; }
 
+if [[ "$model" == sigmadock ]]; then
+  checkpoint="$model_root/weights/checkpoint.ckpt"
+  gnina_source="$repo_root/external_models/bin/gnina-sigmadock-v1.3.2"
+  expected_checkpoint_sha256=db15427ca349e6f1e5f894bff841112c7360384886aa472667d8011307cad382
+  expected_gnina_sha256=5d33538324b40050a03aa262d51832837e0ea6cc100945abbd2d7b732589690e
+  [[ -f "$checkpoint" ]] || { echo "missing SigmaDock checkpoint: $checkpoint" >&2; exit 2; }
+  [[ -x "$gnina_source" ]] || { echo "missing SigmaDock GNINA: $gnina_source" >&2; exit 2; }
+  actual_checkpoint_sha256=$(sha256sum "$checkpoint" | cut -d' ' -f1)
+  actual_gnina_sha256=$(sha256sum "$gnina_source" | cut -d' ' -f1)
+  [[ "$actual_checkpoint_sha256" == "$expected_checkpoint_sha256" ]] || {
+    echo "SigmaDock checkpoint digest mismatch" >&2
+    exit 2
+  }
+  [[ "$actual_gnina_sha256" == "$expected_gnina_sha256" ]] || {
+    echo "SigmaDock GNINA digest mismatch" >&2
+    exit 2
+  }
+  mkdir -p "$model_root/bin"
+  if [[ ! -e "$model_root/bin/gnina" && ! -L "$model_root/bin/gnina" ]]; then
+    ln -s ../../../external_models/bin/gnina-sigmadock-v1.3.2 \
+      "$model_root/bin/gnina"
+  fi
+  [[ -x "$model_root/bin/gnina" ]] || { echo "invalid model-local GNINA link" >&2; exit 2; }
+fi
+
 export UV_CACHE_DIR="$uv_cache"
 export UV_PROJECT_ENVIRONMENT="$model_root/.venv"
 uv sync --project "$model_root" --no-install-project
 [[ -x "$python" ]] || { echo "uv did not create $python" >&2; exit 2; }
 
 case "$model" in
+  sigmadock)
+    PYTHONPATH="$upstream/src:$upstream:$repo_root" "$python" -c \
+      'import e3nn, hydra, pytorch_lightning, rdkit, sigmadock, torch, torch_geometric; assert torch.__version__.startswith("2.13.0"), torch.__version__; print("sigmadock", torch.__version__)'
+    sigmadock_cudnn_lib=$($python -c \
+      'import pathlib, sysconfig; print(pathlib.Path(sysconfig.get_paths()["purelib"]) / "nvidia/cudnn/lib")')
+    LD_LIBRARY_PATH="$sigmadock_cudnn_lib:${LD_LIBRARY_PATH:-}" \
+      "$model_root/bin/gnina" --version
+    ;;
+
   surfdock)
     tools_dir="$upstream/comp_surface/tools"
     if [[ ! -d "$tools_dir/transfer/APBS-3.4.1.Linux" ]]; then

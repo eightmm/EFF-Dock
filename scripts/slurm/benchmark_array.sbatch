@@ -24,7 +24,7 @@ mkdir -p outputs/benchmarks/logs
 : "${EFFDOCK_NUM_SHARDS:?set EFFDOCK_NUM_SHARDS}"
 : "${EFFDOCK_RUN_NAME:?set EFFDOCK_RUN_NAME}"
 
-checkpoint=${EFFDOCK_CHECKPOINT:-weights/effdock_geometry_ft_100k_best.pt}
+checkpoint=${EFFDOCK_CHECKPOINT:-weights/effdock_docking_early_time_t0p10_50k.pt}
 config=${EFFDOCK_CONFIG:-configs/train.yaml}
 num_samples=${EFFDOCK_NUM_SAMPLES:-100}
 num_steps=${EFFDOCK_NUM_STEPS:-10}

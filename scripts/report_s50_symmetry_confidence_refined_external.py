@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from effdock.workflows.evaluate import file_sha256
-from effdock.workflows.posebusters_report import VALIDITY_CHECKS
+from effdock.workflows.guidance_budget_posebusters_report import VALIDITY_CHECKS
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 

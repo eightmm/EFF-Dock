@@ -73,5 +73,5 @@ machine-readable summary are written to `docs/BENCHMARK_RESULTS.md` and
 | PoseBusters v2 | 308 | `49f38295155ae751aba3cdc31b7ed6bdeaeb8d730650ffb6c6b0d7ddff975f71` |
 
 Astex and PoseBusters are the PoseBusters Zenodo benchmark snapshot. Every raw
-receptor, cleaned receptor, ligand, removed residue, and file hash is recorded
-in `reference_redocking_manifest.json`.
+receptor, cleaned receptor, ligand, and file hash is recorded in
+`reference_redocking_manifest.json`.

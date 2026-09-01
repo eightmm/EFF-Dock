@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 FRAGMENT_COLORS = (
     (0.00, 0.45, 0.70),
@@ -221,14 +221,69 @@ def _pml_script(
     return "\n".join(lines) + "\n"
 
 
-def _write_gif(frame_paths: list[Path], output: Path) -> None:
+def _font(size: int, *, bold: bool = False) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    filename = "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf"
+    try:
+        return ImageFont.truetype(filename, size=size)
+    except OSError:
+        return ImageFont.load_default()
+
+
+def _add_frame_label(image: Image.Image, label: str) -> Image.Image:
+    if not label:
+        return image
+    canvas = image.copy()
+    draw = ImageDraw.Draw(canvas, "RGBA")
+    font = _font(max(15, round(image.height * 0.035)), bold=True)
+    left = round(image.width * 0.032)
+    top = round(image.height * 0.040)
+    padding_x = round(image.width * 0.018)
+    padding_y = round(image.height * 0.014)
+    bounds = draw.textbbox((0, 0), label, font=font)
+    width = bounds[2] - bounds[0]
+    height = bounds[3] - bounds[1]
+    box = (
+        left,
+        top,
+        left + width + 2 * padding_x,
+        top + height + 2 * padding_y,
+    )
+    radius = max(8, round(image.height * 0.018))
+    draw.rounded_rectangle(box, radius=radius, fill=(25, 42, 70, 218))
+    draw.text(
+        (left + padding_x, top + padding_y - bounds[1]),
+        label,
+        font=font,
+        fill=(255, 255, 255, 255),
+    )
+    return canvas
+
+
+def _write_gif(
+    frame_paths: list[Path],
+    output: Path,
+    *,
+    frame_labels: list[str] | None = None,
+    frame_durations_ms: list[int] | None = None,
+) -> None:
     images = [Image.open(path).convert("RGB") for path in frame_paths]
+    if frame_labels is not None:
+        if len(frame_labels) != len(images):
+            raise ValueError("frame label count does not match rendered frame count")
+        images = [_add_frame_label(image, label) for image, label in zip(images, frame_labels)]
     palette_images = [
         image.convert("P", palette=Image.Palette.ADAPTIVE, colors=255) for image in images
     ]
-    durations = [110] * len(palette_images)
-    durations[0] = 350
-    durations[-1] = 1100
+    if frame_durations_ms is None:
+        durations = [110] * len(palette_images)
+        durations[0] = 350
+        durations[-1] = 1100
+    else:
+        if len(frame_durations_ms) != len(images):
+            raise ValueError("frame duration count does not match rendered frame count")
+        durations = [int(value) for value in frame_durations_ms]
+        if any(value <= 0 for value in durations):
+            raise ValueError("frame durations must be positive")
     output.parent.mkdir(parents=True, exist_ok=True)
     palette_images[0].save(
         output,
@@ -307,7 +362,18 @@ def render(
                 f"PyMOL rendered {len(frame_paths)} frames; expected {len(frames)}\n"
                 f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
             )
-        _write_gif(frame_paths, output)
+        frame_labels = bundle.get("frame_labels")
+        frame_durations_ms = bundle.get("frame_durations_ms")
+        _write_gif(
+            frame_paths,
+            output,
+            frame_labels=list(frame_labels) if frame_labels is not None else None,
+            frame_durations_ms=(
+                [int(value) for value in frame_durations_ms]
+                if frame_durations_ms is not None
+                else None
+            ),
+        )
     return output
 
 

@@ -1,0 +1,3544 @@
+{
+  "checkpoint_integrity_boundary": {
+    "claim": "checkpoint uses the preserved compatibility split; absolute benchmark metrics are descriptive and are not an independent external-generalization estimate",
+    "datasets": {
+      "astex": {
+        "benchmark_ids_with_exact_entry_and_ligand_overlap": [
+          "1meh"
+        ],
+        "benchmark_ids_with_exact_entry_and_ligand_overlap_count": 1,
+        "benchmark_ids_with_split_ligand_identity_overlap": [
+          "1gm8",
+          "1gpk",
+          "1hp0",
+          "1hq2",
+          "1hww",
+          "1ig3",
+          "1jd0",
+          "1jla",
+          "1lrh",
+          "1m2z",
+          "1meh",
+          "1n2j",
+          "1of6",
+          "1p2y",
+          "1p62",
+          "1r55",
+          "1r9o",
+          "1sg0",
+          "1sq5",
+          "1t40",
+          "1uou",
+          "1w2g",
+          "1x8x",
+          "1z95"
+        ],
+        "benchmark_ids_with_split_ligand_identity_overlap_count": 24,
+        "matching_train_rows": 87,
+        "matching_val_rows": 0
+      },
+      "posebusters": {
+        "benchmark_ids_with_exact_entry_and_ligand_overlap": [],
+        "benchmark_ids_with_exact_entry_and_ligand_overlap_count": 0,
+        "benchmark_ids_with_split_ligand_identity_overlap": [
+          "6m73_fnr",
+          "6vta_akn",
+          "6xct_478",
+          "6xg5_top",
+          "6xht_v2v",
+          "6xm9_v55",
+          "6yja_2ba",
+          "6zae_acv",
+          "6zk5_imh",
+          "6zpb_3d1",
+          "7a9h_tpp",
+          "7an5_rdh",
+          "7b2c_tp7",
+          "7b94_anp",
+          "7bcp_gco",
+          "7c0u_fgo",
+          "7c3u_azg",
+          "7cl8_tes",
+          "7cns_pmv",
+          "7ctm_bdp",
+          "7d6o_mte",
+          "7dkt_glf",
+          "7dql_4cl",
+          "7ed2_a3p",
+          "7elt_tym",
+          "7epv_fda",
+          "7es1_udp",
+          "7f8t_fad",
+          "7fha_adx",
+          "7jg0_gar",
+          "7jmv_4nc",
+          "7kc5_bjz",
+          "7kqu_yof",
+          "7kru_atp",
+          "7lev_0jo",
+          "7ljn_gtp",
+          "7lou_ifm",
+          "7m31_tdr",
+          "7mmh_zjy",
+          "7msr_dca",
+          "7my1_ipe",
+          "7n7b_t3f",
+          "7n7h_ctp",
+          "7nf0_byn",
+          "7nf3_4lu",
+          "7nfb_gen",
+          "7nsw_hc4",
+          "7nut_glp",
+          "7o0n_cdp",
+          "7o1t_5x8",
+          "7ody_dgi",
+          "7oli_8hg",
+          "7omx_cna",
+          "7p2i_mfu",
+          "7p4c_5ov",
+          "7p5t_5yg",
+          "7pgx_fmn",
+          "7pk0_byc",
+          "7pl1_sfg",
+          "7pt3_3kk",
+          "7qe4_nga",
+          "7qf4_rbf",
+          "7qta_uri",
+          "7r3d_apr",
+          "7rc3_sah",
+          "7rws_4ur",
+          "7rzl_npo",
+          "7scw_gsp",
+          "7sdd_4ip",
+          "7suc_com",
+          "7t0d_fpp",
+          "7t3e_slb",
+          "7tb0_ud1",
+          "7tbu_s3p",
+          "7te8_p0t",
+          "7th4_ffo",
+          "7thi_pga",
+          "7tm6_gpj",
+          "7tom_5ad",
+          "7tsf_h4b",
+          "7txk_lw8",
+          "7u0u_fk5",
+          "7uaw_mf6",
+          "7uj4_oq4",
+          "7uj5_dgl",
+          "7umw_nad",
+          "7utw_nai",
+          "7uxs_ojc",
+          "7uy4_smi",
+          "7v3n_akg",
+          "7vb8_stl",
+          "7vkz_noj",
+          "7vq9_isy",
+          "7vyj_ca0",
+          "7w05_gmp",
+          "7w06_itn",
+          "7wcf_acp",
+          "7wdt_ngs",
+          "7wjb_bgc",
+          "7x9k_8og",
+          "7xbv_apc",
+          "7xg5_plp",
+          "7xjn_nsd",
+          "7xpo_upg",
+          "7xqz_fpf",
+          "7xrl_fwk",
+          "7z1q_nio",
+          "7zdy_6mj",
+          "7zu2_dht",
+          "7zxv_45d",
+          "8a1h_dlz",
+          "8ap0_prp",
+          "8aql_plg",
+          "8auh_l9i",
+          "8c3n_adp",
+          "8c5m_mta",
+          "8csd_c5p",
+          "8d19_gsh",
+          "8dko_tfb",
+          "8dp2_uma",
+          "8dsc_nca",
+          "8g6p_api",
+          "8slg_g5a"
+        ],
+        "benchmark_ids_with_split_ligand_identity_overlap_count": 123,
+        "matching_train_rows": 3344,
+        "matching_val_rows": 3
+      }
+    },
+    "pool_parquet": {
+      "path": "data/plinder_pool.parquet",
+      "sha256": "0ff455da77ce5540b839918cccb96f45414e91efff6272d7da3a65337ab1fe91"
+    },
+    "split": {
+      "path": "data/splits/plinder.json",
+      "sha256": "3ac570bf08bced053f1ce040b57efca27c3be616f29a82cd66ef887c08860e6b"
+    }
+  },
+  "datasets": {
+    "astex": {
+      "count": 85,
+      "ids_sha256": "79a5056ccb451a3c94cc29d07806e97d1c1231ba394955e1be6eedfab606bad4",
+      "integrity_boundary": {
+        "benchmark_ids_with_exact_entry_and_ligand_overlap": [
+          "1meh"
+        ],
+        "benchmark_ids_with_exact_entry_and_ligand_overlap_count": 1,
+        "benchmark_ids_with_split_ligand_identity_overlap": [
+          "1gm8",
+          "1gpk",
+          "1hp0",
+          "1hq2",
+          "1hww",
+          "1ig3",
+          "1jd0",
+          "1jla",
+          "1lrh",
+          "1m2z",
+          "1meh",
+          "1n2j",
+          "1of6",
+          "1p2y",
+          "1p62",
+          "1r55",
+          "1r9o",
+          "1sg0",
+          "1sq5",
+          "1t40",
+          "1uou",
+          "1w2g",
+          "1x8x",
+          "1z95"
+        ],
+        "benchmark_ids_with_split_ligand_identity_overlap_count": 24,
+        "matching_train_rows": 87,
+        "matching_val_rows": 0
+      },
+      "ligands": {
+        "1g9v": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc(C)cc(NC(=O)Cc2ccc(OC(C)(C)C(=O)O)cc2)c1",
+            "raw_smiles_sha256": "54935d63acbea7fe0515b0e834786b403f125c443af27f1781c69ac5f8273583",
+            "sha256": "e889c9ea7680715d3722326556769b16277fa6100f891ba73fed4d72a8f19b2b"
+          },
+          "smiles": "Cc1cc(cc(c1)NC(=O)Cc2ccc(cc2)OC(C)(C)C(=O)O)C"
+        },
+        "1gkc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNC(=O)[C@@H](NC(=O)[C@H](CC(C)C)CN(O)C=O)C(C)(C)C",
+            "raw_smiles_sha256": "1e9b97b083ffcdfe8f521bc22e8950117ab2cc58b41643e7fc474deae6884f6c",
+            "sha256": "0a0875186c5d2d177e29c05b982c508eb07b7dc06a4fde50e9bcaf1664343019"
+          },
+          "smiles": "CC(C)C[C@H](CN(C=O)O)C(=O)N[C@H](C(=O)NC)C(C)(C)C"
+        },
+        "1gm8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC1(C)[C@H](C(=O)O)N2C(=O)[C@@H](NC(=O)Cc3ccccc3)[C@H]2[S@H]1O",
+            "raw_smiles_sha256": "eba87064ce82182375dbd2708b5d1c4a980c660e043c552c583423d24ba9bc8e",
+            "sha256": "dee68ebdf72ded86583598014cdcc04a313ba2ca62094e3caf5aed190c079c48"
+          },
+          "smiles": "CC1([C@@H](N2[C@H]([S@H]1O)[C@@H](C2=O)NC(=O)Cc3ccccc3)C(=O)O)C"
+        },
+        "1gpk": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C/C=C1\\[C@H]2C=C(C)C[C@]1(N)c1ccc(=O)[nH]c1C2",
+            "raw_smiles_sha256": "ca9364854ab191438571c3090a850bc3fb491b03d3fb9cdbc92c6bfd6914c0d4",
+            "sha256": "447329414a46e0ee7d22709bac972c87a18483680d7169eb8e6e65417f6b4a5e"
+          },
+          "smiles": "C/C=C/1\\[C@@H]2CC3=C([C@]1(CC(=C2)C)N)C=CC(=O)N3"
+        },
+        "1hnn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NS(=O)(=O)c1ccc2c(c1)CNCC2",
+            "raw_smiles_sha256": "d88149044387470f067c61814a33b83e1d7152da782c0bb6a3f5fa0f64df4f59",
+            "sha256": "cb5caea049dfc7d952e39769b369fa33dc420dbaba20dab79b67c0b93a6a00fc"
+          },
+          "smiles": "c1cc2c(cc1S(=O)(=O)N)CNCC2"
+        },
+        "1hp0": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nccc2c1ncn2[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "5b30bc5cf91ba19fdb2a07ad982a4e45f00b0cb9eb2096ce0ffb9b10ef805117",
+            "sha256": "831ad8a510de0aaea9f8e3cc5fabfd45b50cf0d216dca90a393240b2c1b1901a"
+          },
+          "smiles": "c1cnc(c2c1n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO)O)O)N"
+        },
+        "1hq2": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(c(=O)[nH]1)N=C(CO)CN2",
+            "raw_smiles_sha256": "76dd2945123b9693abc73b9635a63e1ada96eb50da8204abf55787c96dfacc0c",
+            "sha256": "4256d9d99d74ac05594c376c09680c249311f7b41632ec5573b990acdb83c8f2"
+          },
+          "smiles": "C1C(=NC2=C(N1)N=C(NC2=O)N)CO"
+        },
+        "1hvy": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1nc(=O)c2cc(CN(C)c3ccc(C(=O)N[C@@H](CCC(=O)O)C(=O)O)s3)ccc2[nH]1",
+            "raw_smiles_sha256": "a63781d195e763ea5b974afbe965dcd332251bd4a7bfcf17dc32ce1d3c8d0168",
+            "sha256": "fa50b4ad872e491ef0ed6dfd72638560243f753506fb01f27f202d08db97db3d"
+          },
+          "smiles": "CC1=NC(=O)c2cc(ccc2N1)CN(C)c3ccc(s3)C(=O)N[C@@H](CCC(=O)O)C(=O)O"
+        },
+        "1hwi": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)n1c(/C=C/[C@@H](O)C[C@@H](O)CC(=O)O)c(-c2ccc(F)cc2)c2ccccc21",
+            "raw_smiles_sha256": "92c7092eb2bc8cc6fd48b5970c0869a2d28d6fca93c88d66d725bcc711927493",
+            "sha256": "c45eea80663e800ef033cf9d6ab681711f09cb8a90bd9627eb532e0000deace4"
+          },
+          "smiles": "CC(C)n1c2ccccc2c(c1/C=C/[C@H](C[C@H](CC(=O)O)O)O)c3ccc(cc3)F"
+        },
+        "1hww": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O[C@H]1[C@H]2[C@H](O)CCCN2C[C@H]1O",
+            "raw_smiles_sha256": "1008e2859aae9b94b983be19155213acce0e34a3bb6df1bb068f6b6963a93389",
+            "sha256": "2c733243787e61e012f2ee0883f739f5ea538916aaeaf975e196902ee36669b3"
+          },
+          "smiles": "C1C[C@H]([C@@H]2[C@@H]([C@@H](C[N@]2C1)O)O)O"
+        },
+        "1ia1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc(N)c2c(Sc3ccccc3)cccc2n1",
+            "raw_smiles_sha256": "7b3bc16438cb7e6bc2fedd0bff6389618be4113298179d233f770bea7dc81405",
+            "sha256": "3f24c8264820246ab29be60684cf1e798cb8df5894880597e4eebe02bd3b109c"
+          },
+          "smiles": "c1ccc(cc1)Sc2cccc3c2c(nc(n3)N)N"
+        },
+        "1ig3": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ncc(C[n+]2csc(CCO)c2C)c(N)n1",
+            "raw_smiles_sha256": "11f50b2db3b12fc637700bd3947a2ee68d38a9c754df9bd3e8b2584ca02fefea",
+            "sha256": "e0c59e8fb2d4d09358194bba7dd5b96a098a121922c846d65f4e85fe8cffd4d8"
+          },
+          "smiles": "Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO"
+        },
+        "1j3j": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCc1nc(N)nc(N)c1-c1ccc(Cl)cc1",
+            "raw_smiles_sha256": "681511e955ec34262c1e880381700bcc1f6282cd6af96527cc345e4cad5abcdc",
+            "sha256": "86b3d62568ddfe05a294f890c9561d092b29c4b080e5bbfb6bd391f56efc212d"
+          },
+          "smiles": "CCc1c(c(nc(n1)N)N)c2ccc(cc2)Cl"
+        },
+        "1jd0": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)Nc1nnc(S(N)(=O)=O)s1",
+            "raw_smiles_sha256": "5a243f2dea1fa6a4332c1fea5355cf7be23e1d5bcd2ff93f9131cbf55d992621",
+            "sha256": "82387c497977973dd9f76df74f31275a7d36c4e8c6137b5f756104b4bfa9a4dc"
+          },
+          "smiles": "CC(=O)Nc1nnc(s1)S(=O)(=O)N"
+        },
+        "1jje": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)[C@@H](Cc1ccccc1)[C@H](Cc1ccc2c(c1)OCO2)C(=O)O",
+            "raw_smiles_sha256": "c0214d9ac69b8610892ff8d304f180bbbe6a931b43b9347d2148c89b473163c8",
+            "sha256": "8021e8dcb9bf7c8ee18acc2bb71765ecccfdd554de84f89576d71c6ccab4670f"
+          },
+          "smiles": "c1ccc(cc1)C[C@@H]([C@H](Cc2ccc3c(c2)OCO3)C(=O)O)C(=O)O"
+        },
+        "1jla": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)c1c(Cc2ccccc2)n(COCc2ccccc2)c(=O)[nH]c1=O",
+            "raw_smiles_sha256": "37ce390c0f8e62aeddf01999a4112a62c350d6f9fb209b07902531d157005a0e",
+            "sha256": "32f070827fcff248ca2877310681654658e84ec3774ddf928aefe82dc530709a"
+          },
+          "smiles": "CC(C)C1=C(N(C(=O)NC1=O)COCc2ccccc2)Cc3ccccc3"
+        },
+        "1k3u": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)C[C@H](NC(=O)Cc1c[nH]c2ccccc12)C(=O)O",
+            "raw_smiles_sha256": "55d02808170550e75d8400e6f4e9f4d2774616bd285cd94cc5783373b6c7dd54",
+            "sha256": "ab91e521892918d37660ef1c2bc1584004cd55ef88da543d433dea574a93e1bd"
+          },
+          "smiles": "c1ccc2c(c1)c(c[nH]2)CC(=O)N[C@@H](CC(=O)O)C(=O)O"
+        },
+        "1ke5": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNS(=O)(=O)c1ccc(N/C=C2\\C(=O)Nc3ccccc32)cc1",
+            "raw_smiles_sha256": "214edf384019df4a128f5658b27baa3b893ea873ee8e993b3165a3ec28b32df3",
+            "sha256": "60513d577bca10c1132eb6e2fe7c0bbc8a7c0867cd2a2a9467b3de383df1e41d"
+          },
+          "smiles": "CNS(=O)(=O)c1ccc(cc1)N\\C=C/2\\c3ccccc3NC2=O"
+        },
+        "1kzk": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccccc1CNC(=O)[C@H]1N(C(=O)[C@@H](O)[C@H](Cc2ccccc2)NC(=O)c2cccc(O)c2C)CSC1(C)C",
+            "raw_smiles_sha256": "b36eadbffee05a438542c947cff5be6d120e10bbf0d508f4d7cb598a42580d3c",
+            "sha256": "0cfd4fe8a8dbedeebbeab075b6a7aab4590028acb5b0046a7cfc067f046eb3d3"
+          },
+          "smiles": "Cc1ccccc1CNC(=O)[C@@H]2C(SCN2C(=O)[C@H]([C@H](Cc3ccccc3)NC(=O)c4cccc(c4C)O)O)(C)C"
+        },
+        "1l2s": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1sccc1S(=O)(=O)Nc1ccc(Cl)cc1",
+            "raw_smiles_sha256": "f18d8fd4bd02cc1932f2b7a987ee01eba1206014b7fe955d9101031155820cf9",
+            "sha256": "de40a91d13ea3bf266cf394fb4ee5caa97005e65cbcd64266d8bd70620527df9"
+          },
+          "smiles": "c1cc(ccc1NS(=O)(=O)c2ccsc2C(=O)O)Cl"
+        },
+        "1l7f": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCC(CC)[C@H](NC(C)=O)[C@@H]1[C@H](O)[C@@H](C(=O)O)C[C@H]1NC(=N)N",
+            "raw_smiles_sha256": "10c1172e6dfbc49a50198f2905e2fba94d9e6ae6cb178fbb9f9515e005010638",
+            "sha256": "f0355266e840d4c7e2111f816927fb1ae58829947975717095b518330670f003"
+          },
+          "smiles": "CCC(CC)[C@@H]([C@H]1[C@@H](C[C@@H]([C@H]1O)C(=O)O)NC(=N)N)NC(=O)C"
+        },
+        "1lpz": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cccc2c1cc(C(=O)NCc1cc(Cl)cc(Cl)c1)n2Cc1cccc(C(=N)N)c1",
+            "raw_smiles_sha256": "60ebb952a791afb994351cb9860ec69f7e4b3c80d37ac43901ad0b4f9deea7b6",
+            "sha256": "19a76a988223b92b618d2fba97d041ac6e8e5c8d7c63d9f2745cc91d64eb3eb8"
+          },
+          "smiles": "Cc1cccc2c1cc(n2Cc3cccc(c3)C(=N)N)C(=O)NCc4cc(cc(c4)Cl)Cl"
+        },
+        "1lrh": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)Cc1cccc2ccccc12",
+            "raw_smiles_sha256": "cb4835403bc9ff2459f6d1566dcb14d8eab58b70cee0b03ffea3daf4c2ede8ae",
+            "sha256": "04afe9d44d4a278b433ce332720175bb248dae7c151d21e34768fb3f1ac29b39"
+          },
+          "smiles": "c1ccc2c(c1)cccc2CC(=O)O"
+        },
+        "1m2z": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@@H]1C[C@H]2[C@@H]3CCC4=CC(=O)C=C[C@]4(C)[C@@]3(F)[C@@H](O)C[C@]2(C)[C@@]1(O)C(=O)CO",
+            "raw_smiles_sha256": "4d24e2ea39dbf4c4c97227e5b76ce8b0989dc3c9d0fcc8d1bbb558ee11f6a6fc",
+            "sha256": "76060437b16333327ad988ed4c85f56f8c950b11262bd0937773a406ab39ec71"
+          },
+          "smiles": "C[C@@H]1C[C@H]2[C@@H]3CCC4=CC(=O)C=C[C@@]4([C@]3([C@H](C[C@@]2([C@]1(C(=O)CO)O)C)O)F)C"
+        },
+        "1meh": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1c(C)c2c(c(O)c1C/C=C(\\C)CCC(=O)O)C(=O)OC2",
+            "raw_smiles_sha256": "84cf9adee0da2f23cf77dbc66cf38133b6f0997950feeb6901724a4972ef5fc4",
+            "sha256": "4512c59757fc4359d6269168f728e8ec351c80b8e6fdb0367eecd052fe3ec437"
+          },
+          "smiles": "COc1c(C)c2c(c(O)c1C/C=C(\\C)CCC(=O)O)C(=O)OC2"
+        },
+        "1mmv": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCNC(=[NH2+])NCCC[C@H](N)C(=O)O",
+            "raw_smiles_sha256": "9c645a7f20c6b3597a47fbff7d5d33589fd3e4cdcd488b55958a0821d5ee4613",
+            "sha256": "84d51ff262bdd849767c558be9059da06abe6e18e88dd493e52a94d7ad841d21"
+          },
+          "smiles": "CCCNC(=[NH2+])NCCC[C@@H](C(=O)O)N"
+        },
+        "1mzc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC[C@@]1(c2cccc(Oc3cc([C@](C)(N)c4cncn4C)ccc3C#N)c2)CCCCN(C)C1=O",
+            "raw_smiles_sha256": "fe802423229f51540698553dc0fb3b25489cc36bb37aca53aaf9aec9e82cdb22",
+            "sha256": "b7f8851a0ab6fcf5ed3c6bce7b7168ec4e8debc51a6910891a9f6d5fbfed4b72"
+          },
+          "smiles": "CC[C@]1(CCCCN(C1=O)C)c2cccc(c2)Oc3cc(ccc3C#N)[C@@](C)(c4cncn4C)N"
+        },
+        "1n1m": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)[C@H](N)C(=O)N1CCCC1",
+            "raw_smiles_sha256": "a3ec87b0d63c4739925513690da9d48b9d28ceebe02ced17184568971cf6acc2",
+            "sha256": "9fea0456a35d1e636e2b55abd18205e0fe718baa382ec044e36204dcb4638ec9"
+          },
+          "smiles": "CC(C)[C@@H](C(=O)N1CCCC1)N"
+        },
+        "1n2j": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)(CO)[C@@H](O)C(=O)[O-]",
+            "raw_smiles_sha256": "4336364736c513c52dc419b7749a5acaedf816f880fb83955be9c5aad1baa4ce",
+            "sha256": "e0b3156069c99f10ff7fc04ba236907e4aadf17a1a8bad920cd530158c14e191"
+          },
+          "smiles": "CC(C)(CO)[C@H](C(=O)[O-])O"
+        },
+        "1n2v": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCc1nc2c(=O)[nH][nH]c(=O)c2[nH]1",
+            "raw_smiles_sha256": "2715af4cae431eb76a2d2c0b6f0de87620a6634fd9525ff16a0a3b8a55be4e1b",
+            "sha256": "4580927a757634878bc132287e17d7d051817629853a6d418621f7836283874d"
+          },
+          "smiles": "CCCCc1[nH]c2c(n1)C(=O)NNC2=O"
+        },
+        "1n46": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc(-n2ncc(=O)[nH]c2=O)cc(C)c1Oc1ccc(O)c(C(C)C)c1",
+            "raw_smiles_sha256": "b9f282d44682dea918f7a24097c9a8cb8f423ecd96b349a73d78ba3c5efbe7de",
+            "sha256": "45697ebd7199329073286c9cdbd397533076e7c9e15813be521eef8eac373fe0"
+          },
+          "smiles": "Cc1cc(cc(c1Oc2ccc(c(c2)C(C)C)O)C)N3C(=O)NC(=O)C=N3"
+        },
+        "1nav": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)c1cc(Oc2c(Cl)cc(CC(=O)O)cc2Cl)ccc1O",
+            "raw_smiles_sha256": "dd02e48565d9d89eca43d959875539c432c7a4a9562924f7ebeea4c4288e4237",
+            "sha256": "a875c2344cc6f12cbc56bf83f3d2d33d743211722fbaf6fbb4c8b98a53748f25"
+          },
+          "smiles": "CC(C)c1cc(ccc1O)Oc2c(cc(cc2Cl)CC(=O)O)Cl"
+        },
+        "1of1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cn([C@@]23C[C@H](O)[C@@H](CO)[C@@H]2C3)c(=O)[nH]c1=O",
+            "raw_smiles_sha256": "98b4c9716cafd4c44b531fd0b40831f97077c927858d0706aadea8ea74537c61",
+            "sha256": "5a0310de676262861953aa925e3ecd402fef246f19ed6f180925a2403dd5856b"
+          },
+          "smiles": "CC1=CN(C(=O)NC1=O)[C@]23C[C@H]2[C@@H]([C@H](C3)O)CO"
+        },
+        "1of6": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@H](Cc1ccc(O)cc1)C(=O)O",
+            "raw_smiles_sha256": "333facdceaad724d62b2d3425c05d43968fae4dd9144ce1f661eee36752d86b0",
+            "sha256": "cf91ec1d17f6ae8100fad7139bce2f20f382014a792f6f6b142b4fdf25cf0797"
+          },
+          "smiles": "c1cc(ccc1C[C@H](C(=O)O)N)O"
+        },
+        "1opk": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cn1c(=O)c(-c2c(Cl)cccc2Cl)cc2cnc(Nc3cccc(CO)c3)nc21",
+            "raw_smiles_sha256": "21dc9b582ae95e58b312bd1f0a5a493f8d1058fd6a811240941f1c93b0e13dba",
+            "sha256": "2e422eeb4865f40b3514ec7e329f8c1f5a2cc06ce1269e0dfc6712761fcc75a3"
+          },
+          "smiles": "CN1c2c(cnc(n2)Nc3cccc(c3)CO)C=C(C1=O)c4c(cccc4Cl)Cl"
+        },
+        "1oq5": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc(-c2cc(C(F)(F)F)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+            "raw_smiles_sha256": "32c0065d6d360e92b423fa22406b1abe4f939d4207051b4c602bfab5a3580ba7",
+            "sha256": "4abd31ae613ffc0dc1fba5d672d8eb74bb1e08ff662b707f277deb917d5a7d0f"
+          },
+          "smiles": "Cc1ccc(cc1)c2cc(nn2c3ccc(cc3)S(=O)(=O)N)C(F)(F)F"
+        },
+        "1owe": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N=C(N)c1ccc2cc(C(=O)Nc3ccccc3)ccc2c1",
+            "raw_smiles_sha256": "97162a73f983fd127d9bf907698032683e089061de70507971df109097744bbb",
+            "sha256": "c15e1eb68f1cce780406ea3832611466d2f2b596343f09caecc14ee1cdcc82c3"
+          },
+          "smiles": "[H]/N=C(/c1ccc2cc(ccc2c1)C(=O)Nc3ccccc3)\\N"
+        },
+        "1oyt": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=[NH2+])c1ccc([C@H]2[C@H]3C(=O)N(Cc4ccc(F)cc4)C(=O)[C@H]3[C@@H]3CCCN32)cc1",
+            "raw_smiles_sha256": "d37c8c7593d2d24ed468c72495ef241e44a78ec7ae204dd23e3438e4b24cb266",
+            "sha256": "b8fb458342be83a3bbb78b79b71def1fec009e853dc260dd169aa5ca815c3807"
+          },
+          "smiles": "c1cc(ccc1CN2C(=O)[C@H]3[C@@H]4CCC[N@@]4[C@H]([C@H]3C2=O)c5ccc(cc5)C(=[NH2+])N)F"
+        },
+        "1p2y": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN1CCC[C@H]1c1cccnc1",
+            "raw_smiles_sha256": "7a8c8bf7d8375be0c846929b7d977e2f391ee21ffe7a35d38b332397a98e6b87",
+            "sha256": "d950b5a09078ee0ffb3ddfe57235bc6c46a0266c7ade41a94527f627c02c5659"
+          },
+          "smiles": "C[N@@]1CCC[C@H]1c2cccnc2"
+        },
+        "1p62": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ccn([C@@H]2O[C@H](CO)[C@@H](O)C2(F)F)c(=O)n1",
+            "raw_smiles_sha256": "c9fd1a88c7c69a19a8b189c0f9a497ee02f6fe2a700d675f963e2665dbf433f6",
+            "sha256": "9ac6010bc169a8147c0d734d0cf077be25159c83e4f86ce75ed090c2cfb6ccdc"
+          },
+          "smiles": "C1=CN(C(=O)N=C1N)[C@H]2C([C@@H]([C@H](O2)CO)O)(F)F"
+        },
+        "1pmn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCn1c(C2CCN(C)CC2)nc(-c2ccc(Cl)c(Cl)c2)c1-c1ccnc(NC2CC2)n1",
+            "raw_smiles_sha256": "322f7df9fbef73d4f74a8bcd6e2a02b4710864885ffa7c63587693fee6840da4",
+            "sha256": "0e0f8fb811136de3fb77981857b8e65b51f2fe277825e3daea46c526b143b918"
+          },
+          "smiles": "CCCn1c(c(nc1C2CCN(CC2)C)c3ccc(c(c3)Cl)Cl)c4ccnc(n4)NC5CC5"
+        },
+        "1q1g": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CSC[C@H]1[NH2+][C@@H](c2c[nH]c3c(=O)[nH]cnc23)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "dfe50ede293d2a59e56b463539a3392c3e6d1e7633e9626ddb50da63737e2abf",
+            "sha256": "bf86ae00ff72e034cfdd576b5c9ae9cc2c0d3659981f9b8dc289a2c7e6da0560"
+          },
+          "smiles": "CSC[C@@H]1[C@H]([C@H]([C@@H]([NH2+]1)c2c[nH]c3c2N=CNC3=O)O)O"
+        },
+        "1q41": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C1Nc2ccccc2/C1=C1Nc2ccccc2C/1=N\\O",
+            "raw_smiles_sha256": "f8375ac3d8927abaaadcd3cedf4b17a2ba4f354bd3ff53fc439c0e144c202551",
+            "sha256": "45a1b0217636af1470d6eba57460d63e17d0044dfd547d472841b856d6db01e3"
+          },
+          "smiles": "c1ccc2c(c1)/C(=C/3\\C(=N\\O)\\c4ccccc4N3)/C(=O)N2"
+        },
+        "1q4g": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H](C(=O)O)c1ccc(-c2ccccc2)cc1",
+            "raw_smiles_sha256": "b975efdacc6e32c15bed4e58f4a2fa593a9146119fdc796952b19a898fde3753",
+            "sha256": "9d4828b0e2cc98c1088cfbe3b6dfd7fafa9fa2dcc42bc2fa7cd6ee71041b77bc"
+          },
+          "smiles": "C[C@@H](c1ccc(cc1)c2ccccc2)C(=O)O"
+        },
+        "1r1h": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H](NC(=O)[C@H](Cc1ccc(-c2ccccc2)cc1)C[P@](=O)(O)[C@H](C)N)C(=O)O",
+            "raw_smiles_sha256": "7b81da95d82574ddb91de0330aa0e58a8cbfe7c936b8657c6018e18a2e0e7bbc",
+            "sha256": "0b21f1f81c4581ee62beb625d0894b72608a4b636bda36df571b05396eb0a5df"
+          },
+          "smiles": "C[C@@H](C(=O)O)NC(=O)[C@H](Cc1ccc(cc1)c2ccccc2)C[P@@](=O)([C@H](C)N)O"
+        },
+        "1r55": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNC(=O)[C@@H](NC(=O)[C@H](CC(C)C)[C@H](O)C(=O)NO)C(C)(C)C",
+            "raw_smiles_sha256": "6b24bc8698eea3f5bb95df4aa64d79d3aa7fda0c6225c5881ad9ec2db412d2fb",
+            "sha256": "8762950cb807129b91c4df4a1eda22fd379734169709a74a4ec1fd37b8dfc882"
+          },
+          "smiles": "CC(C)C[C@H]([C@@H](C(=O)NO)O)C(=O)N[C@H](C(=O)NC)C(C)(C)C"
+        },
+        "1r58": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)SCC[C@@H](N)[C@H](O)C(=O)NNC(=O)c1cccc(Cl)c1",
+            "raw_smiles_sha256": "edd3f2437b98f689280762cc806686af7b9e3304a867dd508a93e1d78cc4e968",
+            "sha256": "e3f1b69e0725069c8a84d9d18e6b85b1df3b2d7e423e69e545a9aafd7ca3546f"
+          },
+          "smiles": "CC(C)SCC[C@H]([C@@H](C(=O)NNC(=O)c1cccc(c1)Cl)O)N"
+        },
+        "1r9o": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H](C(=O)O)c1ccc(-c2ccccc2)c(F)c1",
+            "raw_smiles_sha256": "961a553b807490648a42e6a156e89795817fda671259c7420c4c6301b666f9de",
+            "sha256": "d24de8a458656b768302014c471487f5ee0401b891bb8bfd2d5ed43371882ec3"
+          },
+          "smiles": "C[C@@H](c1ccc(c(c1)F)c2ccccc2)C(=O)O"
+        },
+        "1s19": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C1/C(=C\\C=C2/CCC[C@]3(C)[C@@H]([C@H](C)/C=C/[C@@H](O)C4CC4)CC[C@@H]23)C[C@@H](O)C[C@@H]1O",
+            "raw_smiles_sha256": "5666f582634f7e4e7d4278e066c0109d8017fa2fb610b34bbffeb51340dedc4a",
+            "sha256": "451dacd370e6bd35d1614588b0b941d588edc5431c243b4cb0bf8303cf63cc80"
+          },
+          "smiles": "C[C@H](\\C=C\\[C@H](C1CC1)O)[C@H]2CC[C@@H]\\3[C@@]2(CCC/C3=C\\C=C/4\\C[C@H](C[C@@H](C4=C)O)O)C"
+        },
+        "1s3v": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cc(N(C)CC2CCC3=C(C2)C(N)=N[C@H](N)N3)cc(OC)c1OC",
+            "raw_smiles_sha256": "a873e9aadffcecb6fba20cce730d609c67971a22bbb19d8cf8f0775f8f42172c",
+            "sha256": "6d8e94b430154f482bbee0bc2cb76db914139d7982c40af4bdba3a132a1ab7eb"
+          },
+          "smiles": "CN(CC1CCC2=C(C1)C(=N[C@@H](N2)N)N)c3cc(c(c(c3)OC)OC)OC"
+        },
+        "1sg0": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Oc1ccc(/C=C/c2cc(O)cc(O)c2)cc1",
+            "raw_smiles_sha256": "824ce764489d5e9b264b6ec42fc599a8bf8dab2fa0ce6325a6deb2acdad89e6a",
+            "sha256": "43d14ea4ff66fa4bfe5f32f5684d9df925b1d2dc5e0c7372549b27d35bf50493"
+          },
+          "smiles": "c1cc(ccc1\\C=C\\c2cc(cc(c2)O)O)O"
+        },
+        "1sj0": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Oc1ccc([C@H]2Sc3cc(O)ccc3O[C@H]2c2ccc(OCCN3CCCCC3)cc2)cc1",
+            "raw_smiles_sha256": "29c3e35ba669281c119c1ddece2b97507d1a648c532bede48740e1a1f4ab69a8",
+            "sha256": "908b54fcc5a935c41dffbca367d7cc21dbc06890afe147858e16b5fec0f10a35"
+          },
+          "smiles": "c1cc(ccc1[C@@H]2[C@@H](Oc3ccc(cc3S2)O)c4ccc(cc4)OCCN5CCCCC5)O"
+        },
+        "1sq5": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)(CO)[C@@H](O)C(=O)NCCC(=O)O",
+            "raw_smiles_sha256": "06ecae4ee9108ee234f89525991c5b8912fee545b3751ef670ebec4b3211f0ba",
+            "sha256": "342991b0540cae0f1d98521dbbc8ebc817a7e092e1ef8a253c1bc3acb71f60ff"
+          },
+          "smiles": "CC(C)(CO)[C@H](C(=O)NCCC(=O)O)O"
+        },
+        "1sqn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C#C[C@]1(O)CC[C@H]2[C@@H]3CCC4=CC(=O)CC[C@@H]4[C@H]3CC[C@@]21C",
+            "raw_smiles_sha256": "a2363cfa51c685ae5db5444e193e50666ef742b5ff851b83c26ded52e5b200ba",
+            "sha256": "18f4f710c51d3b0b035eedc1de7f26d4739b9d59a6bcf8c0a653b2e97d6b929f"
+          },
+          "smiles": "C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@]2(C#C)O)CCC4=CC(=O)CC[C@H]34"
+        },
+        "1t40": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)COc1cc(F)ccc1C(=O)NCc1nc2c(F)c(F)cc(F)c2s1",
+            "raw_smiles_sha256": "a018c54f800007f4fa62836b8f3f9eabd317e0687ea97c9158d20b078e65a9ea",
+            "sha256": "b26e3946d8edd658e30050c0457d137508d59792ff691ca68902570171433e15"
+          },
+          "smiles": "c1cc(c(cc1F)OCC(=O)O)C(=O)NCc2nc3c(c(cc(c3s2)F)F)F"
+        },
+        "1t46": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc1nccc(-c2cccnc2)n1",
+            "raw_smiles_sha256": "641bad35c482c510f6ecb3412c6136d70219d0d50cdff2a17192f31a1a41ec98",
+            "sha256": "31ee00c55fead63928a7e5c654818a00ae172e93365f7bcdfc7ca59d2a5ba23f"
+          },
+          "smiles": "Cc1ccc(cc1Nc2nccc(n2)c3cccnc3)NC(=O)c4ccc(cc4)CN5CCN(CC5)C"
+        },
+        "1t9b": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1nc(C)nc(NC(=O)NS(=O)(=O)c2ccccc2Cl)n1",
+            "raw_smiles_sha256": "da401b92bee29a3eb47ac34dc69aa6fa8dec6d57c919716ed4a4469d1bcbb92d",
+            "sha256": "be7a35f8eb7849f1cc7068d51edcc7c26665f22321ca440019043a61790a4dcc"
+          },
+          "smiles": "Cc1nc(nc(n1)OC)NC(=O)NS(=O)(=O)c2ccccc2Cl"
+        },
+        "1tow": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)CCCn1c2ccccc2c2ccccc21",
+            "raw_smiles_sha256": "2225f96a59df9353bd5691c9d73ce3688c4f31879a3d436cdbb7ac606c0efa03",
+            "sha256": "fac5f9d5362b688bafd47967edbe8bf168c4b98e5d7852a939813aa2b1fde363"
+          },
+          "smiles": "c1ccc2c(c1)c3ccccc3n2CCCC(=O)O"
+        },
+        "1tt1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C(C)[C@H]1CN[C@H](C(=O)O)[C@H]1CC(=O)O",
+            "raw_smiles_sha256": "b897943af4cff5293520c4fa0dacb1c0a80212066248ccd6b43a8974098aefcf",
+            "sha256": "4b525e50e2dd7d75a2fae7e7a53a4236361d9852faddad335f52aa84b45330d2"
+          },
+          "smiles": "CC(=C)[C@H]1CN[C@@H]([C@H]1CC(=O)O)C(=O)O"
+        },
+        "1tz8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC/C(=C(/CC)c1ccc(O)cc1)c1ccc(O)cc1",
+            "raw_smiles_sha256": "f40c4a5391258d03a218a893651a8fcba9212cad7b62c2ad0fefc20caef3cbde",
+            "sha256": "25c70da90d46799803e2b000d3f209f175bf425b6bbf1cbd9d250ab9f81929b8"
+          },
+          "smiles": "CC/C(=C(/CC)\\c1ccc(cc1)O)/c2ccc(cc2)O"
+        },
+        "1u1c": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=c1[nH]c(=O)n(COCCO)cc1Cc1ccccc1",
+            "raw_smiles_sha256": "8fcdb4985d5fad8088aa07f0ccb1d45f832e6c774c47c7428f36a6d7f32bb841",
+            "sha256": "2eeeb0627ede518f63a9506744858ab07cfa23b58d551afdadd5fcd51832a26e"
+          },
+          "smiles": "c1ccc(cc1)CC2=CN(C(=O)NC2=O)COCCO"
+        },
+        "1u4d": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC1=N/C(=C2/CCNC(=O)c3[nH]ccc32)C(=O)N1",
+            "raw_smiles_sha256": "4b7ce7d6ec9f853e689062cf41a23a2149a23a79e06d0b31d81c427f5d8daba6",
+            "sha256": "e784c921f13d1734a5d23c1d6fe786fa6455b7db31174c6062a5620aea13a393"
+          },
+          "smiles": "c1c[nH]c2c1/C(=C\\3/C(=O)NC(=N3)N)/CCNC2=O"
+        },
+        "1uml": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=O)c1cn([C@@H](CO)CCn2ccc3ccc(NC(=O)CCc4ccccc4)cc32)cn1",
+            "raw_smiles_sha256": "dd7c64337301f1e35d422703f2369e6e9a9e884c418eb30ebe9c3cf913bcf7c4",
+            "sha256": "c8810a2186a6389f6e404b06b3862927219bc9dc88caf45a7a84021c7be9515b"
+          },
+          "smiles": "c1ccc(cc1)CCC(=O)Nc2ccc3ccn(c3c2)CC[C@H](CO)n4cc(nc4)C(=O)N"
+        },
+        "1unl": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC[C@H](CO)Nc1nc(NCc2ccccc2)c2ncn(C(C)C)c2n1",
+            "raw_smiles_sha256": "f544d2c5c0dc7a5feb5102e04a3141cca02c395bc5a66574a92f2e16aadcd9f0",
+            "sha256": "d6d51233eeb7c3dafd8a1eb883ff6012fb672537ab927f242d53f119ba63efa4"
+          },
+          "smiles": "CC[C@H](CO)Nc1nc(c2c(n1)n(cn2)C(C)C)NCc3ccccc3"
+        },
+        "1uou": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N=C1CCCN1Cc1[nH]c(=O)[nH]c(=O)c1Cl",
+            "raw_smiles_sha256": "402b25b899eb7fa0bf71df3fecf56de0171d79ce696c8ec5ed15bb27e0d5f525",
+            "sha256": "b621d39a290cc2f3bbbcfcaf9e5a07eb94d5e4f6d63b4fda5d81bbb6b41d7187"
+          },
+          "smiles": "[H]/N=C\\1/CCCN1CC2=C(C(=O)NC(=O)N2)Cl"
+        },
+        "1v0p": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)[C@H](CO)Nc1nc(Nc2ccc(C(=O)O)c(Cl)c2)c2ncn(C(C)C)c2n1",
+            "raw_smiles_sha256": "ba1050b589c3d4bd3c8f1905e28943d13f4dabfcb53c470806b304e259e5ae43",
+            "sha256": "5a34657f15bd0ab9c3be691d63ee7cbfcee8958761f0361d563635351e8b7311"
+          },
+          "smiles": "CC(C)[C@H](CO)Nc1nc(c2c(n1)n(cn2)C(C)C)Nc3ccc(c(c3)Cl)C(=O)O"
+        },
+        "1v48": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(ncn2CCCCC(F)(F)P(=O)(O)O)c(=O)[nH]1",
+            "raw_smiles_sha256": "139682d302365e7c1634476a33119ae63a2b3b9682511f070bd9b0c0bc6511a1",
+            "sha256": "1e6c6f8d447023d37f2ab3e8f75fba7b4b848b792f849772d2c7b38ee6392863"
+          },
+          "smiles": "c1nc2c(n1CCCCC(F)(F)P(=O)(O)O)N=C(NC2=O)N"
+        },
+        "1v4s": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cn1ccnc1Sc1cc(C(=O)Nc2nccs2)c(N)cc1F",
+            "raw_smiles_sha256": "0cdaa9cd2be17232b6f486777142cbcd1aebe673ac597b5caac3c2cc21a16573",
+            "sha256": "d2ad7d734740a18f7e22f516d2080b2c251c039849ef8deb9591d9a91a210e1d"
+          },
+          "smiles": "Cn1ccnc1Sc2cc(c(cc2F)N)C(=O)Nc3nccs3"
+        },
+        "1vcj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCC(CC)Nc1cc(C(=O)O)ccc1N1C(=O)CC[C@@]1(CN)CO",
+            "raw_smiles_sha256": "b57b6b5ad940de5511db83865e44d5c652b03625ed8783e2a95075a13fceacce",
+            "sha256": "88a04e84e4e44bc75d66ddc9b954a212932d1b2d2286b83a46a50f5f4f8cba9d"
+          },
+          "smiles": "CCC(CC)Nc1cc(ccc1N2C(=O)CC[C@@]2(CN)CO)C(=O)O"
+        },
+        "1w1p": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C1NCC(=O)N2CCC[C@@H]12",
+            "raw_smiles_sha256": "8e8ef2f3dd63660b795d932e33eb93aa6f7dd6f323a8bda0876481e60f4f6a90",
+            "sha256": "e9e4ee055c4a4bef0e88e9d61eadd6cadd763a049f4415f8c4ed231bf550fdbe"
+          },
+          "smiles": "C1C[C@H]2C(=O)NCC(=O)N2C1"
+        },
+        "1w2g": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cn([C@H]2C[C@H](O)[C@@H](CO)O2)c(=O)[nH]c1=O",
+            "raw_smiles_sha256": "6a234e14c6c261575e384db5ca965bc540e579485c6dd323daa0f52f0fbfa86c",
+            "sha256": "f02542c1f9d58e983fd52324ae46c30e4cd7a67e3fae984607020d5d587a7bfa"
+          },
+          "smiles": "CC1=CN(C(=O)NC1=O)[C@H]2C[C@@H]([C@H](O2)CO)O"
+        },
+        "1x8x": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@@H](Cc1ccc(O)cc1)C(=O)O",
+            "raw_smiles_sha256": "2798b78cab3f6edb77029ec02dfd128d8b7ca6dc535abeaf081fec0cdf3f2f6b",
+            "sha256": "aac32dc33c3d00f1684dfe6f9d058eff05815ded8bc8321f724641c9744fad34"
+          },
+          "smiles": "c1cc(ccc1C[C@@H](C(=O)O)N)O"
+        },
+        "1xm6": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCOc1cc([C@]2(C)CNC(=O)O2)ccc1OC",
+            "raw_smiles_sha256": "a6ac620abb6101953620ef69ebbccde53522ecf2e010ca806700a50f4122342a",
+            "sha256": "82dd47ea8fa198501757ca66cd3455c14be167047dcc56f4c30a27cb0fea4256"
+          },
+          "smiles": "CCCOc1cc(ccc1OC)[C@@]2(CNC(=O)O2)C"
+        },
+        "1xoq": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(Nc1c(Cl)cncc1Cl)c1ccc(OC(F)F)c(OCC2CC2)c1",
+            "raw_smiles_sha256": "1beba0d99399bfab2a0680ca9813fd35688e5f010839fa20ab37d427bb665830",
+            "sha256": "bd08fda539bf998b48be2c4fb9e70b14b7365d38c5bfea5ad5248f1d5b99b282"
+          },
+          "smiles": "c1cc(c(cc1C(=O)Nc2c(cncc2Cl)Cl)OCC3CC3)OC(F)F"
+        },
+        "1xoz": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN1CC(=O)N2[C@H](c3ccc4c(c3)OCO4)c3[nH]c4ccccc4c3C[C@@H]2C1=O",
+            "raw_smiles_sha256": "fbcb9e0fd51be4bcfcc392a27668a414e33b0a37c7a85c0095349b053288fea0",
+            "sha256": "dfaae8b888b42a73b908015128595289c1468310e3213ddff0685b752087f53d"
+          },
+          "smiles": "CN1CC(=O)N2[C@@H](C1=O)Cc3c4ccccc4[nH]c3[C@H]2c5ccc6c(c5)OCO6"
+        },
+        "1y6b": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1ccc(S(=O)(=O)NCC2CC2)cc1Nc1ncc(-c2cccc(-c3cccnc3)c2)o1",
+            "raw_smiles_sha256": "6075fff1cedf6af06a3109790fb4d8f8709f2729ba9491dfca82cb82dd63750a",
+            "sha256": "a1985883346e9482f60e7b5048be3e0837dc5fc6f134604a6d8dfc5762983ef7"
+          },
+          "smiles": "COc1ccc(cc1Nc2ncc(o2)c3cccc(c3)c4cccnc4)S(=O)(=O)NCC5CC5"
+        },
+        "1ygc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCOc1cc(OCC)c(F)c([C@@H](Nc2ccc(C(=N)N)c(O)c2)C(=O)NS(=O)(=O)c2cccc(N)c2)c1",
+            "raw_smiles_sha256": "ffaca0f31d49e9407e4bb03f6897b5baf63316549b20ef39fbf6e40a340020d3",
+            "sha256": "4aa16b289dee6b82fe531fa9995bb45e06b44c801aa3ee1557b8d0f579062b01"
+          },
+          "smiles": "[H]/N=C(/c1ccc(cc1O)N[C@H](c2cc(cc(c2F)OCC)OCC)C(=O)NS(=O)(=O)c3cccc(c3)N)\\N"
+        },
+        "1yqy": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc(S(=O)(=O)N[C@@H](C(=O)NO)C2CCOCC2)ccc1F",
+            "raw_smiles_sha256": "2128ae19a1117dbb8691c9c362f4343961070ee524977ab6d30147e11fa9d054",
+            "sha256": "7692cfd82ef9d6693b80c035a4ce8e2842fe3a9cd5d57664eb97e58cb7ff0120"
+          },
+          "smiles": "Cc1cc(ccc1F)S(=O)(=O)N[C@H](C2CCOCC2)C(=O)NO"
+        },
+        "1yv3": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc2c(c1)C(=O)[C@]1(O)CCN(c3ccccc3)C1=N2",
+            "raw_smiles_sha256": "bceb7b68ae6bd63269dd637e35c87be1ebf098108cb41cacb0031f7a28fb2f9c",
+            "sha256": "8d6ac8ed074cd1fdc79bba998156ba002ddd9f4b96b346c98e0150af129617b4"
+          },
+          "smiles": "Cc1ccc2c(c1)C(=O)[C@@]3(CCN(C3=N2)c4ccccc4)O"
+        },
+        "1yvf": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)/C(=C/c1ccc(Oc2ccccc2Br)cc1)NC(=O)c1ccccc1",
+            "raw_smiles_sha256": "4789db41f32e26af18d628f7c84e5b7a2188dadc2c33e1b9e14f844e359867d8",
+            "sha256": "52c699a5de69e4b9c53d3ce6bc746cf329c1436602fac678b8fe8978a591e0ca"
+          },
+          "smiles": "c1ccc(cc1)C(=O)N/C(=C\\c2ccc(cc2)Oc3ccccc3Br)/C(=O)O"
+        },
+        "1ywr": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H](Nc1nccc(-c2c(-c3ccc(F)cc3)c(=O)n(C3CCNCC3)n2C)n1)c1ccccc1",
+            "raw_smiles_sha256": "ce44cbdb5f9279698e52079e4f7a6da16cdc08763e2af386e679783f3d6113b1",
+            "sha256": "4b7c12ac5ee8ff0fd35ba050419353286624c536939f8e3e741c5d47a9cd3022"
+          },
+          "smiles": "C[C@@H](c1ccccc1)Nc2nccc(n2)C3=C(C(=O)N(N3C)C4CCNCC4)c5ccc(cc5)F"
+        },
+        "1z95": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@](O)(CS(=O)(=O)c1ccc(F)cc1)C(=O)Nc1ccc(C#N)c(C(F)(F)F)c1",
+            "raw_smiles_sha256": "0f43e57c2eb9cb3d3878e93445b4a0049f649a5f09a162c5d0abbf719437fb64",
+            "sha256": "06a2e9c0295d51cf476907f49895ec44407ca722579c8c6bb3ecd4e6ddab869d"
+          },
+          "smiles": "C[C@](CS(=O)(=O)c1ccc(cc1)F)(C(=O)Nc2ccc(c(c2)C(F)(F)F)C#N)O"
+        },
+        "2bm2": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NCc1cccc(C2CCN(C(=O)c3cncc(CCc4ccccc4)c3)CC2)c1",
+            "raw_smiles_sha256": "bcdeb4b5d0ef51a9ca6ec65f9e2a37e023b479a7ea88d92c754635002a0bbcde",
+            "sha256": "2870901ddd0b69cab30b20f290720fb8d4824ac50019271a05b14d328693af3c"
+          },
+          "smiles": "c1ccc(cc1)CCc2cc(cnc2)C(=O)N3CCC(CC3)c4cccc(c4)CN"
+        },
+        "2br1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1ccc(-c2oc3ncnc(NCCO)c3c2-c2ccc(OC)cc2)cc1",
+            "raw_smiles_sha256": "5ce12d756ee2e7de26c399e2f9126714798633f0999cdbfbd32f91cd0c382314",
+            "sha256": "5f066ae746cd730e1692f30c517fd61ca7227d006978635a71f6ae38198fd53c"
+          },
+          "smiles": "COc1ccc(cc1)c2c3c(ncnc3oc2c4ccc(cc4)OC)NCCO"
+        },
+        "2bsm": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCNC(=O)c1n[nH]c(-c2cc(Cl)c(O)cc2O)c1-c1ccc(OC)cc1",
+            "raw_smiles_sha256": "89152119c3df648216d159e10cc024a74916f56aaaf1faf9a22a4ce3c0f0c69e",
+            "sha256": "336cf6d75bcd70a1f78abd8d19c6e3dcf7ce86ceec73c3fde057cf726e55cf75"
+          },
+          "smiles": "CCNC(=O)c1c(c([nH]n1)c2cc(c(cc2O)O)Cl)c3ccc(cc3)OC"
+        }
+      },
+      "mapping_sha256": "4f9b8c5f2753949bd14ba9c45f920cab0ebd63f2a0110126ca429645070200ca",
+      "source_manifests": {
+        "mapping": {
+          "path": "data/external_test/astex_smiles.json",
+          "sha256": "ec53476f64fda163058541ede965278a36a18f47d2fb943d6cc1d0bf64953e67"
+        }
+      }
+    },
+    "posebusters": {
+      "count": 308,
+      "ids_sha256": "ecbeb7b6a01c1a4eddf44e5b4e19cf9222042ebc100f563bf50ccabde33715af",
+      "integrity_boundary": {
+        "benchmark_ids_with_exact_entry_and_ligand_overlap": [],
+        "benchmark_ids_with_exact_entry_and_ligand_overlap_count": 0,
+        "benchmark_ids_with_split_ligand_identity_overlap": [
+          "6m73_fnr",
+          "6vta_akn",
+          "6xct_478",
+          "6xg5_top",
+          "6xht_v2v",
+          "6xm9_v55",
+          "6yja_2ba",
+          "6zae_acv",
+          "6zk5_imh",
+          "6zpb_3d1",
+          "7a9h_tpp",
+          "7an5_rdh",
+          "7b2c_tp7",
+          "7b94_anp",
+          "7bcp_gco",
+          "7c0u_fgo",
+          "7c3u_azg",
+          "7cl8_tes",
+          "7cns_pmv",
+          "7ctm_bdp",
+          "7d6o_mte",
+          "7dkt_glf",
+          "7dql_4cl",
+          "7ed2_a3p",
+          "7elt_tym",
+          "7epv_fda",
+          "7es1_udp",
+          "7f8t_fad",
+          "7fha_adx",
+          "7jg0_gar",
+          "7jmv_4nc",
+          "7kc5_bjz",
+          "7kqu_yof",
+          "7kru_atp",
+          "7lev_0jo",
+          "7ljn_gtp",
+          "7lou_ifm",
+          "7m31_tdr",
+          "7mmh_zjy",
+          "7msr_dca",
+          "7my1_ipe",
+          "7n7b_t3f",
+          "7n7h_ctp",
+          "7nf0_byn",
+          "7nf3_4lu",
+          "7nfb_gen",
+          "7nsw_hc4",
+          "7nut_glp",
+          "7o0n_cdp",
+          "7o1t_5x8",
+          "7ody_dgi",
+          "7oli_8hg",
+          "7omx_cna",
+          "7p2i_mfu",
+          "7p4c_5ov",
+          "7p5t_5yg",
+          "7pgx_fmn",
+          "7pk0_byc",
+          "7pl1_sfg",
+          "7pt3_3kk",
+          "7qe4_nga",
+          "7qf4_rbf",
+          "7qta_uri",
+          "7r3d_apr",
+          "7rc3_sah",
+          "7rws_4ur",
+          "7rzl_npo",
+          "7scw_gsp",
+          "7sdd_4ip",
+          "7suc_com",
+          "7t0d_fpp",
+          "7t3e_slb",
+          "7tb0_ud1",
+          "7tbu_s3p",
+          "7te8_p0t",
+          "7th4_ffo",
+          "7thi_pga",
+          "7tm6_gpj",
+          "7tom_5ad",
+          "7tsf_h4b",
+          "7txk_lw8",
+          "7u0u_fk5",
+          "7uaw_mf6",
+          "7uj4_oq4",
+          "7uj5_dgl",
+          "7umw_nad",
+          "7utw_nai",
+          "7uxs_ojc",
+          "7uy4_smi",
+          "7v3n_akg",
+          "7vb8_stl",
+          "7vkz_noj",
+          "7vq9_isy",
+          "7vyj_ca0",
+          "7w05_gmp",
+          "7w06_itn",
+          "7wcf_acp",
+          "7wdt_ngs",
+          "7wjb_bgc",
+          "7x9k_8og",
+          "7xbv_apc",
+          "7xg5_plp",
+          "7xjn_nsd",
+          "7xpo_upg",
+          "7xqz_fpf",
+          "7xrl_fwk",
+          "7z1q_nio",
+          "7zdy_6mj",
+          "7zu2_dht",
+          "7zxv_45d",
+          "8a1h_dlz",
+          "8ap0_prp",
+          "8aql_plg",
+          "8auh_l9i",
+          "8c3n_adp",
+          "8c5m_mta",
+          "8csd_c5p",
+          "8d19_gsh",
+          "8dko_tfb",
+          "8dp2_uma",
+          "8dsc_nca",
+          "8g6p_api",
+          "8slg_g5a"
+        ],
+        "benchmark_ids_with_split_ligand_identity_overlap_count": 123,
+        "matching_train_rows": 3344,
+        "matching_val_rows": 3
+      },
+      "ligands": {
+        "5sak_zry": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC1=N/C(=N\\Nc2ccccc2)c2ccccc21",
+            "raw_smiles_sha256": "c54544322856e07ed400fe599529f731dd0ec1fa3499a954e5c5f4e6a92111e5",
+            "sha256": "59eacd995c8b6c91e14f9017cf1210737233b76427a99b60874e6e839c5e7748"
+          },
+          "smiles": "c1ccc(cc1)N/N=C\\2/c3ccccc3C(=N2)N"
+        },
+        "5sb2_1k2": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(N[C@@H]1C[C@H]1c1ccccc1)c1cc(Cl)cc(COc2cnc3[nH]ccc3c2)c1",
+            "raw_smiles_sha256": "e5ac65bcc03db591a18a686196296d645cfdf2895b3c606de12b4f3440bed368",
+            "sha256": "6530daefc799727fa711034bb29ad3d8fafac2bd5aab1c33127c1285099cf7d3"
+          },
+          "smiles": "c1ccc(cc1)[C@@H]2C[C@H]2NC(=O)c3cc(cc(c3)Cl)COc4cc5cc[nH]c5nc4"
+        },
+        "5sd5_hwi": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCc1nc(N)nc(N)c1OCCCOc1cc(C)ccc1N1CC(C(=O)O)C1",
+            "raw_smiles_sha256": "6b74a64387bc72dbdf38194a59dc3ca18608d495cdf627386c25dbcde37fd6bc",
+            "sha256": "a9c120469942d351019049a6b75a796e4ff6717af034ffecfc6ea2e0db0aa0d2"
+          },
+          "smiles": "CCc1c(c(nc(n1)N)N)OCCCOc2cc(ccc2N3CC(C3)C(=O)O)C"
+        },
+        "5sis_jsm": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNCCN(C)C(=O)c1cnn(C)c1C(=O)Nc1ccn2cc(-c3ccccc3)nc2c1",
+            "raw_smiles_sha256": "915ce38892f041b4d89d983a47ed1178b625662118c85de40013875b322697fd",
+            "sha256": "5a0ea64b2b46ccfddeac6aac4ecdd26121eb9d551757a7b47bba22592d29814d"
+          },
+          "smiles": "CNCCN(C)C(=O)c1cnn(c1C(=O)Nc2ccn3cc(nc3c2)c4ccccc4)C"
+        },
+        "6m2b_ezo": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN(/N=C/c1ccccc1C(=O)O)c1nc(-c2ccccc2Cl)cs1",
+            "raw_smiles_sha256": "cae8a704e8fd644a42296a719d81365cc058312b43d17bc4fc820d2dbb6f1190",
+            "sha256": "bf673ff934fcd21c3bcd89ebd7c055302e166c8816e1a0f4fc0369025bb69895"
+          },
+          "smiles": "CN(c1nc(cs1)c2ccccc2Cl)/N=C/c3ccccc3C(=O)O"
+        },
+        "6m73_fnr": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc2c(cc1C)N(C[C@H](O)[C@H](O)[C@H](O)COP(=O)(O)O)c1[nH]c(=O)[nH]c(=O)c1N2",
+            "raw_smiles_sha256": "892ec29620528769e8180b9b9223618a4fd1fc107fc8e07a527d5ff39cf0ac06",
+            "sha256": "7673cec3b575db75388ff7c9515c6df5bc704a6cf286ddd8c62acc81d33e5bf2"
+          },
+          "smiles": "Cc1cc2c(cc1C)N(C3=C(N2)C(=O)NC(=O)N3)C[C@@H]([C@@H]([C@@H](COP(=O)(O)O)O)O)O"
+        },
+        "6t88_mwq": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)CCc1cnc[nH]1",
+            "raw_smiles_sha256": "089d9c4e50d1c8bee8d6a34b94fc42327b5bc2cdadad88ffd601f7acb29115b6",
+            "sha256": "07f2af477bacf42c00ddaac62c3d22b4df8ce60e8a6fe003d81347e0caa5a9d7"
+          },
+          "smiles": "c1c([nH]cn1)CCC(=O)O"
+        },
+        "6tw5_9m2": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1nn(C)c(C)c1CCOc1cc(F)ccc1-c1ccc2n[nH]c(CN(C)C)c2c1",
+            "raw_smiles_sha256": "89ee5c1ca0b8499242b5c02d457336df5946c655426dbbc1077ca66cdedef56d",
+            "sha256": "73a996fc55509b11bef58dde00b930da3b5f3ad2070150684dceb4055e3b2511"
+          },
+          "smiles": "Cc1c(c(n(n1)C)C)CCOc2cc(ccc2c3ccc4c(c3)c([nH]n4)CN(C)C)F"
+        },
+        "6tw7_nzb": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN(C)Cc1[nH]nc2ccc(-c3ccc(F)cc3OCCc3cccnc3)cc12",
+            "raw_smiles_sha256": "8a78921a85154a3036713eb380689645b9007cc5ba33a9141fe7630491ecb470",
+            "sha256": "5eaab753cf34900c52108adda33ebdcb5244e82c119953cdc87855831ce27676"
+          },
+          "smiles": "CN(C)Cc1c2cc(ccc2n[nH]1)c3ccc(cc3OCCc4cccnc4)F"
+        },
+        "6vta_akn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NCC[C@H](O)C(=O)N[C@@H]1C[C@H](N)[C@@H](O[C@H]2O[C@H](CN)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@H]1O[C@H]1O[C@H](CO)[C@@H](O)[C@H](N)[C@H]1O",
+            "raw_smiles_sha256": "12aa5e32954bf153f7341d0e5cf66a3f4c6d98db4305367ed40024bcac81a170",
+            "sha256": "6eb26c8a72b1c7dbf3725a9c16516ef84a25d1450b11cc81bf1d3b301fc20e23"
+          },
+          "smiles": "C1[C@@H]([C@H]([C@@H]([C@H]([C@@H]1NC(=O)[C@H](CCN)O)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)N)O)O)O[C@@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CN)O)O)O)N"
+        },
+        "6wtn_rxt": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N#CC[C@H](C1CCCC1)n1cc(-c2ncnc3[nH]ccc23)cn1",
+            "raw_smiles_sha256": "59653852441e2925766b2e19ee44400682f9101c3da54d5d3ef8f0c8116dc770",
+            "sha256": "b466406a0bbfad7885c3cc5b7c2732ee83aabb8b45b851dec44b3627d94c05e2"
+          },
+          "smiles": "c1c[nH]c2c1c(ncn2)c3cnn(c3)[C@H](CC#N)C4CCCC4"
+        },
+        "6xbo_5mc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cn([C@@H]2O[C@H](COP(=O)(O)O)[C@@H](O)[C@H]2O)c(=O)nc1N",
+            "raw_smiles_sha256": "b4e9efab72621b04517888071246927d708a6bd9963bd1d5a4326dc65df0e62d",
+            "sha256": "64ccffadfb3a1b2a870a6fcdfc1861aeac606b6f033de1ed0c1d0c669d493687"
+          },
+          "smiles": "CC1=CN(C(=O)N=C1N)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)(O)O)O)O"
+        },
+        "6xct_478": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)CN(C[C@@H](O)[C@H](Cc1ccccc1)NC(=O)O[C@H]1CCOC1)S(=O)(=O)c1ccc(N)cc1",
+            "raw_smiles_sha256": "a64dab0f51bae8092228983bf08f92a60b19f086b66935f28ce63eb99a87959d",
+            "sha256": "9b43cc91c06afae375e5ab4fb5b0ed2395f5c4f73ebd075a78464e5a83b40f33"
+          },
+          "smiles": "CC(C)C[N@](C[C@H]([C@H](Cc1ccccc1)NC(=O)O[C@H]2CCOC2)O)S(=O)(=O)c3ccc(cc3)N"
+        },
+        "6xg5_top": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cc(Cc2cnc(N)nc2N)cc(OC)c1OC",
+            "raw_smiles_sha256": "e4f980fafa74b0c9c321ce78d6835a35b4f60a70e720505a2fc2727bc959f26d",
+            "sha256": "a2f3776c8c32ab9d2c79c21230147cb1de332d3c221f73a1677a53eccaf259dd"
+          },
+          "smiles": "COc1cc(cc(c1OC)OC)Cc2cnc(nc2N)N"
+        },
+        "6xht_v2v": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ccn([C@@H]2OC(COP(=O)(O)OP(=O)(O)OC[C@@H](O)[C@@H](O)[C@@H](O)CO)[C@@H](O)[C@H]2O)c(=O)n1",
+            "raw_smiles_sha256": "e06f7cef8e6aadc5049be2a7f2d32cef1b86be9489bb07c0ecdab9dd362dfc1a",
+            "sha256": "b7c6dc8109d34a73a94ae45d8a5a52b285accfd850c4756cd2ab90507607ea04"
+          },
+          "smiles": "C1=CN(C(=O)N=C1N)[C@H]2[C@@H]([C@@H](C(O2)COP(=O)(O)OP(=O)(O)OC[C@H]([C@H]([C@H](CO)O)O)O)O)O"
+        },
+        "6xm9_v55": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cc(C=O)ccc1O",
+            "raw_smiles_sha256": "f2b986e3a564a087dcf5aca79e6202b4577d73676c3d3284c9e24bee9ce88d2b",
+            "sha256": "bc0898dede0555ab936605517b2595e10d0bfafc6dd2af7bd598a596f8a67200"
+          },
+          "smiles": "COc1cc(ccc1O)C=O"
+        },
+        "6yja_2ba": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@@H]2CO[P@@](=O)(O)O[C@H]3[C@@H](O)[C@H](n4cnc5c(N)ncnc54)O[C@@H]3CO[P@@](=O)(O)O[C@H]2[C@H]1O",
+            "raw_smiles_sha256": "03b72d5027b83c103b307ddbff4f0d5bb14b47f753d5e56a23207a41828badea",
+            "sha256": "ffb6ae338631870a733f9ead9721e70dbcb57abd4e13aa97a145d83954904b80"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@H]4[C@H](O3)CO[P@](=O)(O[C@@H]5[C@@H](CO[P@](=O)(O4)O)O[C@H]([C@@H]5O)n6cnc7c6ncnc7N)O)O)N"
+        },
+        "6yms_ozh": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)C[C@H](NC(=O)CNP(=O)(O)[C@@H](Cc1ccccc1)NC(=O)OCc1ccccc1)C(=O)O",
+            "raw_smiles_sha256": "7a9882a4497f0c1f4ca18a5cc4c44135bbb800c105aa4e8e39d0b5f9a993980f",
+            "sha256": "2e91d435f8f7f80cc0c57a817850d54fc60b92b17e0678d84ec7243603d09e76"
+          },
+          "smiles": "CC(C)C[C@@H](C(=O)O)NC(=O)CNP(=O)([C@@H](Cc1ccccc1)NC(=O)OCc2ccccc2)O"
+        },
+        "6yqv_8k2": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NS(=O)(=O)c1ccc(Cl)s1",
+            "raw_smiles_sha256": "4e97f6e07a9d5fd1b05dca2c741a197f2724065c15ef3996aefeca256d6a3cb9",
+            "sha256": "f02e08af1cb34b507103f2e349ede7971a17f7fc44a88d4af2791560b22b428e"
+          },
+          "smiles": "c1cc(sc1S(=O)(=O)N)Cl"
+        },
+        "6yqw_82i": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNc1cnn(C)c(=O)c1Cl",
+            "raw_smiles_sha256": "b8124f0671515afcd9ab93c5f5162eadee912a27719eec0dc51d50c84f038761",
+            "sha256": "0e94e204db8eb6af7656f9a5e192dfe799c702e366be9321b9a5b130694e4052"
+          },
+          "smiles": "CNC1=C(C(=O)N(N=C1)C)Cl"
+        },
+        "6yr2_t1c": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[NH+](C)c1cc(NC(=O)CNC(C)(C)C)c(O)c2c1C[C@H]1C[C@H]3[C@H]([NH+](C)C)C(O)=C(C(N)=O)C(=O)[C@@]3(O)C(O)=C1C2=O",
+            "raw_smiles_sha256": "958795f71a8ceb028255e6f6240ccdec7ac46b7c5ff142a09e6fe5811074e67f",
+            "sha256": "82d1b490c02cef8fbb908ba3ee6ba4ca54ac16ccdfda2a602f70eaa623f2c95b"
+          },
+          "smiles": "CC(C)(C)NCC(=O)Nc1cc(c2c(c1O)C(=O)C3=C([C@]4([C@@H](C[C@@H]3C2)[C@@H](C(=C(C4=O)C(=O)N)O)[NH+](C)C)O)O)[NH+](C)C"
+        },
+        "6yrv_pj8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCCCCCCCCCCCCCC",
+            "raw_smiles_sha256": "b9eaa8aa28e35519b6788290ea13e0b0c8bacb80a74dc544f96ff44bca8ba470",
+            "sha256": "f38b1571aab82df11805c1086a8b3f6a3672733412bf2da6be36e448e52d7f1e"
+          },
+          "smiles": "CCCCCCCCCCCCCCCCC"
+        },
+        "6ysp_pal": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)C[C@H](NC(=O)CP(=O)(O)O)C(=O)O",
+            "raw_smiles_sha256": "9b4ec84ac465f70f97ce6a3e222edc96faee609a1a836745ee1840e91bed86ce",
+            "sha256": "ffe73dc31ff7c8c1056ed6aaa58306d62e30665c724290e0e76796ba65a2eb2f"
+          },
+          "smiles": "C([C@@H](C(=O)O)NC(=O)CP(=O)(O)O)C(=O)O"
+        },
+        "6yt6_pke": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN(c1ncccc1CNc1ccnc(Nc2ccc3c(c2)CC(=O)N3)n1)S(C)(=O)=O",
+            "raw_smiles_sha256": "6d82c1ca156b8389594368c00a784b851aea06b0d9878fe9d074a77cd18e7e74",
+            "sha256": "9ab896beee67c9c353d5f68f3fa549023896630d3c0c0ca15d826ea2d59447a4"
+          },
+          "smiles": "CN(c1c(cccn1)CNc2ccnc(n2)Nc3ccc4c(c3)CC(=O)N4)S(=O)(=O)C"
+        },
+        "6yyo_q1k": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CS(=O)(=O)N1CCN(c2ccc3nncn3n2)CC1",
+            "raw_smiles_sha256": "71bf1dfed7d1ecd756cead9e11d847947d3142fdbe5276f037f06966047996cc",
+            "sha256": "153f1c7d74c0caec6d4d278f27e696a7c7c383413c11c02bb96a5177ace1eeb9"
+          },
+          "smiles": "CS(=O)(=O)N1CCN(CC1)c2ccc3nncn3n2"
+        },
+        "6z0r_q4h": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N#Cc1cncnc1N",
+            "raw_smiles_sha256": "6b14adfd6b9b79ab9fb25690c3651aa7c32d3d8ed9eae3e187830f5cc2f0ab8d",
+            "sha256": "30eab962a8bb82e55b4fa100adae09c14e8783d2ce12c56fac202707d1a48254"
+          },
+          "smiles": "c1c(c(ncn1)N)C#N"
+        },
+        "6z14_q4z": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC1=[NH+][C@H]2[C@@H](O1)O[C@H](COS(=O)(=O)[O-])[C@@H](O)[C@@H]2O",
+            "raw_smiles_sha256": "20191c5711378e06e360836be8cc0f9759a9548604bafba1cc81c3c120001580",
+            "sha256": "f0f16493d1c3c3b821d96609d33a9ca7a203efdbceb7ea77f43a515f7d792970"
+          },
+          "smiles": "CC1=[NH+][C@@H]2[C@H]([C@@H]([C@H](O[C@@H]2O1)COS(=O)(=O)[O-])O)O"
+        },
+        "6z1c_7ey": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc(-c2csc3ncnc(SCCC(=O)O)c23)cc1",
+            "raw_smiles_sha256": "1e4d82d797ccc4ed55e81e070ddc4f46125dee23d26af76b06960ad779da54c5",
+            "sha256": "f4522bf6d2c3adb090d26be51656f4b0c60be7735c7d9c9cd47c77d43b3f523c"
+          },
+          "smiles": "Cc1ccc(cc1)c2csc3c2c(ncn3)SCCC(=O)O"
+        },
+        "6z2c_q5e": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)CCCCCN1C(=O)[C@@H]2[C@H](C1=O)[C@]1(Cl)C(Cl)=C(Cl)[C@@]2(Cl)C1(Cl)Cl",
+            "raw_smiles_sha256": "a46bd35d395accae0919f5e5db663a9fbea1a731c597ede71fcb5451b4ebd184",
+            "sha256": "78bc0c529c7b897e2971b5dc043d8a156813d90db8212746be449b628aa200b1"
+          },
+          "smiles": "C(CCC(=O)O)CCN1C(=O)[C@H]2[C@@H](C1=O)[C@]3(C(=C([C@@]2(C3(Cl)Cl)Cl)Cl)Cl)Cl"
+        },
+        "6z4n_q7b": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc(C[C@@]2(C(=O)O)C[C@H]2c2ccccc2)cc1",
+            "raw_smiles_sha256": "e3e9b9c87fad053c5589a9a59626d953970ca5ef326a2b169edb9e31529134de",
+            "sha256": "15c60fc0a0c455ad146c39a858478ab307535a563caa7f6c3772051ee345f1fb"
+          },
+          "smiles": "Cc1ccc(cc1)C[C@]2(C[C@H]2c3ccccc3)C(=O)O"
+        },
+        "6zae_acv": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)[C@@H](NC(=O)[C@H](CS)NC(=O)CCC[C@H](N)C(=O)O)C(=O)O",
+            "raw_smiles_sha256": "a954f14729cf146ce4753fa769efc1e6fbabd73a3258faae18d607c139d3629f",
+            "sha256": "dc83e0ec4dd6466f71dc573449437cf70730cce299be5dcbb2685da101b81156"
+          },
+          "smiles": "CC(C)[C@H](C(=O)O)NC(=O)[C@H](CS)NC(=O)CCC[C@@H](C(=O)O)N"
+        },
+        "6zc3_jor": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CS(=O)(=O)Nc1ccc(F)cc1C(=O)O",
+            "raw_smiles_sha256": "77085ad4121d81f1fb0e8d7926079bb17a32d162ec1af5c92c5e49415e3c4782",
+            "sha256": "e8398ac6053423a3bc6390f6a1a87dc28e6601692ae5aad852cd84e0e01e6237"
+          },
+          "smiles": "CS(=O)(=O)Nc1ccc(cc1C(=O)O)F"
+        },
+        "6zcy_qf8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNC(=O)c1nn(C)c2ccc(Nc3nccc(-n4cc(N[C@@H]5CCNC5)c(C)n4)n3)cc12",
+            "raw_smiles_sha256": "51d2348297cb2a5f8ecbbb265fdf8aab977aa4482a680e80c0dc79b2451561d7",
+            "sha256": "b47089704213bc8890f7d9225ea79c3a0bc4e20ebaa3f49abe329f276f44ec3b"
+          },
+          "smiles": "Cc1c(cn(n1)c2ccnc(n2)Nc3ccc4c(c3)c(nn4C)C(=O)NC)N[C@@H]5CCNC5"
+        },
+        "6zk5_imh": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=c1[nH]cnc2c([C@@H]3N[C@H](CO)[C@@H](O)[C@H]3O)c[nH]c12",
+            "raw_smiles_sha256": "762273ff793b4ad3e0df928ca36a65870797d9e7aa0dc42630141c1a222e5e89",
+            "sha256": "9b1a6b88cbf5fe62af8c54e1c5546168b214d810291f3d80a6a1ffc9b4611337"
+          },
+          "smiles": "c1c(c2c([nH]1)C(=O)NC=N2)[C@H]3[C@@H]([C@@H]([C@H](N3)CO)O)O"
+        },
+        "6zpb_3d1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@H]1C[C@H](O)[C@@H](CO)O1",
+            "raw_smiles_sha256": "407e933a8203aed58a0e4f744e150512781f29b66d1dbbd4ddc35b1f9e711eb7",
+            "sha256": "098946836558547e551972321d3b41cb813b3055fe3fd523299ff9683dd1ea55"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3C[C@@H]([C@H](O3)CO)O)N"
+        },
+        "7a1p_qw2": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCC[C@@H](CC(=O)C(=O)O)C(=O)O",
+            "raw_smiles_sha256": "a11e3682d0fa9f1a36123dcfe406a1723f54ecf2399f4eb3ca56952b27db18fb",
+            "sha256": "594a3c2f875c110218b1b5ee6d3c64f1ffee310f50cb12e4abd410f7544542bd"
+          },
+          "smiles": "CCC[C@@H](CC(=O)C(=O)O)C(=O)O"
+        },
+        "7a9e_r4w": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCS(C)(=O)=O",
+            "raw_smiles_sha256": "874b03c4f65083976ea7afa586f6cc45782e51244c0ad9b99a5f3fc5d6116215",
+            "sha256": "7eac73529f4c3fcd9bd248bfc3734d6870076199736dad7819778881f1b2a7cf"
+          },
+          "smiles": "CCS(=O)(=O)C"
+        },
+        "7a9h_tpp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ncc(C[n+]2csc(CCO[P@](=O)(O)OP(=O)(O)O)c2C)c(N)n1",
+            "raw_smiles_sha256": "deb81e772a86e98147e55b7e1ba550ddce4f9f5c075fa3c0aefb59aecf682797",
+            "sha256": "1e556a5ffb6f1b5eb70f902dac69c7132135176d271eb103900ccede136edcdd"
+          },
+          "smiles": "Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO[P@](=O)(O)OP(=O)(O)O"
+        },
+        "7afx_r9k": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cccc2c(-c3ccccc3Cl)c(C(=O)O)[nH]c12",
+            "raw_smiles_sha256": "900d8e8c15aebad5959b96a0b484e6a6104b5245423b968be59c76d9d6c4e9e5",
+            "sha256": "6043afd2198372c06d31462b8afc5e380465f158e8ee81b6973b0919b6355e07"
+          },
+          "smiles": "Cc1cccc2c1[nH]c(c2c3ccccc3Cl)C(=O)O"
+        },
+        "7akl_rk5": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1oc2ccc(-c3cc(N)nc(N)c3)cc2c1C",
+            "raw_smiles_sha256": "41189990239959614cfc8d93d5ddc180b77f1b185a501497cb858d3a1c5b9e0d",
+            "sha256": "866218976e38589c258d8b0fefa0f8030f9bfc80ad6d7adff7c7131635a550b8"
+          },
+          "smiles": "Cc1c(oc2c1cc(cc2)c3cc(nc(c3)N)N)C"
+        },
+        "7an5_rdh": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C(Oc1cccc(C(=O)O)c1)C(=O)O",
+            "raw_smiles_sha256": "5d54ea10189b38bf6f986890f1fc70e926b90bf34fe83873bb143e27323b4994",
+            "sha256": "c92527de1aadd86581694dbb6004a086c179c0303697208af37d64c00bcee889"
+          },
+          "smiles": "C=C(C(=O)O)Oc1cccc(c1)C(=O)O"
+        },
+        "7b2c_tp7": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@@H](OP(=O)(O)O)[C@H](NC(=O)CCCCCCS)C(=O)O",
+            "raw_smiles_sha256": "5d2362e19f27b66b4b884b07714d2b82ab8a59524f192730f4b9b0d12db76fa3",
+            "sha256": "51e118e5c12112672d9124ae9482b06966c3aa9ac05e2689420922a48deaec06"
+          },
+          "smiles": "C[C@H]([C@@H](C(=O)O)NC(=O)CCCCCCS)OP(=O)(O)O"
+        },
+        "7b94_anp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO[P@](=O)(O)O[P@](=O)(O)NP(=O)(O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "d1cd19ccd3c3fca9a7b56e7b656628ace6a4dd214efd9b219761f9e74956702c",
+            "sha256": "3606b1798ae7a7b57d79b59d0a213d815c76ebdccbe1a33e9906c6b1ba23c69e"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)O[P@@](=O)(NP(=O)(O)O)O)O)O)N"
+        },
+        "7bcp_gco": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)[C@H](O)[C@@H](O)[C@H](O)[C@H](O)CO",
+            "raw_smiles_sha256": "b3aefb31f650ca80830a3ab7f5438ed48d81e275a415ab033300a3094c355a15",
+            "sha256": "9317b1db32887abb0ea1d18d2b797a0c5945f297b0350086075ecdab3421dbda"
+          },
+          "smiles": "C([C@H]([C@H]([C@@H]([C@H](C(=O)O)O)O)O)O)O"
+        },
+        "7bjj_tvw": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2n[nH]cc12",
+            "raw_smiles_sha256": "3eb30b556012afa1cb55caeff6b5552c18856ef2ab6b208cf485520639b0cc92",
+            "sha256": "dfcdd206be58eb808a13383c42a736d20e8428377e72cdbcc3d460fdf33b69ce"
+          },
+          "smiles": "c1c2c(ncnc2n[nH]1)N"
+        },
+        "7bka_4jc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCc1ccc(S(N)(=O)=O)cc1",
+            "raw_smiles_sha256": "ae43070adc7445dcfe1b33ffd33c9998111d452c57465d912a11954d5b745a1d",
+            "sha256": "a5b6fce8f3b5e5716087898ffc7d8213ec484cc6016214b689ea3d4660ddc8e8"
+          },
+          "smiles": "CCc1ccc(cc1)S(=O)(=O)N"
+        },
+        "7bmi_u4b": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1ccnc(C(=O)O)c1F",
+            "raw_smiles_sha256": "01c08a10add2cf2870a785dd4b088b4d1ee1e9ba1aea10cf4171876d918673ab",
+            "sha256": "0ea38c3c6b710cf3e1f9154b48f456ce26ec678c49dfb904048408e2af94aafd"
+          },
+          "smiles": "c1cnc(c(c1C(=O)O)F)C(=O)O"
+        },
+        "7bnh_bez": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1ccccc1",
+            "raw_smiles_sha256": "0e52d5fc526b2ee144dd4fc9c4c99c23a575fd68d955c7ada020e5421b5b64ad",
+            "sha256": "b3770965bcb3a0bf8569a18b2a5c40c5356a2174cb0b1d54d1db8cbee66f95fc"
+          },
+          "smiles": "c1ccc(cc1)C(=O)O"
+        },
+        "7btt_f8r": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cc2c(cc1Nc1nc(Nc3ccccc3S(=O)(=O)C(C)C)c3[nH]ccc3n1)N(C(=O)CN(C)C)CC2",
+            "raw_smiles_sha256": "26e9e134dedb228b57acde344b7aca300ef5fd68ff1389a2409429ecd497afb4",
+            "sha256": "96ced0c02ee7239b648951a8f1fd3621e011ae5465d9b962c92ca78b8abc7af1"
+          },
+          "smiles": "CC(C)S(=O)(=O)c1ccccc1Nc2c3c(cc[nH]3)nc(n2)Nc4cc5c(cc4OC)CCN5C(=O)CN(C)C"
+        },
+        "7c0u_fgo": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(ncn2[C@@H]2O[C@H](COP(=O)(O)O[C@H]3[C@@H](O)[C@H](n4ccc(=O)[nH]c4=O)O[C@@H]3CO)[C@H]3CC(O)(O)C[C@H]32)c(=O)[nH]1",
+            "raw_smiles_sha256": "76eb204f32685bcdb16aa2651deb5b83fc6f9a1a96e218a92827d6ec72d67009",
+            "sha256": "21de60810d592c7632cba8063f7afe70602dd010cd07f2d084b6ad32bc32007a"
+          },
+          "smiles": "c1nc2c(n1[C@H]3[C@@H]4CC(C[C@@H]4[C@H](O3)COP(=O)(O)O[C@@H]5[C@H](O[C@H]([C@@H]5O)N6C=CC(=O)NC6=O)CO)(O)O)N=C(NC2=O)N"
+        },
+        "7c3u_azg": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc(O)c2[nH]nnc2n1",
+            "raw_smiles_sha256": "9ff2faf2d0e65a1cf86c270cc28e1dba84936c3c387320711429b623d427ad38",
+            "sha256": "635ac5bc08fbaa1cb5c698422d9a0e256daa362113406579a8a5a3226de63eaa"
+          },
+          "smiles": "c12c(nc(nc1O)N)nn[nH]2"
+        },
+        "7c8q_dsg": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=O)C[C@@H](N)C(=O)O",
+            "raw_smiles_sha256": "b35f4121699bd9d937e5fc4b9f8abeb0ba829afb5fc81c539097ee8edbf1035b",
+            "sha256": "e09abad1c4518cae0a89856149448512a74c95416dd28ee46bf4414abc549c48"
+          },
+          "smiles": "C([C@H](C(=O)O)N)C(=O)N"
+        },
+        "7cd9_fvr": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN1C[C@H](Nc2nc3cc[nH]c3c(=O)n2C)C[C@H](c2ccc(OCc3ccccc3)cc2)C1",
+            "raw_smiles_sha256": "39eeffff4682c736b17713cead2008e916245ae43dd44a87648dbce7d9e698ce",
+            "sha256": "799451e6aa43714d6260701ea122352ff287f9c9de454e0c7deb76023cb0d839"
+          },
+          "smiles": "CN1C[C@H](C[C@H](C1)NC2=Nc3cc[nH]c3C(=O)N2C)c4ccc(cc4)OCc5ccccc5"
+        },
+        "7cij_g0c": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CSCCC/N=C/c1c(COP(=O)(O)O)cnc(C)c1O",
+            "raw_smiles_sha256": "c02efd6cf4f48eea2d8330ef0483018c58cfba1946c3e90af8db928f11676a62",
+            "sha256": "b9f357c1209e79bcf26c51a9dbae2d0e8f0d4db2073a6469ac7c845cae280a15"
+          },
+          "smiles": "Cc1c(c(c(cn1)COP(=O)(O)O)/C=N/CCCSC)O"
+        },
+        "7cl8_tes": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@]12CC[C@H]3[C@@H](CCC4=CC(=O)CC[C@@]43C)[C@@H]1CC[C@@H]2O",
+            "raw_smiles_sha256": "3556a4584e1303e92b79f555a2376f1bc0bc37c04a2d9546ecba736dfb644535",
+            "sha256": "92de3e86c9f7a4860770fb0e1058d1e796ee47881cd292caa7ce21710b573e83"
+          },
+          "smiles": "C[C@]12CC[C@H]3[C@H]([C@@H]1CC[C@@H]2O)CCC4=CC(=O)CC[C@]34C"
+        },
+        "7cnq_g8x": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)[C@H]1NCC[C@H]1O",
+            "raw_smiles_sha256": "742f634bb4b010f6704bf994b4f6e0e29f0e9a13d994b136aaa6b8db89bbd457",
+            "sha256": "781d569cd61bcc4f1f13557a2154a83fbb2defdfab78f60487ddd3ca70bb5566"
+          },
+          "smiles": "C1CN[C@@H]([C@@H]1O)C(=O)O"
+        },
+        "7cns_pmv": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@@](O)(CCOP(=O)(O)O)CC(=O)O",
+            "raw_smiles_sha256": "3528e5f16ab4947f2c94cb69aecb9676149b9181a2b8b298210a252ea0875465",
+            "sha256": "d0feda35ff091a3994ee465deeb7997a224c3bce0aaa0410fa32b70773a56b8c"
+          },
+          "smiles": "C[C@@](CCOP(=O)(O)O)(CC(=O)O)O"
+        },
+        "7ctm_bdp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)[C@H]1O[C@@H](O)[C@H](O)[C@@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "ca2eba82313e3d75144eb4b58d3da2655f3e69fcb39a4005b1e6a6fed84fa527",
+            "sha256": "8f8c1a0f1518e5f142caabadcc854e29caca0504a47e8fa10037f7f4e374c27d"
+          },
+          "smiles": "[C@@H]1([C@@H]([C@H](O[C@H]([C@@H]1O)O)C(=O)O)O)O"
+        },
+        "7cuo_phb": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1ccc(O)cc1",
+            "raw_smiles_sha256": "b61130f7008a4b854d452bfac235154434a27b48ed1ca9535fc686b748d35e6a",
+            "sha256": "2adf837e9ceba3baa6fe298ac664dc652c03ee3410244d79cec7475edacabc4d"
+          },
+          "smiles": "c1cc(ccc1C(=O)O)O"
+        },
+        "7d5c_gv6": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC[C@H](C)[C@H](N)C(=O)OP(=O)(O)OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "1f2f5713c901f711913707e7f919ae3339ae7e5e73a0885d0cfa99ddf06068ba",
+            "sha256": "61dab502fefed9cde9288365af799144c5dc7671e67baab97db9f03fcb90bc1d"
+          },
+          "smiles": "CC[C@H](C)[C@@H](C(=O)OP(=O)(O)OC[C@@H]1[C@H]([C@H]([C@@H](O1)n2cnc3c2ncnc3N)O)O)N"
+        },
+        "7d6o_mte": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(c(=O)[nH]1)N[C@H]1C(S)=C(S)[C@@H](COP(=O)(O)O)O[C@H]1N2",
+            "raw_smiles_sha256": "e26c3e131742a2088d794ed35a73c851dde17cc87a2096146e7c2254cba190f7",
+            "sha256": "3d584fa475003b81363e0ba4a6a028be900d44a53ffc072843fe9c8cbc425da9"
+          },
+          "smiles": "C([C@@H]1C(=C([C@H]2[C@@H](O1)NC3=C(N2)C(=O)NC(=N3)N)S)S)OP(=O)(O)O"
+        },
+        "7dkt_glf": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "OC[C@H]1O[C@H](F)[C@H](O)[C@@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "ae61b4fabbab7b43d0bba3cf06c54cd995ee9aa23f4007c35c393769dedfae82",
+            "sha256": "b2e01958d45b71a248904aa8d370f166059664c7bb05b03b7bb7180087455a3f"
+          },
+          "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)F)O)O)O)O"
+        },
+        "7dql_4cl": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Oc1ccc(Cl)cc1O",
+            "raw_smiles_sha256": "482cac8f908310c8135347e528c40548622e984ff2778aea582bf632de7badb3",
+            "sha256": "05d6a2de0097313d4de2b2542e4c04b9e3f181eae4e982c035e67c78c106a84a"
+          },
+          "smiles": "c1cc(c(cc1Cl)O)O"
+        },
+        "7dua_hj0": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc(NC(=O)c2cn(C3(C)CC3)c3ncnc(N)c23)n[nH]1",
+            "raw_smiles_sha256": "bfa4fc21bfc5804c0f5268945c9afb7d48f7a9f24e0c9a4f03865f24f97d90ff",
+            "sha256": "c164936be579a11e3676db8633e35e1d5d4f459e2e358cc9a9de4e19049dec5e"
+          },
+          "smiles": "Cc1cc(n[nH]1)NC(=O)c2cn(c3c2c(ncn3)N)C4(CC4)C"
+        },
+        "7e4l_mdn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=P(O)(O)CP(=O)(O)O",
+            "raw_smiles_sha256": "f662e8750e47b55db60931c9ef509440e36754c40147cb11d2b99211f8688b7c",
+            "sha256": "a5cf5953cc7bbe030a8d2b257ecb0260e088d5d3bb3dce0551ffdd09c025cb2d"
+          },
+          "smiles": "C(P(=O)(O)O)P(=O)(O)O"
+        },
+        "7ebg_j0l": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNc1cccc2c1NC(=O)C2(C)C",
+            "raw_smiles_sha256": "e424ee86581e589fe9799cd288db5fde6ec3aa6cd9206fa0bc93befa4d0a25ca",
+            "sha256": "5cf367f2e34c833f4dc492aa1929b748083f5fd9a35a354fefe658914d729060"
+          },
+          "smiles": "CC1(c2cccc(c2NC1=O)NC)C"
+        },
+        "7ecr_sin": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)CCC(=O)O",
+            "raw_smiles_sha256": "01721e50bb665b79283bf0cc67fb27a9008669a10f4b4b73845fa707cdc1e819",
+            "sha256": "5b151bee0d05fc8c606f866026324f1e16856e4a5ef021f7cef6b427bcac89a9"
+          },
+          "smiles": "C(CC(=O)O)C(=O)O"
+        },
+        "7ed2_a3p": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](COP(=O)(O)O)[C@@H](OP(=O)(O)O)[C@H]1O",
+            "raw_smiles_sha256": "8bf473ab089f355957f5e6c3bf9e011d383f825f469f71b40d30fa52209075f3",
+            "sha256": "b751369d67bbe22726bc7c25534b7d9b7196c96b0d870a1d25b1ee66e13ada69"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)COP(=O)(O)O)OP(=O)(O)O)O)N"
+        },
+        "7elt_tym": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO[P@@](=O)(O)OC(=O)[C@@H](N)Cc2c[nH]c3ccccc23)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "9c6d93d81b33fc7a8f3d6daef71fee9b247d90b1b419a5baee2016e8f3309a1c",
+            "sha256": "7e4473762d269f1e951898a524f7167c1faa260923bf59a683506c63f0b972ea"
+          },
+          "smiles": "c1ccc2c(c1)c(c[nH]2)C[C@@H](C(=O)O[P@](=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)n4cnc5c4ncnc5N)O)O)N"
+        },
+        "7epv_fda": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc2c(cc1C)N(C[C@H](O)[C@H](O)[C@H](O)CO[P@@](=O)(O)O[P@@](=O)(O)OC[C@H]1O[C@@H](n3cnc4c(N)ncnc43)[C@H](O)[C@@H]1O)c1[nH]c(=O)[nH]c(=O)c1N2",
+            "raw_smiles_sha256": "8b4b3ab1f8b01528117cd1f364b2e26217a2f7933b28a65337cd10e926e938fa",
+            "sha256": "70c13b4524f6a0ae93e48f04d76e2a3fe4006e6abdc1f40db7037459519f867e"
+          },
+          "smiles": "Cc1cc2c(cc1C)N(C3=C(N2)C(=O)NC(=O)N3)C[C@@H]([C@@H]([C@@H](CO[P@@](=O)(O)O[P@@](=O)(O)OC[C@@H]4[C@H]([C@H]([C@@H](O4)n5cnc6c5ncnc6N)O)O)O)O)O"
+        },
+        "7es1_udp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=c1ccn([C@@H]2O[C@H](CO[P@@](=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]2O)c(=O)[nH]1",
+            "raw_smiles_sha256": "73313111a8021fb7988a716df76a977e830fa1acc75130a1fa95631851b95b0a",
+            "sha256": "7e6877511eece9f3ff213bb75aa392dc15c18415e7e353ac416b5c45893f5660"
+          },
+          "smiles": "C1=CN(C(=O)NC1=O)[C@H]2[C@@H]([C@@H]([C@H](O2)CO[P@@](=O)(O)OP(=O)(O)O)O)O"
+        },
+        "7f51_ba7": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](COP(=O)(O)OP(=O)(O)OC[C@H]2O[C@@H](O)[C@H](OC(=O)c3ccccc3)[C@@H]2O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "b3e97d5b531c1e0cbe414716bd924fefc08eb32551d570f378dd0551b5cbdab8",
+            "sha256": "ccee054498b04925caf791a416ad3cf1038b0ed08adbb98c7b528d5357056a2d"
+          },
+          "smiles": "c1ccc(cc1)C(=O)O[C@@H]2[C@@H]([C@H](O[C@H]2O)COP(=O)(O)OP(=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)n4cnc5c4ncnc5N)O)O)O"
+        },
+        "7f5d_euo": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNc1cc(-c2ccc3[nH]ccc3c2)nc(S(C)(=O)=O)n1",
+            "raw_smiles_sha256": "b463864fd22e6f44dfc73870715d2b098803846b15789cc1cf7c4bc13291a76a",
+            "sha256": "67d220e4ed82e77e85b6a93e50dd71d5ff69d6d3184a0f47898930d48a3bdfb4"
+          },
+          "smiles": "CNc1cc(nc(n1)S(=O)(=O)C)c2ccc3c(c2)cc[nH]3"
+        },
+        "7f8t_fad": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc2nc3c(=O)[nH]c(=O)nc-3n(C[C@H](O)[C@H](O)[C@H](O)CO[P@@](=O)(O)O[P@](=O)(O)OC[C@H]3O[C@@H](n4cnc5c(N)ncnc54)[C@H](O)[C@@H]3O)c2cc1C",
+            "raw_smiles_sha256": "20a296d7a7537890d55ecaf19257fb022fc5c71a19349a0a03ccc6311315622a",
+            "sha256": "3a6ee9253878ef3d50571a425732d1918cec48c9a30cf6fc1ecc0faf71dd3b35"
+          },
+          "smiles": "Cc1cc2c(cc1C)N(C3=NC(=O)NC(=O)C3=N2)C[C@@H]([C@@H]([C@@H](CO[P@@](=O)(O)O[P@](=O)(O)OC[C@@H]4[C@H]([C@H]([C@@H](O4)n5cnc6c5ncnc6N)O)O)O)O)O"
+        },
+        "7fb7_8nf": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc(C)c(N)cn1",
+            "raw_smiles_sha256": "089c57860c24fbcc155eac51536fa53913972db01a3bfcc7b1aa01016b4a5fcc",
+            "sha256": "0fcbb9974456a765a333e7066d8f12ab0bcca76249a4f9e9a7ec23659fa6b101"
+          },
+          "smiles": "Cc1cc(ncc1N)C"
+        },
+        "7fha_adx": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO[P@](=O)(O)OS(=O)(=O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "1fa03d45c16e966f34d15461f0e1ddc7b5e8abf278ba00075af2ea1366d351a2",
+            "sha256": "2ff863d7ab99608a3c883dcb5a2ef736a35a2daa8451522eb01b83d2a1450797"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)OS(=O)(=O)O)O)O)N"
+        },
+        "7frx_o88": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=S(=O)(NCc1ccc(S(=O)(=O)c2ccc(O)c(O)c2)cc1)c1ccc(O)c(O)c1",
+            "raw_smiles_sha256": "e6829c106e8f4ab43d555c51119303b7aa5bcfea8c165c3f72636b1f57fc7e1c",
+            "sha256": "51ce92ed5b241736ad62aa4aca3a1a7ef9047968a511558c25ce9502577884c8"
+          },
+          "smiles": "c1cc(ccc1CNS(=O)(=O)c2ccc(c(c2)O)O)S(=O)(=O)c3ccc(c(c3)O)O"
+        },
+        "7ft9_4mb": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CS(=O)(=O)Nc1ccc(C(=O)O)cc1",
+            "raw_smiles_sha256": "bf7ac37d8544e0328a81781d040c41d6a8e72fb9db093553a765b8b0f7ea4289",
+            "sha256": "412f16a7bf6d2c8289f17cbd62fe11db596048dd4108391d87018fb64019b1c4"
+          },
+          "smiles": "CS(=O)(=O)Nc1ccc(cc1)C(=O)O"
+        },
+        "7jg0_gar": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NCC(=O)N[C@@H]1O[C@H](COP(=O)([O-])[O-])[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "98bdc03443555dd3d4e409e6f1e88291c13a92ea8c3abea40cb55629d5960471",
+            "sha256": "060c50e95c8f4419219eac553b269b204650b9c455b29101756f700595f705fb"
+          },
+          "smiles": "C([C@@H]1[C@H]([C@H]([C@@H](O1)NC(=O)CN)O)O)OP(=O)([O-])[O-]"
+        },
+        "7jhq_vaj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1ccc(-c2cccc(C(=O)O)c2)cc1",
+            "raw_smiles_sha256": "11c8fc9e1b6887722970263f8433af79fbecb6468ee693e9c9ea83dc3a87ef0e",
+            "sha256": "28cee20356869a07cdda4b6fb941b4f587f09ea7cbe6ff10f9c625c9dc314c03"
+          },
+          "smiles": "c1cc(cc(c1)C(=O)O)c2ccc(cc2)C(=O)O"
+        },
+        "7jmv_4nc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=[N+]([O-])c1ccc(O)c(O)c1",
+            "raw_smiles_sha256": "beed8fdd675735a58d5ca64e4f2c5586480e50f901cb40ff0f408bf2301022e9",
+            "sha256": "83c8ec46bfea5f5fef21ea83a3cfe6ef5b2c39b120266ab7e12bfb5fab28104a"
+          },
+          "smiles": "c1cc(c(cc1[N+](=O)[O-])O)O"
+        },
+        "7jxx_vp7": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)(O)C#Cc1ccc2[nH]c3c(c2c1)-c1nc(N)ncc1CCC3",
+            "raw_smiles_sha256": "75c96908d3c38f3ce2a981a64bc4f4fda0d48881df4b3f3b69e5c50162fb7dbc",
+            "sha256": "82b9eb45447f9ddf20300406b18a09dd18b8dc2eb007aa7db0df016016875ecf"
+          },
+          "smiles": "CC(C)(C#Cc1ccc2c(c1)c-3c([nH]2)CCCc4c3nc(nc4)N)O"
+        },
+        "7jy3_vud": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H](Oc1cc2cc(F)ccc2nc1N)c1[nH]c(=O)ccc1-n1cccn1",
+            "raw_smiles_sha256": "9a11f5eb151c59f8ccd889b611131c87a24d59b124d2a1c17d6f9a4630143062",
+            "sha256": "c76ac800302cbbd67952118bd7fe52578de52ec36915481341ae1d767858e556"
+          },
+          "smiles": "C[C@@H](C1=C(C=CC(=O)N1)n2cccn2)Oc3cc4cc(ccc4nc3N)F"
+        },
+        "7k0v_vqp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc(F)c(NC(=O)NCCC(C)(C)C)cc1Nc1ccc2ncn(C)c(=O)c2c1F",
+            "raw_smiles_sha256": "f7e898871e64f8bdfb729bb4bd24d60482d02c0d7b4e3774f64158f385446301",
+            "sha256": "15f45f218b7cd740b45c0162df51d646523ef1488a2b1bb0de298dac4c0a4144"
+          },
+          "smiles": "Cc1cc(c(cc1Nc2ccc3c(c2F)C(=O)N(C=N3)C)NC(=O)NCCC(C)(C)C)F"
+        },
+        "7kb1_wbj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C/C(=N\\Cc1c(COP(=O)(O)O)cnc(C)c1O)C(=O)O",
+            "raw_smiles_sha256": "76a769b11fb67591d3827c354f848f000453daf445cfd5dc29b084da56b15022",
+            "sha256": "3d8e1589543b98fe1077888b56d6bc964d1d8c142b21a0190f697d256a4049e4"
+          },
+          "smiles": "Cc1c(c(c(cn1)COP(=O)(O)O)C/N=C(\\C=C)/C(=O)O)O"
+        },
+        "7kc5_bjz": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN1C(=O)N(c2cc(Cl)cc(Cl)c2)C(=O)[C@]12CN(c1ccc(C(=O)O)cn1)C[C@H]2c1ccc(C#N)cc1",
+            "raw_smiles_sha256": "9be5063e7e6dbbf12b5556bd5671a48bd626b7b9bc241f35493ba4ec6277043a",
+            "sha256": "f92764c8fd8eaa5be2bf0f6e0511843f7b8f6d489a33bea3b167c2ceeee4febf"
+          },
+          "smiles": "CN1C(=O)N(C(=O)[C@]12CN(C[C@H]2c3ccc(cc3)C#N)c4ccc(cn4)C(=O)O)c5cc(cc(c5)Cl)Cl"
+        },
+        "7km8_wpd": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCc1nc(N)nc(N)c1OCCCOc1cccc(C[C@@H](C(=O)O)C(F)F)c1",
+            "raw_smiles_sha256": "bf5dcf40ac9e58370655ae5bf7ade0d91453886bbe89e04c49c7f1c0a5fa42e3",
+            "sha256": "a92b02cd4a9cbe71b7dfa5987896d38ae268238c6b54a682c3a7f0374d37f79b"
+          },
+          "smiles": "CCc1c(c(nc(n1)N)N)OCCCOc2cccc(c2)C[C@H](C(F)F)C(=O)O"
+        },
+        "7kqu_yof": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@@H](Cc1ccc(O)c(F)c1)C(=O)O",
+            "raw_smiles_sha256": "20fbbc97f91a087e8f417cf2cbc842e6ecc5fb4c2519ce63f193c9bc91ff3921",
+            "sha256": "195aba5a8b30953151d99bd17145665fc605c4633b187db801ac51395055fd1e"
+          },
+          "smiles": "c1cc(c(cc1C[C@@H](C(=O)O)N)F)O"
+        },
+        "7kru_atp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO[P@@](=O)(O)O[P@](=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "e9c67cf6bd299f1bc73dde45c901ac3174d7956398347fe21ec39e92e1c9f07e",
+            "sha256": "ae132e9364c24e7f0d3667726d2f8864bddd4c11c1f610a4000903b5866a58bd"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@@](=O)(O)O[P@](=O)(O)OP(=O)(O)O)O)O)N"
+        },
+        "7kz9_xn7": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(CNCCO)NCCO",
+            "raw_smiles_sha256": "26eaa5428716484c3e8821b65c43280f57cfc5823707980494f10524fb685827",
+            "sha256": "35db8bcde453600d57e6fed21b93591e03552115fb3c4898a6a458137c44b416"
+          },
+          "smiles": "C(CO)NCC(=O)NCCO"
+        },
+        "7l00_xcj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CS(=O)(=O)c1ccc2nc(NC(=O)Cc3csc(-n4cccc4)n3)sc2c1",
+            "raw_smiles_sha256": "42533d4a9c86173d564924f716be8e5b788dd6f06473f5ab6f7d9f359ee353a7",
+            "sha256": "be3601c03bb8eae1275e7d8022f45189949de22beddb2da34288f57161ab7948"
+          },
+          "smiles": "CS(=O)(=O)c1ccc2c(c1)sc(n2)NC(=O)Cc3csc(n3)n4cccc4"
+        },
+        "7l03_f9f": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=P(O)(O)OCCNS(=O)(=O)c1ccc(OC(F)(F)F)cc1",
+            "raw_smiles_sha256": "af0ad0b710c6a3f236e056823956342ca128dfce8eb4f8357115cae17239e98b",
+            "sha256": "d44889cb98e889b2ce5d810af86703d158a3835506d6e0d98c371220aeffc5c1"
+          },
+          "smiles": "c1cc(ccc1OC(F)(F)F)S(=O)(=O)NCCOP(=O)(O)O"
+        },
+        "7l5f_xng": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCCCCCCC(=O)NCCCC(=O)O",
+            "raw_smiles_sha256": "34d119522c3d246467f8198028f6e2414eca68d9e87b55ecba2d0195dd0ea0d6",
+            "sha256": "43bc4e1e1ab35a39379b0d6db9ab9d80dd723d15d670f88ec087e2edb40dd10a"
+          },
+          "smiles": "CCCCCCCCCC(=O)NCCCC(=O)O"
+        },
+        "7l7c_xq1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cccc(-c2ccc3c(CC(=O)O)coc3c2)c1",
+            "raw_smiles_sha256": "c0cfb8d4cdd497afc3be41c2a465a26f7084a0351d3eb5e25f41776ecd7a57e8",
+            "sha256": "11bc559a093e4e109dff753cbb4b2c9214cab55ea346c1bae34c77a38aea92f7"
+          },
+          "smiles": "COc1cccc(c1)c2ccc3c(c2)occ3CC(=O)O"
+        },
+        "7lcu_xta": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN1CCN(c2ncc(Oc3cc(CN4CCC(CC(=O)O)CC4)cc(-c4cc(Cl)cc(Cl)c4)n3)cn2)CC1",
+            "raw_smiles_sha256": "2617fe7801ad8bc40851f3bc6480d06af6fea3bf7288d5d6845faf540ee0c637",
+            "sha256": "b6163d1295af7dbcfadb6083795536a95f53c0f6c5b0a034103b414838192191"
+          },
+          "smiles": "CN1CCN(CC1)c2ncc(cn2)Oc3cc(cc(n3)c4cc(cc(c4)Cl)Cl)CN5CCC(CC5)CC(=O)O"
+        },
+        "7lev_0jo": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C(/N=C/c1c(COP(=O)(O)O)cnc(C)c1O)C(=O)O",
+            "raw_smiles_sha256": "0b94631e22727d798552a281a0e9e1e64fb6fc9c766846ee400fabf515c86be1",
+            "sha256": "fe079d49806faad1fb04244de725104f9ccc30758232a9b0e34c69b976312a9e"
+          },
+          "smiles": "Cc1c(c(c(cn1)COP(=O)(O)O)/C=N/C(=C)C(=O)O)O"
+        },
+        "7ljn_gtp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(ncn2[C@@H]2O[C@H](CO[P@](=O)(O)O[P@](=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]2O)c(=O)[nH]1",
+            "raw_smiles_sha256": "37ae704f31328424bf7e228b98061ce55619c881355b7fe822741c409da169e1",
+            "sha256": "734093f145f1e5cfc4ae5525bd624bd392d30ea1cf84fa1814f8988272e00e64"
+          },
+          "smiles": "c1nc2c(n1[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)O[P@](=O)(O)OP(=O)(O)O)O)O)N=C(NC2=O)N"
+        },
+        "7lmo_nyo": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCN(CC)c1ccc2c(C)c(CCN3C(=O)N[C@@]4(CCN(C(=O)c5c[nH]cn5)C4)C3=O)c(=O)oc2c1",
+            "raw_smiles_sha256": "6343fd52b0f3b57c95e265aec10ddcdcdb93fb7c059fc51c82c7afdc082da699",
+            "sha256": "a67e753b8298387afd1087389806c79f3c92097a23d2e8832d962266e757f712"
+          },
+          "smiles": "CCN(CC)c1ccc2c(c1)OC(=O)C(=C2C)CCN3C(=O)[C@]4(CCN(C4)C(=O)c5c[nH]cn5)NC3=O"
+        },
+        "7loe_y84": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Fc1cccc2ccccc12",
+            "raw_smiles_sha256": "c153fb14bb8cb9abe97152ef87b36595ed755f00222d364062e2751ee2ec78a3",
+            "sha256": "cceb1cc57f3a8d4bb5fce09768a905304599f951ec4ccd40297c19e0ddee0829"
+          },
+          "smiles": "c1ccc2c(c1)cccc2F"
+        },
+        "7lou_ifm": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "OC[C@H]1CNC[C@@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "2d9a8026018e9130edd615303c7d7e0569646d60cdf47804ca0e8b70f487d973",
+            "sha256": "5920b0a9377c064198d00083bf4dc47b747beaf8c55923589796985b791a6c90"
+          },
+          "smiles": "C1[C@@H]([C@H]([C@@H](CN1)O)O)CO"
+        },
+        "7lt0_onj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc(Sc2cc(C(=O)N3Cc4ccccc4C3)ccc2O)cc1C",
+            "raw_smiles_sha256": "c69c7e62ce3f0d7c86bc4e5e274faa18f924251f59a1f62d255a8664cb5fef2d",
+            "sha256": "c1daa058d5191c62f7ffb29c32e49cc685c22bde25ae7f84ec084e0ae143dfda"
+          },
+          "smiles": "Cc1ccc(cc1C)Sc2cc(ccc2O)C(=O)N3Cc4ccccc4C3"
+        },
+        "7lzd_yhy": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc(F)c2cc(C(=O)Nc3cccc(N4CCC(N(C)C)CC4)c3)[nH]c12",
+            "raw_smiles_sha256": "71c1b59a03c1f09a4453fe662f457401d5babb12d91c313170ffc4c1a519031f",
+            "sha256": "bf0beb7f8a4cf279ecd08c0600f888eb6cf62898f3a902355f1d4ab9668d8600"
+          },
+          "smiles": "Cc1ccc(c2c1[nH]c(c2)C(=O)Nc3cccc(c3)N4CCC(CC4)N(C)C)F"
+        },
+        "7m31_tdr": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1c[nH]c(=O)[nH]c1=O",
+            "raw_smiles_sha256": "e9862f99efc96fbcc185c7d0f0a2bf2c2b921339c470a55d57224088466a4be2",
+            "sha256": "28e71b4103a51b8722cea5803dceaa6d4041816e173e2769ec2d0e35aa054c95"
+          },
+          "smiles": "CC1=CNC(=O)NC1=O"
+        },
+        "7m3h_ypv": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCc1ccc(NS(=O)(=O)c2ccc(O)c(C(=O)O)c2)cc1",
+            "raw_smiles_sha256": "4320f2e87620ecc79dd1cd91bff79b2e434b82be28c9ccac9f64ed013e75d79f",
+            "sha256": "304bb5d3e15caac29ca946c2d6df4704bab308a82aef4e1b8a3df3193d9f9f89"
+          },
+          "smiles": "CCCCc1ccc(cc1)NS(=O)(=O)c2ccc(c(c2)C(=O)O)O"
+        },
+        "7m6k_yrj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(NCc1ccc[n+]([C@@H]2O[C@H](COP(=O)(O)O)[C@@H](O)[C@H]2O)c1)Nc1ccc([N+](=O)[O-])cc1",
+            "raw_smiles_sha256": "384466a1d7f4f8c74905d51f267e1ff4a33e6a52939ef13899e8275c44915d2d",
+            "sha256": "88893f060607febd29ba6519c830fd15099f5a724a5b3e982427e353beee34d9"
+          },
+          "smiles": "c1cc(c[n+](c1)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)(O)O)O)O)CNC(=O)Nc3ccc(cc3)[N+](=O)[O-]"
+        },
+        "7mfp_z7p": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ncc(COP(=O)(O)O)c(/C=N/[C@H]2[C@H](O)[C@@H](O)[C@@H](OP(=O)(O)OP(=O)(O)OC[C@H]3O[C@@H](n4ccc(=O)[nH]c4=O)[C@H](O)[C@@H]3O)O[C@@H]2C)c1O",
+            "raw_smiles_sha256": "9f83a9dcc57c106373dc12532d5084a0df6bba040c9d15db95e43d4a09119e14",
+            "sha256": "606306b17f55f777f867e591d66e0d7fbb1efac50e08590fb188a6f15f1d05f9"
+          },
+          "smiles": "Cc1c(c(c(cn1)COP(=O)(O)O)/C=N/[C@@H]2[C@H](O[C@@H]([C@@H]([C@H]2O)O)OP(=O)(O)OP(=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)N4C=CC(=O)NC4=O)O)O)C)O"
+        },
+        "7mgt_zd4": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc(Cl)nc2c1ncn2[C@@H]1O[C@H](COP(=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "bc0753eab792c303c268b2c2741a246141ac8e247deca09eacc0e42638a01289",
+            "sha256": "9c158c0c66960a42d44d724d4399a5e5a1a6eb82aeb64c92eb731d59b436e66d"
+          },
+          "smiles": "c1nc2c(nc(nc2n1[C@H]3[C@@H]([C@@H]([C@H](O3)COP(=O)(O)OP(=O)(O)O)O)O)Cl)N"
+        },
+        "7mgy_zd1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@H]1C=C(CO)[C@@H](O[C@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)[C@H](O)[C@H]1O",
+            "raw_smiles_sha256": "163ab54badbb839eb7b8877ba99f8539ec09c3aef71089f00727f33680e562a2",
+            "sha256": "6b6f921f3bb5d728fdc8e003be62d12d5b1b5ad6f4222354f4ddad45ba6e7eb2"
+          },
+          "smiles": "C1=C([C@H]([C@@H]([C@H]([C@H]1N)O)O)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)O)O)CO"
+        },
+        "7mmh_zjy": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1ccc2nc(C)c(O[C@@H]3C[C@H]4C(=O)N[C@]5(C(=O)NS(=O)(=O)C6(C)CC6)C[C@H]5/C=C\\CCCCC[C@H](NC(=O)OCC5(C(F)(F)F)CC5)C(=O)N4C3)nc2c1",
+            "raw_smiles_sha256": "d7c75d0ccef77567f8c1809bb356cfab5cb51855cb22879b0dba1fe802e6d7e5",
+            "sha256": "5d51ed8db9fcef83925cbd4f3161499ad95c1adf5fccd8490eb8c1912e54292c"
+          },
+          "smiles": "Cc1c(nc2cc(ccc2n1)OC)O[C@@H]3C[C@H]4C(=O)N[C@@]5(C[C@H]5/C=C\\CCCCC[C@@H](C(=O)N4C3)NC(=O)OCC6(CC6)C(F)(F)F)C(=O)NS(=O)(=O)C7(CC7)C"
+        },
+        "7moi_hps": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=P(O)(O)Oc1ccccc1",
+            "raw_smiles_sha256": "187a7739b79599407c49009c6aba7c118ea49f3b7bb1f9fada5fa1d190f547ab",
+            "sha256": "f82b827b1bf9ac0f7b73610b0c4f31e34a450130811e2788e5a000bb58c412b0"
+          },
+          "smiles": "c1ccc(cc1)OP(=O)(O)O"
+        },
+        "7msr_dca": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCNC(=O)CCNC(=O)[C@H](O)C(C)(C)CO[P@@](=O)(O)O[P@@](=O)(O)OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1OP(=O)(O)O",
+            "raw_smiles_sha256": "fb279d4e0f7837072966452b4523f76d6d595bcdccdfaa899f2a86bfdc135cf6",
+            "sha256": "be1ccfd8729c42fdbfabd601ea670e56e5f94d344c2af588a6bd8ff8ea538679"
+          },
+          "smiles": "CCNC(=O)CCNC(=O)[C@@H](C(C)(C)CO[P@@](=O)(O)O[P@@](=O)(O)OC[C@@H]1[C@H]([C@H]([C@@H](O1)n2cnc3c2ncnc3N)O)OP(=O)(O)O)O"
+        },
+        "7mwn_wi5": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1c(C(=O)c2cccc3ccccc23)c2cccc3c2n1[C@H](CN1CCOCC1)CO3",
+            "raw_smiles_sha256": "4ef5f0b993df13cb62388a972423d9769633ddc5c4c3dbc3dc6890a15b0e0436",
+            "sha256": "5f8bc9010777d523deeb7d708f3c81fb250292a3fcfbd1056ee586b06dba5786"
+          },
+          "smiles": "Cc1c(c2cccc3c2n1[C@@H](CO3)CN4CCOCC4)C(=O)c5cccc6c5cccc6"
+        },
+        "7mwu_zpm": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)C1CCC1",
+            "raw_smiles_sha256": "7737a5c629d52d2f400d035543662f63f4c0f5c87265ede94359420acac70abf",
+            "sha256": "bafef600e4969f59e19af276e063188308051c82d59e570abc7b63e70d59b3e5"
+          },
+          "smiles": "C1CC(C1)C(=O)O"
+        },
+        "7my1_ipe": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C(C)CCO[P@@](=O)(O)OP(=O)(O)O",
+            "raw_smiles_sha256": "d3a579efa4c304b5b352b5fb0822aba482da047ab3019f5a07fe026b19308591",
+            "sha256": "61c00be25e3a75bfa5bcaf206990dd1d27aa354a7e822f0e0c388dfdafe7e93e"
+          },
+          "smiles": "CC(=C)CCO[P@@](=O)(O)OP(=O)(O)O"
+        },
+        "7myu_zr7": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cnc(C(=O)Nc2ccc(F)c([C@]34CN(c5ncc(F)cn5)C[C@H]3CSC(N)=N4)c2)cn1",
+            "raw_smiles_sha256": "6ca14c24735806dc105997ec3d9ce5f4c1c15755e8f9d943f64a243c3a8e32eb",
+            "sha256": "123c8acf701895ba93d919de41763837707008ee73bae2448ab4dfb056ff3103"
+          },
+          "smiles": "COc1cnc(cn1)C(=O)Nc2ccc(c(c2)[C@]34CN(C[C@H]3CSC(=N4)N)c5ncc(cn5)F)F"
+        },
+        "7n03_zrp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCCCNc1ccc2ncc(C(=O)NC)c(Nc3ccccc3)c2c1",
+            "raw_smiles_sha256": "93115e52f7437cfad5963bf2a997dea4745207109a04cd24890794b71fbf2b75",
+            "sha256": "59899845ff0ce06764f925bebdc55169f923c3b40e29fe4a9bae6e6bd26bc7cf"
+          },
+          "smiles": "CCCCCCNc1ccc2c(c1)c(c(cn2)C(=O)NC)Nc3ccccc3"
+        },
+        "7n4n_0bk": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cc(C(=O)Nc2ccc(F)c([C@]3(CF)CC[C@@](C)(S(C)(=O)=O)C(N)=N3)c2)ncn1",
+            "raw_smiles_sha256": "376117ebb47518f81e85c39209fa63701340f13cfc35e2be72c3d707e91697d2",
+            "sha256": "d443f38628180966dad49f3bb8814c75d95075f11b89a68194e26c3a3aa93fac"
+          },
+          "smiles": "C[C@]1(CC[C@@](N=C1N)(CF)c2cc(ccc2F)NC(=O)c3cc(ncn3)OC)S(=O)(=O)C"
+        },
+        "7n4w_p4v": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cc2c(cc1OC)[C@H]1Cc3ccc(OC)c(OC)c3CN1CC2",
+            "raw_smiles_sha256": "dba51aa175f8089bb7a4db4cf520ecdd73132cc76b93d4d24aac1bf10f9cd46e",
+            "sha256": "90f2629864c2872883dbee37f0fc0078fc731c9ce63c23fcac74bdb67d133c08"
+          },
+          "smiles": "COc1ccc2c(c1OC)CN3CCc4cc(c(cc4[C@H]3C2)OC)OC"
+        },
+        "7n6f_0i1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(C1CCN(c2cncnc2-c2ccc(F)cc2)CC1)N1CC(F)C1",
+            "raw_smiles_sha256": "17cb73b98dbc91285baa30c277d59f7794ae7ce7504d6824d6c028dbae1ae9c9",
+            "sha256": "3e749998366d698f0608a382edc668fcaa7202f22d766ca1cb5cc96955725120"
+          },
+          "smiles": "c1cc(ccc1c2c(cncn2)N3CCC(CC3)C(=O)N4CC(C4)F)F"
+        },
+        "7n7b_t3f": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cn([C@H]2C[C@H](O)[C@@H](CO[P@@](=O)(O)O[P@](=O)(O)O[C@H]3O[C@H](C)[C@H](O)[C@H](N)[C@H]3O)O2)c(=O)[nH]c1=O",
+            "raw_smiles_sha256": "a3a09c7ed91c5b90f553e5a3f53a217ddc5f2727e7b2a72ae1d260e14da98f2a",
+            "sha256": "9d8bea44ba75d01bb0979d2470aded50368b100917736d96258c8208ec7782dc"
+          },
+          "smiles": "C[C@@H]1[C@@H]([C@@H]([C@H]([C@H](O1)O[P@@](=O)(O)O[P@](=O)(O)OC[C@@H]2[C@H](C[C@@H](O2)N3C=C(C(=O)NC3=O)C)O)O)N)O"
+        },
+        "7n7h_ctp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ccn([C@@H]2O[C@H](CO[P@](=O)(O)O[P@](=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]2O)c(=O)n1",
+            "raw_smiles_sha256": "f4ffba09198f3464b1f39e1da12e26f3bc07dd9ec8d42d744cd75a2c6f7871dd",
+            "sha256": "9c0a2225d951d3566a172f7a087014af67660675a8d41913534ed36763c1e1dc"
+          },
+          "smiles": "C1=CN(C(=O)N=C1N)[C@H]2[C@@H]([C@@H]([C@H](O2)CO[P@](=O)(O)O[P@](=O)(O)OP(=O)(O)O)O)O"
+        },
+        "7nf0_byn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc2c3c(c1C)C(C)(C)C[C@@H](O)N3c1c(nc(O)[nH]c1=O)N2C[C@H](O)[C@H](O)[C@H](O)COP(=O)(O)O",
+            "raw_smiles_sha256": "c953a85e9a35f7c5d7f8ec56e4a57d521b0c7a25ad485d539f5c46b6671bac83",
+            "sha256": "c3d8eeaa62ae148ac7ab9216a26d7a497d0fb0eb502f11abb52e01e12122585d"
+          },
+          "smiles": "Cc1cc2c3c(c1C)C(C[C@H](N3C4=C(N2C[C@@H]([C@@H]([C@@H](COP(=O)(O)O)O)O)O)N=C(NC4=O)O)O)(C)C"
+        },
+        "7nf3_4lu": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc2c3c(c1C)C(C)(C)CC=[N+]3c1c([nH]c(=O)[nH]c1=O)N2C[C@H](O)[C@H](O)[C@H](O)COP(=O)(O)O",
+            "raw_smiles_sha256": "4f139d4901e0f8ee6a8a3ef843808c4dd4e086c4811a4056c67de27fbc63f4cb",
+            "sha256": "920c6367b86b91fbb676a6db32ebc03beb19dc8fe07391789ef3f343c23a4ccf"
+          },
+          "smiles": "Cc1cc2c3c(c1C)C(CC=[N+]3C4=C(N2C[C@@H]([C@@H]([C@@H](COP(=O)(O)O)O)O)O)NC(=O)NC4=O)(C)C"
+        },
+        "7nfb_gen": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=c1c(-c2ccc(O)cc2)coc2cc(O)cc(O)c12",
+            "raw_smiles_sha256": "fdddfa6159dfbab257087ad3d9cccc3d444ab03e02cf323d039009c9ae2f6a78",
+            "sha256": "a0ed16af70493c9bce4a0a38472cda3630fbbfb8c5684a2eb18aac2c6b5f0179"
+          },
+          "smiles": "c1cc(ccc1C2=COc3cc(cc(c3C2=O)O)O)O"
+        },
+        "7ngw_uaw": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC1CCN(C(=O)Nc2ccc(O)cc2)CC1",
+            "raw_smiles_sha256": "97cb18f517d49dec0bf8957d352c9322adabb1e1e23df888264b9181db508e07",
+            "sha256": "075eef4db1ade4b57a886297903a7749eca499656c89cf269fd55ef16c4820d5"
+          },
+          "smiles": "CC1CCN(CC1)C(=O)Nc2ccc(cc2)O"
+        },
+        "7nlv_uje": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(CCCC[C@@H]1SC[C@@H]2NC(=O)N[C@@H]21)N[C@H]1CCNC1",
+            "raw_smiles_sha256": "afcc280af746491d053f4858fccee95f1d9391edeeaf5ef6dd1dca522fd8a511",
+            "sha256": "290b2f34a59575a3de1fd169bffc822a7090088988e4cd568ed17da2eca55966"
+          },
+          "smiles": "C1CNC[C@H]1NC(=O)CCCC[C@H]2[C@@H]3[C@H](CS2)NC(=O)N3"
+        },
+        "7np6_uk8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1ccc(OCc2c(-c3c(Cl)cccc3C(F)(F)F)noc2-c2cn[nH]c2)cc1",
+            "raw_smiles_sha256": "6e2f9d30286d56baeac9bdf46d539ed3d32ba352c1ea24152c718c196bafcdbb",
+            "sha256": "20983ff325d0d9e02b1ed40409b394a23f6fd44537c0292ead26722d8e2aae69"
+          },
+          "smiles": "c1cc(c(c(c1)Cl)c2c(c(on2)c3c[nH]nc3)COc4ccc(cc4)C(=O)O)C(F)(F)F"
+        },
+        "7npl_ukz": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCC[C@@H](NC(=O)c1cccc2c1CC(=O)N2)[C@@H](O)c1cccc(Cl)c1C",
+            "raw_smiles_sha256": "24a8fc8ff386636a23854e0b8366651c1e857ff77cc29eef8ae76767f89c1682",
+            "sha256": "3ce64036afe835b7a7144666ffdd22b03e4124b681465f6e3d26fdf1da79b7d7"
+          },
+          "smiles": "CCC[C@H]([C@H](c1cccc(c1C)Cl)O)NC(=O)c2cccc3c2CC(=O)N3"
+        },
+        "7nr8_uoe": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H](C(=O)N[C@H](CO)c1cccc(N2CCN(C)CC2)n1)N1Cc2ccc(-c3nc(NC4CCOCC4)ncc3Cl)cc2C1=O",
+            "raw_smiles_sha256": "944b0844158e503c9f13ab6e4e8f029f330b3f14537021290d624890062b5243",
+            "sha256": "1d57be34b7145043090ceda89f9d1620874d5dfd4ed8f78bafa3da9c2fca8b7d"
+          },
+          "smiles": "C[C@H](C(=O)N[C@H](CO)c1cccc(n1)N2CCN(CC2)C)N3Cc4ccc(cc4C3=O)c5c(cnc(n5)NC6CCOCC6)Cl"
+        },
+        "7nsw_hc4": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)/C=C/c1ccc(O)cc1",
+            "raw_smiles_sha256": "1ef1591aa9e374a6106ac9d5ad72673e9db0a0a0a357e49b72c303aca4571b4b",
+            "sha256": "6d484640ad441d3f4febab850b1d4e40d5a459776f1a8f19c14b81b7e2594e3b"
+          },
+          "smiles": "c1cc(ccc1/C=C/C(=O)O)O"
+        },
+        "7nu0_dcl": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)C[C@H](N)CO",
+            "raw_smiles_sha256": "28004c0eac5be1706f6cdf05027281e1c5da8225ea8340a764421b6fff5182e0",
+            "sha256": "d010542e1120184477634229f1afee73a46d12d18db33f063569b22ee2fb4f8a"
+          },
+          "smiles": "CC(C)C[C@@H](CO)N"
+        },
+        "7nut_glp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@@H]1[C@@H](O)[C@H](O)[C@@H](COP(=O)(O)O)O[C@@H]1O",
+            "raw_smiles_sha256": "ab778413b7906461151b681bcc7f7d53e6b0a5b93d36069a25403afdd6fe1ee9",
+            "sha256": "5ac9694694ee6434dbb9345229716e68c5ff4098b4160835b77fde3ff4a2b4ff"
+          },
+          "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)N)O)O)OP(=O)(O)O"
+        },
+        "7nxo_uu8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccccc1Oc1cc(-n2c(=O)cc(S(=O)(=O)c3ccccc3)[nH]c2=O)c(F)cc1C#N",
+            "raw_smiles_sha256": "28b732a2d81a48dd2080529d3f0e4db9c9d4b1121ef83b364a0d90f76b08492c",
+            "sha256": "c392611934afd814370c08cc064b0edbca5898d3217138fd787f54f007fbf0e3"
+          },
+          "smiles": "Cc1ccccc1Oc2cc(c(cc2C#N)F)N3C(=O)C=C(NC3=O)S(=O)(=O)c4ccccc4"
+        },
+        "7o0n_cdp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ccn([C@@H]2O[C@H](CO[P@@](=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]2O)c(=O)n1",
+            "raw_smiles_sha256": "d5da268b0cbd725f0e4de9800c733d05f871262041cc6bbe5c19334157192590",
+            "sha256": "736e43e8049461e9aa52879480471a44e8377f022a37a797bda0de7415e009a7"
+          },
+          "smiles": "C1=CN(C(=O)N=C1N)[C@H]2[C@@H]([C@@H]([C@H](O2)CO[P@@](=O)(O)OP(=O)(O)O)O)O"
+        },
+        "7o1t_5x8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CSC[C@H](N)C(=O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "5a06431c36a7a0bcd093ca4b7c86ccff6b2b512267315a6b9f65e99bf5767d4a",
+            "sha256": "4a3b8313ee250b174c66c58b130392ce8b75704ae2455a3314906d18205f9e33"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CSC[C@@H](C(=O)O)N)O)O)N"
+        },
+        "7ody_dgi": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(ncn2[C@H]2C[C@H](O)[C@@H](CO[P@](=O)(O)OP(=O)(O)O)O2)c(=O)[nH]1",
+            "raw_smiles_sha256": "603e4e028d6df9569a53e5b91d70358585e2e4a178f3353940ff51e861192200",
+            "sha256": "3b89499a2177a11a607ecd6ccda4f60d465048dd330151d2a186653e1ce37f24"
+          },
+          "smiles": "c1nc2c(n1[C@H]3C[C@@H]([C@H](O3)CO[P@](=O)(O)OP(=O)(O)O)O)N=C(NC2=O)N"
+        },
+        "7oeo_v9z": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNC(=O)CN(CC(c1ccccc1)c1ccccc1)C(=O)c1cc(C)c(OC)c(C)c1",
+            "raw_smiles_sha256": "39e0b4d111555e485eee20082ded57ec4cfccc2ef5e1133a8262f0d9d91d46d2",
+            "sha256": "208d0d9ef5e5233ce0fa0f25752729280574bfb6f98a20fbaca4dc69e605c515"
+          },
+          "smiles": "Cc1cc(cc(c1OC)C)C(=O)N(CC(c2ccccc2)c3ccccc3)CC(=O)NC"
+        },
+        "7off_vcb": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(N[C@@H](C(=O)O)c1ccccc1)c1cccc2c1-c1ccccc1C2=O",
+            "raw_smiles_sha256": "c9f71d6c950745f2ed66d849232c5eebb2411a806f40e8906f3fd1c36ba889dc",
+            "sha256": "021c07df5ee14f2bae57b253d0bfb4c4f47256dadb7dda8f44ceccb41708327b"
+          },
+          "smiles": "c1ccc(cc1)[C@H](C(=O)O)NC(=O)c2cccc3c2-c4ccccc4C3=O"
+        },
+        "7ofk_vch": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)N1Cc2cc(S(C)(=O)=O)ccc2[C@@H]1C(=O)Nc1ccc(C(O)(C(F)(F)F)C(F)(F)F)cc1",
+            "raw_smiles_sha256": "35409ab6c42f2c1a7281159cb1e66e4c302757996fef8b450b97af0dd9e155a6",
+            "sha256": "d49fc6bfad0e6846360ca61feafe4eae45731a4fdb8d21e872ccad953c2c8e37"
+          },
+          "smiles": "CC(=O)N1Cc2cc(ccc2[C@@H]1C(=O)Nc3ccc(cc3)C(C(F)(F)F)(C(F)(F)F)O)S(=O)(=O)C"
+        },
+        "7oli_8hg": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c([nH]c(=O)n2[C@H]2C[C@H](O)[C@@H](CO)O2)c(=O)[nH]1",
+            "raw_smiles_sha256": "70517015b6b15788cb3ae125c3a1ecdea9a4957ddcd7e3267654928560c99ec5",
+            "sha256": "bda382bc625811b07f9500e95008efcf261f511e7fef46208fb3790124abf6b1"
+          },
+          "smiles": "C1[C@@H]([C@H](O[C@H]1N2C3=C(C(=O)NC(=N3)N)NC2=O)CO)O"
+        },
+        "7omx_cna": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=O)c1ccc[n+]([C@@H]2C[C@H](COP(=O)(O)OP(=O)(O)OC[C@H]3O[C@@H](n4cnc5c(N)ncnc54)[C@H](O)[C@@H]3O)[C@@H](O)[C@H]2O)c1",
+            "raw_smiles_sha256": "c71a2dcdfb3ea44a8df5d4d94097dad0be5227e88b0256785a81594eafbd9e26",
+            "sha256": "65d24f5b6e2a2259a569b8bc2065c3cd748e4ed291ac8aebbe569359f99f2c0e"
+          },
+          "smiles": "c1cc(c[n+](c1)[C@@H]2C[C@@H]([C@H]([C@H]2O)O)COP(=O)(O)OP(=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)n4cnc5c4ncnc5N)O)O)C(=O)N"
+        },
+        "7op9_06k": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Clc1nc(Cl)c2[nH]cnc2n1",
+            "raw_smiles_sha256": "9c4daaa68decc61abc1fdfdcc8b6fe1c7182ffc8fef59f95398df3cdb8c2eba9",
+            "sha256": "0d2d5cc751acadbf54586d7822725a3ff76cf5f85557e28a44be495913bf68f7"
+          },
+          "smiles": "c1[nH]c2c(n1)nc(nc2Cl)Cl"
+        },
+        "7opg_06n": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCNc1nn2c(-c3ccc(O)cc3)cnc2s1",
+            "raw_smiles_sha256": "e03a5c56fec408b80408560ddfdbbcee7528cbaf5670c01f218787d3aa9d8228",
+            "sha256": "6a6e525374c7a5f1f9f669d56f6d4868ec4a0190428d6d5b20bc05d568705661"
+          },
+          "smiles": "CCCNc1nn2c(cnc2s1)c3ccc(cc3)O"
+        },
+        "7oso_0v1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "OCC[C@H](O)CO",
+            "raw_smiles_sha256": "29bc9c5bf63599b224cec084f47b53342aa5c982fc70489420f45211535f7cbb",
+            "sha256": "d5a5d0fad3c505a995d2fa24bced175e8f3a434b2d5fb103ac5e3551794ca54f"
+          },
+          "smiles": "C(CO)[C@@H](CO)O"
+        },
+        "7oz9_ngk": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)N[C@@H]1[C@@H](O)[C@@H](OS(=O)(=O)O)[C@@H](CO)O[C@@H]1O",
+            "raw_smiles_sha256": "804c9185747b0b9f34f9fde4f4289b0a3016a8409cad071f8d2ef354a6c07a77",
+            "sha256": "dc113b06595f314dd41d57e03a382d516aaaeb3a5e86cf934e0b60bd267e9b72"
+          },
+          "smiles": "CC(=O)N[C@@H]1[C@H]([C@H]([C@H](O[C@@H]1O)CO)OS(=O)(=O)O)O"
+        },
+        "7ozc_g6s": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=S(=O)(O)OC[C@H]1O[C@@H](O)[C@H](O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "539e307e926411ff1b5e8d65b7ab87bbfc2e4696ab5391c54c9ef986a14eacae",
+            "sha256": "2789d0fcec7ba264e797e48fae007cba7ce7fac4a7f775a11b9c6bbe0ef9f5f4"
+          },
+          "smiles": "C([C@@H]1[C@@H]([C@@H]([C@H]([C@@H](O1)O)O)O)O)OS(=O)(=O)O"
+        },
+        "7p1f_kfn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)C1=C[C@H](O)[C@@H](O)[C@H]([C@H](O)[C@H](O)CO)O1",
+            "raw_smiles_sha256": "d62cdbfea6b8830b87916177d82b0b52648f0d904c0c08795a0dbf763fb14f28",
+            "sha256": "acc7612aedd01ec7ddad8f956dd47d60688b0f393640d2b8681bbbde97320fa1"
+          },
+          "smiles": "C1=C(O[C@H]([C@@H]([C@H]1O)O)[C@@H]([C@@H](CO)O)O)C(=O)O"
+        },
+        "7p1m_4iu": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cn1c(CO[C@@H]2C=CO[C@H](CO)[C@@H]2O)nc2ccc(C(=O)O)cc21",
+            "raw_smiles_sha256": "e30f58a386795ebad57bd234514a9a5e015c568cdeba5a54204275f6626b972e",
+            "sha256": "1a8332428e3bfb54ad3c2ecfd1ef42d44f6be62b5901e548695e2f079524db81"
+          },
+          "smiles": "Cn1c2cc(ccc2nc1CO[C@@H]3C=CO[C@@H]([C@@H]3O)CO)C(=O)O"
+        },
+        "7p2i_mfu": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CO[C@@H]1O[C@@H](C)[C@@H](O)[C@@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "8844ebca3b1bdad94b798cba9589844d1a534fa8c178a04e73726731403b8e87",
+            "sha256": "8af88ad787e5e3a4b86d50178788b7b9e00ae45e8a06e8eff36f4556448415cd"
+          },
+          "smiles": "C[C@H]1[C@H]([C@H]([C@@H]([C@@H](O1)OC)O)O)O"
+        },
+        "7p4c_5ov": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=S1(=O)N[C@@H]2[C@H](O)[C@@H](O)[C@H](O)[C@@H](CO)[C@@H]2O1",
+            "raw_smiles_sha256": "af00add5c965f4ed8a0fb1f9e10ef6f8014c89aca9fd9383d623f0c321644d70",
+            "sha256": "82468f69fd296268a9f1667d4850a9c3f9674e7bf15674d5bd75c89ba1546fc4"
+          },
+          "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@@H]2[C@H]1OS(=O)(=O)N2)O)O)O)O"
+        },
+        "7p5t_5yg": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1ccc(CNc2ccc(Cc3ccncc3)cc2)cc1",
+            "raw_smiles_sha256": "934aed9aede5f406230513557fb79efeefc7fc5bb3976a40711a63c930476479",
+            "sha256": "d4d24e20758104c0a78bbf7bccf7b94290179411f92702a6cf5eb7cdb1eff751"
+          },
+          "smiles": "COc1ccc(cc1)CNc2ccc(cc2)Cc3ccncc3"
+        },
+        "7pgx_fmn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc2nc3c(=O)[nH]c(=O)nc-3n(C[C@H](O)[C@H](O)[C@H](O)COP(=O)(O)O)c2cc1C",
+            "raw_smiles_sha256": "b87954243a57ee0e78d26414e4e1cc27fd3d5f69a678a43fe9672c6af38c858b",
+            "sha256": "9d28370b1fdd2af12e7f2e26697b84b2fa73603d00f51d34bdf823170f7b4406"
+          },
+          "smiles": "Cc1cc2c(cc1C)N(C3=NC(=O)NC(=O)C3=N2)C[C@@H]([C@@H]([C@@H](COP(=O)(O)O)O)O)O"
+        },
+        "7pih_7qw": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC1CCN(Cc2cccc(-c3ccc4c(O)nccc4c3)c2)C1",
+            "raw_smiles_sha256": "8ca47b0b74f8ed1ae0eaed8f89e718df1cff0082349dc1e10dc21de724870696",
+            "sha256": "dc1a7c255ebf45050a06f3b1ad00eb773be08880fb950189a51e5ebbafd9e00c"
+          },
+          "smiles": "c1cc(cc(c1)c2ccc3c(c2)ccnc3O)CN4CCC(C4)N"
+        },
+        "7pjq_owh": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNC(=S)c1cccnc1",
+            "raw_smiles_sha256": "e330a89279a9f191dbf8f101c80b526cc75fb38709644bf72f9aa80a14ff2771",
+            "sha256": "ef4e2eb7efa6775119dd94daa71408b0f122b04ee8a72343d310b88d25c88276"
+          },
+          "smiles": "CNC(=S)c1cccnc1"
+        },
+        "7pk0_byc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)(CO[P@](=O)(O)O[P@@](=O)(O)OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1OP(=O)(O)O)[C@@H](O)C(=O)NCCC(=O)NCCSC(=O)c1ccccc1",
+            "raw_smiles_sha256": "115c93d953fb4fdab3fc7967b9d85bd278b035f23048238b6df020e6fa3128b0",
+            "sha256": "c87e4b893a9f35610ae82397a46373ab8b1cd41f8eb15dc462fa2b004fef946b"
+          },
+          "smiles": "CC(C)(CO[P@](=O)(O)O[P@@](=O)(O)OC[C@@H]1[C@H]([C@H]([C@@H](O1)n2cnc3c2ncnc3N)O)OP(=O)(O)O)[C@H](C(=O)NCCC(=O)NCCSC(=O)c4ccccc4)O"
+        },
+        "7pl1_sfg": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](C[C@@H](N)CC[C@H](N)C(=O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "a69a4b9907fb84a2af810675cd4231230d07854b9d4c8bdcbbb939d3bd56f53f",
+            "sha256": "541e1e0c02f23bca044222aa297f05313621cd11c34d1611fad11cdeaa281532"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)C[C@H](CC[C@@H](C(=O)O)N)N)O)O)N"
+        },
+        "7pom_7vz": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COC(=O)c1cc(S(N)(=O)=O)c(SC2CCCCC2)cc1Cl",
+            "raw_smiles_sha256": "f084f545408ccd9606c8213cd46f5e327372c17f82ec3d8bf80ff9a7e99c2707",
+            "sha256": "f2d1241c4e54b1bd3e4d1cf41415e4ed2775cbcbb7fa366b7d4adebf52ac96d3"
+          },
+          "smiles": "COC(=O)c1cc(c(cc1Cl)SC2CCCCC2)S(=O)(=O)N"
+        },
+        "7pri_7ti": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1cc(C(Cl)=C(Cl)Cl)c(S(N)(=O)=O)cc1S(N)(=O)=O",
+            "raw_smiles_sha256": "3451dd5f715000a0fdeca9a5e492fe6af709119d3b83b94e0652c27e8e27f95a",
+            "sha256": "cb1076685c139c1e2cbca072074c79f1389708107463570ee85f05529adf29ad"
+          },
+          "smiles": "c1c(c(cc(c1N)S(=O)(=O)N)S(=O)(=O)N)C(=C(Cl)Cl)Cl"
+        },
+        "7prm_81i": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(c1ccco1)N1CCN([C@@H]2CC(=O)N(c3ccc(-c4ccc(F)cc4)cc3)C2)CC1",
+            "raw_smiles_sha256": "51ce9ca3997b6108d880c27ce890b3ae687fca6eb244e6497f68ac092e305423",
+            "sha256": "ba1287682f206564142a1a154729c25f5421bea0786946a7f8d3b6c2efd41994"
+          },
+          "smiles": "c1cc(oc1)C(=O)N2CCN(CC2)[C@@H]3CC(=O)N(C3)c4ccc(cc4)c5ccc(cc5)F"
+        },
+        "7pt3_3kk": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)(O)C(=O)SCCNC(=O)CCNC(=O)[C@H](O)C(C)(C)COP(=O)(O)OP(=O)(O)OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1OP(=O)(O)O",
+            "raw_smiles_sha256": "eff1a6e3de798411b9e549b059adf959bbe52c11afb9dac14d64fa6b89ebb86e",
+            "sha256": "a7907bb5be9da9e5909b6218ec0b7a40ba78057d935394a40c62f5a64e29e953"
+          },
+          "smiles": "CC(C)(COP(=O)(O)OP(=O)(O)OC[C@@H]1[C@H]([C@H]([C@@H](O1)n2cnc3c2ncnc3N)O)OP(=O)(O)O)[C@H](C(=O)NCCC(=O)NCCSC(=O)C(C)(C)O)O"
+        },
+        "7puv_84z": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COC(=O)c1cc(S(N)(=O)=O)c(Cl)cc1S(=O)(=O)c1ccccc1",
+            "raw_smiles_sha256": "eccec2d20998cd69d382c4eb07727d201522f453f8b67f8586da8636c40c3adc",
+            "sha256": "00529c3fc15819f190c8863aecd15364674987043d011da9bacc73043e81cdb6"
+          },
+          "smiles": "COC(=O)c1cc(c(cc1S(=O)(=O)c2ccccc2)Cl)S(=O)(=O)N"
+        },
+        "7q25_8j9": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCC[C@H](N[C@@H](CCc1ccccc1)C(=O)O)C(=O)N[C@@H](Cc1ccc(O)cc1)C(=O)O",
+            "raw_smiles_sha256": "2de555a65c06e4c935e927f179c221f636ecc08a28e5d040b91a28d42dea735c",
+            "sha256": "2f1d14ce17349d17d63def96b46e121a09bb4a69d4806983d564ddb5b74e38dc"
+          },
+          "smiles": "CCCC[C@@H](C(=O)N[C@@H](Cc1ccc(cc1)O)C(=O)O)N[C@@H](CCc2ccccc2)C(=O)O"
+        },
+        "7q27_8kc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCC[C@H](N[C@@H](CCc1ccccc1)C(=O)O)C(=O)N[C@@H](Cc1c[nH]c2ccccc12)C(=O)O",
+            "raw_smiles_sha256": "a00cf997630e1d6f2a9768957b16251bf052172acfd2a4ff1fc3be801fb2d1b7",
+            "sha256": "79d7c185406ad02aff51b9c9eb7d90d6452583764dea644909c380f662a032c8"
+          },
+          "smiles": "CCCC[C@@H](C(=O)N[C@@H](Cc1c[nH]c2c1cccc2)C(=O)O)N[C@@H](CCc3ccccc3)C(=O)O"
+        },
+        "7q2b_m6h": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "c1ccc(CC2NCCN2)cc1",
+            "raw_smiles_sha256": "79447b275d7a35e6d8854ad2f60dca7d3836f59159ef02117656afb988e78c38",
+            "sha256": "97c28d661b1a00757275aa16e03b090462453a670c37d92b6fc9beb3367f3e42"
+          },
+          "smiles": "c1ccc(cc1)CC2NCCN2"
+        },
+        "7q5i_i0f": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN(C)c1ccc(/C=C(\\C#N)C(=O)N[C@@H]2O[C@H](CO)[C@@H](O)[C@H](O)[C@H]2O)cc1",
+            "raw_smiles_sha256": "0a9fca8d3d1e17e55f1b6e0d9b57e89d3749356fd8d0dc9ba611c9755aef0d4d",
+            "sha256": "a2fb2947e6876ed75fabfee94a32d0497e9abf0388f7a1ed2b98c0d41cd4b684"
+          },
+          "smiles": "CN(C)c1ccc(cc1)/C=C(\\C#N)/C(=O)N[C@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)O)O"
+        },
+        "7qe4_nga": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)N[C@@H]1[C@@H](O)[C@@H](O)[C@@H](CO)O[C@H]1O",
+            "raw_smiles_sha256": "33d6c172312a18e237c32adb3d29f2fb17e71fc44d4674515f8e299ce0b8ac20",
+            "sha256": "060e2cad70b658c35ae727da5113a65aa9934fce90ec30aa1f48c9e891c20037"
+          },
+          "smiles": "CC(=O)N[C@@H]1[C@H]([C@H]([C@H](O[C@H]1O)CO)O)O"
+        },
+        "7qf4_rbf": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc2nc3c(=O)[nH]c(=O)nc-3n(C[C@H](O)[C@H](O)[C@H](O)CO)c2cc1C",
+            "raw_smiles_sha256": "e611ef966039292e26e12df27d3f20307dea06596573460c93b49f6a1e6d61f3",
+            "sha256": "67a6fa06fe45902e5ac53b0532a7e303b23be219874224fffa80295e8b084af1"
+          },
+          "smiles": "Cc1cc2c(cc1C)N(C3=NC(=O)NC(=O)C3=N2)C[C@@H]([C@@H]([C@@H](CO)O)O)O"
+        },
+        "7qfm_ay3": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C1Nc2ccccc2/C1=C\\c1ccc(C(=O)O)cc1",
+            "raw_smiles_sha256": "abd3fc4c8848572439f3b98ec0bdc1476da89d5435f5762ab7f4f4982aca3598",
+            "sha256": "de7432f03bda3a9dc1ad95c98d91336e8a7877fb7539274f4e6ebc6b98715a2d"
+          },
+          "smiles": "c1ccc2c(c1)/C(=C\\c3ccc(cc3)C(=O)O)/C(=O)N2"
+        },
+        "7qgp_dj8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc(Cl)ccc1CNC(=O)Nc1ccc2cc1OCCOCCNc1ccn3ncc-2c3n1",
+            "raw_smiles_sha256": "fdd0450ac2df29d4860390bffbc718370226bb37102bc2a268147c1ab365e4af",
+            "sha256": "154ddd9755a374a1dce64687b23ca60a55ef679aae47724631f0ef79d006c9ed"
+          },
+          "smiles": "Cc1cc(ccc1CNC(=O)Nc2ccc-3cc2OCCOCCNc4ccn5c(c3cn5)n4)Cl"
+        },
+        "7qhg_t3b": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)C(=O)Nc1ncc(C(=O)NCCN(Cc2ccccc2)C(=O)c2ccc(S(=O)(=O)Nc3ccccc3)cc2)s1",
+            "raw_smiles_sha256": "3d49aaa5f22a4a59d3516e1ade1b41eca79d3d7ef932a27ef70d475a3c0f2829",
+            "sha256": "7ba8b7951453c7bbfaa3fdd91fc46b9f2f5f334a349ba2cf220b6571fdad520d"
+          },
+          "smiles": "CC(C)C(=O)Nc1ncc(s1)C(=O)NCCN(Cc2ccccc2)C(=O)c3ccc(cc3)S(=O)(=O)Nc4ccccc4"
+        },
+        "7qhl_d5p": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NCCSc1nc(NCc2ccc(-n3cccn3)cc2)c2[nH]nc(C3CCC3)c2n1",
+            "raw_smiles_sha256": "6d839aea226f8251740e4d342cebca211e19cbc19fc7744ad42b17627a40aea5",
+            "sha256": "01baee152ac74555978002fe30b62166d31bede6df0ae43eca0d37b76935b6e2"
+          },
+          "smiles": "c1cnn(c1)c2ccc(cc2)CNc3c4c(c(n[nH]4)C5CCC5)nc(n3)SCCN"
+        },
+        "7qpp_vdx": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C1/C(=C\\C=C2/CCC[C@]3(C)[C@@H]([C@H](C)CCCC(C)(C)O)CC[C@@H]23)C[C@@H](O)C[C@@H]1O",
+            "raw_smiles_sha256": "4258afc4265254bd35b49a4b7e15bc56cea731bfdf88ae682add7fd2c74b25b5",
+            "sha256": "63578a2bf75d8efddcc10ed19874d94e5960de8f1aa8a5586512ad9549d38d9b"
+          },
+          "smiles": "C[C@H](CCCC(C)(C)O)[C@H]1CC[C@@H]\\2[C@@]1(CCC/C2=C\\C=C/3\\C[C@H](C[C@@H](C3=C)O)O)C"
+        },
+        "7qta_uri": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=c1ccn([C@@H]2O[C@H](CO)[C@@H](O)[C@H]2O)c(=O)[nH]1",
+            "raw_smiles_sha256": "3bd95c09de7a05de79930f92952d26aaf89335f3e121406fee2397da2173dbd3",
+            "sha256": "2d3ec626ac462f3323c44319542a174c8420a8169c5de77711a29e35b1495758"
+          },
+          "smiles": "C1=CN(C(=O)NC1=O)[C@H]2[C@@H]([C@@H]([C@H](O2)CO)O)O"
+        },
+        "7r3d_apr": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO[P@](=O)(O)O[P@](=O)(O)OC[C@H]2O[C@@H](O)[C@H](O)[C@@H]2O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "3834e27f2c4f83c15a640b4190f5ed8010987f74a9e6a7e156454a7ebed077e1",
+            "sha256": "daced0c781c62a9f2073887984c62c5de7bca4b5b94772b91f35f890666c0a04"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)O[P@](=O)(O)OC[C@@H]4[C@H]([C@H]([C@@H](O4)O)O)O)O)O)N"
+        },
+        "7r59_i5f": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Oc1ccc2c(c1)sc1nncn12",
+            "raw_smiles_sha256": "a1d34f804a2568d1dc26b4ee84eae2b14582044503e8accc58d73858f9a21ac6",
+            "sha256": "419a9a43fc7e32237dc8a693a2198072441dc54531f92e8f7edf3cef4b1c8e3e"
+          },
+          "smiles": "c1cc2c(cc1O)sc3n2cnn3"
+        },
+        "7r6j_2i7": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cc(NCc2cccc(CN3C[C@H](O)[C@@H](O)[C@H](O)[C@H]3CO)c2)cc(-c2ncccn2)c1",
+            "raw_smiles_sha256": "4f04d852367d869501f4553ca570be54fed2924d1c280c4b429dc9e4b1ff9781",
+            "sha256": "1b54acf85781f38a1e7f6ffcb0b4b22ca5a6162173233e82358fd20e73697c66"
+          },
+          "smiles": "Cc1cc(cc(c1)NCc2cccc(c2)CN3C[C@@H]([C@H]([C@@H]([C@H]3CO)O)O)O)c4ncccn4"
+        },
+        "7r7r_awj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1nc([C@](C)(O)CO)sc1-c1cnc(N)c(O[C@H](C)c2cc(F)ccc2N2NC=CN2)c1",
+            "raw_smiles_sha256": "ab9468e1ec2a7785c227019ad15e53041ca9d4d08cb16fecbf9c13abf63bc47f",
+            "sha256": "c9974ba62e8c56aee352e037284834134a5aac40e7896b0abc76f82c5eb92dd1"
+          },
+          "smiles": "Cc1c(sc(n1)[C@@](C)(CO)O)c2cc(c(nc2)N)O[C@H](C)c3cc(ccc3N4NC=CN4)F"
+        },
+        "7r9n_f97": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)n1ncc2cnc(Nc3cc([C@@H]4CCNC4)nc(N4CCC(F)(F)C4)n3)cc21",
+            "raw_smiles_sha256": "2d02d26ed1a05c5b8f334a23d47cc18556b8de52d16bcccea6ea1669b8130f2f",
+            "sha256": "5087a60483812020022ef48b3e04a810b0791afcf72aa40e4adbce92ec6a9484"
+          },
+          "smiles": "CC(C)n1c2cc(ncc2cn1)Nc3cc(nc(n3)N4CCC(C4)(F)F)[C@@H]5CCNC5"
+        },
+        "7rc3_sah": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CSCC[C@H](N)C(=O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "7a89667196b4d0e44236b5d83dcb23f9bade432980501b80dd32910b4628f710",
+            "sha256": "119497bd7ef5fd43d580f917774126ef559c94e36cd0b2b6e5cb2b2791ba5d36"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CSCC[C@@H](C(=O)O)N)O)O)N"
+        },
+        "7rh3_59o": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CO[C@@H]1O[C@H](CO)[C@H](O)[C@H](OC(=O)c2ccc(C)cc2)[C@@H]1OC(=O)c1ccc(Cl)cc1[N+](=O)[O-]",
+            "raw_smiles_sha256": "e7a92aabb6dbd990a10cf04c404c0ea33c1c2e21eb88a86b059276d1a906b64f",
+            "sha256": "008c2f5ac9a5b9894014737ad9b9adbb74243fe48699b49f11bf8765c7d09af2"
+          },
+          "smiles": "Cc1ccc(cc1)C(=O)O[C@H]2[C@H]([C@H](O[C@H]([C@H]2OC(=O)c3ccc(cc3[N+](=O)[O-])Cl)OC)CO)O"
+        },
+        "7rkw_5tv": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O[C@H](Cn1ccnc1)c1ccc(F)cc1)c1cc(Cl)cc(Cl)c1",
+            "raw_smiles_sha256": "edb37167207e31083f775eaa70fdf834daf4f86f6be51bd4ddb42f3892ac9f6f",
+            "sha256": "716a21f44101512b8122eb826528f8b959eb23f8d21629ec7243ed439d93351b"
+          },
+          "smiles": "c1cc(ccc1[C@@H](Cn2ccnc2)OC(=O)c3cc(cc(c3)Cl)Cl)F"
+        },
+        "7rni_60i": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1nn(C)c(C)c1C(=O)N1CCN(Cc2nc3ccccc3n2CC(C)(C)C)CC1",
+            "raw_smiles_sha256": "46c622501a7c38662faa8d6166a7366e746924649b537912853f1a72dd8af975",
+            "sha256": "5b1a33f7d58aba70a361e65883d3b6324fe2957014f650c481d335325914d5d9"
+          },
+          "smiles": "Cc1c(c(n(n1)C)C)C(=O)N2CCN(CC2)Cc3nc4ccccc4n3CC(C)(C)C"
+        },
+        "7ror_69x": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](COP(=O)(O)OC(=O)[C@@H](N)Cc2ccc(O)cc2)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "d627e0cb50402a168808b86e54410a5ec9357c63078fe4dabea90e26b6dbfeaf",
+            "sha256": "09f232ec45e8fe233d9d5770c3c2b969ed97a4909d7d999da4d864d29329866a"
+          },
+          "smiles": "c1cc(ccc1C[C@@H](C(=O)OP(=O)(O)OC[C@@H]2[C@H]([C@H]([C@@H](O2)n3cnc4c3ncnc4N)O)O)N)O"
+        },
+        "7rou_66i": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1c(OC(F)F)nn2[C@@H]1O[C@H](COS(=O)(=O)NC(=O)[C@@H](N)Cc2ccc(O)cc2)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "930180817a0ef94a4076a39d1e168c6c57a0fc4324c56a7aa2cfcb035e55422a",
+            "sha256": "671e6ce5cd0b8822c6e110ecca1128822b88558f120b195b1c511aaf8566975b"
+          },
+          "smiles": "c1cc(ccc1C[C@@H](C(=O)NS(=O)(=O)OC[C@@H]2[C@H]([C@H]([C@@H](O2)n3c4c(c(ncn4)N)c(n3)OC(F)F)O)O)N)O"
+        },
+        "7rsv_7iq": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@@H]1COCCN1c1cc2n(n1)[C@@H]1CCC[C@@H]1NC2=O",
+            "raw_smiles_sha256": "8996b486b916141e563dc1dd3cb9cda07bbddcfd198495a68df5cc402163f14b",
+            "sha256": "54fa5664e662f281560a748fe3a1438d7d52d73259ff73a0b1e567421bca9783"
+          },
+          "smiles": "C[C@@H]1COCCN1c2cc3n(n2)[C@@H]4CCC[C@@H]4NC3=O"
+        },
+        "7rws_4ur": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(ncn2[C@@H]2O[C@@H]3COP(=O)(O)O[C@@H]4[C@H](O)[C@@H](COP(=O)(O)O[C@H]3[C@H]2O)O[C@H]4n2cnc3c(N)ncnc32)c(=O)[nH]1",
+            "raw_smiles_sha256": "637eeb6f146aaeb857c569594a4ac4c5fb082f985631372aa1f932fbb9e7a61c",
+            "sha256": "c638e6d083ba21693e2e15466f97f986f74b242f5905fba8155397d53111acdd"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@H]4[C@@H]([C@H](O3)COP(=O)(O[C@@H]5[C@@H](COP(=O)(O4)O)O[C@H]([C@@H]5O)n6cnc7c6N=C(NC7=O)N)O)O)N"
+        },
+        "7rzl_npo": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=[N+]([O-])c1ccc(O)cc1",
+            "raw_smiles_sha256": "910336c038f2e2e847689dcd3090c26a9b82aa96567d551eb11cc96f4435df3a",
+            "sha256": "4f567ea9c0ee9b5dae4702dc07e85331fb8e907ac6cfb117df7d3bbddb05f6f3"
+          },
+          "smiles": "c1cc(ccc1[N+](=O)[O-])O"
+        },
+        "7scw_gsp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(ncn2[C@@H]2O[C@H](CO[P@](=O)(O)O[P@](=O)(O)OP(O)(O)=S)[C@@H](O)[C@H]2O)c(=O)[nH]1",
+            "raw_smiles_sha256": "eaff62b74821529261369ecc4b527e36c668785c297a8f68126379116fe54d45",
+            "sha256": "475ca9045d60a67e65cf14763cf09650b8a2cafad9c8d17f5922b92703b7f3cc"
+          },
+          "smiles": "c1nc2c(n1[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)O[P@](=O)(O)OP(=S)(O)O)O)O)N=C(NC2=O)N"
+        },
+        "7sdd_4ip": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=P(O)(O)OC1[C@H](O)[C@H](OP(=O)(O)O)C(OP(=O)(O)O)[C@H](OP(=O)(O)O)[C@H]1O",
+            "raw_smiles_sha256": "e57c40def4c7bb906e9c97ec8425bdf1445361acfe44ec765621e7fcec8bb24a",
+            "sha256": "2074806c5cba7531019c2bac6c7d95171eae0899ad4362336796647edf8091bb"
+          },
+          "smiles": "[C@H]1([C@H](C([C@H]([C@H](C1OP(=O)(O)O)O)OP(=O)(O)O)OP(=O)(O)O)OP(=O)(O)O)O"
+        },
+        "7sfo_98l": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Oc1cccc(CNc2nc(Cl)nc3scc(-c4ccccc4)c23)c1",
+            "raw_smiles_sha256": "5fbbe1d8cb38b3479f49ca8f9b555d7cbb043088511602949c870e1524e8753c",
+            "sha256": "d04ec61d7630e9fa27b3850dac17623a4737545a60b3dbb506714c63fb255036"
+          },
+          "smiles": "c1ccc(cc1)c2csc3c2c(nc(n3)Cl)NCc4cccc(c4)O"
+        },
+        "7siu_9id": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cn1cc(Nc2ncc(C3=CCC[C@@H](NC(=O)c4ccccc4)C3)nc2C(N)=O)cn1",
+            "raw_smiles_sha256": "442b29f31336c12c6f44e2f50f27f2672dc42001506842252c8b2f434780ddb6",
+            "sha256": "827a3ab3aebaa240fc617373dabf5604e3471a3e2ada7f0bd7ac560d5c801052"
+          },
+          "smiles": "Cn1cc(cn1)Nc2c(nc(cn2)C3=CCC[C@H](C3)NC(=O)c4ccccc4)C(=O)N"
+        },
+        "7suc_com": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=S(=O)(O)CCS",
+            "raw_smiles_sha256": "0f8dd63276269d87acce669e362c4aaea49e516159363c7cc7bf3468bd070e54",
+            "sha256": "8c60212821dd28632eb9371aa49e5dc4961e118b600c24bddf621c5eade1b8e5"
+          },
+          "smiles": "C(CS(=O)(=O)O)S"
+        },
+        "7sza_dui": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1cccc2c1C(=O)N([C@@H]1CCC(=O)NC1=O)C2=O",
+            "raw_smiles_sha256": "1c72d7faa8db8369349a05520d0f52b11250ca40dd05bdbddb237ae57a51f7a7",
+            "sha256": "70c21a50738f5f3f74d7ece5ad4563b1f8ca8a0cb402ee6e578c8de17ae23d80"
+          },
+          "smiles": "c1cc2c(c(c1)N)C(=O)N(C2=O)[C@@H]3CCC(=O)NC3=O"
+        },
+        "7t0d_fpp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)=CCC/C(C)=C/CC/C(C)=C/CO[P@@](=O)(O)OP(=O)(O)O",
+            "raw_smiles_sha256": "13a6e7d99f0d97c7a51629d0709956888ddf8b681b3285e815b4e70aa20d0c43",
+            "sha256": "fc74d5812101f7ea6122a68e3d22a32231d55b78ee413d5cdcdddd59401319f8"
+          },
+          "smiles": "CC(=CCC/C(=C/CC/C(=C/CO[P@@](=O)(O)OP(=O)(O)O)/C)/C)C"
+        },
+        "7t1d_e7k": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cn(-c2ccc3c(c2)CN(c2ncc(Cc4ccc(-n5cccn5)cc4)s2)CC3)c(C)n1",
+            "raw_smiles_sha256": "a407b9319526790689b2949c6b37d39c86f974305f964ca75746291520d7ac79",
+            "sha256": "95a6fc04347eda057f5d087a79efd63557336f7e0cd02ffb3e78a1cbc5634ae4"
+          },
+          "smiles": "Cc1cn(c(n1)C)c2ccc3c(c2)CN(CC3)c4ncc(s4)Cc5ccc(cc5)n6cccn6"
+        },
+        "7t3e_slb": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)N[C@H]1[C@H]([C@H](O)[C@H](O)CO)O[C@](O)(C(=O)O)C[C@@H]1O",
+            "raw_smiles_sha256": "12fe3b972128ed988814cde941f475c89a374478e8ca6342d15b06a763fab4ce",
+            "sha256": "e67fd07a94febf766494aa32f61fdb1818c886ba42eb8b38b3efada44bf61431"
+          },
+          "smiles": "CC(=O)N[C@@H]1[C@H](C[C@](O[C@H]1[C@@H]([C@@H](CO)O)O)(C(=O)O)O)O"
+        },
+        "7tb0_ud1": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)N[C@H]1[C@@H](O[P@@](=O)(O)O[P@@](=O)(O)OC[C@H]2O[C@@H](n3ccc(=O)[nH]c3=O)[C@H](O)[C@@H]2O)O[C@H](CO)[C@@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "df7ce076d34d5d3ca88e49fe4af9e3188c156c13bc8d8d4bb27ed6d482c1dc84",
+            "sha256": "2994352988c2bfee40325591265f9c16664d6903f4c26e529f1ca351fe114a55"
+          },
+          "smiles": "CC(=O)N[C@@H]1[C@H]([C@@H]([C@H](O[C@@H]1O[P@@](=O)(O)O[P@@](=O)(O)OC[C@@H]2[C@H]([C@H]([C@@H](O2)N3C=CC(=O)NC3=O)O)O)CO)O)O"
+        },
+        "7tbu_s3p": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)C1=C[C@@H](OP(=O)(O)O)[C@@H](O)[C@H](O)C1",
+            "raw_smiles_sha256": "5f811a89e94b6665c458241d353e2c00075f674598f17f69aaa9ac270ab186bf",
+            "sha256": "c739f1d68d2b4374a21cd0de83112d02a6686ef4de771f0cee55360f7bef9882"
+          },
+          "smiles": "C1[C@H]([C@@H]([C@@H](C=C1C(=O)O)OP(=O)(O)O)O)O"
+        },
+        "7te8_p0t": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C(C)[C@@H]1CCC(C)=C[C@H]1c1c(O)cc(CCCCC)cc1O",
+            "raw_smiles_sha256": "434f08018e291710b168887c70f73b6f6328c12ee6d0d718ace074da48d894f7",
+            "sha256": "468f26e38b77ef0cfca678374b03dbca3ca54ef44c0dcbfae79c8363d6d66ed4"
+          },
+          "smiles": "CCCCCc1cc(c(c(c1)O)[C@@H]2C=C(CC[C@H]2C(=C)C)C)O"
+        },
+        "7th4_ffo": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(c(=O)[nH]1)N(C=O)C(CNc1ccc(C(=O)NC(CCC(=O)O)C(=O)O)cc1)CN2",
+            "raw_smiles_sha256": "6fbde9945a42ad15f3df2922746dd89b868dda58d89edcd27cb3570df8a9fa6b",
+            "sha256": "b4fdcf5a8af8c00e8a7f4b7227cb22aec3cc89582bc71b32d6e4cebc32489d9b"
+          },
+          "smiles": "c1cc(ccc1C(=O)NC(CCC(=O)O)C(=O)O)NCC2CNC3=C(N2C=O)C(=O)NC(=N3)N"
+        },
+        "7thi_pga": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)COP(=O)(O)O",
+            "raw_smiles_sha256": "e5ce41fd10298d0240a817807c7e617140affda12b59d0d4e20d5092c3e16299",
+            "sha256": "a49f1e3370e5a791a22892f0109a53d5f7af31809867be761a3f00c5b9e3ad11"
+          },
+          "smiles": "C(C(=O)O)OP(=O)(O)O"
+        },
+        "7tm6_gpj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)C[NH2+]CP(=O)(O)O",
+            "raw_smiles_sha256": "6da9707bb83d0dd1087856b471d5139b9a34c459138af099f0cbc23b5721a797",
+            "sha256": "454e34f3c19b2c54fe3da484d349cceb0278cf97b72ec43eb7869e030d7668ce"
+          },
+          "smiles": "C(C(=O)O)[NH2+]CP(=O)(O)O"
+        },
+        "7tom_5ad": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "446195bb7a734cfc90767c359559a43cec528553cb642d5db8022cb5df799138",
+            "sha256": "a0d08d5809616d258f5cc9222cd835ac495065e59ce78a58253dca30b6ccac54"
+          },
+          "smiles": "C[C@@H]1[C@H]([C@H]([C@@H](O1)n2cnc3c2ncnc3N)O)O"
+        },
+        "7ts6_kmi": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNCc1cccc(-c2cc(C)cc(N)n2)c1",
+            "raw_smiles_sha256": "6f924ab38c5b53e23493ddce4009cdbe5bc8024233572ec73d1182f3109867f8",
+            "sha256": "842fcbacd5adc76a9edde9b896b322da3c118aa1371d28d22cfdeeb302447be4"
+          },
+          "smiles": "Cc1cc(nc(c1)N)c2cccc(c2)CNC"
+        },
+        "7tsf_h4b": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H](O)[C@H](O)[C@H]1CNc2nc(N)[nH]c(=O)c2N1",
+            "raw_smiles_sha256": "14ec5e20dbc77c7447e4952b189b7f45c39bae5545b4cb543689423ee74509bf",
+            "sha256": "f8ce59a8d851e1cdc814d9db340b0c3b1e74577af88b9020674554d398749158"
+          },
+          "smiles": "C[C@@H]([C@@H]([C@H]1CNC2=C(N1)C(=O)NC(=N2)N)O)O"
+        },
+        "7tuo_kl9": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1cnc2c(N)c(C(=O)NCCc3ccc(C4C[C@H]5CC[C@@H](C4)N5)cc3)sc2n1",
+            "raw_smiles_sha256": "1fb215cf53eb788ed4963ca011463ee869eb906364e47cc5ff6969ae53295957",
+            "sha256": "bbcbdb8e8b6a1e4713a8ce6dcdbe1621abe8574f0db4e1b6d8b86b7234327b3a"
+          },
+          "smiles": "Cc1cnc2c(c(sc2n1)C(=O)NCCc3ccc(cc3)C4C[C@H]5CC[C@@H](C4)N5)N"
+        },
+        "7txk_lw8": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[N+](C)(C)[C@@H](Cc1c[nH]c(=S)[nH]1)C(=O)O",
+            "raw_smiles_sha256": "b86fe3eb1a8d11d33c426f0ae224fe1b7a6c5954c5f17333a4363bc0e14a703b",
+            "sha256": "d2563a86177327fa03ad25a6b14dc0d6cf6ba27bfb0bd2e76aa3ef9f806200c0"
+          },
+          "smiles": "C[N+](C)(C)[C@@H](CC1=CNC(=S)N1)C(=O)O"
+        },
+        "7typ_kur": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1nccnc1-c1nn2c(=O)cc(-c3ccc(C4CCCCC4)cc3)[nH]c2c1C(=O)N1CC(CF)C1",
+            "raw_smiles_sha256": "e8d7e0dfdc40fade9afe49969c656f886e92fd1adc21fef8e8b5dcbdeeecc821",
+            "sha256": "aa129a023b4ecf141306b07d52481f87421d67f3bcf7a1dec0bd6c9c7b447e6e"
+          },
+          "smiles": "Cc1c(nccn1)c2c(c3n(n2)C(=O)C=C(N3)c4ccc(cc4)C5CCCCC5)C(=O)N6CC(C6)CF"
+        },
+        "7u0u_fk5": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=CC[C@@H]1/C=C(\\C)C[C@H](C)C[C@H](OC)[C@H]2O[C@@](O)(C(=O)C(=O)N3CCCC[C@H]3C(=O)O[C@H](/C(C)=C/[C@@H]3CC[C@@H](O)[C@H](OC)C3)[C@H](C)[C@@H](O)CC1=O)[C@H](C)C[C@@H]2OC",
+            "raw_smiles_sha256": "ea9bd887a561c4c4d8692e55ab2494eec59fa0077f27b01e3c2d7451dd06f385",
+            "sha256": "b3dc5f44fd307878a67c8d04f7c9441ed009cd2c6735cd2caeeb0bac9ae57d5c"
+          },
+          "smiles": "C[C@@H]1C[C@@H]([C@@H]2[C@H](C[C@H]([C@@](O2)(C(=O)C(=O)N3CCCC[C@H]3C(=O)O[C@@H]([C@@H]([C@H](CC(=O)[C@@H](\\C=C(\\C1)/C)CC=C)O)C)/C(=C/[C@@H]4CC[C@H]([C@@H](C4)OC)O)/C)O)C)OC)OC"
+        },
+        "7u3j_l6u": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNC(=O)[C@H](CCc1ccccc1)NC(=O)[C@H](NC(=O)CNCc1ccc(OC)cc1OC)c1cccs1",
+            "raw_smiles_sha256": "4e2e7fa466ddaeaf2c1d6cf085bf344ea3e95e77d52a1de032768d506da8e5b2",
+            "sha256": "a44e2315d0b0fdd18f04271b0461601dd0822b49195ab53a58fb4b327697fd49"
+          },
+          "smiles": "CNC(=O)[C@H](CCc1ccccc1)NC(=O)[C@@H](c2cccs2)NC(=O)CNCc3ccc(cc3OC)OC"
+        },
+        "7uas_mbu": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCn1cc(-c2cc(Cn3ccnc3C)cc3c2CCN([C@H](c2cc(C)ccn2)C2CC2)C3=O)c(C(F)(F)F)n1",
+            "raw_smiles_sha256": "5c43d64bb6cf272216338db0066ecc8e86729e542a9ab691bed87fe9b37c304b",
+            "sha256": "99708640a396aefe0e74555bfcc0c841bbf1076d033cd33066516d2dff498fac"
+          },
+          "smiles": "CCn1cc(c(n1)C(F)(F)F)c2cc(cc3c2CCN(C3=O)[C@H](c4cc(ccn4)C)C5CC5)Cn6ccnc6C"
+        },
+        "7uaw_mf6": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@@H]2COP(=O)(O)OP(=O)(O)OC[C@H]3O[C@@H](O[C@@H]1[C@@H]2O)[C@H](O)[C@@H]3O",
+            "raw_smiles_sha256": "facf88c5850b9aeef7019205d67c0d6f136a20007fb23a8cb8d7d01c7d2b0b55",
+            "sha256": "c88fd5a0a8d8df3a43bec242d271dacb0a8ede55c05bd4400f2697671236cc3e"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@H]4[C@@H]([C@H](O3)COP(=O)(OP(=O)(OC[C@@H]5[C@H]([C@H]([C@@H](O5)O4)O)O)O)O)O)N"
+        },
+        "7uj4_oq4": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCN(C(=O)c1cc(F)ccc1Oc1cncnc1N1CC2(CCN(CC3CCC(NS(=O)(=O)CC)CC3)CC2)C1)C(C)C",
+            "raw_smiles_sha256": "5420e40639999c53e1e04b29e8120e9cf24c75a3883589ab5aa811157795cad9",
+            "sha256": "10dc340fd6f46152686181584ecd299634a5761c023e433ca47cd2da48965790"
+          },
+          "smiles": "CCN(C(C)C)C(=O)c1cc(ccc1Oc2cncnc2N3CC4(C3)CCN(CC4)CC5CCC(CC5)NS(=O)(=O)CC)F"
+        },
+        "7uj5_dgl": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@H](CCC(=O)O)C(=O)O",
+            "raw_smiles_sha256": "0920b3b83c4fd1f11f85df52932b3e9912425b89694bc1361daa4a40752e27f1",
+            "sha256": "2346d3eae53c7c24ca9757eda6756ac11197759c5fcc3ccece3f3dc4d795c809"
+          },
+          "smiles": "C(CC(=O)O)[C@H](C(=O)O)N"
+        },
+        "7ujf_r3v": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@H]1CCN(CCOc2ccc([C@@H]3c4ccc(O)cc4CC[C@@H]3c3ccccc3)cc2)C1",
+            "raw_smiles_sha256": "b88a3123e0d42c0e3c8569aeaed5b74831b3f3710b3e400fc90a18117d929cf9",
+            "sha256": "ed8f2238026b49a123627d99be1c0b2ba0af6bc492e55360bb0c533dd4eddade"
+          },
+          "smiles": "C[C@H]1CCN(C1)CCOc2ccc(cc2)[C@@H]3c4ccc(cc4CC[C@@H]3c5ccccc5)O"
+        },
+        "7ulc_56b": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(c(CN[C@H]3C=C[C@H](O)[C@@H]3O)cn2[C@@H]2O[C@H](COP(=O)(O)O)[C@@H](O)[C@H]2O)c(=O)[nH]1",
+            "raw_smiles_sha256": "d87f5f0941e4407f5d757a0150bb65b3aa7fead016cd4f4cb1d2c206cb96190e",
+            "sha256": "c9bfd2b22e04638ed154fb2d1ba0f0a5954d03b42531d0d7e20074a5e91781bb"
+          },
+          "smiles": "c1c(c2c(n1[C@H]3[C@@H]([C@@H]([C@H](O3)COP(=O)(O)O)O)O)N=C(NC2=O)N)CN[C@H]4C=C[C@@H]([C@@H]4O)O"
+        },
+        "7umw_nad": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=O)c1ccc[n+]([C@@H]2O[C@H](CO[P@@](=O)([O-])O[P@@](=O)(O)OC[C@H]3O[C@@H](n4cnc5c(N)ncnc54)[C@H](O)[C@@H]3O)[C@@H](O)[C@H]2O)c1",
+            "raw_smiles_sha256": "c953b385905e9afed426f8d634e28a0fc9c6e946946bd3633394e02f8b78b16c",
+            "sha256": "edc445cb426bb55b814ab85616c61c683bc33d75e40d602c1ac7e54fbd600116"
+          },
+          "smiles": "c1cc(c[n+](c1)[C@H]2[C@@H]([C@@H]([C@H](O2)CO[P@@](=O)([O-])O[P@@](=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)n4cnc5c4ncnc5N)O)O)O)O)C(=O)N"
+        },
+        "7uq3_o2u": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)C[C@@H]1CC(=O)N(O)C1=O",
+            "raw_smiles_sha256": "960b596dd4a349362ddae5cbcba03d07ebeafe4c679f6d120d72956a83c00607",
+            "sha256": "03c2699bbee6d0a7f8eb3a5f661def658f57479e1c756255afcee454a5356b27"
+          },
+          "smiles": "C1[C@H](C(=O)N(C1=O)O)CC(=O)O"
+        },
+        "7ush_82v": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=c1cc(N2CCOCC2)oc2c(-c3ccc4c(c3)OCCO4)csc12",
+            "raw_smiles_sha256": "d3acc27a6dec3003a5210a95085fc1bab087dd0abb80262b6855a8fdcccffdc8",
+            "sha256": "2f81b19cf874496f3a4268e39c2cbf42198d3f510f62407b43ccca38a28d00fe"
+          },
+          "smiles": "c1cc2c(cc1c3csc4c3OC(=CC4=O)N5CCOCC5)OCCO2"
+        },
+        "7utw_nai": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=O)C1=CN([C@@H]2O[C@H](CO[P@](=O)(O)O[P@@](=O)(O)OC[C@H]3O[C@@H](n4cnc5c(N)ncnc54)[C@H](O)[C@@H]3O)[C@@H](O)[C@H]2O)C=CC1",
+            "raw_smiles_sha256": "a16394a5d456a850a6faa05b660649c81d45c5e7ccab21bfca6c9ec7aa14189f",
+            "sha256": "8f08257f9f0133d6d08d3e72255fbbc270ed820e7c631f72759d028cd07a1d04"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)O[P@@](=O)(O)OC[C@@H]4[C@H]([C@H]([C@@H](O4)N5C=CCC(=C5)C(=O)N)O)O)O)O)N"
+        },
+        "7uxs_ojc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@@H]2COP(=O)(O)OP(=O)(O)OC[C@H]3O[C@@H](O[C@H]2[C@H]1O)[C@H](O)[C@@H]3O",
+            "raw_smiles_sha256": "f5043dd3a58aa78ea2adfb153872567f7c3ab32c0ad0e806eb4f33f570937705",
+            "sha256": "d3cf88a4c92534c78b4f3a13db2a80e2628c3b2ed09f7f19d2459756e4c40ffe"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@H]4[C@H](O3)COP(=O)(OP(=O)(OC[C@@H]5[C@H]([C@H]([C@@H](O5)O4)O)O)O)O)O)N"
+        },
+        "7uy4_smi": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN[C@@H]1[C@H](O)[C@H](NC)[C@H]2O[C@]3(O)[C@H](O[C@@H]2[C@H]1O)O[C@H](C)CC3(O)O",
+            "raw_smiles_sha256": "3573091a0ba91fc623526061fa6572d5ffb29d9f0630100428c0dd57df30edf4",
+            "sha256": "1e479a99cf21091590d356e0fc57ff31a2f53713e22e435a1a2b58862eaa277e"
+          },
+          "smiles": "C[C@@H]1CC([C@]2([C@@H](O1)O[C@@H]3[C@H]([C@@H]([C@@H]([C@@H]([C@H]3O2)NC)O)NC)O)O)(O)O"
+        },
+        "7uyb_ok0": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NS(=O)(=O)c1c(C(F)(F)F)ccc(-c2ccc(C3CCNCC3)cc2)c1-c1nnn[nH]1",
+            "raw_smiles_sha256": "f611dede18bd97e653aa73950e6f6a8083bde212a5c75866434374a9bc2ab174",
+            "sha256": "6860b041acf33cfb597ad4a2c7516fffcca4601ab6e04c74d2eb208f0d345e98"
+          },
+          "smiles": "c1cc(ccc1c2ccc(c(c2c3[nH]nnn3)S(=O)(=O)N)C(F)(F)F)C4CCNCC4"
+        },
+        "7v14_oru": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "[O-][n+]1cc(-c2c(-n3cnnn3)ccc(Cl)c2F)ccc1[C@@H](CC1CC1)n1cc(-c2cncs2)cn1",
+            "raw_smiles_sha256": "f6c885e681a9d674736b3fdbc622d75ffc979c16b15efbc1b22a6fbd83cabc2a",
+            "sha256": "cdf5253bb2db685eb55e14e4d2d621d5c15f9718e8532d84bc5047b1aee6a979"
+          },
+          "smiles": "c1cc([n+](cc1c2c(ccc(c2F)Cl)n3cnnn3)[O-])[C@@H](CC4CC4)n5cc(cn5)c6cncs6"
+        },
+        "7v3n_akg": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)CCC(=O)C(=O)O",
+            "raw_smiles_sha256": "bdafa23de5e2c3c11f4a77a368a80aa854419d4374ebe5319561a24c60f10b02",
+            "sha256": "8168b6fe62066089fe36799dc5c182f406e4eca44e74582352f1781ed10a4877"
+          },
+          "smiles": "C(CC(=O)O)C(=O)C(=O)O"
+        },
+        "7v3s_5i9": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(Nc1ccc(F)cc1)C1(C(=O)Nc2ccc(Oc3ccnc4c3Oc3ccccc3N4)c(F)c2)CC1",
+            "raw_smiles_sha256": "fb1f303b4bcc97d501b7d1e17c43b76d15ad9e69985a10e81e41139facd7c5f3",
+            "sha256": "e9f2d5ac2993fdb044bd89d43a3db66ab8e450445f2f0f7faa4dfb454084abef"
+          },
+          "smiles": "c1ccc2c(c1)Nc3c(c(ccn3)Oc4ccc(cc4F)NC(=O)C5(CC5)C(=O)Nc6ccc(cc6)F)O2"
+        },
+        "7v43_c4o": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc(Cl)cc1",
+            "raw_smiles_sha256": "8e480b0fc8a8ca92087092c71b32c4503a1117b5dfa8970315e871e22e7463b4",
+            "sha256": "bd14d63b6832772fb7bd219cef45ef248059aab6040fd264e109d046b46feee1"
+          },
+          "smiles": "Cc1ccc(cc1)Cl"
+        },
+        "7vb8_stl": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Oc1ccc(/C=C/c2cc(O)cc(O)c2)cc1",
+            "raw_smiles_sha256": "824ce764489d5e9b264b6ec42fc599a8bf8dab2fa0ce6325a6deb2acdad89e6a",
+            "sha256": "edc098eff04d9cd0cb1a7ab504b08a589b364e28410e9c3a82a727f62d5e27ed"
+          },
+          "smiles": "c1cc(ccc1\\C=C\\c2cc(cc(c2)O)O)O"
+        },
+        "7vbu_6i4": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ccc2c(n1)[nH]c1c(C3CC3)cccc12",
+            "raw_smiles_sha256": "97736c967d31ecda903570dc439239a641eff795b07e123d5a61cb11f240c33f",
+            "sha256": "a425deca4c22b3c8cdeeca99e0f4d08dd38feab6679e948926b3bc848b4befbe"
+          },
+          "smiles": "Cc1ccc2c3cccc(c3[nH]c2n1)C4CC4"
+        },
+        "7vc5_9sf": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(C[C@H]1NCCC[C@@H]1O)Cn1cnc2ccccc2c1=O",
+            "raw_smiles_sha256": "2e7d1a19dd524f86c8f3b9fd2ee0d149e19e4d7d5facdb9623dc6e90e76fb5d9",
+            "sha256": "04c38552295e2a17ef6df5e68421c49aa86e079cff81282145abadb19a480f72"
+          },
+          "smiles": "c1ccc2c(c1)C(=O)N(C=N2)CC(=O)C[C@@H]3[C@H](CCCN3)O"
+        },
+        "7vkz_noj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "OC[C@H]1NC[C@H](O)[C@@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "cde79e295f91f309a92d9b5e9de6fb8b0ca96fb4d3e00097bed24abe9412ad08",
+            "sha256": "57ec6b552dbf60db20788160210b8a56896fe80fd51e5fe48b304de77be5be90"
+          },
+          "smiles": "C1[C@@H]([C@H]([C@@H]([C@H](N1)CO)O)O)O"
+        },
+        "7vq9_isy": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C(C)CCS[P@@](=O)(O)OP(=O)(O)O",
+            "raw_smiles_sha256": "f1d624ca992ceb6224e6858bac51f691e579de24b04bce9bc21a83cabbac728e",
+            "sha256": "398cd572abd5d6589c5dcf6b696ef81629872b946fe32609beef8793ac8f089c"
+          },
+          "smiles": "CC(=C)CCS[P@@](=O)(O)OP(=O)(O)O"
+        },
+        "7vwf_k55": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCOc1ccc(C[C@H](CC)C(=O)O)cc1CNC(=O)c1ccc(C(F)(F)F)cc1F",
+            "raw_smiles_sha256": "355b75c08932ce82816b4f409ca403f2e4ef785e6c8b4166531bd09e171ca682",
+            "sha256": "dedb26d9396a1f4da726d0d35691a5eba08d090962849596704ccc5ca46b6af4"
+          },
+          "smiles": "CCCCOc1ccc(cc1CNC(=O)c2ccc(cc2F)C(F)(F)F)C[C@H](CC)C(=O)O"
+        },
+        "7vyj_ca0": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=O)O[P@@](=O)(O)OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "35dd85ede63d91dce68e4a31209712457d6c6bde979231a5508ec34386c664cf",
+            "sha256": "0675e6bf6681b98483457e10971a06085562940b6ba052c5a2eba3025838d22e"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)OC(=O)N)O)O)N"
+        },
+        "7w05_gmp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c(ncn2[C@@H]2O[C@H](CO)[C@@H](O)[C@H]2O)c(=O)[nH]1",
+            "raw_smiles_sha256": "81b39a2fe294ce134b19adeb09bded746f6538f8a341a4e2352d79a51b0fad95",
+            "sha256": "004630548e2415d52c7545f4c07d438f4795881e5e8b63e8223979e1e8e50c7c"
+          },
+          "smiles": "c1nc2c(n1[C@H]3[C@@H]([C@@H]([C@H](O3)CO)O)O)N=C(NC2=O)N"
+        },
+        "7w06_itn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=C(CC(=O)O)C(=O)O",
+            "raw_smiles_sha256": "a9de5eb9f55b8baba4b9a34ecad3df4137a696f79d52368e703b44c0fff64de8",
+            "sha256": "8a530e6559281f438fe63b9a24d4497169c67d09e31ae021b49ae22ef057bc9e"
+          },
+          "smiles": "C=C(CC(=O)O)C(=O)O"
+        },
+        "7wcf_acp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO[P@@](=O)(O)O[P@@](=O)(O)CP(=O)(O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "d645a98b565067a493ef8983f0272c8042e3601b238755f59156423756966bcb",
+            "sha256": "c52a17918eebd02c929416c3d1c3c128d7d8eb922b797196db5ac76176186686"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@@](=O)(O)O[P@](=O)(CP(=O)(O)O)O)O)O)N"
+        },
+        "7wdt_ngs": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)N[C@@H]1[C@@H](O)[C@H](O)[C@@H](COS(=O)(=O)O)O[C@H]1O",
+            "raw_smiles_sha256": "2ffc95380ad7d0eb8b086583ebdf3d2c5f57ed5c9fe19340b86987e840d39d14",
+            "sha256": "1baafb412b6b54bb355dadf7b2eb3a0ef78a64c26a6ce00dbaacc71169e333b8"
+          },
+          "smiles": "CC(=O)N[C@@H]1[C@H]([C@@H]([C@H](O[C@H]1O)COS(=O)(=O)O)O)O"
+        },
+        "7wjb_bgc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "OC[C@H]1O[C@@H](O)[C@H](O)[C@@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "6acce3c77d6d14341e0b8a0f6bff01f3174ba55471e29f8740047d2268084f69",
+            "sha256": "47811c3b96b62feadd7ddc5132736d52e479ce0f08618773052f6594c4b9917f"
+          },
+          "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@@H](O1)O)O)O)O)O"
+        },
+        "7wkl_caq": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Oc1ccccc1O",
+            "raw_smiles_sha256": "bdb439dee4fd93a2b0ae3f5a3420b40ee84f02646b5494038e2b37a851b60fbc",
+            "sha256": "0e7cfa797a7f70632727bde5ef4767814bea2385ce9874a9d6dd06003b86787f"
+          },
+          "smiles": "c1ccc(c(c1)O)O"
+        },
+        "7wl4_jfu": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCN1C(=O)c2cc(N3CCN(C)CC3)nc3c(NS(=O)(=O)c4ccc(F)cc4F)ccc1c23",
+            "raw_smiles_sha256": "551d39a2fd1fc4a1bc253656b0d27cdfc2f60026eaa10e49b3f7567be875c7bf",
+            "sha256": "2ee7661ba839cbbeb92f5b4be5a04955af189e9965018021c69b72e447ae091d"
+          },
+          "smiles": "CCN1c2ccc(c3c2c(cc(n3)N4CCN(CC4)C)C1=O)NS(=O)(=O)c5ccc(cc5F)F"
+        },
+        "7wpw_f15": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCCCCCCCCCCCC(=O)O",
+            "raw_smiles_sha256": "fd541ab8f396b854dd47be13dd2994469e9644441a678d8274f473adc8d706e6",
+            "sha256": "5c1acaade90f24044722328539ad69232db519d50806e0ef70aeeacc3b687aff"
+          },
+          "smiles": "CCCCCCCCCCCCCCC(=O)O"
+        },
+        "7wqq_5z6": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)(C)c1cc(C(=O)/C=C/c2ccc(C(=O)O)cc2)cc(C(C)(C)C)c1",
+            "raw_smiles_sha256": "d9043be319bc925228e58b92f3ec7ec4416a5d557c737681d755b6cfea63bb9e",
+            "sha256": "45569616f32533d9843b88221280b22f4a4b4a8202de132d4d5a8dc684966eeb"
+          },
+          "smiles": "CC(C)(C)c1cc(cc(c1)C(C)(C)C)C(=O)/C=C/c2ccc(cc2)C(=O)O"
+        },
+        "7wux_6oi": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@@H](CC[C@H](O)[C@@H](N)COS(=O)(=O)O)C(=O)O",
+            "raw_smiles_sha256": "36161c28d222ed1c4519991de2bb6abb27cbff4a6a93d0d1dfff519cb716d2bd",
+            "sha256": "98f7dd7082af1de44524665140bc4287d4f5232d1a45ff2d132b1e205efec418"
+          },
+          "smiles": "C(C[C@@H](C(=O)O)N)[C@@H]([C@H](COS(=O)(=O)O)N)O"
+        },
+        "7wuy_76n": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@@H]1C=C[C@@H]2CCCC[C@@H]2[C@H]1C(=O)c1c(O)c([C@]2(O)CC[C@H](O)[C@@H]3O[C@@H]32)c[nH]c1=O",
+            "raw_smiles_sha256": "7a67b94a45e9b6880853a3359a62d97ea33ea63c266d56d4cdc571a7d62de6f2",
+            "sha256": "4a0fcab7cf7c03504396e31296f12e00703679c9db08990af596c34bcfc988f3"
+          },
+          "smiles": "C[C@@H]1C=C[C@@H]2CCCC[C@@H]2[C@H]1C(=O)C3=C(C(=CNC3=O)[C@@]4(CC[C@@H]([C@H]5[C@@H]4O5)O)O)O"
+        },
+        "7wy1_d0l": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCCCCN1CCC[C@H]1C(=O)N[C@@H](Cc1ccccc1)C(=O)O",
+            "raw_smiles_sha256": "0c5e6205c972301738ada5b785f3f61b4a85057c8060661a98e3cdcb36f5c0e3",
+            "sha256": "5d9770c47a5a6be014bea858423297d6548a2d4c8f33d54cc954f974acfb4439"
+          },
+          "smiles": "CCCCCCCN1CCC[C@H]1C(=O)N[C@@H](Cc2ccccc2)C(=O)O"
+        },
+        "7x5n_5m5": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1n[nH]c2c1[C@](c1cc(CO)cc(-c3ccccc3)c1)(C(C)C)C(C#N)=C(N)O2",
+            "raw_smiles_sha256": "b9d81f93bacf85e805894d1a2f0444bf5d5aed690c855f51a0cec7ad29db4dee",
+            "sha256": "5d1c1a91d17515fbca32ff162bd12c00370b828e77649c0ef7495b0689607130"
+          },
+          "smiles": "Cc1c2c([nH]n1)OC(=C([C@@]2(c3cc(cc(c3)c4ccccc4)CO)C(C)C)C#N)N"
+        },
+        "7x9k_8og": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1nc2c([nH]c(=O)n2[C@H]2C[C@H](O)[C@@H](COP(=O)(O)O)O2)c(=O)[nH]1",
+            "raw_smiles_sha256": "7b02319a05bc4f9323b9fa80b17a504deda7db1e65c13e65a0ac016745aa9114",
+            "sha256": "59b483e3de16b79113ad34c1a085d7576cf5327c4cfdd3ad9f8b9d824e5b9052"
+          },
+          "smiles": "C1[C@@H]([C@H](O[C@H]1N2C3=C(C(=O)NC(=N3)N)NC2=O)COP(=O)(O)O)O"
+        },
+        "7xbv_apc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO[P@](=O)(O)C[P@](=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "5d7cf72c1fdd37abce1e8ccbe2c9dbc9a775ad083e35f9c0b1c925be50b2dee7",
+            "sha256": "a3bfa472ca2d38781ae13821115e16fe50305bbf937e71f51974e179ad96a311"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@@](=O)(C[P@](=O)(O)OP(=O)(O)O)O)O)O)N"
+        },
+        "7xfa_d9j": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1nc([C@@H]2O[C@H](CO)[C@H](O)[C@H](n3cc(-c4cc(F)c(Cl)c(F)c4)nn3)[C@H]2O)n(-c2cc(Cl)ccc2C(F)(F)F)n1",
+            "raw_smiles_sha256": "21c89a48a303fee7f363a1f704e05dc190d47d1a2214a7920f2756f525c91903",
+            "sha256": "94d2b9599612ee931180fe779f6558f1c1d4f1ef857ebd84a85d550570921fbf"
+          },
+          "smiles": "Cc1nc(n(n1)c2cc(ccc2C(F)(F)F)Cl)[C@H]3[C@@H]([C@H]([C@H]([C@H](O3)CO)O)n4cc(nn4)c5cc(c(c(c5)F)Cl)F)O"
+        },
+        "7xg5_plp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ncc(COP(=O)(O)O)c(C=O)c1O",
+            "raw_smiles_sha256": "ba9f16c7b6c0bf821be0bfce1b2e455c5965510034a361f7734001d4818d6e90",
+            "sha256": "856e3c0d561cf66587681816c197628adcc2d47f07abac4eaa85a900316d3303"
+          },
+          "smiles": "Cc1c(c(c(cn1)COP(=O)(O)O)C=O)O"
+        },
+        "7xi7_4ri": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCCCCCc1nc(N)nc(N)c1-c1ccccc1",
+            "raw_smiles_sha256": "08e8afdd5184c4052c433a55a22d2cb2aa59bd90762990a2a27d4352a39ee082",
+            "sha256": "93e55c11c0d8285437dc91c09d0865384f5e2f46b813abe2d437cb8b298d72cf"
+          },
+          "smiles": "CCCCCCc1c(c(nc(n1)N)N)c2ccccc2"
+        },
+        "7xjn_nsd": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NCCCNCCCN",
+            "raw_smiles_sha256": "fb973f5b53e3d95df814a0cc8b4386ad9fce0b2b71e6215c4cfd3cb6229d41fc",
+            "sha256": "d4be3092b444d58cde3de99233f5b354723e0a41449af2ce6ac74fb279883214"
+          },
+          "smiles": "C(CN)CNCCCN"
+        },
+        "7xpo_upg": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=c1ccn([C@@H]2O[C@H](CO[P@](=O)(O)O[P@](=O)(O)O[C@H]3O[C@H](CO)[C@@H](O)[C@H](O)[C@H]3O)[C@@H](O)[C@H]2O)c(=O)[nH]1",
+            "raw_smiles_sha256": "5d009b31fa76067dee9b664d79dac0ae5b59250aae669c2c37fb10d862520456",
+            "sha256": "549166039343b190afc7794b66122e80305cb862a8fc42f14f4276c5b7c8f50a"
+          },
+          "smiles": "C1=CN(C(=O)NC1=O)[C@H]2[C@@H]([C@@H]([C@H](O2)CO[P@](=O)(O)O[P@](=O)(O)O[C@@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CO)O)O)O)O)O"
+        },
+        "7xqz_fpf": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)=CCC/C(C)=C/CC/C(C)=C(\\F)CO[P@@](=O)(O)OP(=O)(O)O",
+            "raw_smiles_sha256": "42c24e3ab5407e027fced1a4f646c5eba3a6d49d4a316de9ed6cfd94971b16ca",
+            "sha256": "2b531048ff4ead11a4c91418268fa0476b5d36527a4e3e9e24ed76c0a8d9c02f"
+          },
+          "smiles": "CC(=CCC/C(=C/CC/C(=C(/CO[P@@](=O)(O)OP(=O)(O)O)\\F)/C)/C)C"
+        },
+        "7xrl_fwk": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "d932a82befa0b599f43555afc6641dbc8567a8fc5985455fb35ed87eb07f8407",
+            "sha256": "f6cf891a68bf076232210e03612e6047ec99e2bad9a26b581b3803ece8ee61a2"
+          },
+          "smiles": "CC[C@@H]1[C@H]([C@H]([C@@H](O1)n2cnc3c2ncnc3N)O)O"
+        },
+        "7yzu_do7": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CO[C@H]1O[C@H](CS(=O)(=O)O)[C@@H](O)[C@H](O)[C@H]1O",
+            "raw_smiles_sha256": "c497ba2861744b68d47a4b3ec11bfe90d4077cea79f9d05a49ab4e7e472047eb",
+            "sha256": "f58f687df58baacb7d036b5f1f5d389fbacc86d80e5c6068343dbe01a3e5021f"
+          },
+          "smiles": "CO[C@@H]1[C@@H]([C@H]([C@@H]([C@H](O1)CS(=O)(=O)O)O)O)O"
+        },
+        "7z1q_nio": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1cccnc1",
+            "raw_smiles_sha256": "69eb92c3d731026e4b902a60d0c5199cdd799e2d07957d098cf34af5dc8f31e5",
+            "sha256": "8a081714b6e7a084cf682bd777e299015b1f6e2abab1b8e90fb1fc8cf7d301ce"
+          },
+          "smiles": "c1cc(cnc1)C(=O)O"
+        },
+        "7z2o_iaj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cccc2sc3nncn3c12",
+            "raw_smiles_sha256": "7a2d99b0014019f18e41ed5b2f0fec9e42eb6c98dce5a5a8c5db5e2fb8f10b2d",
+            "sha256": "ad14094f535d9401fb004aecd7b30cd8fcc050541864017d289f17a2c797e3de"
+          },
+          "smiles": "COc1cccc2c1n3cnnc3s2"
+        },
+        "7z7f_if3": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CNc1nc(NC)c2ncn(C)c2n1",
+            "raw_smiles_sha256": "01137ed967d3f9fc95850d4b09ea8059cb4df4d5732ed726a269be32843176d2",
+            "sha256": "0b97e91fa31f53992df6a1b2c9ea351e10cd288158d522eeb8d535a950aa0c0a"
+          },
+          "smiles": "CNc1c2c(nc(n1)NC)n(cn2)C"
+        },
+        "7zcc_oga": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)CNC(=O)C(=O)O",
+            "raw_smiles_sha256": "af77c7cfed41161a734d5b30e7e9e7a241a11a21f4e2aa67858dab3d64187460",
+            "sha256": "d8f0cabbfab41b074d88ba163d63937c4b7f39c64233160d113882e8d13d2189"
+          },
+          "smiles": "C(C(=O)O)NC(=O)C(=O)O"
+        },
+        "7zdy_6mj": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CO[C@@H]1OC[C@@H](O)[C@H](O)[C@H]1O",
+            "raw_smiles_sha256": "bcdb74cfeb8049b9d24a1d14fc4085344431ff8238e91e122031ab0719a6eb3b",
+            "sha256": "5fb2dd761589b7f11a64f9d396aa999c254e055f7663a55efde3c4115280db45"
+          },
+          "smiles": "CO[C@H]1[C@@H]([C@H]([C@@H](CO1)O)O)O"
+        },
+        "7zf0_dhr": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N#C[C@@H](O)c1ccc(O)cc1",
+            "raw_smiles_sha256": "df01fcc4de4a2df13c033012308e3dab94f582b2c9d95e65437f11bf399daa9e",
+            "sha256": "ea51d3fd7a5a2a0d3cd124ff5b119a6ab279780efecc56511db91dcc447e7d6a"
+          },
+          "smiles": "c1cc(ccc1[C@@H](C#N)O)O"
+        },
+        "7zhp_iqy": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCC(O)(C#Cc1ccc2[nH]c3c(c2c1)-c1nc(N)ncc1CCC3)CC",
+            "raw_smiles_sha256": "95ddba1588d1807324816b3bcb4b4cc45c58a49da42bdd21676798b98530e012",
+            "sha256": "ada8f5c816d207283354728be9668141e715466aa31bf3bd4eadd78c01efe626"
+          },
+          "smiles": "CCC(CC)(C#Cc1ccc2c(c1)c-3c([nH]2)CCCc4c3nc(nc4)N)O"
+        },
+        "7zl5_iwe": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NS(=O)(=O)c1cc(-c2nnn[nH]2)c(NCc2cccs2)cc1Cl",
+            "raw_smiles_sha256": "ff3cfa70d3bbec65017086d7502d294198b8e0c700aa2b86e2395e6d13686a28",
+            "sha256": "451a5e960a8bb984ce8e2452bbdc93cb29a499b56b01f6be8eef07f05ddd0c3f"
+          },
+          "smiles": "c1cc(sc1)CNc2cc(c(cc2c3[nH]nnn3)S(=O)(=O)N)Cl"
+        },
+        "7zoc_t8e": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)c1ccc(NC(=O)C(C)S)cc1",
+            "raw_smiles_sha256": "d4492f5673c0f87ad88d9a2e031d64204d3a04e9b054fa8a0431b720145f268c",
+            "sha256": "ad7450cace559973c88bdbef51f6c6d055f80dfa7dd033d2a599915b423e2415"
+          },
+          "smiles": "CC(C(=O)Nc1ccc(cc1)C(=O)C)S"
+        },
+        "7ztl_bcn": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)CN(CCO)CCO",
+            "raw_smiles_sha256": "76ae2d3ff616f8208331c7d4b17d0ab4ad86854f9c023442b31cbbd7a557f6f3",
+            "sha256": "e2a76ae07bfc927e20b7e65a971793769f54e86431c4d7ef564fd1fd8e5dc32b"
+          },
+          "smiles": "C(CO)N(CCO)CC(=O)O"
+        },
+        "7zu2_dht": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C[C@]12CCC(=O)C[C@@H]1CC[C@@H]1[C@@H]2CC[C@]2(C)[C@@H](O)CC[C@@H]12",
+            "raw_smiles_sha256": "7658701088903eb721f5a12636d2b8d07a2d4311b3035852f0f32c2f67ecc851",
+            "sha256": "4cf9d09447ceec47e330c17788c7400f749d2783c972f464628d3531967940a4"
+          },
+          "smiles": "C[C@]12CCC(=O)C[C@@H]1CC[C@@H]3[C@@H]2CC[C@]4([C@H]3CC[C@@H]4O)C"
+        },
+        "7zxv_45d": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC1=C(/C=C/C(C)=C/C=C/C(C)=C/C=C/C=C(C)/C=C/C=C(C)/C=C/C2=C(C)C(=O)CCC2(C)C)C(C)(C)CCC1=O",
+            "raw_smiles_sha256": "bf507c235b3374cbda3fe6bf5a23a766775783d21d458a42810fb1df650d93ab",
+            "sha256": "1510bc3ba19db9371e063934518f30a0acdee998ae2afc2653c4c0ad2fefd43d"
+          },
+          "smiles": "CC1=C(C(CCC1=O)(C)C)/C=C/C(=C/C=C/C(=C/C=C/C=C(/C=C/C=C(/C=C/C2=C(C(=O)CCC2(C)C)C)\\C)\\C)/C)/C"
+        },
+        "7zzw_kkw": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C([C@H]1C[C@@H](c2cccc(Cl)c2)CN1)N1CCN(c2nccc3ccsc23)CC1",
+            "raw_smiles_sha256": "3e1412dfbeac10866e80d7a79ffae880114b97cf500a2ed2e598ed7235c078fa",
+            "sha256": "0f03e0459f1130eb210866762a259e8ccc1da295e33094e1bdb926ea0992a7f9"
+          },
+          "smiles": "c1cc(cc(c1)Cl)[C@@H]2C[C@@H](NC2)C(=O)N3CCN(CC3)c4c5c(ccn4)ccs5"
+        },
+        "8a1h_dlz": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1nc2c(=O)[nH]c(=O)nc-2n(C[C@H](O)[C@H](O)[C@H](O)CO)c1C",
+            "raw_smiles_sha256": "e8b347e88691e0bbb53642b39dda6a81d0f9a8a9980bfbf4e8b487b6d6150995",
+            "sha256": "08f06472751de61be1a4b825f667ddf0c9595c26ca647b3938deb65f0ece5b07"
+          },
+          "smiles": "CC1=C(N(C2=NC(=O)NC(=O)C2=N1)C[C@@H]([C@@H]([C@@H](CO)O)O)O)C"
+        },
+        "8a2d_kxy": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1c(C#Cc2ccc(CN3CCC(CO)CC3)cc2)cc(C(F)F)c2cn([C@@H](C(=O)Nc3nccs3)c3ncn4c3CCC43CC3)nc12",
+            "raw_smiles_sha256": "6e40ca763a1f171189ea9b63c4d1ee5446a99ecb519111ae66250eb07aa930be",
+            "sha256": "cdcf9d511f273c202df366d30a08acb11925de5a1fcf47b8db8271b42d2c0e71"
+          },
+          "smiles": "Cc1c(cc(c2c1nn(c2)[C@H](c3c4n(cn3)C5(CC4)CC5)C(=O)Nc6nccs6)C(F)F)C#Cc7ccc(cc7)CN8CCC(CC8)CO"
+        },
+        "8aau_lh0": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(C)C(=O)Nc1ncc(-c2cc(C(F)F)nn2-c2c(Cl)cccc2Cl)s1",
+            "raw_smiles_sha256": "834c635ae1fb292ebd5893b9728bc655e351db65736fdfd7f7d8b197baee4f19",
+            "sha256": "a38e5aaa996131bef0bd30b71e22de3e0880c814a08370da56033212d358b8dd"
+          },
+          "smiles": "CC(C)C(=O)Nc1ncc(s1)c2cc(nn2c3c(cccc3Cl)Cl)C(F)F"
+        },
+        "8aem_lvf": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N#CCc1c[nH]c2ccc(Cl)cc12",
+            "raw_smiles_sha256": "f1847cbe61d16c651491f746ecc71d55a8df4ca9c72fc648d899f7ab778f632e",
+            "sha256": "6bc609f47b113fda3495101dd44fb17d722bcd4f161beafad70e410f0d1d6287"
+          },
+          "smiles": "c1cc2c(cc1Cl)c(c[nH]2)CC#N"
+        },
+        "8aie_m7l": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ncc(COP(=O)(O)O)c(C/N=C(\\CON)C(=O)O)c1O",
+            "raw_smiles_sha256": "8028dde00326f167f4e1856012bb93f31e240bba3b316c5a900b33cefecf4656",
+            "sha256": "8c25c7edb229e364fe631260f6601cabd236f637bd264b866dc3230e1d0e523b"
+          },
+          "smiles": "Cc1c(c(c(cn1)COP(=O)(O)O)C/N=C(\\CON)/C(=O)O)O"
+        },
+        "8ap0_prp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=P(O)(O)OC[C@H]1O[C@H](O[P@@](=O)(O)OP(=O)(O)O)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "e6a7ed9a95a90a79e972ac9536dc5528c8156ad28b7541d8aa1e5eb417a0cdc2",
+            "sha256": "b78f73d3b5b175573e5d2cbde9d50a9f9a31f656738dadc908a97c307d29964f"
+          },
+          "smiles": "C([C@@H]1[C@H]([C@H]([C@H](O1)O[P@@](=O)(O)OP(=O)(O)O)O)O)OP(=O)(O)O"
+        },
+        "8aql_plg": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ncc(COP(=O)(O)O)c(CNCC(=O)O)c1O",
+            "raw_smiles_sha256": "947d427fe0ec09108519184fb45f626c55d1aa8a962abbfc4bc35a3147d90a4b",
+            "sha256": "1503ec332793d42b82533b719048143e61d0e720b0083340c480854c96fc6020"
+          },
+          "smiles": "Cc1c(c(c(cn1)COP(=O)(O)O)CNCC(=O)O)O"
+        },
+        "8auh_l9i": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCOC(=O)/C(=N\\O)C(C)=O",
+            "raw_smiles_sha256": "575a4629fd7ef0450f6b3c2a37f7ffa9fa0b0f9fed25e031e8d076123deac3ca",
+            "sha256": "9cf222d25be35510f88f4fdfd73c1f33b6591b92f8bcfb621da39326957ea100"
+          },
+          "smiles": "CCOC(=O)/C(=N\\O)/C(=O)C"
+        },
+        "8ay3_oe3": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCn1c(=O)cc(C)c2cc(CNS(=O)(=O)c3ccccc3)ccc21",
+            "raw_smiles_sha256": "71f00ed5663cd04b33032628b6b11f459db0546455dd1397dd92dc10561d474d",
+            "sha256": "241c56472f9fca38a950f4cb545beadd0d691abc80306fab9e53df5b7d863318"
+          },
+          "smiles": "CCN1c2ccc(cc2C(=CC1=O)C)CNS(=O)(=O)c3ccccc3"
+        },
+        "8b8h_ojq": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ncc(COP(=O)(O)O)c(C[NH2+]c2conc2O)c1O",
+            "raw_smiles_sha256": "7f8f9b54f09cf66e2f4241fe473a6626b2828091a6ac03d1419b4d12a829a67b",
+            "sha256": "b33357eab142e601d7f8b7bccfb8379a1ccb3ac140d8e0eba93d338012b8c3ab"
+          },
+          "smiles": "Cc1c(c(c(cn1)COP(=O)(O)O)C[NH2+]c2conc2O)O"
+        },
+        "8bom_qu6": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1cccc(NC(=O)c2ccc(C)c(Nc3nc(-c4cccnc4)nc4c3cnn4C)c2)c1",
+            "raw_smiles_sha256": "32be161205d56779436e847fc424cbfd411b5fba88a299aa58f4cc4870dfa0e1",
+            "sha256": "8eb52bc259fa0097adacba0242f1d8e8ac3b1aa7c26fa4c31ef71f27f56ae02a"
+          },
+          "smiles": "Cc1ccc(cc1Nc2c3cnn(c3nc(n2)c4cccnc4)C)C(=O)Nc5cccc(c5)OC"
+        },
+        "8bti_rfo": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COCC(=O)n1ccc2c(Cl)cccc21",
+            "raw_smiles_sha256": "61dd36954d3b2affa8df70d6b2f9877b0a16e821eafb05335068351f579c5cfc",
+            "sha256": "3b17d4a4f930102a60c7ea5066e12dffe023218686a1f27550078b8c1aa8cc56"
+          },
+          "smiles": "COCC(=O)n1ccc2c1cccc2Cl"
+        },
+        "8c3n_adp": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ncnc2c1ncn2[C@@H]1O[C@H](CO[P@](=O)(O)OP(=O)(O)O)[C@@H](O)[C@H]1O",
+            "raw_smiles_sha256": "4dd804c9949f0ad1b69fc03439d20e47d4d13e28c624349195274b22af1a63d4",
+            "sha256": "556bea6a8889513553d32cf9ff9d6db7bb4de4309f66ebb51648e35af2ba9d14"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)OP(=O)(O)O)O)O)N"
+        },
+        "8c5m_mta": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CSC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "144eceb682827053e45a3d60430640bf23e1757351c122b5a66e015c1377c9df",
+            "sha256": "c0320cbeeb8c74268920c062bc8af21daf60abbafde784a83cfb736dbc9b3844"
+          },
+          "smiles": "CSC[C@@H]1[C@H]([C@H]([C@@H](O1)n2cnc3c2ncnc3N)O)O"
+        },
+        "8cnh_v6u": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COC(=O)c1ccccc1Cc1cn(C)nc1-c1cc(Cl)nc(N)n1",
+            "raw_smiles_sha256": "1fe9eb901d8cbf236c238d448080e64dc0bc1fc0bf4516479852c8539c8409ca",
+            "sha256": "e837bce8ace032fa1d4a4666812059e675303ce5b9469ec6ed591c162c7a0673"
+          },
+          "smiles": "Cn1cc(c(n1)c2cc(nc(n2)N)Cl)Cc3ccccc3C(=O)OC"
+        },
+        "8csd_c5p": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Nc1ccn([C@@H]2O[C@H](COP(=O)(O)O)[C@@H](O)[C@H]2O)c(=O)n1",
+            "raw_smiles_sha256": "b44bb76d0fca3e493a9831e2e3726f10bd13ec3fcf70387b8e27a2b57434497a",
+            "sha256": "a2e3a5973091560c12ea85830905e16adc529bd8451a2592374712fb4c2367a4"
+          },
+          "smiles": "C1=CN(C(=O)N=C1N)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)(O)O)O)O"
+        },
+        "8d19_gsh": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@@H](CCC(=O)N[C@@H](CS)C(=O)NCC(=O)O)C(=O)O",
+            "raw_smiles_sha256": "18edf55c2eee89a47740f2a1d5149f65ed68752f4bd9e972aa3ecf06f7055510",
+            "sha256": "c5556254974755176dd7fcb444ed7fb03f73a6e9fa32f97593a94bd20659ea59"
+          },
+          "smiles": "C(CC(=O)N[C@@H](CS)C(=O)NCC(=O)O)[C@@H](C(=O)O)N"
+        },
+        "8d39_qdb": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1ccc(C(=O)c2ccccc2)cc1",
+            "raw_smiles_sha256": "a424fc91c1d8e01ecc0b65e3b453c4ef9522979313194b184416ffe7785244cf",
+            "sha256": "74b614aa12479a6f7347b6bfc3a5291a892f6cdbe6849f95c3a7bf6be7b90e9e"
+          },
+          "smiles": "c1ccc(cc1)C(=O)c2ccc(cc2)C(=O)O"
+        },
+        "8d5d_5dk": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1ncc(COP(=O)(O)O)c(/C=N/[C@H](CCCNC(=N)N)C(=O)O)c1O",
+            "raw_smiles_sha256": "3d6c1e023d650dd52c196bd80953567cbe85e6ea611351d7e1ffb06748d014b1",
+            "sha256": "a00584b9f05d6f71a05d8a0ff0a8d06db5b72d67a79ed4817f67f660110aa56d"
+          },
+          "smiles": "[H]/N=C(\\N)/NCCC[C@H](C(=O)O)/N=C/c1c(cnc(c1O)C)COP(=O)(O)O"
+        },
+        "8dhg_t78": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CCn1c(CO)nn(-c2nc(O[C@@H](C)C(F)(F)F)c(C(=O)Nc3c(C)ccnc3Cl)cc2F)c1=O",
+            "raw_smiles_sha256": "665c025d7dd0934aa195ac50d2b1c701d5b47a59555c89b97dc09b17d5165adb",
+            "sha256": "919eb49f70a4a944c6a3da98d8d9f644ebf0dd6bf2864d8a22ceef241a97d382"
+          },
+          "smiles": "CCN1C(=NN(C1=O)c2c(cc(c(n2)O[C@@H](C)C(F)(F)F)C(=O)Nc3c(ccnc3Cl)C)F)CO"
+        },
+        "8dko_tfb": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)[C@@H]1CCCO1",
+            "raw_smiles_sha256": "b8cabff1baa34f3f9e16a3fdfd10b83b344164c846d855f817c6f5fcf015b42a",
+            "sha256": "cd3ec415e8a19e5f5dc0e4b06064c6c028054a9f721dbd2decc2447629563222"
+          },
+          "smiles": "C1C[C@H](OC1)C(=O)O"
+        },
+        "8dp2_uma": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)N[C@H]1[C@@H](O[P@@](=O)(O)O[P@](=O)(O)OC[C@H]2O[C@@H](n3ccc(=O)[nH]c3=O)[C@H](O)[C@@H]2O)O[C@H](CO)[C@@H](O)[C@@H]1O[C@H](C)C(=O)N[C@@H](C)C(=O)O",
+            "raw_smiles_sha256": "f86b96536a1057b2df7d5668df6cc805f4f6db2f0b87db7eac4241a00e75b551",
+            "sha256": "78e56445b4f33cbbf74b4b1cec62dfe78e3780c6c0dd7db2d716de188b8f0b2b"
+          },
+          "smiles": "C[C@@H](C(=O)O)NC(=O)[C@@H](C)O[C@@H]1[C@H]([C@H](O[C@@H]([C@H]1O)CO)O[P@@](=O)(O)O[P@](=O)(O)OC[C@@H]2[C@H]([C@H]([C@@H](O2)N3C=CC(=O)NC3=O)O)O)NC(=O)C"
+        },
+        "8dsc_nca": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=O)c1cccnc1",
+            "raw_smiles_sha256": "976736c1c3b2233c45e3f07b88a4ec58b838f37e3a40c0e9285fdf542893a12b",
+            "sha256": "cfc06252040ea0bc66310587c8130596cecb17247b1b825234d8cc0517ff87b7"
+          },
+          "smiles": "c1cc(cnc1)C(=O)N"
+        },
+        "8eab_vn2": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(N[C@H](C(=O)Nc1cnccc1-c1ccc(C(F)(F)F)cc1)c1cccc(C(F)(F)F)c1)c1cnccc1-c1ccc(C(F)(F)F)cc1",
+            "raw_smiles_sha256": "7a1102f6607c42d66323f9b73cf8c0c37beffa21099961bca6def08953583b3a",
+            "sha256": "3f1be134ac632d2e6a5f1c65b2453e730f582fb73a080d0807627d913c5f8422"
+          },
+          "smiles": "c1cc(cc(c1)C(F)(F)F)[C@@H](C(=O)Nc2cnccc2c3ccc(cc3)C(F)(F)F)NC(=O)c4cnccc4c5ccc(cc5)C(F)(F)F"
+        },
+        "8ex2_q2q": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C1CC(c2ccccc2)=Nc2c(-c3ccccc3)c(C(F)(F)F)nn21",
+            "raw_smiles_sha256": "58d2a99c5002cfdb804579a4c0d3c06e4721f0856857e93160cb464db2d15d00",
+            "sha256": "617562b632f5ebaeefd4fa9c1cc74110f9615f1f93e82065b887948390ff4fef"
+          },
+          "smiles": "c1ccc(cc1)c2c(nn3c2N=C(CC3=O)c4ccccc4)C(F)(F)F"
+        },
+        "8exl_799": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "Cc1nc(-c2cn3c(n2)-c2ccc(-c4cnn(C(C)(C)C(N)=O)c4)cc2OCC3)n(C(C)C)n1",
+            "raw_smiles_sha256": "c3242da5e5ce0f88501f88009fc479f921ad49677b4f4d75ecb2f001a6174ba3",
+            "sha256": "be9f60155e62fe7d5a1e083b1af4d7283c9c689f2c35a531970f1ba45e4dc1d6"
+          },
+          "smiles": "Cc1nc(n(n1)C(C)C)c2cn3c(n2)-c4ccc(cc4OCC3)c5cnn(c5)C(C)(C)C(=O)N"
+        },
+        "8eye_x4i": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(CNc1cc(F)cc(F)c1)N[C@@H](C(=O)NO)c1ccc(-c2cc(F)c(F)c(F)c2)cc1",
+            "raw_smiles_sha256": "8dad8247ee8ff518a664f7eaab05f74e0fdb29588156d4f0ffc32ab7a03dc03c",
+            "sha256": "579f3ca71e5ceef8d95e4874fa2eadf10f185aa68f3c5fa4751e7eb0db1b6ca6"
+          },
+          "smiles": "c1cc(ccc1c2cc(c(c(c2)F)F)F)[C@H](C(=O)NO)NC(=O)CNc3cc(cc(c3)F)F"
+        },
+        "8f4j_pho": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C=Cc1c(C)c2cc3nc(c4c5[nH]c(cc6nc(cc1[nH]2)C(C)=C6CC)c(C)c5C(=O)[C@@H]4C(=O)OC)[C@@H](CCC(=O)OC/C=C(\\C)CCC[C@H](C)CCC[C@H](C)CCCC(C)C)[C@@H]3C",
+            "raw_smiles_sha256": "cc09813e12b67a91e497eedbbecf3aaf823cb45a60c35c8785d6ee693da2952a",
+            "sha256": "4f325e3297e8e0dc0360eab5aa5d94b92a307d39561d3f4147c65bb5d5da2752"
+          },
+          "smiles": "CCC1=C(/c/2c/c3c(c(c([nH]3)/cc/4\\nc(c5c6c(c(/c(/[nH]6)c/c1n2)C)C(=O)[C@@H]5C(=O)OC)[C@H]([C@@H]4C)CCC(=O)OC/C=C(\\C)/CCC[C@H](C)CCC[C@H](C)CCCC(C)C)C)C=C)C"
+        },
+        "8f8e_xji": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NC(=O)C[C@H](NC(=O)c1c[nH]nc1-c1ccc(Cl)cc1F)c1ccc(F)c(Cl)c1",
+            "raw_smiles_sha256": "7cec4461bad2a0e696271108dd0f1c29f5795a6853f9d6d662d1736b3f09c6d3",
+            "sha256": "107f67f045c8be55a18bfa92bba0c71287b87968e0b1adc68d657646c32b5b65"
+          },
+          "smiles": "c1cc(c(cc1[C@H](CC(=O)N)NC(=O)c2c[nH]nc2c3ccc(cc3F)Cl)Cl)F"
+        },
+        "8fav_4y5": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C(O)c1ccc(-c2nn(C(=O)c3c(Cl)cccc3C(F)(F)F)c3cccc(F)c23)c(F)c1",
+            "raw_smiles_sha256": "e41fcb35b599f0a362559804aa15ca1e0ae0fa35c6a6f2492e3ae9b5b8086b7b",
+            "sha256": "e896f277fe4989275be124af5bd9a233add118edf68bcd60ae263654a8c1ba27"
+          },
+          "smiles": "c1cc(c(c(c1)Cl)C(=O)n2c3cccc(c3c(n2)c4ccc(cc4F)C(=O)O)F)C(F)(F)F"
+        },
+        "8flv_zb9": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CN(c1ncnc2[nH]ccc12)[C@@H]1CCCN(C(=O)CNc2cc(Cl)cc(Cl)c2)C1",
+            "raw_smiles_sha256": "9360bbe4fa4c381fd2dc78aa81142a1ceb8a049acc0998658a297017e9fa60fc",
+            "sha256": "e4817b676b4179e970e5f5f9bd6fbb19d5dcb852ad19e7991e9dc750179c5cdb"
+          },
+          "smiles": "CN(c1c2cc[nH]c2ncn1)[C@@H]3CCCN(C3)C(=O)CNc4cc(cc(c4)Cl)Cl"
+        },
+        "8fo5_y4u": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)c1ccn(S(=O)(=O)c2ccccc2)c1",
+            "raw_smiles_sha256": "d21f0303897acccb917a8b1c2951db863e307e748d93b706e5790f7666636755",
+            "sha256": "6519a5653ca3642816b2cbdbb4b4e9aecf03b3e2884bd34c5cbedaec667b0328"
+          },
+          "smiles": "CC(=O)c1ccn(c1)S(=O)(=O)c2ccccc2"
+        },
+        "8g0v_yht": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "C#CCOP(=O)(O)OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "670d5bc31a0f1c6f0c41dfa7a7c2783bd32a454c2b4e18ca5bbf272a4d13fec7",
+            "sha256": "2a4db2c1fef6be4cda5d0c813e944562449f2710bd7fd80066dcd4a2ecbafca5"
+          },
+          "smiles": "C#CCOP(=O)(O)OC[C@@H]1[C@H]([C@H]([C@@H](O1)n2cnc3c2ncnc3N)O)O"
+        },
+        "8g6p_api": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "N[C@H](CCC[C@H](N)C(=O)O)C(=O)O",
+            "raw_smiles_sha256": "6f2202a1e7787ed23c1805f57881787f51de1cf1074e78505b7a714f563609a9",
+            "sha256": "53bfc284e53362b57156b2ecaa8b0d34dc5bf068ff9b1fa20cc9da76c51f3d8a"
+          },
+          "smiles": "C(C[C@H](C(=O)O)N)C[C@@H](C(=O)O)N"
+        },
+        "8gfd_zhr": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "CC(=O)N[C@H]1[C@H](OCCc2ccc3occc3c2)O[C@H](CO)[C@@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "d8e5bb82f21eb20a9e59f6ba1fc301411575b3833c58e1d4a8b52d39b5879b1d",
+            "sha256": "12ef601b61f504853eefd8ea012b864e3f8d846c256228fe1d1472cf4ac98a8a"
+          },
+          "smiles": "CC(=O)N[C@@H]1[C@H]([C@@H]([C@H](O[C@H]1OCCc2ccc3c(c2)cco3)CO)O)O"
+        },
+        "8hfn_xgc": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "COc1ccc(-c2cccc(S(=O)(=O)NC(=O)[C@@H](N)CS)c2)cn1",
+            "raw_smiles_sha256": "541e76dcaab5cb6b5ac7a8b8530bcdde7535a2e684b5109212ce7d938e47e8c7",
+            "sha256": "4e4e565a7c1adfd15683fefdc4b23deef229a76c65fbdece29deca981dbe5513"
+          },
+          "smiles": "COc1ccc(cn1)c2cccc(c2)S(=O)(=O)NC(=O)[C@H](CS)N"
+        },
+        "8ho0_3zi": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "O=C1N[C@@H](Cc2c[nH]c3c(F)cccc23)C(=O)N2CCC[C@@H]12",
+            "raw_smiles_sha256": "624610f536d2da941b587cae0392507da65cf768cd97193ee63cc41e848fffe0",
+            "sha256": "114e949bd2dc1062e7b730617f1295862f1292cf30a0a1e3d53f208cc0806885"
+          },
+          "smiles": "c1cc2c(c[nH]c2c(c1)F)C[C@H]3C(=O)N4CCC[C@H]4C(=O)N3"
+        },
+        "8slg_g5a": {
+          "input_identity": {
+            "canonical_heavy_isomeric_smiles": "NCC(=O)NS(=O)(=O)OC[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O",
+            "raw_smiles_sha256": "7f01053d47ba54951393f22c61a61fb5d1c536cec12288024eb36555f0cbfa05",
+            "sha256": "c3a8a63784fff84d5bfcdffcf2d57810bd441bec2dd33606319c7fd5c32ca111"
+          },
+          "smiles": "c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)COS(=O)(=O)NC(=O)CN)O)O)N"
+        }
+      },
+      "mapping_sha256": "6f3f0cf229131559ea7ff095cc6b87beaa55e4e6b09d5626f555643a1e06f74f",
+      "source_manifests": {
+        "mapping": {
+          "path": "data/external_test/pb_smiles.json",
+          "sha256": "f17b424fdf779ff5284f6be3e46df57d03244ce9e21575d2b59b7f65517b91c9"
+        },
+        "membership": {
+          "path": "data/external_test/posebusters_v2_ids.txt",
+          "sha256": "a69a7b6b9a5a52531933078ef983e6c069e3a987a1d7a733bd7d72cbe1793de6"
+        }
+      }
+    }
+  },
+  "declared_source_correction": {
+    "complex_id": "1meh",
+    "coordinate_use": "graph identity correction only; coordinates forbidden in sampling",
+    "corrected_smiles": "COc1c(C)c2c(c(O)c1C/C=C(\\C)CCC(=O)O)C(=O)OC2",
+    "old_input_identity": {
+      "canonical_heavy_isomeric_smiles": "O=c1[nH]cnc2c1ncn2[C@@H]1O[C@H](COP(=O)(O)O)[C@@H](O)[C@H]1O",
+      "raw_smiles_sha256": "0d5f7038c5c46e93863b4e849ef172aa8ea06bb25d4db7a8911cdd1751c4229b",
+      "sha256": "8ce58240811936401752dc644ae889eb0febc3761e94bf99dbc3bac4914bd688"
+    },
+    "reason": "source mapping labels IMP/nucleotide but deposited Astex complex is MOA",
+    "reference_heavy_atoms": 23,
+    "reference_sdf": "data/external_benchmarks/data/astex_diverse_set/1MEH_MOA/1MEH_MOA_ligand.sdf",
+    "reference_sdf_sha256": "7a35262c9a5d88b47294107423cd765c1ad35c4c685fe235a9a8659599b6b553",
+    "reference_sdf_title": "1MEH_MOA_A_600"
+  },
+  "hydrogen_policy": "seeded generic loader followed by Chem.RemoveAllHs",
+  "protocol_id": "EFFDOCK-UNIFIED-GUIDANCE-BUDGET1000-FULL-V2",
+  "rdkit_version": "2025.09.5",
+  "schema_version": "effdock.benchmark_inputs.v2"
+}

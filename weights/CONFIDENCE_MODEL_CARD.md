@@ -1,70 +1,76 @@
-# EFF-Dock extmatch pose-confidence checkpoint
+# EFF-Dock S50 raw+refined pose-confidence checkpoint
 
-- File: `effdock_confidence_extmatch_n80_s25_step42500.pt`
-- SHA-256: `e31fde6f351284205c78f7a1510002779c43312e94d9f82003d47a14d72bc78f`
+- File: `effdock_confidence_s50_raw_refined_u70k.pt`
+- SHA-256: `ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638`
 - Model type: `docking_graph_pose_confidence`
-- Training step: 42,500
-- Selected metric: `success_selected_lt2`
-- Paired docking checkpoint: `effdock_geometry_ft_100k_best.pt`
-- Pose-shard tag: `conf_ligonly_extmatch_n80_s25_sig0p5_pc10`
-- Seed: 42
+- Training update: 70,000 of the registered 100,000-update run
+- Selection metric: validation Top-1 symmetry-aware RMSD `<2A`
+- Paired docking checkpoint: `effdock_docking_early_time_t0p10_50k.pt`
+- Default sampler: N100/S10/sigma-2/late-power-3/pocket-10A
+- Default selector: stable minimum predicted pose RMSD
 
 ## Intended use
 
-Rank multiple poses generated for the same receptor/ligand/explicit-pocket
-complex. This checkpoint's training-matched preset was 80 poses, 25 ODE steps,
-translation sigma 0.5, and a 10A protein crop. The public `dock` and `evaluate`
-commands now use 100 poses, 10 ODE steps, and sigma 2.0 by default with the same
-10A crop. This is an explicit candidate-distribution shift. The model predicts
-pose RMSD and success plus per-atom displacement/success heads; these are
-ranking signals and are not claimed to be calibrated across datasets or
-sampling distributions.
+Rank multiple poses generated for the same receptor, ligand, and explicit
+pocket. The promoted contract uses 100 poses, 10 ODE steps, translation sigma
+2.0, and a 10A protein crop. The checkpoint predicts pose RMSD and success plus
+per-atom displacement and success heads. These are within-complex ranking
+signals; they are not calibrated across targets and do not predict binding
+affinity.
 
-The frozen historical composite selector is
-`pair_gate_density_rank_vote_plclash_ambig`. It combines the learned heads with
-candidate density/rank voting and a narrow protein-clash fallback. Pure minimum
-predicted RMSD is always reported separately so learned-model behavior is not
-conflated with the composite selector.
+The confidence model consumes t=1 ligand hidden representations from the
+paired docking model. The default files, sampling preset, and pure-confidence
+selector form one versioned stack. Using a different generator, sigma, pose
+count, ODE budget, or protein crop is a distribution shift and must be reported
+explicitly.
 
-The active implementation was checked against all 393 retained historical
-Astex/PoseBusters per-pose records and reproduced the frozen selected index for
-393/393 complexes.
+## Training and internal selection
 
-## Frozen validation evidence
+The run initialized from the terminal U50k symmetry-confidence state and used
+one balanced per-complex mixture of 32 raw sigma-2 poses, 32 deterministically
+refined poses, and one mapped crystal anchor. Pose-level training and selection
+labels use RDKit `CalcRMS` symmetry-aware no-alignment heavy-atom RMSD.
 
-The retained checkpoint metadata reports, on the frozen 256-complex validation
-subset, 49.22% selected RMSD <2A from the RMSD head, 49.61% from the success
-head, and 68.75% oracle coverage. Two 500-step hard-pair fine-tunes were tested;
-neither improved this baseline, so they were not promoted.
+The checkpoint was selected only on the fixed 1,035-complex PLINDER validation
+bank. U70k reached 622/1,035 (60.10%) Top-1 `<2A`, the best registered value in
+the 100k run. U100k reached 617/1,035 (59.61%) and remains the terminal training
+state, not the deployment checkpoint.
 
-## External evidence boundary
+## External characterization
 
-Historical reference-defined redocking reached 81.18% on Astex and 77.60% on
-PoseBusters v2 with the frozen composite selector. Those values are diagnostic,
-not prospective screening claims. Active frozen-manifest results and their
-failure/rescue records live in `docs/BENCHMARK_RESULTS.md`.
+All rows reuse the same N100/S10/sigma-2 candidates. `Raw` is the sampled
+ensemble. `Refined` uses the separately evaluated deterministic physical
+refinement. `Joint` additionally requires official PoseBusters validity.
 
-The completed active N80 rerun reached composite <2A rates of 78.82% on Astex
-and 72.73% on PoseBusters. Same-candidate pure confidence was 76.47% and
-73.05%, respectively. The checkpoint remains the selected
-confidence model; the composite selector is retained for reproducibility but
-did not consistently improve the learned RMSD head.
+| Dataset | N | Raw Top-1 `<2A` | Refined Top-1 `<2A` | Refined PB-valid | Refined joint valid + `<2A` |
+|---|---:|---:|---:|---:|---:|
+| Astex Diverse | 85 | 81.18% | 85.88% | 94.12% | 81.18% |
+| PoseBusters v2 | 308 | 78.25% | 84.09% | 95.13% | 81.17% |
+| PhiBench | 203 | 63.05% | 64.53% | 90.64% | 59.11% |
+| FoldBench | 66 | 63.64% | 68.18% | 90.91% | 66.67% |
+| OpenBind | 860 | 49.07% | 55.47% | 98.60% | 54.65% |
 
-## Experimental S50 successor
-
-A later internal PLINDER study retrained this confidence model on the frozen
-S50 N100/S10/sigma-2 bank using symmetry-aware no-alignment RMSD. Its selected
-U25k checkpoint reached 58.45% Top-1 `<2A` on 1,035 internal validation
-complexes; the terminal U50k checkpoint reached 56.81%. These checkpoints are
-preserved under ignored `outputs/` and are not packaged release artifacts, so
-they do not change this model card's default checkpoint or intended-use
-contract. Exact hashes, slices, and repeated-use external diagnostics are in
-`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`.
+U70k was not chosen from these external results. The cohorts had already been
+used during development, so the figures are descriptive. PhiBench and
+FoldBench are the core temporal checks; OpenBind is a dense single-protease
+auxiliary cohort. The refinement numbers do not imply that `eff-dock dock`
+silently performs refinement.
 
 ## Limitations
 
-- Requires an explicit pocket and a compatible EFF-Dock hidden representation.
-- Performance can shift with pose count, sigma, ODE steps, pocket crop, receptor
-  source, or candidate generator checkpoint.
-- Does not predict binding affinity or binder/non-binder status.
-- Reference-defined benchmark pockets do not demonstrate blind pocket finding.
+- Requires an explicit pocket and compatible EFF-Dock hidden features.
+- Performance can shift with receptor preparation, ligand protonation or
+  stereochemistry, pose count, sigma, ODE budget, crop, or generator weights.
+- Reference structures are used only for evaluation labels, not ranking.
+- The external studies are pocket-redocking evaluations, not blind pocket
+  discovery or prospective screening.
+- The model does not predict affinity or binder/non-binder status.
+
+Exact protocols and paired comparisons are in
+`docs/S50_RAW_REFINED_CONFIDENCE_100K_PROTOCOL.md`,
+`docs/S50_RAW_REFINED_CONFIDENCE_EXTERNAL_RESULTS.md`, and
+`docs/S50_RAW_REFINED_CONFIDENCE_TEMPORAL_EXTERNAL_RESULTS.md`.
+
+This checkpoint is released together with the paired docking checkpoint under
+Apache-2.0. See `DOCKING_MODEL_CARD.md` and `MANIFEST.md` for the complete
+deployment identity.

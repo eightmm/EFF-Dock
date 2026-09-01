@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import math
-from dataclasses import replace
+from dataclasses import fields, replace
 
 import pytest
 import torch
 
 Chem = pytest.importorskip("rdkit.Chem")
 
+import effdock.guidance.interaction as interaction_module  # noqa: E402
 from effdock.guidance.interaction import (  # noqa: E402
     InteractionEnergyConfig,
     _cone_gate,
@@ -64,6 +65,7 @@ def _system(
         protein_atomic_numbers=protein_atomic_numbers,
         protein_uff_x=parameters.uff_x,
         protein_uff_d=parameters.uff_d,
+        protein_vdw_radius=parameters.vdw_radius,
         parameter_set={"name": "test", "version": "test"},
         protein_source_atoms=int(protein_coords.shape[0]),
         interaction_topology=interaction,
@@ -1156,3 +1158,42 @@ def test_active_interaction_rejects_missing_typing() -> None:
     )
     assert set(disabled) == {"total"}
     assert float(disabled["total"]) == pytest.approx(0.0)
+
+
+def test_custom_baseline_path_does_not_build_inactive_interaction_grids(
+    monkeypatch,
+) -> None:
+    coords, system = _hbond_fixture()
+
+    def inactive_called(*_args, **_kwargs):
+        raise AssertionError("inactive interaction family was evaluated")
+
+    monkeypatch.setattr(interaction_module, "_ring_geometry", inactive_called)
+    monkeypatch.setattr(interaction_module, "_halogen_bond_components", inactive_called)
+    monkeypatch.setattr(interaction_module, "_metal_components", inactive_called)
+
+    baseline = InteractionEnergyConfig(
+        active_terms=(
+            "hydrophobic",
+            "hydrogen_bond",
+            "screened_formal_charge",
+        )
+    )
+    components = interaction_energy(coords, system, baseline)
+    assert set(components) == {
+        "interaction_hydrophobic",
+        "interaction_hydrogen_bond",
+        "interaction_screened_formal_charge",
+        "total",
+    }
+
+
+@pytest.mark.parametrize("bad_value", [math.nan, math.inf, -math.inf])
+def test_every_numeric_interaction_config_field_must_be_finite(
+    bad_value: float,
+) -> None:
+    for item in fields(InteractionEnergyConfig):
+        if item.name == "active_terms":
+            continue
+        with pytest.raises(ValueError, match=f"{item.name} must be finite"):
+            InteractionEnergyConfig(**{item.name: bad_value})

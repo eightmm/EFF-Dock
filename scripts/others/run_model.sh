@@ -23,10 +23,24 @@ export UV_CACHE_DIR="$model_root/.cache/uv"
 export UV_PROJECT_ENVIRONMENT="$model_root/.venv"
 export TORCH_HOME="$model_root/.cache/torch"
 export HF_HOME="$model_root/.cache/huggingface"
+export MPLCONFIGDIR="$model_root/.cache/matplotlib"
 export PATH="$model_root/bin:$model_root/.venv/bin:$PATH"
 export PYTHONHASHSEED=${PYTHONHASHSEED:-0}
 
 case "$model" in
+  sigmadock)
+    export PYTHONPATH="$upstream/src:$upstream:$repo_root${PYTHONPATH:+:$PYTHONPATH}"
+    sigmadock_nvidia_root=$($model_root/.venv/bin/python -c \
+      'import pathlib, sysconfig; print(pathlib.Path(sysconfig.get_paths()["purelib"]) / "nvidia")')
+    sigmadock_cudnn_lib="$sigmadock_nvidia_root/cudnn/lib"
+    [[ -f "$sigmadock_cudnn_lib/libcudnn.so.9" ]] || {
+      echo "missing SigmaDock cuDNN runtime: $sigmadock_cudnn_lib/libcudnn.so.9" >&2
+      exit 2
+    }
+    sigmadock_nvidia_libs=$($model_root/.venv/bin/python -c \
+      'import pathlib, sysconfig; root = pathlib.Path(sysconfig.get_paths()["purelib"]) / "nvidia"; print(":".join(str(p) for p in sorted(root.glob("*/lib")) if p.is_dir()))')
+    export LD_LIBRARY_PATH="$sigmadock_nvidia_libs${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    ;;
   surfdock|diffbindfr)
     export PYTHONPATH="$upstream:$repo_root${PYTHONPATH:+:$PYTHONPATH}"
     ;;

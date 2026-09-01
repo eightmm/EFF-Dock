@@ -54,9 +54,9 @@ its results are not overwritten or presented as the confidence model result.
 
 ## Frozen outcome
 
-Completed 2026-07-19 with 393/393 final rows. Frozen-composite <2A rates were
-78.82% Astex and 72.73% PoseBusters; same-candidate Vina rates were 77.65% and
-71.10%. The PoseBusters improvement prediction passed
+Completed 2026-07-19 on Astex and PoseBusters. Frozen-composite <2A rates were
+78.82% and 72.73%; same-candidate Vina rates were 77.65% and 71.10%. The
+PoseBusters improvement prediction passed
 (+1.62pp), while historical reproduction failed the ±2pp criterion on Astex
 (-2.35pp) and PoseBusters (-4.87pp). Official PoseBusters pass-all validity was
 54.87%. Full results and rescue provenance are in `BENCHMARK_RESULTS.md` and

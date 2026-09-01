@@ -1,0 +1,346 @@
+<div id="__ROOT_ID__">
+  <div class="viz-controls">
+    <label class="form-label" for="__ROOT_ID__-mode">Run
+      <select class="form-select" id="__ROOT_ID__-mode"></select>
+    </label>
+    <button class="btn" id="__ROOT_ID__-play" type="button">Play</button>
+    <label class="form-label" for="__ROOT_ID__-frame">Frame <output id="__ROOT_ID__-frame-value">1</output>
+      <input class="form-range" id="__ROOT_ID__-frame" type="range" min="0" value="0">
+    </label>
+  </div>
+  <canvas id="__ROOT_ID__-canvas" width="1000" height="620" role="img"
+    aria-label="Interactive guidance-only rigid-fragment relaxation trajectory with total, per-term interaction, and RMSD diagnostics"></canvas>
+  <div class="text-small" id="__ROOT_ID__-status" aria-live="polite"></div>
+  <script type="application/json" id="__ROOT_ID__-data">__PAYLOAD__</script>
+  <style>
+    #__ROOT_ID__ {
+      color: var(--foreground);
+      width: 100%;
+    }
+    #__ROOT_ID__-canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      touch-action: none;
+    }
+    #__ROOT_ID__-status {
+      color: var(--muted-foreground);
+      margin-top: 0.5rem;
+      min-height: 1.25em;
+      overflow-wrap: anywhere;
+    }
+  </style>
+  <script>
+    (() => {
+      const root = document.getElementById("__ROOT_ID__");
+      const canvas = document.getElementById("__ROOT_ID__-canvas");
+      const ctx = canvas.getContext("2d");
+      const modeSelect = document.getElementById("__ROOT_ID__-mode");
+      const playButton = document.getElementById("__ROOT_ID__-play");
+      const frameInput = document.getElementById("__ROOT_ID__-frame");
+      const frameValue = document.getElementById("__ROOT_ID__-frame-value");
+      const status = document.getElementById("__ROOT_ID__-status");
+      const data = JSON.parse(document.getElementById("__ROOT_ID__-data").textContent);
+      let frameIndex = 0;
+      let yaw = 0;
+      let pitch = 0;
+      let dragging = false;
+      let pointerX = 0;
+      let pointerY = 0;
+      let timer = null;
+
+      Object.entries(data.runs).forEach(([key, run]) => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = run.label || key;
+        modeSelect.append(option);
+      });
+
+      function css(name) {
+        return getComputedStyle(root).getPropertyValue(name).trim()
+          || getComputedStyle(root).color;
+      }
+
+      function palette() {
+        return [1, 2, 3, 4, 5, 6].map((index) => css(`--viz-series-${index}`));
+      }
+
+      function rotate(point) {
+        const cy = Math.cos(yaw);
+        const sy = Math.sin(yaw);
+        const cp = Math.cos(pitch);
+        const sp = Math.sin(pitch);
+        const x = cy * point[0] + sy * point[2];
+        const z = -sy * point[0] + cy * point[2];
+        const y = cp * point[1] - sp * z;
+        return [x, y, sp * point[1] + cp * z];
+      }
+
+      function project(point, mainHeight) {
+        const rotated = rotate(point);
+        const scale = Math.min(canvas.width, mainHeight) / (2 * data.halfSpan);
+        return [
+          canvas.width / 2 + rotated[0] * scale,
+          mainHeight / 2 - rotated[1] * scale,
+          rotated[2],
+        ];
+      }
+
+      function fmt(value) {
+        if (value === null || value === undefined || !Number.isFinite(value)) return "n/a";
+        const absolute = Math.abs(value);
+        if (absolute >= 10000 || (absolute > 0 && absolute < 0.001)) {
+          return value.toExponential(2);
+        }
+        return absolute >= 100 ? value.toFixed(1) : value.toFixed(3);
+      }
+
+      function drawEnergy(run, foreground, muted, grid) {
+        const yTop = 525;
+        const yBottom = 596;
+        const xLeft = 74;
+        const xRight = 974;
+        const finite = run.total.filter((value) => value !== null && Number.isFinite(value));
+        ctx.font = "14px sans-serif";
+        ctx.fillStyle = muted;
+        ctx.fillText("total energy", 18, yTop + 10);
+        if (!finite.length) {
+          ctx.fillText("not recorded", xLeft, yTop + 32);
+          return;
+        }
+        let low = Math.min(...finite);
+        let high = Math.max(...finite);
+        if (low === high) {
+          low -= 1;
+          high += 1;
+        }
+        ctx.strokeStyle = grid;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(xLeft, yBottom);
+        ctx.lineTo(xRight, yBottom);
+        ctx.stroke();
+        ctx.strokeStyle = css("--viz-series-1");
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        let started = false;
+        run.total.forEach((value, index) => {
+          if (value === null || !Number.isFinite(value)) {
+            started = false;
+            return;
+          }
+          const x = xLeft + index / Math.max(run.total.length - 1, 1) * (xRight - xLeft);
+          const y = yBottom - (value - low) / (high - low) * (yBottom - yTop);
+          if (started) ctx.lineTo(x, y);
+          else ctx.moveTo(x, y);
+          started = true;
+        });
+        ctx.stroke();
+        const cursorX = xLeft + frameIndex / Math.max(run.total.length - 1, 1) * (xRight - xLeft);
+        ctx.strokeStyle = foreground;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cursorX, yTop);
+        ctx.lineTo(cursorX, yBottom);
+        ctx.stroke();
+        ctx.fillStyle = muted;
+        ctx.fillText(fmt(high), 18, yTop + 28);
+        ctx.fillText(fmt(low), 18, yBottom);
+      }
+
+      function draw() {
+        const run = data.runs[modeSelect.value];
+        frameIndex = Math.min(frameIndex, run.frames.length - 1);
+        const frame = run.frames[frameIndex];
+        const colors = palette();
+        const foreground = css("--foreground");
+        const muted = css("--muted-foreground");
+        const grid = css("--border");
+        const destructive = css("--destructive");
+        const mainHeight = 500;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = muted;
+        ctx.globalAlpha = 0.2;
+        data.protein.map((point) => project(point, mainHeight)).forEach((point) => {
+          if (
+            point[0] >= 0 && point[0] <= canvas.width
+            && point[1] >= 0 && point[1] <= mainHeight
+          ) {
+            ctx.beginPath();
+            ctx.arc(point[0], point[1], 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+        ctx.globalAlpha = 1;
+
+        if (data.pocketCenter) {
+          const point = project(data.pocketCenter, mainHeight);
+          const centerColor = css("--viz-series-6");
+          ctx.strokeStyle = centerColor;
+          ctx.fillStyle = centerColor;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(point[0], point[1], 11, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(point[0] - 15, point[1]);
+          ctx.lineTo(point[0] + 15, point[1]);
+          ctx.moveTo(point[0], point[1] - 15);
+          ctx.lineTo(point[0], point[1] + 15);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(point[0], point[1] - 5);
+          ctx.lineTo(point[0] + 5, point[1]);
+          ctx.lineTo(point[0], point[1] + 5);
+          ctx.lineTo(point[0] - 5, point[1]);
+          ctx.closePath();
+          ctx.fill();
+          ctx.fillStyle = foreground;
+          ctx.font = "14px sans-serif";
+          const label = "pocket center";
+          const labelWidth = ctx.measureText(label).width;
+          const labelX = Math.max(4, Math.min(canvas.width - labelWidth - 4, point[0] + 18));
+          const labelY = Math.max(16, Math.min(mainHeight - 4, point[1] - 8));
+          ctx.fillText(label, labelX, labelY);
+        }
+
+        const crystal = data.crystal.map((point) => project(point, mainHeight));
+        ctx.strokeStyle = muted;
+        ctx.fillStyle = muted;
+        ctx.globalAlpha = 0.28;
+        ctx.lineWidth = 2;
+        data.bonds.forEach(([atomI, atomJ]) => {
+          ctx.beginPath();
+          ctx.moveTo(crystal[atomI][0], crystal[atomI][1]);
+          ctx.lineTo(crystal[atomJ][0], crystal[atomJ][1]);
+          ctx.stroke();
+        });
+        crystal.forEach((point) => {
+          ctx.beginPath();
+          ctx.arc(point[0], point[1], 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+
+        const visibleCenters = run.centers.slice(0, frameIndex + 1);
+        if (visibleCenters.length) {
+          visibleCenters[0].forEach((_, fragment) => {
+            ctx.strokeStyle = colors[fragment % colors.length];
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            visibleCenters.forEach((centers, index) => {
+              const point = project(centers[fragment], mainHeight);
+              if (index === 0) ctx.moveTo(point[0], point[1]);
+              else ctx.lineTo(point[0], point[1]);
+            });
+            ctx.stroke();
+          });
+        }
+
+        const projected = frame.map((point) => project(point, mainHeight));
+        data.bonds.forEach(([atomI, atomJ]) => {
+          const cut = data.fragmentId[atomI] !== data.fragmentId[atomJ];
+          ctx.strokeStyle = cut ? destructive : colors[data.fragmentId[atomI] % colors.length];
+          ctx.lineWidth = cut ? 3 : 4;
+          ctx.setLineDash(cut ? [7, 6] : []);
+          ctx.beginPath();
+          ctx.moveTo(projected[atomI][0], projected[atomI][1]);
+          ctx.lineTo(projected[atomJ][0], projected[atomJ][1]);
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+        projected
+          .map((point, atom) => ({point, atom}))
+          .sort((left, right) => left.point[2] - right.point[2])
+          .forEach(({point, atom}) => {
+            ctx.fillStyle = colors[data.fragmentId[atom] % colors.length];
+            ctx.strokeStyle = foreground;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(point[0], point[1], 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          });
+
+        drawEnergy(run, foreground, muted, grid);
+        frameValue.value = `${frameIndex + 1} / ${run.frames.length}`;
+        const step = run.steps[frameIndex];
+        const initialization = data.initializationLabel
+          ? `${data.initializationLabel} · `
+          : "";
+        const interactionTerms = (run.interactionTerms || [])
+          .map((term) => ({label: term.label, value: term.values[frameIndex]}))
+          .filter(({value}) => Number.isFinite(value) && Math.abs(value) > 1e-12)
+          .map(({label, value}) => `${label} ${fmt(value)}`)
+          .join(" · ");
+        status.textContent = `${initialization}step ${step} · total ${fmt(run.total[frameIndex])}`
+          + ` · interaction ${fmt(run.interaction[frameIndex])}`
+          + ` · raw RMSD ${fmt(run.rmsd[frameIndex])} Å`
+          + (interactionTerms ? ` · ${interactionTerms}` : "");
+      }
+
+      function stop() {
+        if (timer !== null) window.clearInterval(timer);
+        timer = null;
+        playButton.textContent = "Play";
+      }
+
+      function configureMode() {
+        stop();
+        frameIndex = 0;
+        const run = data.runs[modeSelect.value];
+        frameInput.max = String(run.frames.length - 1);
+        frameInput.value = "0";
+        draw();
+      }
+
+      playButton.addEventListener("click", () => {
+        if (timer !== null) {
+          stop();
+          return;
+        }
+        playButton.textContent = "Pause";
+        timer = window.setInterval(() => {
+          const run = data.runs[modeSelect.value];
+          if (frameIndex >= run.frames.length - 1) {
+            stop();
+            return;
+          }
+          frameIndex += 1;
+          frameInput.value = String(frameIndex);
+          draw();
+        }, 100);
+      });
+      modeSelect.addEventListener("change", configureMode);
+      frameInput.addEventListener("input", () => {
+        stop();
+        frameIndex = Number(frameInput.value);
+        draw();
+      });
+      canvas.addEventListener("pointerdown", (event) => {
+        dragging = true;
+        pointerX = event.clientX;
+        pointerY = event.clientY;
+        canvas.setPointerCapture(event.pointerId);
+      });
+      canvas.addEventListener("pointermove", (event) => {
+        if (!dragging) return;
+        yaw += (event.clientX - pointerX) * 0.01;
+        pitch = Math.max(-1.35, Math.min(1.35, pitch + (event.clientY - pointerY) * 0.01));
+        pointerX = event.clientX;
+        pointerY = event.clientY;
+        draw();
+      });
+      canvas.addEventListener("pointerup", (event) => {
+        dragging = false;
+        canvas.releasePointerCapture(event.pointerId);
+      });
+      canvas.addEventListener("pointercancel", () => {
+        dragging = false;
+      });
+      configureMode();
+    })();
+  </script>
+</div>

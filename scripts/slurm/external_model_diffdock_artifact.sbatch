@@ -1,0 +1,1 @@
+../../benchmarks/external_models/slurm/external_model_diffdock_artifact.sbatch

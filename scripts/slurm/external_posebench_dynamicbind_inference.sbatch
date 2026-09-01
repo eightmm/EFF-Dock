@@ -1,0 +1,1 @@
+../../benchmarks/external_models/slurm/external_posebench_dynamicbind_inference.sbatch

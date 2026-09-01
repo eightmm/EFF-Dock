@@ -23,7 +23,7 @@ candidate distribution, model architecture, or frozen selector?
   split, evaluated on all 80 poses with no stochastic crop.
 - Split audit: 47,310 train and 1,076 validation sample keys; exact sample-key,
   canonical-SMILES, and pocket70-community overlaps are all zero.
-- External PoseBusters and Astex labels/results are forbidden for model,
+- External benchmark labels/results are forbidden for model,
   loss, checkpoint, or hyperparameter selection.
 
 ## Frozen baseline
@@ -92,7 +92,7 @@ failures, not scientific outcomes. Exact reruns on an 80 GB H100 completed
 successfully without changing the 80-pose contract.
 
 The pre-registered `+1.5 pp` success bar was not met. Multi-seed/full-val and
-external PoseBusters/Astex evaluation were therefore not run. Keep
+external benchmark evaluation was therefore not run. Keep
 `weights/effdock_confidence_extmatch_n80_s25_step42500.pt`; abandon these three
 loss additions at the tested weights. The next falsifying experiment should
 change data coverage or representation rather than perform another short

@@ -1,171 +1,155 @@
 # EFF-Dock
 
-EFF-Dock is a trainable protein-ligand docking project built around
-fragment-level SE(3)-equivariant flow matching. It supports PLINDER
-preprocessing, PyTorch DDP training, learned pose-confidence ranking, external
-benchmark evaluation, exact checkpoint resume, and single-complex docking
-through one CLI.
+EFF-Dock is a fragment-level SE(3)-equivariant flow-matching model for
+protein-ligand docking. The repository contains the Python implementation,
+training and evaluation workflows, the promoted docking/confidence weights,
+and the evidence used for the accompanying paper.
 
-The public inference boundary requires a receptor structure, ligand chemistry,
-and an explicit pocket center. EFF-Dock does not perform blind pocket discovery
-or binding-affinity prediction.
+EFF-Dock predicts ligand poses inside an explicitly supplied binding pocket.
+It does not perform blind pocket discovery, binding-affinity prediction, or
+binder/non-binder classification.
+
+## Released model
+
+The public model is one paired deployment stack:
+
+- docking: `weights/effdock_docking_early_time_t0p10_50k.pt`;
+- confidence: `weights/effdock_confidence_s50_raw_refined_u70k.pt`;
+- sampling: 100 poses, 10 ODE steps, translation sigma 2.0;
+- pocket crop: 10 Angstrom;
+- time grid: late schedule with power 3;
+- selection: minimum predicted pose RMSD.
+
+The confidence model consumes hidden features from the paired docking model.
+Changing either checkpoint, the pose generator, sigma, ODE budget, or pocket
+crop is a distribution shift and should be reported explicitly. Checksums and
+model-card links are in [`weights/MANIFEST.md`](weights/MANIFEST.md).
 
 ## Requirements
 
-- Python 3.12
-- [`uv`](https://docs.astral.sh/uv/)
-- Linux with an NVIDIA GPU for the pinned CUDA 13 training/inference stack
-- Git LFS when cloning the retained model weights
-
-## Setup
+- Python 3.12;
+- [`uv`](https://docs.astral.sh/uv/);
+- Linux with an NVIDIA GPU compatible with the pinned CUDA 13 stack;
+- Git LFS for the released weights.
 
 ```bash
 git lfs install
-uv sync --group dev
-uv run eff-dock --help
+uv sync --frozen --group dev
+uv run python scripts/verify_release.py
 ```
 
-Run the CPU verification suite with:
+The repository is currently distributed as a research codebase rather than a
+general-purpose PyPI package. Run examples from the repository root so the
+versioned configs and weights resolve to the released files.
 
-```bash
-uv run pytest -q
-uv run ruff check .
+## Python inference
+
+The primary inference interface is `effdock.inference.DockingOptions` plus
+`effdock.inference.dock`:
+
+```python
+from pathlib import Path
+
+import torch
+
+from effdock.inference import DockingOptions, dock
+
+options = DockingOptions(
+    protein=Path("receptor.pdb"),
+    ligand="ligand.sdf",  # an SDF path or a SMILES string
+    pocket_center=torch.tensor([12.4, -3.1, 8.7]),
+    checkpoint=Path("weights/effdock_docking_early_time_t0p10_50k.pt"),
+    confidence_checkpoint=Path(
+        "weights/effdock_confidence_s50_raw_refined_u70k.pt"
+    ),
+    config=Path("configs/train.yaml"),
+    num_samples=100,
+    num_steps=10,
+    sigma=2.0,
+    pocket_cutoff=10.0,
+    time_schedule="late",
+    schedule_power=3.0,
+    rank_by="confidence",
+    out_dir=Path("outputs/docked"),
+    device="cuda",
+    seed=42,
+)
+
+dock(options)
 ```
 
-## Canonical workflows
+The call writes the complete pose ensemble to `docked_poses.sdf`, raw tensors
+and provenance to `results.pt`, and convenience selected-pose artifacts under
+the requested output directory. A receptor, ligand chemistry, and explicit
+pocket center are required; target/crystal ligand coordinates must not be used
+to define the pocket in a prospective setting.
 
-```bash
-uv run eff-dock data curate --help
-uv run eff-dock data prepare --help
-uv run eff-dock data split --help
-uv run eff-dock data benchmark --help
-uv run eff-dock train --config configs/train.yaml
-uv run eff-dock confidence prepare \
-  --checkpoint weights/effdock_geometry_ft_100k_best.pt --split train
-uv run eff-dock confidence train --config configs/train_confidence.yaml
-uv run eff-dock evaluate --dataset astex --data-dir DATASET \
-  --pocket-centers FROZEN_CENTERS.json
-uv run eff-dock benchmark --help
-uv run eff-dock dock --protein receptor.pdb --ligand ligand.sdf \
-  --pocket-center X,Y,Z
-uv run eff-dock physical trace --protein receptor.pdb \
-  --ligand crystal_ligand.sdf --output outputs/guidance/trace.json
+The `eff-dock` command remains as a thin wrapper around the same Python
+workflows for reproducibility and Slurm jobs. It is not the primary public API.
+
+## Training and evaluation
+
+Reusable components are importable from the package:
+
+```python
+from effdock.confidence import DockingGraphPoseConfidence
+from effdock.training import Trainer, flow_matching_loss
 ```
 
-`physical trace` is the backward-compatible command for the diagnostic-only,
-self-contained Torch guidance trace. It records physical, hydrophobic,
-idealized missing-valence-cone hydrogen-bond, screened formal-charge-group, and
-combined energies/forces for a crystal pose or saved trajectory; it does not
-optimize the crystal or enable production ODE guidance. Vina is not part of
-this path. See
-[`docs/GUIDANCE_CONTRACT.md`](docs/GUIDANCE_CONTRACT.md).
+Experiment entry points live in `effdock.workflows`; the corresponding
+configuration files are under `configs/`. Dataset construction, split rules,
+checkpoint selection, and exact evaluation definitions are documented in:
 
-## Retained weights
+- [`docs/DATA.md`](docs/DATA.md);
+- [`docs/MODEL.md`](docs/MODEL.md);
+- [`docs/EVALUATION.md`](docs/EVALUATION.md);
+- [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
 
-Model artifacts under `weights/` are tracked with Git LFS. The public default
-inference stack is:
+## Main results
 
-- `effdock_geometry_ft_100k_best.pt`
-- `effdock_confidence_extmatch_n80_s25_step42500.pt`
-- 100 candidate poses, 10 ODE steps, translation sigma 2.0, and a 10A pocket crop
+All rows below use the released docking/U70k pair on the same saved
+N100/S10/sigma-2 candidates. RMSD is symmetry-aware heavy-atom RMSD without
+alignment. `Raw` is the sampler output. `Refined` is the separately evaluated
+deterministic physical refinement and is not silently applied by `dock()`.
+`Joint` requires both refined RMSD below 2 Angstrom and official PoseBusters
+validity.
 
-Both `eff-dock dock` and `eff-dock evaluate` therefore run with
-`--num-samples 100 --num-steps 10` unless explicitly overridden. Use
-`--no-confidence` to disable learned reranking.
+| Dataset | N | Raw Top-1 `<2A` | Refined Top-1 `<2A` | Refined PB-valid | Refined joint `<2A` |
+|---|---:|---:|---:|---:|---:|
+| Astex Diverse | 85 | 81.18% | 85.88% | 94.12% | 81.18% |
+| PoseBusters v2 | 308 | 78.25% | 84.09% | 95.13% | 81.17% |
+| PhiBench | 203 | 63.05% | 64.53% | 90.64% | 59.11% |
+| FoldBench | 66 | 63.64% | 68.18% | 90.91% | 66.67% |
+| OpenBind | 860 | 49.07% | 55.47% | 98.60% | 54.65% |
 
-The packaged confidence checkpoint was originally trained on N80/S25/sigma0.5
-pose banks. N100/S10/sigma2 is the current deployment sampling budget, so this
-is an intentional candidate-distribution shift rather than a claim that the
-retained checkpoint was trained with the new defaults. The historical
-N80/S25/sigma0.5 contract remains in the model card for exact reproduction.
+These are supplied-pocket redocking results, not blind docking or prospective
+screening. Astex, PoseBusters, and the temporal cohorts were inspected during
+development, so their results are descriptive. U70k was selected only on the
+fixed 1,035-complex PLINDER validation bank. PhiBench and FoldBench are the
+core temporal checks; OpenBind is reported separately as a dense
+single-protease auxiliary cohort.
 
-Checksums, compatibility notes, and the confidence model card are in
-[`weights/MANIFEST.md`](weights/MANIFEST.md) and
-[`weights/CONFIDENCE_MODEL_CARD.md`](weights/CONFIDENCE_MODEL_CARD.md).
+The paper-facing claim map and detailed tables are in
+[`docs/PAPER_EVIDENCE.md`](docs/PAPER_EVIDENCE.md) and
+[`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md).
 
-The later S50/sigma-2 symmetry-confidence experiment is complete but remains
-an unpromoted research result. Current benchmark reporting uses the terminal
-U50k checkpoint on the frozen sigma-2 N100 candidate banks:
+## Repository map
 
-| Dataset | N | Raw Top-1 <2A | Refined Top-1 <2A | Refined oracle <2A | Refined PB-valid | Refined joint valid+<2A |
-|---|---:|---:|---:|---:|---:|---:|
-| Astex Diverse | 85 | 70/85 (82.35%) | 73/85 (85.88%) | 82/85 (96.47%) | 80/85 (94.12%) | 69/85 (81.18%) |
-| PoseBusters v2 | 308 | 241/308 (78.25%) | 259/308 (84.09%) | 295/308 (95.78%) | 289/308 (93.83%) | 250/308 (81.17%) |
+- `src/effdock/`: reusable Python package;
+- `configs/`: training and evaluation configurations;
+- `weights/`: the two released model artifacts and model cards;
+- `benchmarks/`: external-model adapters and compact result artifacts;
+- `scripts/`: experiment and Slurm launchers;
+- `tests/`: unit and scientific-contract tests;
+- `docs/`: method, data, evaluation, protocol, and paper-evidence documents.
 
-These Astex/PoseBusters results are descriptive external evaluations. The
-registered internal PLINDER rule selected U25k (`58.45%` Top-1 `<2A`; U50k
-`56.81%`), and that historical selection is not rewritten. U50k is used here
-as the project reporting convention after external outcomes were opened; this
-does not by itself promote the checkpoint into public deployment defaults.
-Exact checkpoint hashes, validity decomposition, and evaluation boundaries are
-documented in
-[`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`](docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md).
-The score-only U50 reporting override for the additional cohorts is frozen in
-[`docs/EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md`](docs/EXTERNAL_TEMPORAL_U50_REPORT_PROTOCOL.md).
-Primary-source results for SurfDock, SigmaDock, Matcha, PocketXMol,
-DiffDock-Pocket RL, AlphaFold 3, classical dockers, legacy PB `N=428`, and
-denominator-mismatched recent reports are separated and recorded in
-[`docs/LITERATURE_BENCHMARK_COMPARISON.md`](docs/LITERATURE_BENCHMARK_COMPARISON.md).
+Start with [`docs/README.md`](docs/README.md) for the documentation index and
+[`docs/STRUCTURE.md`](docs/STRUCTURE.md) for ownership boundaries. Raw data,
+pose banks, scheduler logs, complete run ledgers, and historical checkpoints
+remain local and are not part of the public repository.
 
-The same frozen N100/S10 guided/refined stack was run without retuning on
-recent external pocket-redocking cohorts:
+## License
 
-| Dataset | N | Raw Top-1 <2 A | Refined Top-1 <2 A | Refined joint PB-valid + <2 A |
-|---|---:|---:|---:|---:|
-| PhiBench derived | 203 | 61.58% | 65.02% | 60.10% |
-| FoldBench P-L adaptation | 66 | 65.15% | 62.12% | 60.61% |
-| OpenBind clean non-covalent | 860 | 48.14% | 51.74% | 50.93% |
-
-These are descriptive pocket-redocking adaptations; PhiBench and FoldBench are
-not claimed as native author-leaderboard reproductions. Cohort provenance,
-exact U50-selected counts, validity, and artifact hashes are in
-[`docs/EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md`](docs/EXTERNAL_TEMPORAL_GUIDED_REFINED_RESULTS.md).
-
-The same guided/refined inference stack has also been ranked with U50k
-confidence and aggregated under the public OpenBind filtered scaffold-only
-Top-25 contract (`N=802`, with 16 missing EFF-Dock predictions counted as
-failures):
-
-| Rank budget | PB-valid + BiSyRMSD <=2 A | + LDDT-PLI >=0.8 |
-|---|---:|---:|
-| Top-1 | 417/802 (52.00%) | 359/802 (44.76%) |
-| Top-5 | 603/802 (75.19%) | 511/802 (63.72%) |
-| Top-25 | **695/802 (86.66%)** | **581/802 (72.44%)** |
-
-OpenBind's cross-method figure is an any-pose Top-25 comparison, not a
-deployable Top-1 benchmark. Exact denominator construction, PoseBusters 0.6.5
-validity, OpenStructure 2.11.1 BiSyRMSD/LDDT-PLI commands, public comparison
-values, and artifact hashes are documented in
-[`docs/OPENBIND_OFFICIAL_TOP25_RESULTS.md`](docs/OPENBIND_OFFICIAL_TOP25_RESULTS.md).
-
-The portable code paths used by this study are published with the repository:
-
-```bash
-uv run python scripts/prepare_s50_confidence_training_bank.py --help
-uv run python scripts/build_s50_symmetry_rmsd_sidecars.py --help
-uv run python scripts/calibrate_s50_refinement_budget.py --help
-uv run python scripts/refine_s50_confidence_pose_bank.py --help
-uv run python scripts/materialize_s50_refined_confidence_bank.py --help
-uv run python scripts/report_s50_confidence_training.py --help
-uv run python scripts/run_guidance_sdf_post_refinement.py --help
-uv run python scripts/score_guidance_sdf_post_refinement_confidence.py --help
-uv run python scripts/report_s50_symmetry_confidence_refined_external.py --help
-uv run python scripts/evaluate_s50_u50_refinement_validity.py --help
-```
-
-`configs/train_confidence_s50_symmetry.yaml` reproduces the symmetry-target
-confidence setup. `configs/train_confidence_s50_raw_refined_10k.yaml` defines
-the paired raw/refined continuation with 32 poses from each bank plus one
-mapped-crystal anchor. The scripts require explicit manifests, hashes, paths,
-and output roots. The external scripts reproduce the frozen refined-pose
-rescoring and official PoseBusters validity decomposition. Generated banks,
-checkpoints, and cluster-specific submission wrappers are intentionally not
-stored in Git.
-
-Raw data, generated outputs, and historical migration material stay local and
-are ignored by Git. The active package, configs, tests, documentation, and
-retained weights form the published interface.
-
-See [`docs/STRUCTURE.md`](docs/STRUCTURE.md) for the repository layout,
-[`docs/EVALUATION.md`](docs/EVALUATION.md) for the evaluation contract, and
-[`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md) for reproducibility notes.
+The EFF-Dock source code and released EFF-Dock model artifacts are provided
+under the [Apache License 2.0](LICENSE). Third-party datasets, software, and
+model artifacts remain subject to their respective terms.

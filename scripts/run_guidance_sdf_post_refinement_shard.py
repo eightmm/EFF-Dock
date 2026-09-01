@@ -69,6 +69,17 @@ def main() -> None:
     parser.add_argument("--energy-convergence-patience", type=int, default=5)
     parser.add_argument("--energy-convergence-min-steps", type=int, default=20)
     parser.add_argument("--confidence-sigma", type=float, default=0.5)
+    parser.add_argument("--pocket-cutoff", type=float, default=10.0)
+    parser.add_argument(
+        "--docking-checkpoint",
+        type=Path,
+        default=Path("weights/effdock_geometry_ft_100k_best.pt"),
+    )
+    parser.add_argument(
+        "--confidence-checkpoint",
+        type=Path,
+        default=Path("weights/effdock_confidence_extmatch_n80_s25_step42500.pt"),
+    )
     args = parser.parse_args()
     if args.num_shards < 1 or not 0 <= args.shard_index < args.num_shards:
         raise ValueError("invalid shard contract")
@@ -113,6 +124,7 @@ def main() -> None:
                 "--steps", "100",
                 "--save-every", "25",
                 "--batch-size", "10",
+                "--pocket-cutoff", str(args.pocket_cutoff),
             ]
             if args.energy_convergence_absolute_kcal_mol is not None:
                 command.extend(
@@ -148,10 +160,11 @@ def main() -> None:
                 "--benchmark-input-manifest", str(args.benchmark_input_manifest),
                 "--external-dir", str(args.external_dir),
                 "--config", "configs/train.yaml",
-                "--docking-checkpoint", "weights/effdock_geometry_ft_100k_best.pt",
-                "--confidence-checkpoint", "weights/effdock_confidence_extmatch_n80_s25_step42500.pt",
+                "--docking-checkpoint", str(args.docking_checkpoint),
+                "--confidence-checkpoint", str(args.confidence_checkpoint),
                 "--output-dir", str(confidence_dir),
                 "--sigma", str(args.confidence_sigma),
+                "--pocket-cutoff", str(args.pocket_cutoff),
                 "--pose-batch-size", "20",
                 "--device", "cuda",
             ]
@@ -180,6 +193,9 @@ def main() -> None:
             "min_steps": args.energy_convergence_min_steps,
         },
         "confidence_sigma": args.confidence_sigma,
+        "pocket_cutoff_angstrom": args.pocket_cutoff,
+        "docking_checkpoint": str(args.docking_checkpoint),
+        "confidence_checkpoint": str(args.confidence_checkpoint),
         "assigned": len(records),
         "completed": completed,
         "runtime": {

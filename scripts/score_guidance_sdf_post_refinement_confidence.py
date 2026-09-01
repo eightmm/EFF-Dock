@@ -10,6 +10,7 @@ import math
 import os
 import sys
 import tempfile
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -36,6 +37,11 @@ from run_guidance_sdf_post_refinement import (
 PROTOCOL_ID = "EFFDOCK-GUIDANCE-SDF-POST-REFINEMENT-CONFIDENCE-V2"
 SCHEMA_VERSION = "effdock.guidance_sdf_post_refinement_confidence.v2"
 FROZEN_POSE_BATCH_SIZE = 20
+
+
+def _synchronize(device: torch.device) -> None:
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
 
 
 def _select_index(scores: list[dict[str, float]]) -> int:
@@ -113,10 +119,9 @@ def _trajectory_stages(summary: dict[str, Any], mol_input) -> dict[str, torch.Te
     if not path.is_file() or file_sha256(path) != spec["sha256"]:
         raise ValueError(f"missing or changed trajectory tensor: {path}")
     payload = torch.load(path, map_location="cpu", weights_only=True)
-    if (
-        payload.get("protocol_id") != REFINEMENT_PROTOCOL_ID
-        or payload.get("schema_version") != summary.get("schema_version")
-    ):
+    if payload.get("protocol_id") != REFINEMENT_PROTOCOL_ID or payload.get(
+        "schema_version"
+    ) != summary.get("schema_version"):
         raise ValueError("trajectory protocol/schema mismatch")
     steps = payload["saved_steps"].to(torch.long).tolist()
     frames = payload["frames_pocket_centered"].to(torch.float32)
@@ -133,24 +138,24 @@ def _trajectory_stages(summary: dict[str, Any], mol_input) -> dict[str, torch.Te
 
 
 def main() -> None:
+    pipeline_started = time.perf_counter()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--refinement-summary", type=Path, required=True)
-    parser.add_argument("--benchmark-input-manifest", type=Path, required=True)
+    parser.add_argument("--benchmark-input-manifest", type=Path, default=None)
     parser.add_argument("--external-dir", type=Path, default=Path("data/external_test"))
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--docking-checkpoint", type=Path, required=True)
     parser.add_argument("--confidence-checkpoint", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--sigma", type=float, default=0.5)
+    parser.add_argument("--pocket-cutoff", type=float)
     parser.add_argument("--pose-batch-size", type=int, default=FROZEN_POSE_BATCH_SIZE)
     parser.add_argument("--device", default="cuda")
     args = parser.parse_args()
     if not math.isfinite(args.sigma) or args.sigma <= 0:
         raise ValueError("confidence sigma must be finite and positive")
     if args.pose_batch_size != FROZEN_POSE_BATCH_SIZE:
-        raise ValueError(
-            f"V2 protocol requires frozen pose chunks of {FROZEN_POSE_BATCH_SIZE}"
-        )
+        raise ValueError(f"V2 protocol requires frozen pose chunks of {FROZEN_POSE_BATCH_SIZE}")
     if args.output_dir.exists():
         raise FileExistsError(f"refusing to overwrite {args.output_dir}")
     device = torch.device(args.device)
@@ -162,6 +167,16 @@ def main() -> None:
     inputs = refinement["inputs"]
     dataset = str(inputs["dataset"])
     complex_id = str(inputs["complex_id"])
+    refinement_cutoff = float(inputs.get("pocket_cutoff_angstrom", 10.0))
+    pocket_cutoff = (
+        refinement_cutoff if args.pocket_cutoff is None else args.pocket_cutoff
+    )
+    if not math.isfinite(pocket_cutoff) or pocket_cutoff <= 0:
+        raise ValueError("pocket-cutoff must be finite and positive")
+    if not math.isclose(pocket_cutoff, refinement_cutoff, abs_tol=1e-12):
+        raise ValueError(
+            "confidence pocket-cutoff must match the refinement pocket-cutoff"
+        )
     artifacts = refinement["artifacts"]
     stage_specs = {
         "step_000": artifacts["step_000_sdf"],
@@ -172,7 +187,6 @@ def main() -> None:
         if not path.is_file() or file_sha256(path) != spec["sha256"]:
             raise ValueError(f"missing or changed pose input: {path}")
     frozen_files = [
-        args.benchmark_input_manifest,
         args.config,
         args.docking_checkpoint,
         args.confidence_checkpoint,
@@ -180,6 +194,8 @@ def main() -> None:
         Path(inputs["protein"]),
         Path(inputs["ligand_reference"]),
     ]
+    if args.benchmark_input_manifest is not None:
+        frozen_files.append(args.benchmark_input_manifest)
     if any(not path.is_file() for path in frozen_files):
         raise FileNotFoundError("one or more frozen confidence inputs are missing")
 
@@ -193,20 +209,29 @@ def main() -> None:
         Path(inputs["protein"]),
         mol_input,
         pocket_center=pocket_center,
-        pocket_cutoff=10.0,
+        pocket_cutoff=pocket_cutoff,
     )
     if not torch.equal(meta["pocket_center"], pocket_center):
         raise AssertionError("preprocessing changed frozen pocket center")
 
+    stage_coordinates = _trajectory_stages(refinement, mol_input)
+    input_preparation_seconds = time.perf_counter() - pipeline_started
+    _synchronize(device)
+    model_load_started = time.perf_counter()
     model, _, docking_ckpt = load_model(args.config, args.docking_checkpoint, device)
     confidence_model, confidence_ckpt = load_pose_confidence_model(
         args.confidence_checkpoint, device
     )
-    stage_coordinates = _trajectory_stages(refinement, mol_input)
+    _synchronize(device)
+    model_load_seconds = time.perf_counter() - model_load_started
     stage_scores: dict[str, list[dict[str, float]]] = {}
+    confidence_forward_seconds: dict[str, float] = {}
+    selector_seconds: dict[str, float] = {}
     selected: dict[str, dict[str, float | int | bool]] = {}
     for stage, spec in stage_specs.items():
         centered = list(stage_coordinates[stage])
+        _synchronize(device)
+        scoring_started = time.perf_counter()
         scores = _score_in_batches(
             confidence_model,
             model,
@@ -218,8 +243,12 @@ def main() -> None:
             device=device,
             batch_size=args.pose_batch_size,
         )
+        _synchronize(device)
+        confidence_forward_seconds[stage] = time.perf_counter() - scoring_started
         stage_scores[stage] = scores
+        selection_started = time.perf_counter()
         index = _select_index(scores)
+        selector_seconds[stage] = time.perf_counter() - selection_started
         pose_metrics = refinement["poses"][index]
         rmsd_key = (
             "initial_symmetry_rmsd_angstrom"
@@ -240,19 +269,30 @@ def main() -> None:
         "pose_path": inputs["pose_sdf"],
     }
     source_row = _load_source_row(source_manifest, source_record)
-    expected_scores = json.loads(source_row["confidence_candidate_scores_json"])
-    if len(expected_scores) != EXPECTED_POSES:
-        raise ValueError("source confidence ledger pose count mismatch")
-    baseline_deltas = [
-        abs(float(actual["confidence_rmsd"]) - float(expected["confidence_rmsd"]))
-        for actual, expected in zip(stage_scores["step_000"], expected_scores, strict=True)
-    ]
-    expected_index = int(source_row["confidence_index"])
-    baseline_index_matches = selected["step_000"]["pose_index"] == expected_index
+    source_score_json = source_row.get("confidence_candidate_scores_json", "")
+    if source_score_json:
+        expected_scores = json.loads(source_score_json)
+        if len(expected_scores) != EXPECTED_POSES:
+            raise ValueError("source confidence ledger pose count mismatch")
+        baseline_deltas = [
+            abs(float(actual["confidence_rmsd"]) - float(expected["confidence_rmsd"]))
+            for actual, expected in zip(
+                stage_scores["step_000"], expected_scores, strict=True
+            )
+        ]
+        expected_index: int | None = int(source_row["confidence_index"])
+        baseline_index_matches: bool | None = (
+            selected["step_000"]["pose_index"] == expected_index
+        )
+    else:
+        baseline_deltas = []
+        expected_index = None
+        baseline_index_matches = None
     args.output_dir.parent.mkdir(parents=True, exist_ok=True)
     attempt = Path(
         tempfile.mkdtemp(prefix=f".{args.output_dir.name}.attempt-", dir=args.output_dir.parent)
     )
+    serialization_started = time.perf_counter()
     score_rows: list[dict[str, Any]] = []
     for pose_index in range(EXPECTED_POSES):
         score_rows.append(
@@ -279,6 +319,7 @@ def main() -> None:
         writer = csv.DictWriter(handle, fieldnames=list(score_rows[0]), extrasaction="raise")
         writer.writeheader()
         writer.writerows(score_rows)
+    score_serialization_seconds = time.perf_counter() - serialization_started
     summary = {
         "schema_version": SCHEMA_VERSION,
         "protocol_id": PROTOCOL_ID,
@@ -293,14 +334,22 @@ def main() -> None:
         "pose_count": EXPECTED_POSES,
         "sigma": args.sigma,
         "pose_batch_size": args.pose_batch_size,
+        "pocket_cutoff_angstrom": pocket_cutoff,
         "selected": selected,
-        "selector_changed": selected["step_000"]["pose_index"] != selected["step_100"]["pose_index"],
+        "selector_changed": selected["step_000"]["pose_index"]
+        != selected["step_100"]["pose_index"],
         "historical_baseline_reproduction": {
             "source_selected_index": expected_index,
             "rescored_selected_index": selected["step_000"]["pose_index"],
             "selected_index_matches": baseline_index_matches,
-            "max_abs_predicted_rmsd_delta": max(baseline_deltas),
-            "role": "diagnostic_only_not_a_completion_gate",
+            "max_abs_predicted_rmsd_delta": (
+                max(baseline_deltas) if baseline_deltas else None
+            ),
+            "role": (
+                "diagnostic_only_not_a_completion_gate"
+                if baseline_deltas
+                else "unavailable_source_sampling_skipped_confidence"
+            ),
         },
         "inputs": {
             "refinement_summary": str(refinement_path),
@@ -326,6 +375,22 @@ def main() -> None:
             }
         },
         "runtime": {
+            "stage_seconds": {
+                "input_preparation": input_preparation_seconds,
+                "model_load": model_load_seconds,
+                "confidence_forward_by_pose_stage": confidence_forward_seconds,
+                "confidence_forward_total": sum(confidence_forward_seconds.values()),
+                "selector_by_pose_stage": selector_seconds,
+                "selector_total": sum(selector_seconds.values()),
+                "score_serialization": score_serialization_seconds,
+            },
+            "confidence_forward_seconds_per_scored_pose": (
+                sum(confidence_forward_seconds.values()) / (2 * EXPECTED_POSES)
+            ),
+            "selector_seconds_per_candidate_set": (
+                sum(selector_seconds.values()) / len(selector_seconds)
+            ),
+            "wall_seconds_before_summary_write": time.perf_counter() - pipeline_started,
             "device": str(device),
             "cuda_device_name": (
                 torch.cuda.get_device_name(device) if device.type == "cuda" else None

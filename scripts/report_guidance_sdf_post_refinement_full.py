@@ -13,8 +13,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from effdock.workflows.guidance_budget_posebusters_report import VALIDITY_CHECKS
 from effdock.workflows.guidance_pl_valid import PL_VALIDITY_CHECKS
-from effdock.workflows.posebusters_report import VALIDITY_CHECKS
 
 EXPECTED_COUNTS = {"astex": 85, "posebusters": 308}
 CONFIDENCE_PROTOCOL_ID = "EFFDOCK-GUIDANCE-SDF-POST-REFINEMENT-CONFIDENCE-V2"

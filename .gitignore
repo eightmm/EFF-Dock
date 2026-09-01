@@ -15,11 +15,11 @@ env/
 # uv
 .uv/
 
-# PyTorch — ignore intermediate checkpoints; distribute only the weights/ dir
-# (tracked via Git LFS for the published model, see .gitattributes).
+# PyTorch — publish only the promoted docking/confidence pair via Git LFS.
 *.pth
 *.pt
-!weights/*.pt
+!weights/effdock_docking_early_time_t0p10_50k.pt
+!weights/effdock_confidence_s50_raw_refined_u70k.pt
 checkpoints/
 
 # Data
@@ -47,6 +47,17 @@ wandb/
 
 # External benchmark implementations, isolated environments, and weights.
 /external_models/
+
+# Canonical local runtime location for public benchmark code.  Publish lock
+# files and compact results, never populated environments/checkouts/caches.
+/benchmarks/external_models/runtime/
+/benchmarks/external_models/environments/*/.venv/
+/benchmarks/external_models/environments/*/.cache/
+/benchmarks/external_models/environments/*/upstream
+/benchmarks/external_models/environments/*/weights
+/benchmarks/external_models/environments/*/bin/
+/benchmarks/external_models/environments/*/logs/
+/benchmarks/external_models/environments/*/state/
 
 # Model-local external benchmark workspaces.  Keep only reproducible uv
 # manifests and documentation under version control.
@@ -94,6 +105,8 @@ AGENTS.md
 # Private project planning and manuscript sources
 /PROJECT.md
 /paper/
+/docs/EXPERIMENTS.jsonl
+/scripts/presentations/
 
 # OMC artifacts
 .omc/

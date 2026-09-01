@@ -20,10 +20,8 @@ from posebusters import PoseBusters
 from rdkit import Chem
 
 from effdock.workflows.evaluate import file_sha256
-from effdock.workflows.posebusters_report import (
-    VALIDITY_CHECKS,
-    require_posebusters_runtime_version,
-)
+from effdock.workflows.guidance_budget_posebusters_report import VALIDITY_CHECKS
+from effdock.workflows.posebusters_report import require_posebusters_runtime_version
 
 PROTOCOL_ID = "EFFDOCK-S50-U50-REFINEMENT-PB-VALIDITY-V1"
 SOURCE_PROTOCOL_ID = "EFFDOCK-S50-SYMMETRY-CONFIDENCE-REFINED-EXTERNAL-V1"

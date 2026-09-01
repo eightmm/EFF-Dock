@@ -86,6 +86,19 @@ def test_frozen_manifest_is_content_addressed(tmp_path: Path) -> None:
         load_benchmark_inputs("astex", tmp_path, path)
 
 
+def test_repository_full_v2_manifest_freezes_corrected_1meh() -> None:
+    path = Path("docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json")
+    raw = json.loads(path.read_text())
+    assert raw["schema_version"] == BENCHMARK_INPUT_MANIFEST_SCHEMA
+    assert raw["datasets"]["astex"]["count"] == 85
+    assert raw["datasets"]["posebusters"]["count"] == 308
+    astex, identity = load_benchmark_inputs("astex", Path("data/external_test"), path)
+    assert astex["1meh"] == "COc1c(C)c2c(c(O)c1C/C=C(\\C)CCC(=O)O)C(=O)OC2"
+    assert identity["sources"]["integrity_boundary"][
+        "benchmark_ids_with_exact_entry_and_ligand_overlap"
+    ] == ["1meh"]
+
+
 def test_full_atom_mapping_allows_bond_representation_but_not_connectivity_change() -> None:
     reference = Chem.MolFromSmiles("NC=O")
     represented = Chem.MolFromSmiles("N=CO")

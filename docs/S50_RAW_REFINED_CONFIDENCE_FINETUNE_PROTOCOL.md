@@ -20,8 +20,12 @@ immutable inputs; every new checkpoint is written to a distinct output root.
 - Crystal anchor: one exact reference pose in frozen input atom order, with a
   separately extracted S50 t=1 hidden representation and exact zero RMSD/atom
   displacement. It is an in-complex anchor, not another complex or split row.
-- Train item: one complex containing 32 stratified raw poses, 32 stratified
-  refined poses, and one crystal anchor. This preserves equal complex weight.
+- Train item: one complex containing up to 32 stratified raw poses, the same
+  number of stratified refined poses, and one crystal anchor. This preserves
+  equal complex weight. The completed U50 large-graph policy is retained: a
+  total pose-node product cap of 64,000 is divided equally across the two
+  banks, and graphs above 1,200 nodes use at most four poses per bank (nine
+  total including the crystal anchor).
 - Validation: all 100 refined poses only. Crystal anchors are never included in
   validation selection metrics.
 

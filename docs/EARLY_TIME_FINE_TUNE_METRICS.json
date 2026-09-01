@@ -1,0 +1,16 @@
+{
+  "slurm_job_id": 53692,
+  "elapsed_s": 2421,
+  "evaluation_samples": 256,
+  "step0_success_2A_count": 40,
+  "step0_success_2A": 0.15625,
+  "step2000_success_2A_count": 39,
+  "step2000_success_2A": 0.15234375,
+  "step2000_success_2A_delta_pp": -0.390625,
+  "step2000_success_5A": 0.5859375,
+  "step2000_rmsd_median": 4.343502998352051,
+  "best_observed_rmsd_median": 4.291815280914307,
+  "best_observed_rmsd_step": 1500,
+  "step2000_val_loss": 5.7157,
+  "primary_gate_pass": 0
+}

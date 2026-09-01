@@ -14,7 +14,7 @@ model:
 data:
   data_dir: data/plinder_processed
   # Preserved migration split: train=47,310 / val=1,076. It remains usable for
-  # legacy-weight compatibility runs but predates the strict external-benchmark
+  # legacy-weight compatibility runs but predates the strict three-benchmark
   # EFF-Dock split contract. See docs/DATA.md before publishing new results.
   split_file: data/splits/plinder.json
 

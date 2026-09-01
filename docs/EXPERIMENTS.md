@@ -1,7 +1,24 @@
-# EXPERIMENTS
+# Experiment index
 
-Append-only narrative run log. One entry per experiment. Newest on top.
-Distinct from docs/EXPERIMENTS.jsonl, the machine ledger written by run-ledger.
+This is the curated public experiment record. The complete machine-generated
+ledger, scheduler commands, local paths, and raw logs are preserved outside
+Git. Frozen protocols and results remain the authoritative source for exact
+claims.
+
+## Released model path
+
+- Docking: 50k early-time/t=0 replay checkpoint; see
+  `EARLY_TIME_FINE_TUNE_50K_PROTOCOL.md` and
+  `EARLY_TIME_T0P10_50K_EXTERNAL_PAIRED_RESULTS.md`.
+- Confidence: raw+refined+crystal-anchor U70k checkpoint; see
+  `S50_RAW_REFINED_CONFIDENCE_100K_PROTOCOL.md` and
+  `weights/CONFIDENCE_MODEL_CARD.md`.
+- External results: `BENCHMARK_RESULTS.md` and
+  `S50_RAW_REFINED_CONFIDENCE_TEMPORAL_EXTERNAL_RESULTS.md`.
+- Paper claim map: `PAPER_EVIDENCE.md`.
+
+The older entries below are retained as an append-only narrative of negative
+and superseded studies. They do not define the released default.
 
 Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
 
@@ -60,7 +77,7 @@ Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
   same-candidate Vina+DG = 77.65/71.10%; pure confidence = 76.47/73.05%;
   oracle-80 = 95.29/94.81%.
 - Validity/completeness: official PoseBusters pass-all excluding RMSD = 54.87%
-  (169/308); 393/393 final rows, with two recorded Astex H100 numerical
+  (169/308); 678/678 final rows, with two recorded Astex H100 numerical
   rescues and no unresolved failures.
 - Historical evidence: single-run frozen selector Astex 81.18%, PoseBusters
   77.60%; hard-pair fine-tunes failed to beat step 42500 on validation.
@@ -68,8 +85,8 @@ Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
   over Vina), but historical reproduction failed (-2.35pp Astex, -4.87pp
   PoseBusters versus the ±2pp criterion). Keep the trained checkpoint; retain
   the composite for reproducibility and treat selector recalibration as a new
-  validation-only study. Neither selector dominated across both datasets.
-- Jobs: inference `38752`/`38760`, Astex rescues `38770`/`38771`,
+  validation-only study. Pure confidence was slightly stronger overall.
+- Jobs: inference `38752`/`38760`/`38761`, Astex rescues `38770`/`38771`,
   official validity `38781`; confidence prepare/train smokes `38773`/`38762`.
 - Artifacts: `docs/CONFIDENCE_BENCHMARK_PROTOCOL.md`,
   `outputs/benchmarks/confidence/summary.json`,
@@ -86,7 +103,7 @@ Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
 - Config: `EFFDOCK-REDOCK-EMA-N40-S25-V1`; N=40, 25 ODE steps, sigma=1,
   late schedule power=3, reference-defined 8A pocket center, seed=42.
 - Result: Astex/PoseBusters Vina+DG <2A = 64.71/64.29%; oracle-40 =
-  94.12/91.56%; official PoseBusters validity = 60.71%; 393/393 final rows.
+  94.12/91.56%; official PoseBusters validity = 60.71%.
 - Conclusion: hypothesis passed. Keep the EMA sampler and fixed physical
   selector as the no-confidence compatibility baseline; prioritize selection
   and large/flexible-ligand behavior before a target-independent release.
@@ -102,7 +119,7 @@ Each entry: ID, date, hypothesis, config diff, result, conclusion, wandb link.
 - Config: `configs/train.yaml`; AdamW default; explicit pocket definitions.
 - Result: migration verification only; no new benchmark number claimed.
 - Conclusion: keep as the architecture/checkpoint compatibility baseline.
-- Next: freeze the Astex/PoseBusters mapping and pocket-center manifests,
-  generate a strict benchmark-excluded split, then run GPU train/inference smokes.
+- Next: freeze benchmark mapping and pocket-center manifests, generate a
+  strict benchmark-excluded split, then run GPU train/inference smokes.
 
 ---

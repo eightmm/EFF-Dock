@@ -21,6 +21,7 @@ training:
   warmup_ratio: 0.02
   cooldown_ratio: 0.5
   min_lr_ratio: 0.05
+  # The paired 2-GPU path is validated without DDP gradient accumulation.
   gradient_accumulation_steps: 1
 
 loss:
@@ -61,7 +62,9 @@ confidence:
   use_wandb: false
   eval_on_start: true
   batch_complexes: 1
-  num_workers: 4
+  # Match the completed four-GPU U50 runtime. Forked data workers can deadlock
+  # after CUDA/DDP initialization; rank-local synchronous loading is stable.
+  num_workers: 0
   train_limit: null
   val_limit: null
   hidden: 512
@@ -76,6 +79,12 @@ confidence:
   # Interpreted as 64 candidate poses total; paired mode samples 32 per bank
   # and appends one zero-RMSD crystal anchor, yielding 65 poses in the batch.
   max_train_poses_per_complex: 64
+  # Match the completed U50 large-graph compute policy. Paired mode divides
+  # both pose caps equally across raw/refined banks, then appends the anchor:
+  # large graphs therefore use at most 4 raw + 4 refined + 1 crystal pose.
+  max_train_pose_node_product: 64000
+  large_train_graph_node_threshold: 1200
+  large_train_graph_max_poses: 8
   max_val_poses_per_complex: 100
   pose_sample_strategy: stratified
   protein_crop_mode: center

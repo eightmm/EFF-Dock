@@ -1,0 +1,1 @@
+../../benchmarks/external_models/slurm/external_interformer_pose_score.sbatch

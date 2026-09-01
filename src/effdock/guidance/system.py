@@ -892,11 +892,9 @@ class PhysicalSystem:
     protein_atomic_numbers: Tensor
     protein_uff_x: Tensor
     protein_uff_d: Tensor
+    protein_vdw_radius: Tensor
     parameter_set: dict[str, str]
     protein_source_atoms: int
-    # Optional for compatibility with pre-EFF-FF-v2 callers. When omitted,
-    # derive the same versioned radii from the declared atomic numbers.
-    protein_vdw_radius: Tensor | None = None
     protein_parameterized_source_atoms: int | None = None
     excluded_nonprotein_atoms: int = 0
     excluded_nonprotein_residues: tuple[str, ...] = ()
@@ -930,14 +928,6 @@ class PhysicalSystem:
     interaction_parameter_set: dict[str, str] | None = None
 
     def __post_init__(self) -> None:
-        if self.protein_vdw_radius is None:
-            derived = element_parameters(
-                self.protein_atomic_numbers,
-                device=self.protein_coords.device,
-                dtype=self.protein_coords.dtype,
-            ).vdw_radius
-            object.__setattr__(self, "protein_vdw_radius", derived)
-        assert self.protein_vdw_radius is not None
         if self.receptor_policy_mode not in _RECEPTOR_POLICIES:
             raise ValueError(
                 "receptor_policy_mode must be one of "

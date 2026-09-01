@@ -29,7 +29,7 @@ or true RMSD at inference.
 - Threshold fitting: first 1,024 matched PLINDER train complexes only.
 - Confirmation: all 1,076 matched PLINDER validation complexes, opened once
   after choosing one configuration on train.
-- PoseBusters and Astex results are forbidden for threshold fitting or
+- External benchmark results are forbidden for threshold fitting or
   model selection.
 
 ## Selector family

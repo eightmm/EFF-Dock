@@ -65,15 +65,15 @@ uv run eff-dock evaluate \
   --data-dir "$data_dir" \
   --external-dir data/external_test \
   --pocket-centers "$centers" \
-  --checkpoint weights/effdock_geometry_ft_100k_best.pt \
-  --confidence-checkpoint weights/effdock_confidence_extmatch_n80_s25_step42500.pt \
+  --checkpoint weights/effdock_docking_early_time_t0p10_50k.pt \
+  --confidence-checkpoint weights/effdock_confidence_s50_raw_refined_u70k.pt \
   --config configs/train.yaml \
   --output-dir "$output_root/evaluation" \
   --run-name "movie_${dataset}_${complex_id}" \
-  --protocol-id EFFDOCK-CONFIDENCE-SELECTION-V1 \
-  --num-samples 80 \
-  --num-steps 25 \
-  --sigma 0.5 \
+  --protocol-id EFFDOCK-U70K-PUBLIC-V1 \
+  --num-samples 100 \
+  --num-steps 10 \
+  --sigma 2.0 \
   --time-schedule late \
   --schedule-power 3.0 \
   --pocket-cutoff 10.0 \

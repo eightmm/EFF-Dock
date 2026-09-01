@@ -17,6 +17,7 @@ from effdock.training.trainer import configure_optimizers
 from effdock.workflows.train_confidence import (
     BANK_SETTINGS,
     REFINED_BANK_SETTINGS,
+    _env_flag,
     _ordered_ids_sha256,
     _release_eval_cuda_cache,
     _restore_training_states,
@@ -24,12 +25,54 @@ from effdock.workflows.train_confidence import (
     _resume_eval_state,
     _stable_pose_order,
     _summarize_eval_target,
+    _training_trace_summary,
     _write_eval_ledger,
     evaluate,
     validate_bank_manifest,
 )
 
 POSE_TAG = "s50-test"
+
+
+def test_confidence_trace_flag_is_strict(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("EFFDOCK_CONFIDENCE_TRACE_BATCHES", raising=False)
+    assert not _env_flag("EFFDOCK_CONFIDENCE_TRACE_BATCHES")
+    monkeypatch.setenv("EFFDOCK_CONFIDENCE_TRACE_BATCHES", "yes")
+    assert _env_flag("EFFDOCK_CONFIDENCE_TRACE_BATCHES")
+    monkeypatch.setenv("EFFDOCK_CONFIDENCE_TRACE_BATCHES", "maybe")
+    with pytest.raises(ValueError, match="must be a boolean flag"):
+        _env_flag("EFFDOCK_CONFIDENCE_TRACE_BATCHES")
+
+
+def test_training_trace_summary_reports_paired_shapes_and_contacts() -> None:
+    item = {
+        "pid": "sample-1",
+        "system_id": "system-1",
+        "pose_atom_coords": torch.zeros(3, 2, 3),
+        "pose_rmsd": torch.tensor([2.0, 1.0, 0.0]),
+        "pose_bank_component": torch.tensor([0, 1, 2]),
+        "graph": {
+            "node_coords": torch.tensor(
+                [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [9.0, 9.0, 9.0]]
+            ),
+            "edge_index": torch.tensor([[0, 1, 2], [1, 2, 0]]),
+            "prot_atom_slice": torch.tensor([2, 4]),
+            "num_lig_atom": torch.tensor(2),
+            "num_lig_frag": torch.tensor(1),
+            "num_prot_atom": torch.tensor(2),
+            "num_prot_res": torch.tensor(1),
+        },
+    }
+
+    summary = _training_trace_summary(item)
+
+    assert summary["pid"] == "sample-1"
+    assert summary["pose_shape"] == [3, 2, 3]
+    assert summary["pose_components"] == {"refined": 1, "raw": 1, "crystal": 1}
+    assert summary["graph_nodes"] == 4
+    assert summary["graph_edges"] == 3
+    assert summary["contacts_le5_min"] == 2
+    assert summary["contacts_le5_max"] == 2
 
 
 def test_release_eval_cuda_cache_is_cuda_only(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -227,6 +270,58 @@ def test_paired_dataset_rejects_cross_bank_graph_drift(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="graph field 'node_coords' differs"):
         PairedLigandPoseConfidenceDataset(primary, auxiliary)[0]
+
+
+def test_paired_dataset_uses_primary_independently_rebuilt_graph_distance(
+    tmp_path: Path,
+) -> None:
+    primary_root = tmp_path / "primary"
+    auxiliary_root = tmp_path / "auxiliary"
+    primary_root.mkdir()
+    auxiliary_root.mkdir()
+    primary_split, primary_path = _dataset_fixture(primary_root)
+    auxiliary_split, auxiliary_path = _dataset_fixture(auxiliary_root)
+    primary_shard = torch.load(primary_path, map_location="cpu", weights_only=False)
+    auxiliary_shard = torch.load(auxiliary_path, map_location="cpu", weights_only=False)
+    primary_shard["graph_centered"]["edge_ref_dist"] = torch.tensor([2.0, 2.0])
+    auxiliary_shard["graph_centered"]["edge_ref_dist"] = torch.tensor([2.0, 2.0])
+    auxiliary_shard["graph_centered"]["edge_ref_dist"][0] += 0.01
+    torch.save(primary_shard, primary_path)
+    torch.save(auxiliary_shard, auxiliary_path)
+    primary = LigandPoseConfidenceDataset(
+        split_file=primary_split,
+        split="train",
+        processed_dir=primary_root,
+        pose_tag=POSE_TAG,
+        shard_paths={"sample": primary_path},
+    )
+    auxiliary = LigandPoseConfidenceDataset(
+        split_file=auxiliary_split,
+        split="train",
+        processed_dir=auxiliary_root,
+        pose_tag=POSE_TAG,
+        shard_paths={"sample": auxiliary_path},
+    )
+
+    item = PairedLigandPoseConfidenceDataset(primary, auxiliary)[0]
+
+    assert item["pose_atom_coords"].shape[0] == 6
+    assert torch.equal(
+        item["graph"]["edge_ref_dist"],
+        primary_shard["graph_centered"]["edge_ref_dist"],
+    )
+
+
+def test_paired_dataset_rejects_nonfinite_derived_graph_distance() -> None:
+    primary = {"edge_ref_dist": torch.tensor([2.0, 2.0])}
+    auxiliary = {"edge_ref_dist": torch.tensor([2.0, float("nan")])}
+
+    with pytest.raises(ValueError, match="graph field 'edge_ref_dist' must be finite"):
+        PairedLigandPoseConfidenceDataset._require_matching_graphs(
+            primary,
+            auxiliary,
+            pid="sample",
+        )
 
 
 def test_dataset_caps_train_poses_by_saved_graph_node_product(tmp_path: Path) -> None:
@@ -674,3 +769,26 @@ def test_scheduled_resume_repairs_only_the_uncommitted_evaluation_phase(
             eval_target_key="pose_rmsd_symmetry_no_align",
             bank_provenance=provenance,
         )
+
+
+def test_s50_launcher_seals_capsule_and_admits_only_four_gpu_training() -> None:
+    repo = Path(__file__).resolve().parents[1]
+    submitter = (repo / "scripts/slurm/submit_s50_confidence_training.sh").read_text()
+    trainer = (repo / "scripts/slurm/s50_confidence_train_matched.sbatch").read_text()
+    bank_control = (repo / "scripts/slurm/s50_confidence_bank_control.sbatch").read_text()
+    bank_array = (repo / "scripts/slurm/s50_confidence_bank_array.sbatch").read_text()
+
+    assert "single-gpu-fallback" not in submitter
+    assert "  configs/train.yaml\n" in submitter
+    assert 'capsule_path="$execution_root/$path"' in submitter
+    assert '[[ "$sealed_runtime_sha256" == "$runtime_sha256" ]]' in submitter
+    assert '(cd "$execution_root" && sha256sum "$path")' in submitter
+    assert "EFFDOCK_TRAIN_WORLD_SIZE=1" not in submitter
+    assert '[[ "$world_size" -eq 4 ]]' in trainer
+    assert "single-GPU" not in trainer
+    assert "#SBATCH --qos=long" in trainer
+    assert "#SBATCH --time=2-23:59:00" in trainer
+    assert "--qos=normal --time=04:00:00" in submitter
+    assert "--qos=long --time=2-23:59:00" in submitter
+    assert "#SBATCH --time=23:59:00" in bank_control
+    assert "#SBATCH --time=23:59:00" in bank_array

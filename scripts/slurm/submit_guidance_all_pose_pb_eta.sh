@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+cd "$repo_root"
+[[ $# -le 1 ]] || { echo "usage: $0 [SAFE_RUN_ID]" >&2; exit 2; }
+run_id=${1:-$(date -u +%Y%m%dT%H%M%SZ)}
+[[ "$run_id" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || { echo "unsafe run ID" >&2; exit 2; }
+protocol_id=EFFDOCK-GUIDANCE-ALL-POSE-PB-ETA-V1
+output_root="outputs/benchmarks/guidance_all_pose_pb_eta_runs/$run_id"
+reference_root=outputs/benchmarks/guidance_steric_high_eta_confidence_runs/20260807T045916Z
+extension_root=outputs/benchmarks/guidance_eta_cap_extension_runs/20260810T034923Z
+mkdir -p outputs/benchmarks/guidance_all_pose_pb_eta_runs outputs/benchmarks/logs
+mkdir "$output_root" || { echo "refusing existing output root" >&2; exit 2; }
+submitted=(); committed=0
+cleanup(){ code=$?; trap - EXIT; if [[ "$committed" -eq 0 ]]; then for job in "${submitted[@]}"; do scancel "$job" 2>/dev/null || true; done; fi; exit "$code"; }
+trap cleanup EXIT
+for required in "$reference_root/raw" "$extension_root/raw" docs/GUIDANCE_ALL_POSE_PB_ETA_PROTOCOL.md .venv/bin/python; do
+  [[ -e "$required" ]] || { echo "missing input $required" >&2; exit 2; }
+done
+mapfile -t package_files < <(rg --files src/effdock | sort)
+copy_files=("${package_files[@]}" pyproject.toml uv.lock docs/GUIDANCE_ALL_POSE_PB_ETA_PROTOCOL.md scripts/build_guidance_all_pose_pb_manifest.py scripts/run_guidance_all_pose_posebusters.py scripts/audit_guidance_all_pose_posebusters.py scripts/report_guidance_all_pose_posebusters.py scripts/slurm/guidance_all_pose_pb_manifest.sbatch scripts/slurm/guidance_all_pose_pb_array.sbatch scripts/slurm/guidance_all_pose_pb_audit.sbatch scripts/slurm/guidance_all_pose_pb_report.sbatch scripts/slurm/submit_guidance_all_pose_pb_eta.sh scripts/create_execution_capsule.py)
+capsule_args=(); for path in "${copy_files[@]}"; do capsule_args+=(--copy-file "$path"); done
+execution_root=".effdock_execution_capsules/$protocol_id/$run_id"
+.venv/bin/python scripts/create_execution_capsule.py --repo-root "$repo_root" --output "$repo_root/$execution_root" --link-root .venv --link-root data --link-root outputs "${capsule_args[@]}" >/dev/null
+execution_root_abs=$(readlink -f "$execution_root")
+git_commit=$(git rev-parse HEAD); read -r git_diff_sha256 _ < <(git diff --no-ext-diff | sha256sum)
+printf '%s\n' 'status=submitting' "protocol_id=$protocol_id" "run_id=$run_id" "output_root=$output_root" 'etas=0,0.5,1,1.5,2,2.5,3' 'cells=2751' 'poses=275100' 'confidence_selection=false' 'validity=official_posebusters_0.6.5_all_27_non_rmsd_checks' "reference_root=$reference_root" "extension_root=$extension_root" "git_commit=$git_commit" "git_diff_sha256=$git_diff_sha256" "execution_root=$execution_root_abs" > "$output_root/.submission.pending"
+base_export="ALL,EFFDOCK_REPO_DIR=$execution_root_abs,PYTHONPATH=$execution_root_abs/src,PYTHONDONTWRITEBYTECODE=1,EFFDOCK_OUTPUT_ROOT=$output_root,EFFDOCK_ALL_POSE_REFERENCE_ROOT=$reference_root,EFFDOCK_ALL_POSE_EXTENSION_ROOT=$extension_root"
+submit(){ dependency=$1; script=$2; exports=$3; array=${4:-}; partition=${5:?}; args=(--parsable --partition="$partition" --export="$exports"); [[ -z "$dependency" ]] || args+=(--dependency="afterok:$dependency"); [[ -z "$array" ]] || args+=(--array="$array"); raw=$(sbatch "${args[@]}" "$script"); job=${raw%%;*}; [[ "$job" =~ ^[0-9]+$ ]] || return 1; printf '%s' "$job"; }
+manifest_job=$(submit '' "$execution_root_abs/scripts/slurm/guidance_all_pose_pb_manifest.sbatch" "$base_export" '' 'test,cpu_only'); submitted+=("$manifest_job")
+smoke_export="$base_export,EFFDOCK_ALL_POSE_PB_MODE=smoke"
+full_export="$base_export,EFFDOCK_ALL_POSE_PB_MODE=full"
+smoke_job=$(submit "$manifest_job" "$execution_root_abs/scripts/slurm/guidance_all_pose_pb_array.sbatch" "$smoke_export" '0-13%6' 'test,cpu_only'); submitted+=("$smoke_job")
+smoke_audit_job=$(submit "$smoke_job" "$execution_root_abs/scripts/slurm/guidance_all_pose_pb_audit.sbatch" "$smoke_export" '' 'test,cpu_only'); submitted+=("$smoke_audit_job")
+full_job=$(submit "$smoke_audit_job" "$execution_root_abs/scripts/slurm/guidance_all_pose_pb_array.sbatch" "$full_export" '0-63%8' 'test,cpu_only'); submitted+=("$full_job")
+full_audit_job=$(submit "$full_job" "$execution_root_abs/scripts/slurm/guidance_all_pose_pb_audit.sbatch" "$full_export" '' 'test,cpu_only'); submitted+=("$full_audit_job")
+report_job=$(submit "$full_audit_job" "$execution_root_abs/scripts/slurm/guidance_all_pose_pb_report.sbatch" "$full_export" '' 'test,cpu_only'); submitted+=("$report_job")
+printf '%s\n' "manifest_job=$manifest_job" "smoke_job=$smoke_job" "smoke_audit_job=$smoke_audit_job" "full_job=$full_job" "full_audit_job=$full_audit_job" "report_job=$report_job" "submitted_at_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$output_root/.submission.pending"
+sed -i 's/^status=submitting$/status=submitted/' "$output_root/.submission.pending"; mv "$output_root/.submission.pending" "$output_root/.submission"
+committed=1; trap - EXIT
+printf 'output_root=%s\nmanifest_job=%s\nsmoke_job=%s\nsmoke_audit_job=%s\nfull_job=%s\nfull_audit_job=%s\nreport_job=%s\n' "$output_root" "$manifest_job" "$smoke_job" "$smoke_audit_job" "$full_job" "$full_audit_job" "$report_job"

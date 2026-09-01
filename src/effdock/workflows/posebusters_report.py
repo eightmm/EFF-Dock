@@ -14,38 +14,6 @@ from posebusters import PoseBusters
 
 EXPECTED_POSEBUSTERS_VERSION = "0.6.5"
 
-# PoseBusters 0.6.5 ``redock`` binary checks used for pass-all validity.
-# The separately reported RMSD check is intentionally not part of this tuple.
-VALIDITY_CHECKS = (
-    "mol_pred_loaded",
-    "mol_true_loaded",
-    "mol_cond_loaded",
-    "sanitization",
-    "inchi_convertible",
-    "all_atoms_connected",
-    "no_radicals",
-    "molecular_formula",
-    "molecular_bonds",
-    "double_bond_stereochemistry",
-    "tetrahedral_chirality",
-    "bond_lengths",
-    "bond_angles",
-    "internal_steric_clash",
-    "aromatic_ring_flatness",
-    "non-aromatic_ring_non-flatness",
-    "double_bond_flatness",
-    "internal_energy",
-    "protein-ligand_maximum_distance",
-    "minimum_distance_to_protein",
-    "minimum_distance_to_organic_cofactors",
-    "minimum_distance_to_inorganic_cofactors",
-    "minimum_distance_to_waters",
-    "volume_overlap_with_protein",
-    "volume_overlap_with_organic_cofactors",
-    "volume_overlap_with_inorganic_cofactors",
-    "volume_overlap_with_waters",
-)
-
 
 def require_posebusters_runtime_version() -> str:
     """Fail before evaluation when the installed official checker has drifted."""

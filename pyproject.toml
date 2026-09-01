@@ -3,7 +3,26 @@ name = "eff-dock"
 version = "0.1.0"
 description = "Fragment-based SE(3)-equivariant protein-ligand docking"
 readme = "README.md"
+license = "Apache-2.0"
 requires-python = ">=3.12"
+keywords = [
+    "drug-discovery",
+    "flow-matching",
+    "molecular-docking",
+    "protein-ligand",
+    "se3-equivariant",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: GPU :: NVIDIA CUDA :: 13",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
 dependencies = [
     "biopython==1.87",
     "cuequivariance==0.9.0",
@@ -30,6 +49,11 @@ dependencies = [
     "wandb==0.25.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/eightmm/EFF-Dock"
+Issues = "https://github.com/eightmm/EFF-Dock/issues"
+Repository = "https://github.com/eightmm/EFF-Dock"
+
 [project.scripts]
 eff-dock = "effdock.cli:main"
 
@@ -46,6 +70,17 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/effdock"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/effdock",
+    "/configs",
+    "/README.md",
+    "/CONTRIBUTING.md",
+    "/SECURITY.md",
+    "/LICENSE",
+    "/pyproject.toml",
+]
 
 [tool.uv]
 find-links = ["https://data.pyg.org/whl/torch-2.10.0+cu130.html"]

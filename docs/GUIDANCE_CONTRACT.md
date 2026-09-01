@@ -2,18 +2,32 @@
 
 ## Status
 
-- Protocol: `EFFDOCK-GUIDANCE-DIAGNOSTIC-V4`.
+- Protocol: `EFFDOCK-GUIDANCE-DIAGNOSTIC-V7`.
 - Implemented: one self-contained
   `GuidanceEnergy = PhysicalEnergy + InteractionEnergy` Torch diagnostic,
   fragment-force projection, crystal perturbation tracing, and
-  saved-trajectory tracing. Hydrophobic contact, directional heavy-atom
-  hydrogen-bond, and screened formal-charge-group terms are active.
-- Not admitted: production ODE coupling and metal coordination.
+  saved-trajectory tracing. By explicit user request, all seven implemented
+  interaction terms—hydrophobic contact, directional heavy-atom hydrogen bond,
+  screened formal-charge groups, pi stacking, cation-pi, ligand-to-protein
+  halogen bond, and profile-dispatched metal coordination—are enabled by
+  default as separately traceable diagnostics.
+  The default physical profile also includes the compact, vdW-radius
+  `protein_ligand_steric_barrier` as a separately traceable diagnostic guard.
+  `polar_unsatisfied_proxy` is implemented as dimensionless trace metadata
+  only and contributes no energy or force.
+- Experimental sampler couplings: the guarded operator-split corrector and a
+  normalized direct ODE drift. Both are explicit evaluation-only modes and
+  share the exact same GuidanceEnergy and physical-system provenance.
+- Not admitted: production ODE coupling, interaction-energy candidate-selector
+  use, or sampler
+  activation of the four later interaction terms. User-authorized diagnostic
+  default-on is not evidence of production validity.
 - Production gates: independent golden fixtures, broader chemistry coverage,
-  an operator-split trust-region corrector, and PLINDER-only validation.
+  an operator-split trust-region corrector, internal held-out validation, and
+  frozen report-only Astex/PoseBusters characterization.
 
 The diagnostic CLI remains `eff-dock physical trace` for command
-compatibility, but V4 evaluates both physical and interaction layers plus their
+compatibility, but V7 evaluates both physical and interaction layers plus their
 combined force. The code lives in the unified `effdock.guidance` package.
 
 ## Flat code layout and ownership
@@ -42,8 +56,11 @@ The one guidance energy has two auditable components:
   geometry, ligand interfragment sterics/dispersion, and generic
   protein-ligand nonbonded terms.
 - `InteractionEnergy`: typed hydrophobic contact, directional heavy-atom
-  hydrogen-bond, and screened formal-charge-group terms today; later motifs
-  require independent admission.
+  hydrogen bond, screened formal-charge groups, pi stacking, cation-pi,
+  halogen bond, and profile-dispatched metal coordination. All seven are
+  user-requested default-on diagnostics, but the latter four remain
+  scientifically and sampler-unadmitted. The polar-unsatisfied proxy belongs
+  to diagnostics, not this energy sum.
 
 There is no Vina or `HybridGuidance` component in this contract. Legacy Vina
 code and historical reports are preserved outside the active path, but their
@@ -66,16 +83,26 @@ tables with provenance. External software may be used only offline to produce
 immutable validation fixtures that record the program, version, command,
 inputs, preparation, units, parameter set, expected values, and license.
 
-Unsupported chemistry fails with a structured reason. A narrower
-`geometry-only` mode must be named and reported separately; missing parameters
-are never silently zero-filled.
+Unsupported chemistry fails with a structured reason in the default
+`fail_closed` receptor policy. The explicit `geometry_only` coverage policy
+is a separate estimand: it preserves resolved terms, converts unresolved
+fixed receptor atoms/sites only to declared repulsion-only geometry guards,
+and records the downgrade reason. Missing attraction, charge, donor, or bond
+typing is never silently zero-filled or inferred from a PDB record label.
 
 ## Physical layer: EFF-FF-v2 diagnostic
 
-The current parameter profile is `EFF-FF-v2-diagnostic`, formula version
-`effff-diagnostic-2`. It is not AMBER, GAFF, OpenFF, UFF, or MMFF compatible.
+The current parameter profile is `EFF-FF-v2-diagnostic` version `2.2.0`, formula
+version `effff-diagnostic-2.2`. It is not AMBER, GAFF, OpenFF, UFF, or MMFF compatible.
 UFF supplies only the cited element-level Lennard-Jones form and constants.
 Bonded coefficients and typing rules are EFF-Dock diagnostic choices.
+
+The version-2.2 table covers all 33 elements observed across the frozen S50
+confidence train/validation ligand cohort. The original main-group steric
+radii remain Bondi/Mantina values; newly admitted cohort elements use copied,
+versioned RDKit periodic-table vdW radii. These additions provide finite
+diagnostic repulsion and steric terms, not validated transition-metal
+coordination chemistry.
 
 ### Why only the cut interface is evaluated
 
@@ -101,15 +128,25 @@ Receptor chemistry is admitted by normalized residue identity, never by the
 PDB `ATOM` versus `HETATM` record label. Canonical amino acids and explicitly
 mapped amino-acid variants may enter the generic element-level physical shell;
 unsupported mapped variants fail closed for interaction masks as described
-below. Any unmapped cofactor, ion, solvent, carbohydrate, or other nonprotein
-residue inside the active shell raises the structured
-`active_nonprotein_residue` failure regardless of record type. Outside-shell
-nonprotein records are excluded and listed in trace provenance.
+below. Standalone monatomic ZN/MG/CA/MN/FE/CO/NI/CU records are routed to the
+metal profile dispatcher rather than generic protein LJ.
+
+The default `fail_closed` policy raises a structured failure for an active
+cofactor, metal cluster, identity-mismatched ion, solvent additive,
+carbohydrate, or other unsupported nonprotein residue. The explicit
+`geometry_only` policy keeps supported nonmetal heavy atoms as fixed
+UFF-style repulsion-only obstacles and uses a bounded generic steric guard for
+an element without an admitted element row. These atoms do not enter typed
+hydrogen-bond, formal-charge, pi, hydrophobic, halogen, metal-attraction, or
+generic LJ-attraction masks. Every admitted/fallback/excluded count and reason
+is included in receptor provenance. Water and nucleic-acid filtering remains
+an explicit input-preparation policy rather than an inferred chemistry term.
 
 This rule prevents depositor formatting from silently turning an active
-cofactor such as SAH into generic protein LJ. Metals and cofactors require
-their own admitted topology, typing, masking, and parameters; they are not
-silently stripped from a full-complex diagnostic.
+cofactor such as SAH into a fully typed protein site. Supported monatomic
+metals use their own topology, typing, masking, and parameter profiles.
+Cofactors and unsupported metals are neither silently stripped nor granted
+unvalidated attraction in a full-cohort diagnostic.
 
 ### Inference-safe reference geometry
 
@@ -179,6 +216,26 @@ E_LJ,ij = S(r) * D_ij * [(x_ij/r_eff)^12 - 2*(x_ij/r_eff)^6]
 fragments are evaluated. Protein-ligand LJ is evaluated against a fixed
 receptor shell. Repulsive and attractive components are traced separately.
 
+The independent protein-ligand steric guard uses versioned in-repository vdW
+radii:
+
+```text
+d_safe,ij = lambda * (R_vdw,i + R_vdw,j)
+h_ij      = tau * softplus((d_safe,ij - r_ij) / tau)
+C_ij      = compact quintic switch from 1 at d_safe,ij
+            to 0 at d_safe,ij + margin
+
+E_steric,ij = 0.5 * k_steric * h_ij^2 * C_ij
+```
+
+The diagnostic defaults are `lambda=0.8`, `tau=0.1 Å`,
+`margin=0.5 Å`, and `k_steric=20 kcal mol^-1 Å^-2`. They are initial internal
+hypotheses, not PoseBusters-derived fitted values. They must be calibrated and
+frozen using PLINDER train/validation before production admission. The compact
+switch makes every sufficiently distant pair exactly zero and prevents the
+protein-shell size from accumulating a softplus tail. The term is a clash
+guard, not a binding affinity or free-energy contribution.
+
 The active physical components are:
 
 ```text
@@ -190,26 +247,41 @@ ligand_intra_lj_repulsive
 ligand_intra_lj_attractive
 protein_ligand_lj_repulsive
 protein_ligand_lj_attractive
+protein_ligand_steric_barrier
+receptor_geometry_obstacle_uff_repulsive      # geometry_only, typed obstacle atoms
+receptor_geometry_obstacle_generic_repulsive  # geometry_only, unparameterized atoms
 ```
 
-Partial-charge electrostatics, solvation, receptor flexibility, covalent
-docking, and metal-specific coordination are inactive and absent from the
-energy sum. The separately declared screened formal-charge-group proxy belongs
-to `InteractionEnergy`.
+Partial-charge electrostatics, solvation, receptor flexibility, and covalent
+docking are inactive and absent from the energy sum. Screened formal-charge
+groups and profile-dispatched metal handling belong to `InteractionEnergy`.
 
 ## Interaction layer
 
-The parameter profile is `EFF-Interaction-v1-diagnostic`, formula version
-`effdock-interaction-diagnostic-4`. It activates:
+The parameter profile is `EFF-Interaction-v1-diagnostic` version `1.6.0`,
+formula version `effdock-interaction-diagnostic-7`. The combined profile is
+version `1.6.0`, formula
+`physical-v2.2_plus_interaction-v1.6`. By explicit user request, its default
+active terms are all seven implemented interaction energies:
 
 ```text
 interaction_hydrophobic
 interaction_hydrogen_bond
 interaction_screened_formal_charge
+interaction_pi_stacking
+interaction_cation_pi
+interaction_halogen_bond
+interaction_metal_coordination
 ```
 
-It is a differentiable pose-guidance diagnostic, not an affinity, desolvation,
-or binding-free-energy model.
+`polar_unsatisfied_proxy` is a dimensionless contact diagnostic only. It is
+not an `InteractionEnergy` component and cannot contribute energy, force,
+ranking, confidence, or sampler correction.
+
+These are differentiable pose-guidance diagnostics, not affinity,
+desolvation, or binding-free-energy models. Their user-requested default
+activation does not admit them to candidate selection or the production ODE
+sampler.
 
 ### Strict typing boundary
 
@@ -230,14 +302,26 @@ empty.
 Protein masks use standard amino-acid residue/atom tables and canonical
 heavy-atom bonds. PDB bond orders are not guessed. Explicit `HID`, `HIE`, and
 `HIP` names retain their declared histidine state; plain `HIS` side-chain
-nitrogens are excluded and counted as ambiguous. Other explicitly named mapped
-states/PTMs, including `ASH`, `GLH`, `CYM`, `CYX`, and `SEP`, fail closed for
-all active interaction masks and are listed in the trace. V1 hydrogen bonds
-support N/O sites. V1 hydrophobes are carbon-only; sulfur and halogens are
-excluded. Ligand hydrophobes use a graph SMARTS exclusion around N/O/F,
+nitrogens are excluded from hydrogen-bond and charge typing and counted as
+ambiguous. A complete neutral HIS ring may still enter the independently typed
+pi-stacking term. Other explicitly named mapped
+states/PTMs fail closed for the relevant interaction masks and are listed in
+the trace. The strict attractive Zn profile separately admits explicit
+`CYM:SG`; that exception does not admit CYM to hydrogen-bond, charge, or
+hydrophobic typing.
+V1 hydrogen bonds support N/O sites. V1 hydrophobes are carbon-only; sulfur
+and halogens are excluded from those two masks. Halogen and attractive-metal
+profiles use their own narrower, versioned S/Cl/Br/I or N/O/S typing. Ligand
+hydrophobes use a
+graph SMARTS exclusion around N/O/F,
 whereas protein hydrophobes use a curated canonical residue/atom-name table.
 That representation asymmetry is intentional and is not claimed to be a
 shared atom-type ontology.
+
+RDKit performs this static ligand typing once. Every coordinate-dependent
+distance, direction, switch, energy, occupancy, and gradient—including metal
+profile evaluation—is computed with Torch and autograd without an external
+force-field or docking engine.
 
 Because explicit hydrogens are removed, the code does not pretend that the
 opposite heavy-neighbor direction is a hydrogen or lone-pair coordinate.
@@ -287,9 +371,160 @@ For `u` in `[0,1]`, define:
 Q5(u) = 6*u^5 - 15*u^4 + 10*u^3
 ```
 
+Here `u` is a dimensionless normalized position inside a switching interval;
+it is not an ODE time, an energy, or a molecular coordinate. For example, a
+decreasing distance switch over `[a,b]` may use
+`u=clamp((b-r)/(b-a),0,1)`: `u=1` at full strength, `u=0` at the cutoff, and
+intermediate values only while `a<r<b`. The switch acts as a
+coordinate-dependent multiplier,
+
+```text
+E_switched(x) = Q5(u(x)) * E_raw(x),
+```
+
+so reaching the cutoff turns that energy contribution exactly off; it does not
+mean that the coordinates themselves converge to zero. Differentiating the
+product also produces a force from the changing switch:
+
+```text
+-grad(E_switched) = -Q5(u)*grad(E_raw) - E_raw*grad(Q5(u)).
+```
+
+The fifth degree is the minimum polynomial degree that gives a compact `C2`
+join to the constant regions on both sides. The desired endpoint constraints
+are
+
+```text
+Q(0)=0, Q(1)=1,
+Q'(0)=Q'(1)=0,
+Q''(0)=Q''(1)=0.
+```
+
+These are six independent constraints, so a polynomial needs at least six
+coefficients and therefore degree five. To see where every term and coefficient
+comes from, begin with
+
+```text
+Q(u) = a0 + a1*u + a2*u^2 + a3*u^3 + a4*u^4 + a5*u^5.
+```
+
+The three conditions at the zero endpoint give
+
+```text
+Q(0)   = a0   = 0,
+Q'(0)  = a1   = 0,
+Q''(0) = 2*a2 = 0.
+```
+
+Thus the constant term would leave a nonzero boundary value, the linear term
+would leave a nonzero boundary slope and therefore a force jump, and the
+quadratic term would leave the constant second derivative `2*a2`. A `C2` join
+to the zero-valued constant region forces all three coefficients to vanish; it
+is not an arbitrary omission of the lower-order terms. The first power that
+can remain is consequently `u^3`:
+
+```text
+Q(u) = a3*u^3 + a4*u^4 + a5*u^5.
+```
+
+Applying the value, slope, and curvature conditions at `u=1` leaves the linear
+system
+
+```text
+a3 + a4 + a5       = 1,
+3*a3 + 4*a4 + 5*a5 = 0,
+6*a3 + 12*a4 + 20*a5 = 0,
+```
+
+whose unique solution is `a3=10`, `a4=-15`, and `a5=6`. Therefore
+
+```text
+Q5(u) = 10*u^3 - 15*u^4 + 6*u^5.
+```
+
+Equivalently, a decreasing ramp written with progress
+`t=(r-a)/(b-a)` is
+
+```text
+1 - Q5(t) = 1 - 10*t^3 + 15*t^4 - 6*t^5.
+```
+
+Its constant term is one because the decreasing switch begins at full
+strength; its linear and quadratic terms still vanish for the same slope and
+curvature conditions. More generally, making the value and derivatives through
+order `m` vanish at an endpoint means the first possible nonzero power is
+`u^(m+1)`.
+
+The derivative is `Q5'(u)=30*u^2*(1-u)^2`; `Q5'` and `Q5''` both vanish at
+both endpoints. A linear ramp would introduce a force
+discontinuity, while the cubic smoothstep removes that discontinuity but still
+has a second-derivative jump. Fifth degree is therefore the smallest choice
+that keeps energy, force, and the local force derivative continuous for the
+autograd/ODE guidance path.
+Higher-degree switches could make still higher derivatives continuous, but
+that extra smoothness is not required by the current contract and would change
+the transition profile without an established benefit. `Q5` is only the
+switching/gating function: `GuidanceEnergy` itself is not a fifth-order energy
+expansion.
+
 The decreasing switch `S(r;a,b)` equals 1 for `r <= a`,
 `1-Q5((r-a)/(b-a))` for `a < r < b`, and 0 for `r >= b`. Its value, first
 derivative, and second derivative are continuous at both boundaries.
+
+#### Why the compact quintic is the default
+
+The quintic is a numerical design choice for the current force-guided ODE, not
+a claim that fifth-degree polynomials are intrinsically more physical. It is
+the smallest function in this family that simultaneously provides:
+
+- exact values of one and zero outside the declared switching interval;
+- exact compact support, so thousands of distant atom pairs cannot accumulate
+  individually tiny energy or force tails;
+- `C2` joins, making energy, force, and the local force derivative continuous;
+- a transition width controlled directly by the two physical-distance or
+  geometry thresholds;
+- inexpensive, branch-light Torch evaluation using only clamping,
+  multiplication, and addition; and
+- stable float32 behavior without exponential underflow, logarithmic
+  singularities, or an arbitrary numerical tail threshold.
+
+Common alternatives are valid for other objectives but have different failure
+modes here:
+
+- A hard cutoff or linear ramp is compact and cheap, but introduces a jump in
+  energy or force at a boundary.
+- The cubic smoothstep and cosine switch make the force continuous, but their
+  second derivative does not match the surrounding constant region; the local
+  force derivative changes abruptly at the boundary.
+- Logistic, `tanh`, and `erf` switches are `C-infinity`, but do not become
+  exactly zero or one at any finite coordinate. Their small tails can
+  accumulate over a large receptor shell. Truncating those tails at a finite
+  cutoff reintroduces a nonsmooth boundary unless another compact switch is
+  added.
+- `softplus` and `logsumexp` are useful smooth approximations to a hinge,
+  minimum, or maximum, but likewise retain tails and do not by themselves
+  define a compact two-boundary switch. A raw logarithm is unsuitable because
+  `log(u)` is singular as `u` approaches zero; adding an epsilon removes the
+  singularity but introduces another scale and still does not give exact
+  compact support.
+- A compact exponential bump can be made `C-infinity`. For
+  `phi(t)=0` when `t<=0` and `phi(t)=exp(-1/t)` otherwise, the ratio
+  `phi(1-t)/(phi(t)+phi(1-t))` is an exact decreasing compact switch. It is a
+  mathematically sound alternative, but its exponential dynamic range can
+  underflow in float32, its all-orders-flat endpoints can make useful gradients
+  disappear earlier, and a robust implementation needs explicit boundary
+  branches or stable log-domain algebra. The current ODE requires only `C2`, so
+  that added complexity has no established validation benefit.
+- Seventh- or higher-degree polynomials can enforce still higher derivative
+  continuity, but add shape freedom or constraints that the current solver
+  does not require and that would need separate train/validation admission.
+
+Accordingly, the quintic is the current minimum-complexity compromise between
+compactness, force smoothness, numerical stability, and interpretability. If a
+future runtime requires higher-order derivatives, or if an evaluation shows a
+material boundary artifact under the frozen quintic, compact exponential or
+higher-order polynomial switches may be compared as a preregistered PLINDER
+train/validation ablation rather than selected on external test results.
 
 For ligand/protein carbon hydrophobes:
 
@@ -351,9 +586,14 @@ solvent-mediated pose-guidance surrogate. They are not claimed to be an
 orthogonal force-field decomposition. Physical-only, each interaction term,
 and their combination must therefore be ablated before production admission.
 The screened formal-charge term replaces the planned generic salt-bridge term;
-activating both would double count the same ionic motif. Future pi, halogen, or
-metal terms require separate typing, double-count masking, parameters, tests,
-and provenance.
+activating both would double count the same ionic motif. Pi stacking is a
+small orientation-specific correction on top of the generic carbon-contact
+baseline. Their overlap is traced, but neither term suppresses the other:
+atom-site hydrophobic and ring-system pi normalizations are not
+interchangeable, and direct suppression can reverse the sign of adding a
+favorable pi term. Aromatic, halogen, and metal diagnostics each retain
+separate typing, masking, parameters, tests, and provenance. User-requested
+default-on does not mean scientifically validated or sampler-admitted.
 
 ### Screened formal-charge groups
 
@@ -398,75 +638,140 @@ desolvation, polarization, receptor relaxation, and solvent/counterion
 reorganization. Its physical admission and its separate sampler-activation
 gate are frozen in `docs/INTERACTION_GUIDANCE_STUDY.md`.
 
-## Proposed metal-coordination V0
+### Default-on diagnostic aromatic and halogen terms
 
-Metal coordination is not treated as an isotropic Coulomb or LJ attraction.
-The first admissible scope is deliberately narrow:
+The implemented motif terms are:
 
-- Zn(II), mononuclear, approximately tetrahedral site;
-- exactly three fixed receptor donor atoms;
-- at most one ligand donor atom, typed N/O/S;
-- explicit protonation/resonance assignment;
-- no bridging donor or unresolved coordination water.
+- `interaction_pi_stacking`: neutral five/six-member ligand aromatic rings
+  against complete PHE/TYR/TRP and neutral HIS/HID/HIE rings, with
+  parallel/edge-to-face gates, fused-system saturation, collapse quality, and
+  explicit hydrophobic-overlap tracing;
+- `interaction_cation_pi`: declared `+1 e` formal-charge groups against the
+  narrower neutral carbocyclic ring set, evaluated in both ligand/protein
+  directions;
+- `interaction_halogen_bond`: neutral ligand carbon-bound Cl/Br/I directed
+  toward strict protein N/O or MET-SD acceptors, with Bondi-radius-normalized
+  distance and donor/acceptor angular gates.
 
-For receptor donor unit vectors `u_j` from Zn to donor, the vacant direction is
+Their complete Torch equations, constants, typing exclusions, provenance, and
+independent admission gates are frozen in
+`docs/INTERACTION_GUIDANCE_STUDY.md` and
+`src/effdock/guidance/parameters/interaction_v1.json`. They are included in
+the user-requested default diagnostic profile while remaining absent from
+candidate selection and the production sampler until their crystal and
+internal held-out gates pass.
+
+The current fused-ring aggregation is sized for one-pose diagnostics: it uses
+small Python loops and scalar system counts. Before any ODE/sampler admission,
+ring-to-system mappings must be precomputed in topology and aggregation must
+use a vectorized segment reduction with a representative-pocket
+runtime/peak-memory gate.
+
+`polar_unsatisfied_proxy` reports a dimensionless
+`burial * (1 - supported_satisfaction)` value. It remains trace-only because
+the current boundary does not claim complete solvent exposure, water-mediated
+satisfaction, or desolvation. It is never included in `GuidanceEnergy` or its
+gradient.
+
+## Profile-dispatched metal coordination V1
+
+Metal coordination is not treated as a universal isotropic Coulomb or LJ
+attraction. The receptor parser detects standalone monatomic
+`ZN/MG/CA/MN/FE/CO/NI/CU` records, verifies that residue and element identity
+agree, and dispatches each site to an element-specific profile. More than one
+spatially independent site may be represented and the per-site energies are
+summed.
+
+Only two profiles currently permit directional ligand attraction:
+
+| element | strict retained site | ligand donor scope | behavior |
+| --- | --- | --- | --- |
+| ZN | tetrahedral, target CN4, exactly three fixed receptor donors | N/O/S | one-vacancy directional attraction plus repulsion |
+| MG | octahedral, target CN6, exactly five fixed O donors including at least one retained crystallographic water | O | one-vacancy directional attraction plus repulsion |
+| CA/MN/FE/CO/NI/CU | geometry or oxidation state not safely determined | none | bounded repulsion only, with an explicit trace reason |
+
+The ZN and MG attractive profiles require a complete retained receptor shell
+with exactly one ligand-facing vacancy, an unambiguous standalone ion, and no
+bridging donor, unresolved coordinating water, nearby metal cluster, or
+cofactor ownership. ZN keeps its strict tetrahedral geometry gate and MG keeps
+its strict octahedral geometry gate and requires at least one retained
+coordination-water oxygen. A ligand can occupy at most one vacancy per site.
+This deliberately excludes underdetermined coordination shells
+rather than allowing an attractive potential to invent their geometry.
+
+For fixed receptor donor unit vectors `u_j` from metal `M` to donor, the vacant
+direction and directional gate are
 
 ```text
 v = -normalize(sum_j u_j)
+A_i = exp[-(1 - dot(normalize(x_i-M),v)) / tau_theta]
 ```
 
-For a ligand donor at distance `r` and unit direction `u`,
+For an attractive profile, element/donor-specific constants are loaded from
+the versioned in-repository parameter table:
 
 ```text
-A(u,v) = exp[-(1 - dot(u,v)) / tau_theta]
-```
+Delta r_i = ||x_i-M|| - r0(profile, donor_element_i)
 
-The proposed directional Morse pair energy is
+E_pair_i =
+  S_pair(r_i) * D *
+  {exp[-2*a*Delta r_i] - 2*A_i*exp[-a*Delta r_i]}
 
-```text
-Delta r = r - r0
-E_pair =
-  S(r) * D * {exp[-2*a*Delta r] - 2*A(u,v)*exp[-a*Delta r]}
-```
-
-The repulsive radial and directional attractive pieces are traced separately.
-An occupancy proxy controls over-coordination:
-
-```text
-q_i = S_CN(r_i)
-      * exp[-0.5*((r_i-r0)/sigma_r)^2]
-      * A(u_i,v)
+q_i =
+  S_CN(r_i) *
+  exp[-0.5*(Delta r_i/sigma_r)^2] *
+  A_i
 
 CN = N_fixed + sum_i q_i
-
 E_CN =
   k_over  * relu(CN-CN_max)^2
   + k_under * relu(CN_target-CN)^2
-
 E_slot = k_slot * sum_{i<j} q_i*q_j
 ```
 
-V0 sets `CN_max = CN_target = 4` and `k_under = 0`; the model should not pull a
-ligand into an otherwise unsupported site merely to complete coordination.
-When this term is admitted, an active Zn-donor pair replaces generic
-protein-ligand LJ for that pair. Zn/non-donor pairs retain only short-range
-repulsion, and metal Coulomb remains off in V0 to avoid double counting.
+The repulsive radial and directional attractive pieces, occupancy, and slot
+penalties are traced separately. `N_fixed/CN_target` are `3/4` for ZN and
+`5/6` for MG. `k_under = 0`: the energy does not attract a ligand merely to
+complete an unsupported or incomplete site.
 
-The formula is frozen as a contract, but `r0`, `D`, `a`, `tau_theta`,
-`sigma_r`, switches, penalties, donor typing, and site detection are not yet
-parameterized. Therefore metal coordination contributes no energy today.
-Unsupported metals, oxidation states, coordination numbers/geometries,
-binuclear sites, bridging donors, ambiguous waters, or donor protonation fail
-explicitly rather than falling back to Zn V0.
+All eight dispatched metals use a bounded, soft-core short-range repulsion
+for ligand atoms not assigned an attractive donor pair. The
+CA/MN/FE/CO/NI/CU profiles evaluate only that repulsion and emit a structured
+reason such as unresolved coordination geometry or oxidation state; they
+never inherit ZN or MG attraction. Dispatched metals are excluded from generic
+protein-ligand LJ, hydrophobic, hydrogen-bond, formal-charge, and metal-Coulomb
+masks so the metal interaction is not silently double counted.
+
+Metal sites are auto-detected whenever `metal_coordination` is present in the
+default diagnostic profile. Under `fail_closed`, a cofactor-bound metal,
+multi-metal cluster, shared/bridging donor, residue/element identity mismatch,
+unsupported element, ambiguous water, or incompatible donor shell fails with
+site provenance. Under `geometry_only`, the same strict resolution is
+attempted first; a chemistry-domain failure downgrades that site to bounded
+all-ligand repulsion and records the original failure code/message/details.
+It cannot enable directional/radial attraction, under-coordination reward, or
+a fabricated vacancy. Malformed parameter tables and non-finite coordinates
+remain hard implementation failures in both policies.
+
+RDKit is used only once for static ligand donor typing. Site geometry,
+profile dispatch, distance/direction gates, energy, occupancy, repulsion,
+trace values, and gradients are evaluated with Torch from versioned local
+tables; no external metal, force-field, docking, or minimization engine runs
+in this path.
 
 The design is informed by AutoDock4Zn's zinc-specific energetic/geometric
-docking precedent ([Santos-Martins et al., 2014](https://doi.org/10.1021/ci500209e))
-and MetalPDB's curated coordination-site definitions
-([Putignano et al., 2024](https://doi.org/10.1107/S2059798324003152)).
-The EFF-Dock directional Morse/CN expression above is a proposed in-repository
-form, not a claim that either reference used this exact equation.
+docking precedent ([Santos-Martins et al., 2014](https://doi.org/10.1021/ci500209e)),
+MetalPDB's coordination-site definitions
+([Bazayeva, Andreini & Rosato, 2024](https://doi.org/10.1107/S2059798324003152)), and
+high-resolution structural metal-donor distances
+([Dokmanić et al., 2008](https://doi.org/10.1107/S090744490706595X)), and
+MESPEUS metal/donor/coordination statistics
+([MESPEUS 2023 update](https://doi.org/10.1093/nar/gkad1009)). The directional
+Morse, occupancy, repulsion, and penalty equations are EFF-Dock diagnostic
+forms, not a claim that those references used this equation or these energy
+coefficients.
 
-## Force projection and future ODE coupling
+## Force projection and experimental ODE coupling
 
 For unified guidance energy `E`,
 
@@ -492,6 +797,70 @@ Required controls include soft-core annealing, a time ramp, per-term finite
 checks, equivariant caps, and maximum translation, rotation, and atom
 displacement.
 
+The separately named `normalized_drift` mode is a report-only comparison, not
+the production coupling. For pose `b`, fragment `f`, and atom `i` in `f`, it
+maps fragment velocities into a common atom-velocity space:
+
+```text
+A_i(v, omega) = v_f + omega_f cross (x_i - T_f)
+m_b = RMS_i ||A_i(v_model, omega_model)||
+g_b = RMS_i ||A_i(dT_force, domega_force)||
+c_b = eta * interval_average(ramp) * m_b / (g_b + eps)
+
+v_total     = v_model     + gamma_b * c_b * dT_force
+omega_total = omega_model + gamma_b * c_b * domega_force
+```
+
+One positive pose scalar multiplies translation and rotation together so the
+Newton--Euler direction is not changed by separate channel normalization.
+`gamma_b <= 1` jointly enforces the declared guide-only translation, angular,
+and conservative atom-displacement bounds after normalization. The ramp is
+integrated over each ODE interval rather than evaluated at only its left or
+right endpoint, so its total exposure is invariant to the 10/20/25-step grid
+for a fixed continuous trajectory. There is no energy-descent acceptance or
+backtracking in this pure direct-drift arm; the learned and guidance fields are
+summed and passed once to the ordinary SE(3) integrator. The coefficient is a
+dimensionless generative-control strength after velocity normalization, not a
+physical timestep, temperature, force conversion, or MD quantity.
+
+## Experimental constraint-only FK and translation SDE
+
+Constraint-only Feynman--Kac (FK) steering is an experimental particle
+resampling operator. At declared times it evaluates the versioned local
+constraint energy, forms incremental log weights, and performs seeded
+systematic resampling. It does not add the guidance gradient to the learned
+vector field. Every event records effective sample size, normalized weights,
+ancestor indices, the number of unique ancestors, energy components, and the
+sampling-dynamics contract. FK remains report-only and is not a production
+sampler or candidate selector.
+
+For a linear flow-matching translation path with Gaussian prior variance
+`sigma_0^2`, the optional score-corrected translation SDE uses
+
+```text
+score_t(x_t) = (t * v_theta(x_t, t) - x_t) / ((1 - t) * sigma_0^2)
+dx_t = [v_theta(x_t, t) + 0.5 * g(t)^2 * score_t(x_t)] dt + g(t) dW_t
+g(t) = g_0 * (1 - t)
+```
+
+and Euler--Maruyama translation updates on the same fixed model-evaluation
+grid. A dedicated seeded generator isolates Brownian noise from prior-pool
+selection and FK-resampling randomness. The retained model supplies no
+compatible SO(3) score, so rotations continue through the deterministic
+learned SO(3) flow. This path must be described as a translation
+score-corrected SDE with deterministic rotations, not as a complete SE(3)
+reverse SDE. It is mutually exclusive with the legacy heuristic stochastic
+translation flag and with gradient-guidance couplings.
+
+The implementation follows the Gaussian-prior score identity and
+score-corrected SDE construction in
+[Feynman-Kac-Flow](https://arxiv.org/abs/2509.01543); the repository records
+the exact schedule, seed, discretization, and implementation provenance.
+The frozen external Astex comparison is specified in
+`docs/FK_SDE_ASTEX_PROTOCOL.md`. Astex is descriptive only: its outcomes may
+not select the formula, diffusion scale, FK strength/times, particle budget,
+or production admission.
+
 ## Diagnostics, leakage boundary, and admission
 
 `eff-dock physical trace` records exact input, combined parameter,
@@ -501,10 +870,13 @@ counts; physical, interaction and combined component energies; per-term force
 norms; fragment corrections; contact statistics; strongest interaction-pair
 atom/group identities, distance, radial/cone gates, site quality, nearby radial
 candidates rejected by angle/quality gates, every formal-charge site and its
-member weights, signed attractive/repulsive charge sums, and structured
-unsupported chemistry. The implementation identity includes ligand loading,
-fragmentation, and protein typing source, not only the energy kernel. It does
-not optimize coordinates.
+member weights, signed attractive/repulsive charge sums, aromatic
+ring/system geometry, halogen donor/acceptor gates, metal element/profile/site
+identity, attractive versus repulsion-only disposition, donor occupancy,
+masking, and structured profile reason, the trace-only polar-unsatisfied
+proxy, and structured unsupported chemistry. The implementation identity
+includes ligand loading, fragmentation, and protein typing source, not only
+the energy kernel. It does not optimize coordinates.
 
 Saved `results.pt` tracing is strict. Docking-results V2 stores an
 order-sensitive ligand identity containing atom attributes, indexed bond
@@ -519,6 +891,25 @@ term retention, or sampler activation. Guidance settings and production
 activation are selected on internal train/validation data (currently
 PLINDER), with the external benchmarks kept frozen.
 
+### Confidence and energy-selection boundary
+
+Confidence is evaluated only after model ODE integration, in-loop guidance,
+and any explicitly requested post-sampling refinement have produced the final
+candidate coordinates. It ranks those completed candidates and never feeds
+back into the current ODE.
+
+Raw `InteractionEnergy.total` must not be added directly to confidence. Its
+leaf terms mix different signs, opportunity counts, and numerical ranges, and
+an attractive total can reward a buried clashing pose. A future combined
+selector must first persist final per-candidate leaf energies and availability,
+use the vdW steric metric as a hard guard, keep pure predicted RMSD as the base,
+and consider opportunity-normalized interaction improvements only inside a
+fixed confidence near-tie margin. Normalizers, margins, weights, and switch
+thresholds are fitted on PLINDER train and confirmed once on PLINDER
+validation; Astex and PoseBusters remain report-only. Until that study is
+frozen, pure confidence remains the deployed selector and interaction terms
+remain diagnostic selection inputs only.
+
 Before sampler coupling, the implementation must retain:
 
 - force/gradient sign and finite-difference checks;
@@ -529,9 +920,19 @@ Before sampler coupling, the implementation must retain:
 - immutable independent golden energy/force fixtures;
 - PLINDER validity/RMSD guard evaluation;
 - operator-split descent/rejection tests.
+- direct-drift scale-zero no-op, interval-ramp, pose-wise normalization,
+  guide-only cap, batching, and SE(3) tests.
 
 Frozen pre-formal-charge V3 diagnostic outputs and verification evidence are
-recorded in `docs/GUIDANCE_DIAGNOSTIC_RESULTS.json`. The report-only V4
-screened-charge characterization is recorded in
+preserved as historical provenance in
+`docs/GUIDANCE_DIAGNOSTIC_RESULTS.json`; its then-inactive term list is not the
+current callable-term inventory. The report-only V4 screened-charge
+characterization remains preserved in
 `docs/GUIDANCE_FORMAL_CHARGE_BENCHMARK_CHARACTERIZATION_V4.json`. Full
 generated traces remain under the ignored `outputs/guidance/` directory.
+
+The completed interaction prior-probe V2 remains historical evidence with its
+original three-term baseline (`hydrophobic + hydrogen_bond +
+screened_formal_charge`). The later user-authorized seven-term diagnostic
+default does not rewrite that protocol, its 96 trajectories, or its
+no-admission conclusion.

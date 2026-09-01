@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "comparison_scope": "supplied_pocket_only",
+  "provenance": {
+    "paper": "Buttenschoen, Morris, and Deane, Chemical Science (2024)",
+    "doi": "10.1039/D3SC04185A",
+    "zenodo_record": "https://zenodo.org/records/8278563",
+    "source_csv_url": "https://zenodo.org/records/8278563/files/posebusters_paper_results.csv?download=1",
+    "source_csv_md5": "a7cbe725e86e412fdfeb3c3e35c566dd",
+    "posebusters_v2_filter": "outputs/external_models/inputs/posebench_native/posebusters_benchmark/vina_posebusters_benchmark_inputs.csv"
+  },
+  "metric_contract": "Top-1 RMSD <2 A; Joint additionally passes every validity column in the deposited paper result table. No energy minimization rows.",
+  "datasets": {
+    "astex": {
+      "name": "Astex Diverse",
+      "n": 85,
+      "methods": [
+        {
+          "method": "GOLD",
+          "family": "classical",
+          "source": "PoseBusters paper deposited result table",
+          "post_processing": "none",
+          "top1_rmsd_lt2": {
+            "count": 57,
+            "pct": 67.05882352941177
+          },
+          "top1_pb_valid": {
+            "count": 82,
+            "pct": 96.47058823529412
+          },
+          "top1_joint_rmsd_lt2_pb_valid": {
+            "count": 54,
+            "pct": 63.529411764705884
+          }
+        },
+        {
+          "method": "AutoDock Vina",
+          "family": "classical",
+          "source": "PoseBusters paper deposited result table",
+          "post_processing": "none",
+          "top1_rmsd_lt2": {
+            "count": 49,
+            "pct": 57.64705882352941
+          },
+          "top1_pb_valid": {
+            "count": 84,
+            "pct": 98.82352941176471
+          },
+          "top1_joint_rmsd_lt2_pb_valid": {
+            "count": 48,
+            "pct": 56.470588235294116
+          }
+        }
+      ]
+    },
+    "posebusters": {
+      "name": "PoseBusters v2",
+      "n": 308,
+      "methods": [
+        {
+          "method": "GOLD",
+          "family": "classical",
+          "source": "PoseBusters paper deposited result table",
+          "post_processing": "none",
+          "top1_rmsd_lt2": {
+            "count": 179,
+            "pct": 58.116883116883116
+          },
+          "top1_pb_valid": {
+            "count": 288,
+            "pct": 93.50649350649351
+          },
+          "top1_joint_rmsd_lt2_pb_valid": {
+            "count": 168,
+            "pct": 54.54545454545455
+          }
+        },
+        {
+          "method": "AutoDock Vina",
+          "family": "classical",
+          "source": "PoseBusters paper deposited result table",
+          "post_processing": "none",
+          "top1_rmsd_lt2": {
+            "count": 184,
+            "pct": 59.74025974025974
+          },
+          "top1_pb_valid": {
+            "count": 300,
+            "pct": 97.40259740259741
+          },
+          "top1_joint_rmsd_lt2_pb_valid": {
+            "count": 179,
+            "pct": 58.116883116883116
+          }
+        }
+      ]
+    }
+  }
+}

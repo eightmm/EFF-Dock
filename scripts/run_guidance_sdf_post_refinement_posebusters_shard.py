@@ -19,11 +19,9 @@ import pandas as pd
 from posebusters import PoseBusters
 
 from effdock.workflows.evaluate import file_sha256
+from effdock.workflows.guidance_budget_posebusters_report import VALIDITY_CHECKS
 from effdock.workflows.guidance_pl_valid import PL_VALIDITY_CHECKS, is_pl_valid
-from effdock.workflows.posebusters_report import (
-    VALIDITY_CHECKS,
-    require_posebusters_runtime_version,
-)
+from effdock.workflows.posebusters_report import require_posebusters_runtime_version
 
 PROTOCOL_ID = "EFFDOCK-GUIDANCE-SDF-POST-REFINEMENT-PB-V1"
 EXPECTED_COUNTS = {"astex": 85, "posebusters": 308}

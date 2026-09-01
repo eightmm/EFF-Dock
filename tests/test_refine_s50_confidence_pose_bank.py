@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import tempfile
 from pathlib import Path
 
@@ -21,6 +22,7 @@ from scripts.refine_s50_confidence_pose_bank import (
     _protein_pdb_text,
     _refinement_config,
     _selected_records,
+    _semantic_implementation_contract,
 )
 
 
@@ -180,6 +182,46 @@ def test_selected_records_uses_frozen_one_based_split_index_striding() -> None:
 
 def test_ordered_id_digest_is_order_sensitive() -> None:
     assert _ordered_ids_sha256(["a", "b"]) != _ordered_ids_sha256(["b", "a"])
+
+
+def test_implementation_contract_ignores_only_observational_pyproject_digest() -> None:
+    baseline = {
+        "guidance": {
+            "schema_version": "effdock.guidance_implementation.v1",
+            "sha256": "1" * 64,
+            "files": ["guidance/runtime.py"],
+            "runtime_versions": {"torch_runtime": "2.10.0+cu130"},
+            "project_inputs": {
+                "pyproject.toml": "2" * 64,
+                "uv.lock": "3" * 64,
+            },
+        },
+        "parameters": {"sha256": "4" * 64},
+        "torch": "2.10.0+cu130",
+    }
+    packaging_edit = copy.deepcopy(baseline)
+    packaging_edit["guidance"]["sha256"] = "5" * 64
+    packaging_edit["guidance"]["project_inputs"]["pyproject.toml"] = "6" * 64
+
+    assert _semantic_implementation_contract(
+        packaging_edit
+    ) == _semantic_implementation_contract(baseline)
+
+    for path, changed_value in (
+        (("guidance", "files"), ["guidance/changed.py"]),
+        (("guidance", "runtime_versions"), {"torch_runtime": "changed"}),
+        (("guidance", "project_inputs", "uv.lock"), "7" * 64),
+        (("parameters",), {"sha256": "8" * 64}),
+        (("torch",), "changed"),
+    ):
+        changed = copy.deepcopy(baseline)
+        target = changed
+        for key in path[:-1]:
+            target = target[key]
+        target[path[-1]] = changed_value
+        assert _semantic_implementation_contract(
+            changed
+        ) != _semantic_implementation_contract(baseline)
 
 
 def test_refined_bank_v2_uses_calibrated_safe_ceiling_and_batch() -> None:

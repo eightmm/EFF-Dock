@@ -10,6 +10,7 @@ import json
 import math
 import os
 import tempfile
+import time
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -50,7 +51,14 @@ EXPECTED_POSES = 100
 SUPPORTED_SOURCE_PROTOCOLS = {
     "EFFDOCK-GUIDANCE-ALL-POSE-PB-ETA-V1",
     "EFFDOCK-GUIDANCE-SIGMA2-ETA2-REFINEMENT-INPUT-V1",
+    "EFFDOCK-EXTERNAL-TEMPORAL-GUIDED-REFINED-V1",
+    "EFFDOCK-POCKET-CUTOFF-ROBUSTNESS-MANIFEST-V1",
 }
+
+
+def _synchronize(device: torch.device) -> None:
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
 
 
 def _canonical_json(value: Any) -> str:
@@ -73,8 +81,7 @@ def _graph_signature(mol: Chem.Mol) -> tuple[tuple[int, ...], tuple[tuple[int, i
     elements = tuple(atom.GetAtomicNum() for atom in mol.GetAtoms())
     edges = tuple(
         sorted(
-            tuple(sorted((bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())))
-            for bond in mol.GetBonds()
+            tuple(sorted((bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()))) for bond in mol.GetBonds()
         )
     )
     return elements, edges
@@ -86,9 +93,7 @@ def _load_pose_batch(path: Path, template: Chem.Mol) -> tuple[torch.Tensor, list
     # header and returning None for an otherwise valid record.  Sequential
     # parsing avoids that offset path and preserves every source pose.
     with path.open("rb") as stream:
-        molecules = list(
-            Chem.ForwardSDMolSupplier(stream, removeHs=False, sanitize=False)
-        )
+        molecules = list(Chem.ForwardSDMolSupplier(stream, removeHs=False, sanitize=False))
     if len(molecules) != EXPECTED_POSES or any(mol is None for mol in molecules):
         loaded = sum(mol is not None for mol in molecules)
         raise ValueError(
@@ -209,9 +214,7 @@ def _step_frames(
         for offset in range(stop - start):
             initial_metrics = run.metrics[offset][0]
             final_metrics = run.metrics[offset][-1]
-            metrics_by_step = {
-                int(row["step"]): row for row in run.metrics[offset]
-            }
+            metrics_by_step = {int(row["step"]): row for row in run.metrics[offset]}
             saved_total_energy_by_step: dict[str, float] = {}
             for target_step in range(0, config.max_steps + 1, config.save_every):
                 available = [step for step in metrics_by_step if step <= target_step]
@@ -248,13 +251,18 @@ def _step_frames(
 
 
 def main() -> None:
+    pipeline_started = time.perf_counter()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--benchmark-input-manifest", type=Path, required=True)
+    parser.add_argument("--benchmark-input-manifest", type=Path, default=None)
     parser.add_argument("--external-dir", type=Path, default=Path("data/external_test"))
     parser.add_argument("--pocket-centers", type=Path, required=True)
     parser.add_argument("--protocol-file", type=Path, required=True)
-    parser.add_argument("--dataset", choices=("astex", "posebusters"), required=True)
+    parser.add_argument(
+        "--dataset",
+        choices=("astex", "posebusters", "phibench", "foldbench", "openbind"),
+        required=True,
+    )
     parser.add_argument("--eta", type=float, default=0.0)
     parser.add_argument("--complex-id", required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -262,6 +270,7 @@ def main() -> None:
     parser.add_argument("--steps", type=int, default=100)
     parser.add_argument("--save-every", type=int, default=25)
     parser.add_argument("--batch-size", type=int, default=10)
+    parser.add_argument("--pocket-cutoff", type=float, default=10.0)
     parser.add_argument("--protein-shell", type=float, default=18.0)
     parser.add_argument("--energy-convergence-absolute-kcal-mol", type=float)
     parser.add_argument("--energy-convergence-relative", type=float)
@@ -278,6 +287,8 @@ def main() -> None:
         raise ValueError("V1 protocol requires --steps 100 --save-every 25")
     if args.batch_size < 2 or EXPECTED_POSES % args.batch_size:
         raise ValueError("batch-size must be a divisor of 100 and at least two")
+    if not math.isfinite(args.pocket_cutoff) or args.pocket_cutoff <= 0:
+        raise ValueError("pocket-cutoff must be finite and positive")
     if not torch.cuda.is_available() and str(args.device).startswith("cuda"):
         raise RuntimeError("CUDA device requested but unavailable")
 
@@ -316,27 +327,25 @@ def main() -> None:
         raise ValueError("source sampling ligand-input identity mismatch")
     seed = int(record["sampling_seed"])
     mol_input, _ = load_benchmark_ligand(raw_smiles, random_seed=seed)
-    initial_absolute, original_properties = _load_pose_batch(
-        Path(record["pose_path"]), mol_input
-    )
+    initial_absolute, original_properties = _load_pose_batch(Path(record["pose_path"]), mol_input)
 
     centers = json.loads(args.pocket_centers.read_text())
     center_entry = centers.get(record["id"], centers.get(record["id"].lower()))
     if isinstance(center_entry, dict):
         center_entry = center_entry.get("pocket_center", center_entry.get("center"))
     pocket_center_absolute = torch.as_tensor(center_entry, dtype=torch.float32)
-    if pocket_center_absolute.shape != (3,) or not bool(torch.isfinite(pocket_center_absolute).all()):
+    if pocket_center_absolute.shape != (3,) or not bool(
+        torch.isfinite(pocket_center_absolute).all()
+    ):
         raise ValueError("missing or invalid frozen pocket center")
 
     mol_ref = load_ref_ligand(Path(record["ligand_ref"]), "sdf")
-    crystal_absolute, dock_indices, ref_indices, match_method = _aligned_crystal(
-        mol_ref, mol_input
-    )
+    crystal_absolute, dock_indices, ref_indices, match_method = _aligned_crystal(mol_ref, mol_input)
     _, ligand_data, meta = preprocess_complex(
         Path(record["protein"]),
         mol_input,
         pocket_center=pocket_center_absolute,
-        pocket_cutoff=10.0,
+        pocket_cutoff=args.pocket_cutoff,
     )
     if not torch.equal(meta["pocket_center"], pocket_center_absolute):
         raise AssertionError("preprocessing changed pocket center")
@@ -366,15 +375,15 @@ def main() -> None:
         max_backtracks=12,
         convergence_displacement_angstrom=1e-5,
         convergence_patience=20,
-        convergence_energy_absolute_kcal_mol=(
-            args.energy_convergence_absolute_kcal_mol
-        ),
+        convergence_energy_absolute_kcal_mol=(args.energy_convergence_absolute_kcal_mol),
         convergence_energy_relative=args.energy_convergence_relative,
         convergence_energy_patience=args.energy_convergence_patience,
         convergence_energy_min_steps=args.energy_convergence_min_steps,
         physical_cutoff_angstrom=8.0,
         protein_shell_cutoff_angstrom=args.protein_shell,
     )
+    _synchronize(device)
+    refinement_started = time.perf_counter()
     frames, pose_summaries = _step_frames(
         initial=initial,
         crystal=crystal,
@@ -384,7 +393,10 @@ def main() -> None:
         batch_size=args.batch_size,
         dense_diagnostics=args.dense_diagnostics,
     )
+    _synchronize(device)
+    refinement_seconds = time.perf_counter() - refinement_started
 
+    rmsd_started = time.perf_counter()
     for pose_index, row in enumerate(pose_summaries):
         for label, value in (("initial", frames[0]), ("final", frames[args.steps])):
             row[f"{label}_symmetry_rmsd_angstrom"] = compute_pose_rmsd(
@@ -395,12 +407,14 @@ def main() -> None:
                 mol_input,
                 mol_ref,
             )
+    rmsd_evaluation_seconds = time.perf_counter() - rmsd_started
 
     output_dir = args.output_dir.resolve()
     if output_dir.exists():
         raise FileExistsError(f"refusing to overwrite output directory: {output_dir}")
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     attempt = Path(tempfile.mkdtemp(prefix=f".{output_dir.name}.", dir=output_dir.parent))
+    serialization_started = time.perf_counter()
     artifacts: dict[str, dict[str, str]] = {}
     for step, value in sorted(frames.items()):
         path = attempt / f"step_{step:03d}.sdf"
@@ -458,6 +472,7 @@ def main() -> None:
         "path": str(output_dir / trajectory.name),
         "sha256": file_sha256(trajectory),
     }
+    serialization_seconds = time.perf_counter() - serialization_started
     summary = {
         "schema_version": SCHEMA_VERSION,
         "protocol_id": PROTOCOL_ID,
@@ -487,6 +502,7 @@ def main() -> None:
             "pocket_centers": str(args.pocket_centers.resolve()),
             "pocket_centers_sha256": file_sha256(args.pocket_centers),
             "pocket_center_absolute": pocket_center_absolute.tolist(),
+            "pocket_cutoff_angstrom": args.pocket_cutoff,
         },
         "implementation": {
             "guidance": guidance_implementation_identity(),
@@ -518,8 +534,7 @@ def main() -> None:
         "counts": {
             "poses": EXPECTED_POSES,
             "completed_or_converged": sum(
-                row["status"]
-                in {"max_steps", "converged_displacement", "converged_energy_plateau"}
+                row["status"] in {"max_steps", "converged_displacement", "converged_energy_plateau"}
                 for row in pose_summaries
             ),
             "line_search_failed": sum(
@@ -552,6 +567,19 @@ def main() -> None:
         "poses": pose_summaries,
         "artifacts": artifacts,
         "runtime": {
+            "stage_seconds": {
+                "input_preparation": refinement_started - pipeline_started,
+                "minimization_refinement": refinement_seconds,
+                "common_rmsd_evaluation_excluded": rmsd_evaluation_seconds,
+                "pose_serialization": serialization_seconds,
+            },
+            "minimization_refinement_seconds_per_pose": (
+                refinement_seconds / EXPECTED_POSES
+            ),
+            "attempted_refinement_steps": sum(
+                int(row["terminal_step"]) for row in pose_summaries
+            ),
+            "wall_seconds_before_summary_write": time.perf_counter() - pipeline_started,
             "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
             "slurm_partition": os.environ.get("SLURM_JOB_PARTITION"),
         },
@@ -568,10 +596,12 @@ def main() -> None:
                 "failed": summary["counts"]["failed"],
                 "initial_mean_rmsd": sum(
                     row["initial_symmetry_rmsd_angstrom"] for row in pose_summaries
-                ) / EXPECTED_POSES,
+                )
+                / EXPECTED_POSES,
                 "final_mean_rmsd": sum(
                     row["final_symmetry_rmsd_angstrom"] for row in pose_summaries
-                ) / EXPECTED_POSES,
+                )
+                / EXPECTED_POSES,
             },
             sort_keys=True,
         )

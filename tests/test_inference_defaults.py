@@ -10,16 +10,20 @@ from effdock.inference.defaults import (
     DEFAULT_SIGMA,
 )
 from effdock.inference.docking import build_arg_parser as build_dock_parser
-from effdock.inference.sampler import sample_unified, sample_unified_multi_sigma
 from effdock.workflows.evaluate import build_arg_parser as build_evaluate_parser
 
 
-def test_public_sampling_budget_is_n100_s10() -> None:
+def test_promoted_sampling_budget_is_n100_s10() -> None:
+    assert DEFAULT_DOCKING_CHECKPOINT == Path(
+        "weights/effdock_docking_early_time_t0p10_50k.pt"
+    )
+    assert DEFAULT_CONFIDENCE_CHECKPOINT == Path(
+        "weights/effdock_confidence_s50_raw_refined_u70k.pt"
+    )
     assert DEFAULT_NUM_SAMPLES == 100
     assert DEFAULT_NUM_STEPS == 10
+    assert DEFAULT_NUM_SAMPLES * DEFAULT_NUM_STEPS == 1_000
     assert DEFAULT_SIGMA == 2.0
-    assert sample_unified.__kwdefaults__["num_steps"] == DEFAULT_NUM_STEPS
-    assert sample_unified_multi_sigma.__kwdefaults__["num_steps"] == DEFAULT_NUM_STEPS
 
 
 def test_dock_uses_promoted_inference_stack_by_default() -> None:
@@ -44,10 +48,7 @@ def test_dock_uses_promoted_inference_stack_by_default() -> None:
 
 
 def test_evaluate_uses_same_promoted_inference_stack_by_default() -> None:
-    parser = build_evaluate_parser()
-    dataset_action = next(action for action in parser._actions if action.dest == "dataset")
-    assert dataset_action.choices == ("astex", "posebusters")
-    args = parser.parse_args(
+    args = build_evaluate_parser().parse_args(
         [
             "--dataset",
             "astex",

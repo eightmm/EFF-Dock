@@ -1,11 +1,15 @@
 # External model installation status
 
+> Historical installation snapshot. Current source/environment/checkpoint
+> verification is summarized in
+> [`EXTERNAL_MODEL_AUDIT_20260830.md`](EXTERNAL_MODEL_AUDIT_20260830.md).
+
 Snapshot: 2026-08-28 12:32 KST
 EFF-Dock revision at submission: `862409d19159936e556c1bc5e0e2d16dfa1b5cfb`
 External runtime implementation: `00a47ae55eb144eb9a8702b0d38bf4d57f5503cf`
 
 Machine-readable source revisions, pipeline taxonomy, and compatibility
-overrides are in `configs/external_models.json`. Artifact URLs, sizes, and
+overrides are in `benchmarks/external_models/models.json`. Artifact URLs, sizes, and
 digests are in `configs/external_model_artifacts.json`.
 
 ## Active runtime layout

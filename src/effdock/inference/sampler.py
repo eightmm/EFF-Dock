@@ -11,6 +11,8 @@ late-biased training distribution).
 
 from __future__ import annotations
 
+import math
+
 import torch
 from torch import Tensor
 
@@ -58,6 +60,57 @@ def build_time_grid(
     if schedule == "early":
         return u**power
     raise ValueError(f"Unknown time schedule '{schedule}'.")
+
+
+def linear_fm_gaussian_translation_score(
+    position: Tensor,
+    velocity: Tensor,
+    time: Tensor | float,
+    prior_sigma: Tensor | float,
+) -> Tensor:
+    """Recover the linear-CFM translation score for an isotropic Gaussian prior.
+
+    For ``X_t = t X_1 + (1 - t) X_0`` with
+    ``X_0 ~ N(0, prior_sigma**2 I)``, Proposition 2 of Feynman-Kac-Flow gives
+
+    ``grad log p_t(X_t) = (t * v_t(X_t) - X_t) / ((1 - t) * prior_sigma**2)``.
+
+    EFF-Dock fragment translations are pocket-centred before integration, so
+    ``position`` is expressed in the zero-mean prior frame required by the
+    identity. Rotation is deliberately excluded because its prior is uniform
+    on SO(3), not Gaussian.
+    """
+    if position.shape != velocity.shape or position.shape[-1] != 3:
+        raise ValueError(
+            "position and velocity must have identical [..., 3] shapes, got "
+            f"{position.shape} and {velocity.shape}"
+        )
+    t = torch.as_tensor(time, device=position.device, dtype=position.dtype)
+    sigma = torch.as_tensor(prior_sigma, device=position.device, dtype=position.dtype)
+    if not bool(torch.isfinite(t).all()) or bool((t < 0.0).any()) or bool((t >= 1.0).any()):
+        raise ValueError("linear-FM score time must be finite and lie in [0, 1)")
+    if not bool(torch.isfinite(sigma).all()) or bool((sigma <= 0.0).any()):
+        raise ValueError("linear-FM Gaussian prior sigma must be finite and positive")
+    return (t * velocity - position) / ((1.0 - t) * sigma.square())
+
+
+def score_corrected_translation_drift(
+    position: Tensor,
+    velocity: Tensor,
+    time: Tensor | float,
+    prior_sigma: Tensor | float,
+    diffusion_sigma: Tensor | float,
+) -> Tensor:
+    """Return ``v + 0.5 * g(t)^2 * score`` for the translation SDE drift."""
+    score = linear_fm_gaussian_translation_score(position, velocity, time, prior_sigma)
+    diffusion = torch.as_tensor(
+        diffusion_sigma,
+        device=position.device,
+        dtype=position.dtype,
+    )
+    if not bool(torch.isfinite(diffusion).all()) or bool((diffusion < 0.0).any()):
+        raise ValueError("translation diffusion sigma must be finite and non-negative")
+    return velocity + 0.5 * diffusion.square() * score
 
 
 def vp_score_noise_to_velocity(
@@ -205,7 +258,11 @@ def sample_shared_prior_states(
     translation_sigma: float,
     seed: int,
 ) -> tuple[Tensor, Tensor]:
-    """Create a deterministic CPU prior pool reusable across fixed budgets."""
+    """Create a deterministic CPU prior pool that can be sliced across budgets.
+
+    Sampling one common pool before choosing ``num_samples`` prevents a change
+    in candidate count from shifting the translation/rotation RNG streams.
+    """
     if num_samples <= 0 or n_fragments <= 0:
         raise ValueError("num_samples and n_fragments must be positive")
     if translation_sigma <= 0:
@@ -251,15 +308,23 @@ def sample_unified(
     device: torch.device = torch.device("cpu"),
     save_traj: bool = False,
     stochastic_gamma: float = 0.0,
+    translation_sde_base_sigma: float = 0.0,
+    translation_sde_generator: torch.Generator | None = None,
     pose_objective: str = "linear_fm",
     score_rot_sigma_max: float = 3.141592653589793,
     score_alpha_min: float = 0.0,
     guidance_fn=None,
     guidance_scale: float = 0.0,
     guidance_min_t: float = 0.0,
+    guidance_operator_split: bool = False,
+    guidance_direct_drift: bool = False,
     start_t: float = 0.0,
     initial_T_frag: Tensor | None = None,
     initial_q_frag: Tensor | None = None,
+    fk_resample_times: list[float] | tuple[float, ...] | None = None,
+    fk_resampler=None,
+    fk_resample_trans_sigma: float = 0.0,
+    fk_resample_rot_sigma: float = 0.0,
     particle_resample_times: list[float] | tuple[float, ...] | None = None,
     particle_resample_fn=None,
     particle_resample_trans_sigma: float = 0.0,
@@ -285,6 +350,13 @@ def sample_unified(
     target manifold; mid-trajectory it broadens the sample distribution and
     helps escape local modes of the learnt drift.
 
+    ``translation_sde_base_sigma > 0`` instead enables the paper-derived,
+    marginal-preserving SDE on the Gaussian translation subspace. It uses
+    ``g(t) = translation_sde_base_sigma * (1 - t)`` and the analytic score
+    recovered from the linear flow velocity. Fragment rotations remain on the
+    deterministic SO(3) flow because their uniform prior does not admit this
+    Gaussian score identity.
+
     ``particle_resample_times`` optionally performs sequential Monte Carlo style
     resampling at specified integration times. ``particle_resample_fn`` receives
     the current pose set and returns source particle indices of length
@@ -292,10 +364,18 @@ def sample_unified(
     This is intentionally callback-based so scoring can live in benchmark code
     without coupling pose generation to an auxiliary reranker.
 
+    ``fk_resample_times`` enables the experimental constraint-only
+    Feynman--Kac path. At each resolved grid time, the already-computed learned
+    velocity is extrapolated once to ``t=1`` and ``fk_resampler`` scores that
+    endpoint. This path makes no additional model call and is deliberately
+    restricted to ``linear_fm`` dynamics. It may use either the deterministic
+    flow or the translation-only score-corrected SDE described above.
+
     Returns a list of length ``num_samples``. Each entry has
     ``atom_pos_pred: [N_atoms, 3]`` (pocket-centered frame) and, if
     ``save_traj=True``, ``traj: list[Tensor]`` + ``traj_times: list[float]``
-    covering the ``num_steps + 1`` recorded frames.
+    covering the ``num_steps + 1`` recorded frames. ``initial_sample_index``
+    records particle ancestry after any resampling.
     """
     objective = (pose_objective or "linear_fm").lower()
     if objective not in ("linear_fm", "vp_flow", "vp_score", "vp_score_full"):
@@ -303,8 +383,72 @@ def sample_unified(
 
     if start_t < 0.0 or start_t >= 1.0:
         raise ValueError(f"start_t must be in [0, 1), got {start_t}.")
+    if not math.isfinite(translation_sde_base_sigma) or translation_sde_base_sigma < 0.0:
+        raise ValueError("translation_sde_base_sigma must be finite and non-negative")
+    translation_sde_enabled = translation_sde_base_sigma > 0.0
+    if translation_sde_enabled and objective != "linear_fm":
+        raise ValueError("score-corrected translation SDE currently requires linear_fm")
+    if translation_sde_enabled and stochastic_gamma != 0.0:
+        raise ValueError(
+            "score-corrected translation SDE and legacy stochastic_gamma are mutually exclusive"
+        )
+    if translation_sde_enabled and guidance_scale != 0.0:
+        raise ValueError("score-corrected translation SDE and gradient guidance are mutually exclusive")
+    if guidance_operator_split and guidance_direct_drift:
+        raise ValueError("operator-split and direct-drift guidance are mutually exclusive")
+    if guidance_operator_split and guidance_scale != 0.0:
+        if guidance_fn is None:
+            raise ValueError("nonzero operator-split guidance requires a guidance callback")
+        if not hasattr(guidance_fn, "correct"):
+            raise TypeError("operator-split guidance requires a correct(...) callback")
+    if guidance_direct_drift and guidance_scale != 0.0:
+        if guidance_fn is None:
+            raise ValueError("nonzero direct-drift guidance requires a guidance callback")
+        if not hasattr(guidance_fn, "direct_velocity"):
+            raise TypeError("direct-drift guidance requires a direct_velocity(...) callback")
 
     B = int(num_samples)
+    if B < 1:
+        raise ValueError("num_samples must be positive")
+    requested_fk_times = tuple(float(value) for value in (fk_resample_times or ()))
+    fk_enabled = bool(requested_fk_times) or fk_resampler is not None
+    if bool(requested_fk_times) != (fk_resampler is not None):
+        raise ValueError("FK resample times and fk_resampler must be provided together")
+    if fk_enabled:
+        if objective != "linear_fm":
+            raise ValueError("experimental FK resampling currently requires linear_fm")
+        if stochastic_gamma != 0.0:
+            raise ValueError(
+                "experimental FK resampling requires deterministic dynamics or the "
+                "score-corrected translation SDE"
+            )
+        if guidance_scale != 0.0:
+            raise ValueError("FK resampling and gradient guidance are mutually exclusive")
+        if particle_resample_fn is not None or particle_resample_times:
+            raise ValueError("FK and callback particle resampling are mutually exclusive")
+        if not callable(getattr(fk_resampler, "resample", None)):
+            raise TypeError("fk_resampler must provide a resample(...) method")
+        if any(
+            not math.isfinite(value) or value <= float(start_t) or value >= 1.0
+            for value in requested_fk_times
+        ):
+            raise ValueError("FK resample times must lie strictly inside (start_t, 1)")
+        if any(right <= left for left, right in zip(requested_fk_times, requested_fk_times[1:])):
+            raise ValueError("FK resample times must be strictly increasing")
+        if (
+            not math.isfinite(fk_resample_trans_sigma)
+            or not math.isfinite(fk_resample_rot_sigma)
+            or fk_resample_trans_sigma < 0.0
+            or fk_resample_rot_sigma < 0.0
+        ):
+            raise ValueError("FK post-resampling jitter scales must be finite and non-negative")
+        if translation_sde_enabled and (
+            fk_resample_trans_sigma != 0.0 or fk_resample_rot_sigma != 0.0
+        ):
+            raise ValueError(
+                "score-corrected translation SDE cannot be combined with heuristic FK jitter"
+            )
+
     n_frags = int(meta["num_frag"])
     pocket_center = meta["pocket_center"]
     frag_sizes = lig_data["frag_sizes"]
@@ -333,6 +477,13 @@ def sample_unified(
             )
     else:
         sigma_per_sample = torch.full((B,), float(translation_sigma), dtype=torch.float32)
+    if translation_sde_enabled and (
+        not bool(torch.isfinite(sigma_per_sample).all())
+        or bool((sigma_per_sample <= 0.0).any())
+    ):
+        raise ValueError(
+            "score-corrected translation SDE requires finite positive translation priors"
+        )
     sigma_per_frag = sigma_per_sample.repeat_interleave(n_frags)  # [B * n_frags]
 
     # Prior translations (CPU sampling preserves the sequential RNG stream),
@@ -369,6 +520,29 @@ def sample_unified(
         dtype=torch.float32,
     )
     time_grid = float(start_t) + (1.0 - float(start_t)) * base_time_grid
+    fk_step_schedule: dict[int, float] = {}
+    for requested_time in requested_fk_times:
+        resolved_step = next(
+            (
+                index
+                for index in range(1, num_steps)
+                if float(time_grid[index].item()) >= requested_time
+            ),
+            None,
+        )
+        if resolved_step is None:
+            raise ValueError(
+                f"FK resample time {requested_time:g} has no integration-grid state before t=1"
+            )
+        if resolved_step in fk_step_schedule:
+            previous = fk_step_schedule[resolved_step]
+            raise ValueError(
+                f"FK resample times {previous:g} and {requested_time:g} resolve "
+                f"to the same integration step at t={float(time_grid[resolved_step]):g}"
+            )
+        fk_step_schedule[resolved_step] = requested_time
+    if fk_enabled and callable(getattr(fk_resampler, "reset", None)):
+        fk_resampler.reset()
 
     frag_start, frag_end = graph["lig_frag_slice"][0].item(), graph["lig_frag_slice"][1].item()
     atom_start = graph["lig_atom_slice"][0].item()
@@ -386,6 +560,17 @@ def sample_unified(
 
     traj_frames: list[Tensor] = []
     traj_times: list[float] = []
+    initial_sample_index = torch.arange(B, device=device, dtype=torch.long)
+
+    def validated_source_indices(source, *, label: str) -> Tensor:
+        source_idx = torch.as_tensor(source, device=device, dtype=torch.long).view(-1)
+        if source_idx.numel() != B:
+            raise ValueError(
+                f"{label} must return one source index per sample ({B}), got {source_idx.numel()}"
+            )
+        if int(source_idx.min().item()) < 0 or int(source_idx.max().item()) >= B:
+            raise ValueError(f"{label} returned out-of-range source indices")
+        return source_idx
 
     for step_idx in range(num_steps):
         t = time_grid[step_idx]
@@ -440,17 +625,133 @@ def sample_unified(
         else:
             omega_use = out["omega_pred"]
 
+        t_next = float(time_grid[step_idx + 1].item())
+
+        requested_fk_time = fk_step_schedule.get(step_idx)
+        if requested_fk_time is not None:
+            endpoint_horizon = 1.0 - float(t.item())
+            terminal_T, terminal_q = integrate_se3_step(
+                T_flat,
+                q_flat,
+                v_use,
+                omega_use,
+                endpoint_horizon,
+                frag_sizes=frag_sizes_flat,
+            )
+            terminal_R = quaternion_to_matrix(terminal_q)
+            terminal_atom_pos = (
+                torch.einsum(
+                    "nij,nj->ni",
+                    terminal_R[frag_id_flat],
+                    local_pos_d.repeat(B, 1),
+                )
+                + terminal_T[frag_id_flat]
+            ).view(B, n_real_atoms, 3)
+            with torch.no_grad():
+                source_idx = fk_resampler.resample(
+                    terminal_atom_pos.detach(),
+                    prior_sigma=prior_sigma_d.detach(),
+                    requested_time=requested_fk_time,
+                    actual_time=float(t.item()),
+                )
+            source_idx = validated_source_indices(
+                source_idx,
+                label="fk_resampler.resample",
+            )
+            T_state = T_flat.view(B, n_frags, 3).index_select(0, source_idx).contiguous()
+            q_state = q_flat.view(B, n_frags, 4).index_select(0, source_idx).contiguous()
+            v_use = (v_use.view(B, n_frags, 3).index_select(0, source_idx).contiguous()).view(
+                B * n_frags, 3
+            )
+            omega_use = (
+                omega_use.view(B, n_frags, 3).index_select(0, source_idx).contiguous()
+            ).view(B * n_frags, 3)
+            if fk_resample_trans_sigma > 0.0:
+                T_state = T_state + float(fk_resample_trans_sigma) * torch.randn_like(T_state)
+            if fk_resample_rot_sigma > 0.0:
+                rot_noise = float(fk_resample_rot_sigma) * torch.randn(
+                    q_state.shape[:-1] + (3,),
+                    device=device,
+                    dtype=q_state.dtype,
+                )
+                dq = axis_angle_to_quaternion(rot_noise)
+                q_state = standardize_quaternion(
+                    quaternion_multiply(dq, q_state),
+                    reference=q_state,
+                )
+            T_flat = T_state.view(B * n_frags, 3)
+            q_flat = q_state.view(B * n_frags, 4)
+            source_cpu = source_idx.cpu()
+            sigma_per_sample = sigma_per_sample.index_select(0, source_cpu).contiguous()
+            sigma_per_frag = sigma_per_sample.repeat_interleave(n_frags)
+            prior_sigma_d = sigma_per_sample.to(device)
+            initial_sample_index = initial_sample_index.index_select(0, source_idx)
+            if save_traj:
+                traj_frames = [
+                    frame.index_select(0, source_cpu).contiguous() for frame in traj_frames
+                ]
+
+        # Direct normalized GuidanceEnergy drift.  The callback receives the
+        # objective-converted learned field, maps both learned and physical
+        # fragment velocities into atom-velocity space, and returns the actual
+        # (already strength-scaled) correction.  The normal SE(3) integrator
+        # below applies dt exactly once.
+        if (
+            guidance_fn is not None
+            and guidance_scale != 0.0
+            and guidance_direct_drift
+            and t_next > guidance_min_t
+        ):
+            v_g, omega_g = guidance_fn.direct_velocity(
+                atom_pos_flat.detach(),
+                T_flat.detach(),
+                v_use.detach(),
+                omega_use.detach(),
+                frag_sizes_flat,
+                t_start=float(t.item()),
+                t_end=t_next,
+                strength=float(guidance_scale),
+            )
+            v_use = v_use + v_g
+            omega_use = omega_use + omega_g
+
         # Physical guidance: nudge (v, omega) along -grad of an energy on the
         # current atom positions (e.g. PL-clash repulsion). guidance_fn returns
         # per-fragment (v_guide, omega_guide) already aggregated (Newton-Euler).
-        if guidance_fn is not None and guidance_scale != 0.0 and t.item() >= guidance_min_t:
+        if (
+            guidance_fn is not None
+            and guidance_scale != 0.0
+            and not guidance_operator_split
+            and not guidance_direct_drift
+            and t.item() >= guidance_min_t
+        ):
             v_g, omega_g = guidance_fn(
                 atom_pos_flat.detach(), frag_id_flat, T_flat.detach(), t.item()
             )
             v_use = v_use + guidance_scale * v_g
             omega_use = omega_use + guidance_scale * omega_g
 
-        if stochastic_gamma > 0.0 and t.item() < 1.0:
+        if translation_sde_enabled:
+            diffusion_sigma = float(translation_sde_base_sigma) * (1.0 - float(t.item()))
+            prior_sigma_flat = sigma_per_frag.to(device=device, dtype=v_use.dtype).view(-1, 1)
+            v_use = score_corrected_translation_drift(
+                T_flat,
+                v_use,
+                t,
+                prior_sigma_flat,
+                diffusion_sigma,
+            )
+            noise_velocity_scale = diffusion_sigma / math.sqrt(max(float(dt.item()), 1e-12))
+            translation_noise = torch.randn(
+                v_use.shape,
+                device=v_use.device,
+                dtype=v_use.dtype,
+                generator=translation_sde_generator,
+            )
+            v_use = v_use + noise_velocity_scale * translation_noise
+            if not bool(torch.isfinite(v_use).all()):
+                raise FloatingPointError("score-corrected translation SDE produced non-finite drift")
+        elif stochastic_gamma > 0.0 and t.item() < 1.0:
             # Annealed Langevin correction: perturb velocity by γ·√((1-t)/dt)·N(0,I).
             # The 1/√dt normalization makes the noise kick size γ·√((1-t)·dt) once
             # integrated over ``dt`` via the Euler step below — matching the standard
@@ -467,7 +768,22 @@ def sample_unified(
             dt,
             frag_sizes=frag_sizes_flat,
         )
-        t_next = float(time_grid[step_idx + 1].item())
+        if (
+            guidance_fn is not None
+            and guidance_scale != 0.0
+            and guidance_operator_split
+            and t_next >= guidance_min_t
+        ):
+            T_flat, q_flat = guidance_fn.correct(
+                T_flat,
+                q_flat,
+                local_pos_d,
+                frag_id_d,
+                frag_sizes_flat,
+                dt=dt,
+                t=t_next,
+                scale=guidance_scale,
+            )
 
         while (
             particle_resample_fn is not None
@@ -487,14 +803,10 @@ def sample_unified(
                     prior_sigma_d.detach(),
                     resample_times[resample_idx],
                 )
-            source_idx = torch.as_tensor(source_idx, device=device, dtype=torch.long).view(-1)
-            if source_idx.numel() != B:
-                raise ValueError(
-                    "particle_resample_fn must return one source index per sample "
-                    f"({B}), got {source_idx.numel()}"
-                )
-            if int(source_idx.min().item()) < 0 or int(source_idx.max().item()) >= B:
-                raise ValueError("particle_resample_fn returned out-of-range source indices")
+            source_idx = validated_source_indices(
+                source_idx,
+                label="particle_resample_fn",
+            )
             T_state = T_flat.view(B, n_frags, 3).index_select(0, source_idx).contiguous()
             q_state = q_flat.view(B, n_frags, 4).index_select(0, source_idx).contiguous()
             if particle_resample_trans_sigma > 0.0:
@@ -514,6 +826,12 @@ def sample_unified(
             sigma_per_sample = sigma_per_sample.index_select(0, source_idx.cpu()).contiguous()
             sigma_per_frag = sigma_per_sample.repeat_interleave(n_frags)
             prior_sigma_d = sigma_per_sample.to(device)
+            initial_sample_index = initial_sample_index.index_select(0, source_idx)
+            if save_traj:
+                source_cpu = source_idx.cpu()
+                traj_frames = [
+                    frame.index_select(0, source_cpu).contiguous() for frame in traj_frames
+                ]
             resample_idx += 1
 
     R_final = quaternion_to_matrix(q_flat)
@@ -531,12 +849,14 @@ def sample_unified(
     T_final = T_flat.view(B, n_frags, 3).detach().cpu()
     q_final = q_flat.view(B, n_frags, 4).detach().cpu()
     sigma_final = sigma_per_sample.detach().cpu()
+    initial_sample_index_final = initial_sample_index.detach().cpu()
     for i in range(B):
         res: dict[str, Tensor] = {
             "atom_pos_pred": final_per_sample[i],
             "T_frag": T_final[i],
             "q_frag": q_final[i],
             "prior_sigma": sigma_final[i],
+            "initial_sample_index": initial_sample_index_final[i],
         }
         if save_traj:
             res["traj"] = [frame[i] for frame in traj_frames]
@@ -559,12 +879,20 @@ def sample_unified_multi_sigma(
     device: torch.device = torch.device("cpu"),
     save_traj: bool = False,
     stochastic_gamma: float = 0.0,
+    translation_sde_base_sigma: float = 0.0,
+    translation_sde_generator: torch.Generator | None = None,
     pose_objective: str = "linear_fm",
     score_rot_sigma_max: float = 3.141592653589793,
     score_alpha_min: float = 0.0,
     guidance_fn=None,
     guidance_scale: float = 0.0,
     guidance_min_t: float = 0.0,
+    guidance_operator_split: bool = False,
+    guidance_direct_drift: bool = False,
+    fk_resample_times: list[float] | tuple[float, ...] | None = None,
+    fk_resampler=None,
+    fk_resample_trans_sigma: float = 0.0,
+    fk_resample_rot_sigma: float = 0.0,
     particle_resample_times: list[float] | tuple[float, ...] | None = None,
     particle_resample_fn=None,
     particle_resample_trans_sigma: float = 0.0,
@@ -626,12 +954,20 @@ def sample_unified_multi_sigma(
         device=device,
         save_traj=save_traj,
         stochastic_gamma=stochastic_gamma,
+        translation_sde_base_sigma=translation_sde_base_sigma,
+        translation_sde_generator=translation_sde_generator,
         pose_objective=pose_objective,
         score_rot_sigma_max=score_rot_sigma_max,
         score_alpha_min=score_alpha_min,
         guidance_fn=guidance_fn,
         guidance_scale=guidance_scale,
         guidance_min_t=guidance_min_t,
+        guidance_operator_split=guidance_operator_split,
+        guidance_direct_drift=guidance_direct_drift,
+        fk_resample_times=fk_resample_times,
+        fk_resampler=fk_resampler,
+        fk_resample_trans_sigma=fk_resample_trans_sigma,
+        fk_resample_rot_sigma=fk_resample_rot_sigma,
         particle_resample_times=particle_resample_times,
         particle_resample_fn=particle_resample_fn,
         particle_resample_trans_sigma=particle_resample_trans_sigma,
@@ -660,6 +996,10 @@ def parse_sigma_list(spec: str | None, num_samples: int) -> tuple[list[float], l
             s, n = part.split(":")
             sigmas.append(float(s.strip()))
             counts.append(int(n.strip()))
+        if sum(counts) != num_samples:
+            raise ValueError(
+                f"explicit sigma counts must sum to num_samples ({sum(counts)} != {num_samples})"
+            )
     else:
         sigmas = [float(s.strip()) for s in spec.split(",")]
         # Distribute num_samples ≈ evenly (last bucket absorbs remainder).

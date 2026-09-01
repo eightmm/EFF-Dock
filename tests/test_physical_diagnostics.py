@@ -1340,8 +1340,8 @@ def test_trace_shell_includes_crystal_perturbation_coordinates(tmp_path) -> None
     )
     report = trace_physical.build_trace_report(args)
 
-    assert report["schema_version"] == "effdock.guidance_trace.v4"
-    assert report["protocol_id"] == "EFFDOCK-GUIDANCE-DIAGNOSTIC-V4"
+    assert report["schema_version"] == "effdock.guidance_trace.v6"
+    assert report["protocol_id"] == "EFFDOCK-GUIDANCE-DIAGNOSTIC-V5"
     assert report["system"]["protein_shell_heavy_atoms"] == 2
     assert report["system"]["term_counts"]["protein_ligand_pairs"] == 8
     assert report["system"]["topology_reference_sha256"]

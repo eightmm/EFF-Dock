@@ -1,0 +1,4 @@
+# The pinned upstream CLI checks args.filtering_dir although argparse defines
+# args.filtering_model_dir. Hydra-style config loading accepts this compatibility
+# alias before that check; model and checkpoint paths still come from CLI flags.
+filtering_dir: compatibility_alias_for_filtering_model_dir

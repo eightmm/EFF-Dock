@@ -1,5 +1,5 @@
-# Confidence training on PLINDER pose shards matched to the current external
-# benchmark sampling preset: N80/S25, sigma=0.5, pocket_cutoff=10, no local
+# Confidence training on PLINDER pose shards matched to the retained extmatch
+# training preset: N80/S25, sigma=0.5, pocket_cutoff=10, no local
 # resampling. This isolates confidence distribution shift from architecture
 # changes.
 

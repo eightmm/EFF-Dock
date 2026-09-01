@@ -39,6 +39,91 @@ from effdock.preprocess.graph import build_static_complex_graph
 
 _INDEX_VERSION = 1
 
+_TIME_DISTRIBUTIONS = {
+    "uniform",
+    "logit_normal",
+    "mixture",
+    "simplefold",
+    "simplefold_early_replay",
+}
+_DEFAULT_EARLY_REPLAY_WEIGHTS = (0.80, 0.10, 0.10)
+_DEFAULT_EARLY_REPLAY_MAX_TIME = 0.30
+
+
+def _sample_simplefold_time(
+    *, generator: torch.Generator | None, dtype: torch.dtype
+) -> float:
+    """Sample the retained SimpleFold-style late-biased time distribution."""
+    if torch.rand(1, generator=generator).item() < 0.02:
+        return torch.rand(1, generator=generator).item()
+    z = torch.randn(1, generator=generator, dtype=dtype).item()
+    return 1.0 / (1.0 + math.exp(-(0.8 + 1.7 * z)))
+
+
+def sample_flow_time(
+    distribution: str,
+    *,
+    generator: torch.Generator | None = None,
+    dtype: torch.dtype = torch.float32,
+    early_replay_weights: tuple[float, float, float] = _DEFAULT_EARLY_REPLAY_WEIGHTS,
+    early_replay_max_time: float = _DEFAULT_EARLY_REPLAY_MAX_TIME,
+) -> float:
+    """Sample one flow time, including the early-replay fine-tuning mixture.
+
+    ``simplefold_early_replay`` interprets its three weights as
+    ``(simplefold, uniform_early, exact_zero)``.  The exact-zero component
+    trains the first inference model call directly; replaying the retained
+    SimpleFold distribution protects the late-time field from short-fine-tune
+    forgetting.
+    """
+    name = (distribution or "simplefold").lower()
+    if name not in _TIME_DISTRIBUTIONS:
+        choices = ", ".join(sorted(_TIME_DISTRIBUTIONS))
+        raise ValueError(f"unknown time_distribution={distribution!r}; expected one of {choices}")
+
+    if name == "simplefold_early_replay":
+        if len(early_replay_weights) != 3:
+            raise ValueError(
+                "time_early_replay_weights must contain "
+                "(simplefold, uniform_early, exact_zero)"
+            )
+        simplefold_weight, early_weight, zero_weight = (
+            float(value) for value in early_replay_weights
+        )
+        weights = (simplefold_weight, early_weight, zero_weight)
+        if any(not math.isfinite(value) or value < 0.0 for value in weights):
+            raise ValueError("time_early_replay_weights must be finite and non-negative")
+        if not math.isclose(sum(weights), 1.0, rel_tol=0.0, abs_tol=1e-8):
+            raise ValueError("time_early_replay_weights must sum to 1")
+        if (
+            not math.isfinite(early_replay_max_time)
+            or early_replay_max_time <= 0.0
+            or early_replay_max_time > 1.0
+        ):
+            raise ValueError("time_early_replay_max must lie in (0, 1]")
+
+        component = torch.rand(1, generator=generator).item()
+        if component < zero_weight:
+            return 0.0
+        if component < zero_weight + early_weight:
+            return torch.rand(1, generator=generator).item() * early_replay_max_time
+        return _sample_simplefold_time(generator=generator, dtype=dtype)
+
+    if name == "simplefold":
+        return _sample_simplefold_time(generator=generator, dtype=dtype)
+    if name == "logit_normal":
+        z = torch.randn(1, generator=generator, dtype=dtype).item()
+        return 1.0 / (1.0 + math.exp(-z))
+    if name == "mixture":
+        component = torch.rand(1, generator=generator).item()
+        if component < 0.7:
+            z = torch.randn(1, generator=generator, dtype=dtype).item()
+            return 1.0 / (1.0 + math.exp(-z))
+        if component < 0.8:
+            return 0.02 + torch.rand(1, generator=generator).item() * (0.20 - 0.02)
+        return 0.75 + torch.rand(1, generator=generator).item() * (0.98 - 0.75)
+    return torch.rand(1, generator=generator).item()
+
 
 def _load_sample_metadata(path: Path) -> tuple[int, int, int, int, int]:
     meta = torch.load(path, map_location="cpu", weights_only=True)
@@ -458,7 +543,12 @@ class EFFDockDataset(Dataset):
         #   "uniform"      — Lipman et al. 2023 baseline (flat)
         #   "logit_normal" — SD3-style (peaked at t≈0.5)
         #   "mixture"      — 70 % logit-normal + 10 % U[0.02,0.20] + 20 % U[0.75,0.98]
+        #   "simplefold_early_replay" — configurable SimpleFold replay +
+        #       U[0, early_max] + an exact t=0 point mass.
         time_distribution: str = "simplefold",
+        time_early_replay_weights: tuple[float, float, float]
+        | list[float] = _DEFAULT_EARLY_REPLAY_WEIGHTS,
+        time_early_replay_max: float = _DEFAULT_EARLY_REPLAY_MAX_TIME,
         local_refine_prob: float = 0.0,
         local_refine_trans_sigmas: tuple[float, ...] | list[float] | None = None,
         local_refine_trans_weights: tuple[float, ...] | list[float] | None = None,
@@ -505,12 +595,36 @@ class EFFDockDataset(Dataset):
             if any(w < 0 for w in self.prior_sigma_weights) or sum(self.prior_sigma_weights) <= 0:
                 raise ValueError("prior_sigma_weights must be non-negative with positive sum")
         td = (time_distribution or "simplefold").lower()
-        if td not in ("uniform", "logit_normal", "mixture", "simplefold"):
+        if td not in _TIME_DISTRIBUTIONS:
+            choices = ", ".join(sorted(_TIME_DISTRIBUTIONS))
             raise ValueError(
-                f"time_distribution must be 'uniform', 'logit_normal', "
-                f"'mixture' or 'simplefold', got {time_distribution!r}"
+                f"time_distribution must be one of {choices}, got {time_distribution!r}"
             )
         self.time_distribution = td
+        self.time_early_replay_weights = tuple(float(value) for value in time_early_replay_weights)
+        self.time_early_replay_max = float(time_early_replay_max)
+        if self.time_distribution == "simplefold_early_replay":
+            # Validate once during construction without consuming the data RNG.
+            if len(self.time_early_replay_weights) != 3:
+                raise ValueError(
+                    "time_early_replay_weights must contain "
+                    "(simplefold, uniform_early, exact_zero)"
+                )
+            if any(
+                not math.isfinite(value) or value < 0.0
+                for value in self.time_early_replay_weights
+            ):
+                raise ValueError("time_early_replay_weights must be finite and non-negative")
+            if not math.isclose(
+                sum(self.time_early_replay_weights), 1.0, rel_tol=0.0, abs_tol=1e-8
+            ):
+                raise ValueError("time_early_replay_weights must sum to 1")
+            if (
+                not math.isfinite(self.time_early_replay_max)
+                or self.time_early_replay_max <= 0.0
+                or self.time_early_replay_max > 1.0
+            ):
+                raise ValueError("time_early_replay_max must lie in (0, 1]")
         objective = (pose_objective or "linear_fm").lower()
         if objective not in ("linear_fm", "vp_flow", "vp_score", "vp_score_full"):
             raise ValueError(
@@ -731,30 +845,16 @@ class EFFDockDataset(Dataset):
         #   protein-folding paper.
         # "logit_normal" — t = sigmoid(N(0, 1)); SD3-style.
         # "mixture"      — 70 % logit-normal + 10 % U[0.02,0.20] + 20 % U[0.75,0.98].
+        # "simplefold_early_replay" — retained SimpleFold replay plus an
+        #   early interval and exact t=0 samples for short fine-tuning.
         # "uniform"      — t ~ U(0, 1); Lipman et al. 2023 baseline.
-        import math
-
-        if self.time_distribution == "logit_normal":
-            z = torch.randn(1, generator=time_gen, dtype=T_1.dtype).item()
-            t = 1.0 / (1.0 + math.exp(-z))
-        elif self.time_distribution == "mixture":
-            r = torch.rand(1, generator=time_gen).item()
-            if r < 0.7:
-                z = torch.randn(1, generator=time_gen, dtype=T_1.dtype).item()
-                t = 1.0 / (1.0 + math.exp(-z))
-            elif r < 0.8:
-                t = 0.02 + torch.rand(1, generator=time_gen).item() * (0.20 - 0.02)
-            else:
-                t = 0.75 + torch.rand(1, generator=time_gen).item() * (0.98 - 0.75)
-        elif self.time_distribution == "simplefold":
-            r = torch.rand(1, generator=time_gen).item()
-            if r < 0.02:
-                t = torch.rand(1, generator=time_gen).item()
-            else:
-                z = torch.randn(1, generator=time_gen, dtype=T_1.dtype).item()
-                t = 1.0 / (1.0 + math.exp(-(0.8 + 1.7 * z)))
-        else:  # "uniform"
-            t = torch.rand(1, generator=time_gen).item()
+        t = sample_flow_time(
+            self.time_distribution,
+            generator=time_gen,
+            dtype=T_1.dtype,
+            early_replay_weights=self.time_early_replay_weights,
+            early_replay_max_time=self.time_early_replay_max,
+        )
 
         # Per-sample translation prior σ. Range-based sampling lets the model
         # see priors of varying width — at inference we then have one
@@ -1069,4 +1169,4 @@ def effdock_collate(batch: list[dict[str, Tensor]]) -> dict[str, Tensor]:
     return out
 
 
-__all__ = ["EFFDockDataset", "effdock_collate"]
+__all__ = ["EFFDockDataset", "effdock_collate", "sample_flow_time"]

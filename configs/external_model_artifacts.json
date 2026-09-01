@@ -1,10 +1,16 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-08-27",
+  "updated_at": "2026-08-28",
   "artifacts": {
     "sigmadock": {
-      "checkpoint_status": "declared_by_upstream_but_no_github_release_asset_available",
+      "checkpoint_status": "available_official_prerelease",
       "checkpoint_required": true,
+      "checkpoint": {
+        "release": "v0.1.0-beta",
+        "url": "https://github.com/alvaroprat97/sigmadock/releases/download/v0.1.0-beta/sample_checkpoint_0.ckpt",
+        "size": 242097065,
+        "sha256": "db15427ca349e6f1e5f894bff841112c7360384886aa472667d8011307cad382"
+      },
       "gnina": {
         "version": "1.3.2",
         "url": "https://github.com/gnina/gnina/releases/download/v1.3.2/gnina.1.3.2",

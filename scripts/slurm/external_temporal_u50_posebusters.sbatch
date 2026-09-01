@@ -1,0 +1,1 @@
+../../benchmarks/external_models/slurm/external_temporal_u50_posebusters.sbatch

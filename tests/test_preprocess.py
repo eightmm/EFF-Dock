@@ -163,6 +163,13 @@ class TestProteinParsing:
 
 
 class TestLigandParsing:
+    @staticmethod
+    def _conformer_coords(mol: Chem.Mol) -> torch.Tensor:
+        return torch.tensor(
+            mol.GetConformer().GetPositions(),
+            dtype=torch.float64,
+        )
+
     def test_load_molecule_sdf(self, tmp_path: Path):
         mol = _make_mol_manual_coords("c1ccccc1", BENZENE_COORDS)
         sdf_path = tmp_path / "test.sdf"
@@ -173,6 +180,15 @@ class TestLigandParsing:
         assert not used_fallback
         assert sanitize_ok
         assert loaded.GetNumAtoms() == 6
+        docking_mol, has_pose = load_ligand(
+            str(sdf_path),
+            random_seed=2**63 + 17,
+        )
+        assert has_pose
+        torch.testing.assert_close(
+            self._conformer_coords(docking_mol),
+            self._conformer_coords(loaded),
+        )
 
     def test_docking_and_trace_mol2_loaders_have_identity_parity(
         self,
@@ -180,7 +196,10 @@ class TestLigandParsing:
     ):
         mol2_path = tmp_path / "chiral.mol2"
         mol2_path.write_text(CHIRAL_MOL2)
-        docking_mol, has_pose = load_ligand(str(mol2_path))
+        docking_mol, has_pose = load_ligand(
+            str(mol2_path),
+            random_seed=2**63 + 17,
+        )
         trace_mol, _, sanitize_ok = load_molecule(None, mol2_path)
 
         assert has_pose
@@ -194,6 +213,57 @@ class TestLigandParsing:
             trace_mol,
             fragment_id,
         )
+
+    def test_smiles_embedding_is_deterministic_by_default(self):
+        mol_a, has_pose_a = load_ligand("CCCCCCCO")
+        mol_b, has_pose_b = load_ligand("CCCCCCCO")
+
+        assert not has_pose_a
+        assert not has_pose_b
+        torch.testing.assert_close(
+            self._conformer_coords(mol_a),
+            self._conformer_coords(mol_b),
+            rtol=0.0,
+            atol=0.0,
+        )
+
+    def test_smiles_embedding_seed_controls_graph_relevant_geometry(self):
+        mol_a, _ = load_ligand("CCCCCCCO", random_seed=7)
+        mol_b, _ = load_ligand("CCCCCCCO", random_seed=7)
+        mol_c, _ = load_ligand("CCCCCCCO", random_seed=8)
+        mol_wrapped_seed, _ = load_ligand(
+            "CCCCCCCO",
+            random_seed=2**63 + 7,
+        )
+        lig_a = featurize_ligand(mol_a)
+        lig_b = featurize_ligand(mol_b)
+        lig_wrapped_seed = featurize_ligand(mol_wrapped_seed)
+
+        assert lig_a is not None
+        assert lig_b is not None
+        assert lig_wrapped_seed is not None
+        torch.testing.assert_close(
+            lig_a["atom_coords"],
+            lig_b["atom_coords"],
+            rtol=0.0,
+            atol=0.0,
+        )
+        torch.testing.assert_close(
+            lig_a["atom_coords"],
+            lig_wrapped_seed["atom_coords"],
+            rtol=0.0,
+            atol=0.0,
+        )
+
+        distances_a = torch.cdist(
+            self._conformer_coords(mol_a),
+            self._conformer_coords(mol_a),
+        )
+        distances_c = torch.cdist(
+            self._conformer_coords(mol_c),
+            self._conformer_coords(mol_c),
+        )
+        assert not torch.allclose(distances_a, distances_c, rtol=1e-4, atol=1e-4)
 
     def test_featurize_benzene(self):
         mol = _make_mol_manual_coords("c1ccccc1", BENZENE_COORDS)

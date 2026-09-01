@@ -1,0 +1,92 @@
+model:
+  model_type: unified
+  hidden_dim: 384
+  hidden_vec_dim: 32
+  l2_dim: 16
+  l2o_dim: 16
+  num_layers: 6
+  n_rbf: 32
+  t_emb_dim: 128
+  sh_lmax: 2
+  dropout: 0.1
+  contact_cutoff: 5.0
+
+data:
+  data_dir: data/plinder_processed
+  split_file: data/splits/plinder.json
+  expected_train_samples: 47277
+  expected_val_samples: 1076
+
+  min_atoms: 5
+  max_atoms: 120
+  max_frags: 30
+  min_protein_res: 50
+
+  pocket_cutoff: 8.0
+  pocket_jitter_sigma: 2.0
+  pocket_cutoff_noise: 0.0
+  prior_sigma: 0.5
+  pocket_cutoff_range: [6.0, 12.0]
+  prior_sigma_values: [0.5, 1.0, 2.0, 3.0, 4.0]
+  prior_sigma_weights: [0.10, 0.25, 0.30, 0.25, 0.10]
+  prior_sigma_range: null
+  prior_sigma_log_uniform: true
+
+  # Treatment: move 5% of continuous early mass to exact t=0 while holding
+  # SimpleFold replay (80%) and total explicit early intervention (20%) fixed.
+  time_distribution: simplefold_early_replay
+  time_early_replay_weights: [0.80, 0.05, 0.15]
+  time_early_replay_max: 0.30
+  val_time_distribution: simplefold
+
+  rotation_augmentation: ligand_uniform
+  deterministic: false
+  num_workers: 4
+  receptor_aug_prob: 0.0
+  alt_receptor_root: data/plinder_processed/_alt_proteins
+  alt_receptor_mapping: data/plinder_processed/alt_receptor_mapping.json
+
+training:
+  max_steps: 10000
+  batch_size: 16
+  gradient_accumulation_steps: 1
+  size_aware_batches: true
+  size_aware_bucket_mult: 16
+  size_aware_drop_last: false
+  use_muon: false
+  muon_lr: 0.02
+  lr: 1.0e-5
+  weight_decay: 0.01
+  omega_weight: 8.0
+  atom_aux_weight: 0.3
+  dg_weight: 3.0
+  max_grad_norm: 1.0
+  scheduler_type: warmup_stable_cosine
+  # 500 warmup + 7,500 stable + 2,000 cooldown to 1e-6.
+  warmup_ratio: 0.05
+  cooldown_ratio: 0.20
+  min_lr_ratio: 0.10
+  seed: 42
+  use_ema: true
+  ema_decay: 0.999
+  use_time_weighting: false
+  fail_on_nonfinite: true
+  strict_resume_config: true
+
+logging:
+  use_wandb: false
+  wandb_project: eff-dock
+  wandb_run_name: effdock-t0-dose-treatment-t0p15-10k-v1
+  log_every: 20
+  val_every: 1000
+  rollout_every: 2000
+  eval_on_start: true
+  require_exact_eval_coverage: true
+  rollout_steps: 20
+  rollout_time_schedule: uniform
+  rollout_schedule_power: 1.0
+  rollout_max_samples: 0
+  rollout_progress_every: 64
+  rollout_selection_metric: rollout/success_2A
+  rollout_selection_mode: max
+  output_dir: outputs/eff-dock/early-time-t0-dose-treatment-t0p15-10k-v1-20260814

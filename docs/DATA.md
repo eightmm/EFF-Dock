@@ -3,6 +3,12 @@
 EFF-Dock uses PLINDER 2024-06/v2 complexes. Coordinates are Angstroms and the
 immutable sample key is `<system_id>__<ligand_instance_chain>`.
 
+PLINDER and every external benchmark are third-party datasets and are not
+redistributed by this repository. Users must obtain them from their official
+sources, cite the corresponding dataset publications/releases, and comply with
+their current access and license terms. Apache-2.0 applies to EFF-Dock code and
+released EFF-Dock weights, not to third-party structures or annotations.
+
 ## Local assets
 
 - Curated pool: `data/plinder_pool.parquet` (50,297 rows at migration time).
@@ -22,20 +28,21 @@ features are not silently zero-filled.
 
 `eff-dock data split` intersects the pool with successfully processed samples,
 canonicalizes ligands with RDKit, strictly removes canonical SMILES found in
-frozen Astex Diverse and PoseBusters v2 mappings, then groups
-validation by `pocket_fident__70__community`. Train and validation must be
-disjoint on sample key, canonical SMILES, and pocket70 community.
+the frozen external mappings, then groups validation by
+`pocket_fident__70__community`. Train and validation must be disjoint on sample
+key, canonical SMILES, and pocket70 community.
 
-The command intentionally fails until both files exist:
+The command intentionally fails until the two primary mappings exist:
 
 ```text
 data/external_test/astex_smiles.json
 data/external_test/pb_smiles.json
 ```
 
-This prevents an apparently strict split from being generated with an omitted
-benchmark. Every publishable split must record source snapshot hashes, seed,
-counts, exclusions, and preprocessing version in its manifest.
+When present, `phibench_smiles.json`, `foldbench_smiles.json`, and
+`openbind_smiles.json` are also included in the exclusion union. Every
+publishable split must record source snapshot hashes, seed, counts, exclusions,
+and preprocessing version in its manifest.
 
 ## Commands
 

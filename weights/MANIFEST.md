@@ -1,28 +1,31 @@
-# Retained EFF-Dock model artifacts
+# Released EFF-Dock model artifacts
 
-These are the model artifacts promoted into active EFF-Dock. Their historical
-sources remain intact under ignored `outputs/`; the copies here are the stable
-training/inference boundary.
+The two model artifacts under `weights/` are tracked with Git LFS. Their source
+runs remain intact under ignored `outputs/`; this paired stack is the complete
+public training and inference boundary.
 
 | File | Role | SHA-256 |
 |---|---|---|
-| `effdock_legacy_flowfrag_200k_ema.pt` | Portable 200k EMA inference weights | `3ee604ec2338532532fa23a2ae91d0d540322defc32f5e453c8e7e12e389d36a` |
-| `effdock_legacy_flowfrag_200k_resume.pt` | Historical full-state checkpoint; use `--init-from` with the new AdamW baseline | `ec0a5f2f08072a3f6b52b37db83d585d409241b7bf1c13c0ee4d6f854449c734` |
-| `effdock_legacy_flowfrag_small_sigma_best.pt` | Historical small-sigma full-state checkpoint; weights-only migration supported | `10d4384d988aff6dfe0ec8de8a6691b7f1255ead1089a6172bf1ccd4f157ffc2` |
-| `effdock_geometry_ft_100k_best.pt` | Geometry fine-tuned docking checkpoint paired with the extmatch confidence model | `6932fb3ba6ebac770f714453529656a44b8f33cf15119d23c9e675d2d60b36db` |
-| `effdock_confidence_extmatch_n80_s25_step42500.pt` | Selected docking-graph pose-confidence checkpoint; N80/S25/sigma0.5/pocket10 extmatch training distribution | `e31fde6f351284205c78f7a1510002779c43312e94d9f82003d47a14d72bc78f` |
+| `effdock_docking_early_time_t0p10_50k.pt` | Default docking checkpoint; early-time/t=0 replay fine-tune, step 50,000 EMA | `65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6` |
+| `effdock_confidence_s50_raw_refined_u70k.pt` | Default pose-confidence checkpoint; raw+refined sigma-2 training, internally selected U70k | `ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638` |
 
-`--resume` is exact only for checkpoints created with the same EFF-Dock
-optimizer/scheduler layout. Legacy full-state files remain intact, but their
-weights should enter a new baseline through `--init-from`.
+The promoted default is the first two files with N100/S10, translation
+sigma 2.0, a 10A pocket crop, and pure minimum predicted-RMSD ranking. The
+confidence checkpoint was trained and evaluated against hidden features from
+the paired docking checkpoint; mixing it with the older geometry checkpoint
+is outside the promoted contract.
 
-The confidence checkpoint is safely loaded with `weights_only=True` plus the
-explicit `pathlib.PosixPath` allowlist required by its retained argument
-metadata. The hard-pair fine-tunes remain historical because they did not beat
-this step-42500 checkpoint on the frozen validation subset.
+Checkpoint loading is CPU-first with `weights_only=True`. Confidence metadata
+contains `pathlib.PosixPath` values and is loaded with the explicit safe-global
+allowlist in `effdock.confidence.runtime`. Learned key or shape mismatches fail
+explicitly.
 
-The completed S50/sigma-2 symmetry-confidence study produced an internally
-selected U25k checkpoint and a terminal U50k checkpoint, but neither has been
-copied into `weights/` or made a public default. Their immutable output hashes
-and evaluation boundary are recorded in
-`docs/S50_SYMMETRY_CONFIDENCE_RESULTS.md`.
+`--resume` is exact only for checkpoints created with the same optimizer and
+scheduler layout. Historical and intermediate checkpoints are intentionally
+not distributed. Their hashes may remain in frozen experiment protocols,
+while the local files stay in the ignored archive/output store.
+
+See `DOCKING_MODEL_CARD.md` and `CONFIDENCE_MODEL_CARD.md` for intended use,
+selection evidence, external results, and limitations. The EFF-Dock source and
+these two released artifacts are provided under Apache-2.0; third-party data
+and software retain their own terms.
