@@ -3,14 +3,19 @@
 This directory is the public home for benchmark-specific code. Reusable RMSD,
 validity, pose-scoring, and aggregation primitives remain in
 `src/effdock/evaluation` and `src/effdock/workflows`; dataset/model adapters,
-launchers, and paper-figure scripts live here.
+launchers, and result-figure scripts live here.
 
 ```text
 benchmarks/
+├── effdock/               EFF-Dock robustness/evaluation campaigns
 ├── external_models/       model manifests, adapters, runners, evaluators
+│   ├── docs/              protocols, audits, run records
+│   ├── environments/      tracked uv locks; ignored local environments
+│   ├── runtime/           ignored sources, weights, caches, logs
+│   ├── tools/             environment and execution wrappers
 │   └── slurm/             external-model install/inference/evaluation jobs
 ├── figures/               benchmark and presentation figure scripts
-└── results/               compact, claim-bearing public result artifacts
+└── results/               compact public result artifacts
 ```
 
 ## Stable entry points
@@ -20,9 +25,10 @@ benchmarks/
 - External baselines: [`external_models/README.md`](external_models/README.md)
 - Result figures: [`figures/README.md`](figures/README.md)
 
-Raw datasets, generated poses, logs, checkpoints, and model-local upstream
-repositories do not belong here. They remain under ignored `data/`, `outputs/`,
-`external_models/`, and `others/` paths.
+Raw datasets and generated poses remain under ignored `data/` and
+`outputs/benchmarks/` paths. External upstream repositories, weights, caches,
+logs, and installed environments remain under the ignored
+`external_models/runtime/` and `external_models/environments/` subtrees.
 
 ## GitHub release contract
 
@@ -44,8 +50,9 @@ published. They are reproducible runtime material, not benchmark evidence.
 
 ## Compatibility paths
 
-Historical commands and already-submitted Slurm jobs use
+Historical commands and archived Slurm jobs use
 `scripts/external_models`, `scripts/slurm/external_*`, `scripts/figures`, and
-`configs/external_models.json`. These are symlink aliases to the canonical
-files in this directory. Keep them until all archived protocols and external
-automation have migrated; do not create a second copy of an implementation.
+`configs/external_models.json`; local environments may also contain absolute
+`external_models/` or `others/` prefixes. These are symlink aliases to the
+canonical files in this directory. Do not create a second implementation or
+runtime copy.

@@ -13,10 +13,10 @@ from matplotlib.patches import Patch
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_INPUT = (
-    ROOT / "docs/results/external_models/pocket_only_pb_valid_comparison.json"
+    ROOT / "benchmarks/results/external_models/pocket_only_pb_valid_comparison.json"
 )
 DEFAULT_OUTPUT = (
-    ROOT / "docs/results/external_models/pocket_only_pb_valid_comparison.png"
+    ROOT / "benchmarks/results/external_models/pocket_only_pb_valid_comparison.png"
 )
 
 COLORS = {

@@ -8,8 +8,9 @@ if [[ -z "$model" || $# -lt 2 ]]; then
 fi
 shift
 
-repo_root=${EFFDOCK_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}
-model_root="$repo_root/others/$model"
+script_path=$(readlink -f "${BASH_SOURCE[0]}")
+repo_root=${EFFDOCK_REPO_ROOT:-$(cd "$(dirname "$script_path")/../../.." && pwd)}
+model_root="$repo_root/benchmarks/external_models/environments/$model"
 upstream="$model_root/upstream"
 
 [[ -f "$model_root/pyproject.toml" ]] || { echo "unknown model: $model" >&2; exit 2; }

@@ -22,7 +22,8 @@ requires both PB-validity and refined RMSD `<2A`.
 | Astex Diverse | 85 | 69 (81.18%) | 73 (85.88%) | 82 (96.47%) | 80 (94.12%) | 69 (81.18%) |
 | PoseBusters v2 | 308 | 241 (78.25%) | 259 (84.09%) | 295 (95.78%) | 293 (95.13%) | 250 (81.17%) |
 | PhiBench | 203 | 128 (63.05%) | 131 (64.53%) | 179 (88.18%) | 184 (90.64%) | 120 (59.11%) |
-| FoldBench | 66 | 42 (63.64%) | 45 (68.18%) | 58 (87.88%) | 60 (90.91%) | 44 (66.67%) |
+| FoldBench-Pocket full | 558 | 402 (72.04%) | 422 (75.63%) | 513 (91.94%) | 531 (95.16%) | 407 (72.94%) |
+| FoldBench-Pocket post-cutoff | 66 | 45 (68.18%) | 47 (71.21%) | 57 (86.36%) | 59 (89.39%) | 44 (66.67%) |
 | OpenBind | 860 | 422 (49.07%) | 477 (55.47%) | 773 (89.88%) | 848 (98.60%) | 470 (54.65%) |
 
 The following external comparison is restricted to supplied-pocket methods and
@@ -67,6 +68,68 @@ PhiBench and FoldBench are the core temporal checks. OpenBind is an auxiliary
 dense enterovirus 2A-protease series and must not dominate a target-diverse
 aggregate claim.
 
+## Temporal benchmark literature context
+
+These tables expose the relevant published numbers while retaining the input
+and metric contract. PhiBench pocket-prior methods are shown in one contextual
+table. FoldBench cofolding values are kept in a separate reference panel and
+are never EFF-Dock comparison rows.
+The complete source audit and machine-readable rows are in
+[`TEMPORAL_LITERATURE.md`](../benchmarks/results/external_models/TEMPORAL_LITERATURE.md)
+and
+[`temporal_literature.json`](../benchmarks/results/external_models/temporal_literature.json).
+
+### FoldBench protocol matrix
+
+| Contract | EFF-Dock FoldBench-Pocket | FoldBench source-native leaderboard |
+|---|---|---|
+| Prediction task | Holo-receptor redocking | Complete-complex cofolding |
+| Receptor | Experimental holo coordinates supplied | Predicted by the model |
+| Pocket | Crystal pocket supplied | No crystal-pocket input |
+| Selection | U70k confidence Top-1 | Model-native rank |
+| Success endpoint | Symmetry LRMSD `<2A`; separate PB conjunction | LRMSD `<2A` and LDDT-PLI `>0.8` |
+| Directly comparable | No | No |
+
+EFF-Dock's full-558 holo-pocket results are `75.63%` refined Top-1 LRMSD
+success and `72.94%` PB-valid/LRMSD joint success. The separate source-native
+FoldBench cofolding reference panel reports AlphaFold 3 `64.90%`, Boltz-1
+`55.04%`, Chai-1 `51.23%`, HelixFold 3 `51.82%`, Protenix `50.70%`, and
+OpenFold 3 preview `44.49%`. These values must not be sorted together or used
+for a relative performance claim.
+
+### PhiBench context
+
+| Method | Cohort | Pocket prior | Selection/endpoint | RMSD `<2A` | PB-valid + RMSD `<2A` |
+|---|---:|:---:|---|---:|---:|
+| EFF-Dock U70k | Derived 203 | Yes | Refined confidence Top-1 | 64.53% | 59.11% |
+| EFF-Dock U70k | Derived 203 | Yes | Refined confidence Top-5 | 76.85% | 73.89% |
+| PhysDock | Source-native 206 | Yes | Paper pocket-guided endpoint (Top-5) | 83.0% | 77.7% |
+| SurfDock | Source-native 206 | Yes | Paper pocket-guided endpoint (Top-5) | 71.7% | 71.2% |
+| Interformer | Source-native 206 | Yes | Paper pocket-guided endpoint (Top-5) | 68.3% | 63.3% |
+| Uni-Mol Docking V2 | Source-native 206 | Yes | Paper pocket-guided endpoint (Top-5) | 53.3% | 52.2% |
+| DiffDock-L | Source-native 206 | Yes | Paper pocket-guided endpoint (Top-5) | 39.8% | 35.5% |
+| Glide | Source-native 206 | Yes | Paper pocket-guided endpoint (Top-5) | 25.4% | 24.3% |
+| AutoDock Vina | Source-native 206 | Yes | Paper pocket-guided endpoint (Top-5) | 23.7% | 22.7% |
+| DiffDock | Source-native 206 | Yes | Paper pocket-guided endpoint (Top-5) | 30.7% | 25.8% |
+
+The EFF-Dock reconstruction contains 203 rather than 206 systems and uses a
+confidence-ranked Top-1 production endpoint. The added Top-5 row evaluates all
+1,015 ranked poses with PoseBusters and is closer to the paper endpoint, but
+direct performance claims still require one shared manifest and scoring
+contract. The immutable ledger is
+[`phibench_u70k_top5.json`](../benchmarks/results/external_models/phibench_u70k_top5.json).
+
+## Previous fixed-66 FoldBench campaign
+
+The earlier fixed 66-system bank is retained because it used different
+per-complex seeds from the 558-system campaign and is not an interchangeable
+repeat.
+
+| Campaign | N | Raw Top-1 `<2A` | Refined Top-1 `<2A` | Refined oracle `<2A` | PB-valid | Joint |
+|---|---:|---:|---:|---:|---:|---:|
+| Fixed post-cutoff bank | 66 | 42 (63.64%) | 45 (68.18%) | 58 (87.88%) | 60 (90.91%) | 44 (66.67%) |
+| Full-558 post-cutoff slice | 66 | 45 (68.18%) | 47 (71.21%) | 57 (86.36%) | 59 (89.39%) | 44 (66.67%) |
+
 ## Checkpoint selection
 
 U70k was selected only on the fixed 1,035-complex PLINDER validation bank:
@@ -93,7 +156,7 @@ cohort, so the per-dataset result is retained explicitly.
 | Astex Diverse | 73 (85.88%) | 73 (85.88%) | 69 (81.18%) | 69 (81.18%) |
 | PoseBusters v2 | 259 (84.09%) | 259 (84.09%) | 250 (81.17%) | 250 (81.17%) |
 | PhiBench | 132 (65.02%) | 131 (64.53%) | 122 (60.10%) | 120 (59.11%) |
-| FoldBench | 41 (62.12%) | 45 (68.18%) | 40 (60.61%) | 44 (66.67%) |
+| FoldBench fixed-66 bank | 41 (62.12%) | 45 (68.18%) | 40 (60.61%) | 44 (66.67%) |
 | OpenBind | 445 (51.74%) | 477 (55.47%) | 438 (50.93%) | 470 (54.65%) |
 
 The justified claim is that raw+refined training preserves Astex and

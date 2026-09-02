@@ -47,8 +47,14 @@ refinement. `Joint` additionally requires official PoseBusters validity.
 | Astex Diverse | 85 | 81.18% | 85.88% | 94.12% | 81.18% |
 | PoseBusters v2 | 308 | 78.25% | 84.09% | 95.13% | 81.17% |
 | PhiBench | 203 | 63.05% | 64.53% | 90.64% | 59.11% |
-| FoldBench | 66 | 63.64% | 68.18% | 90.91% | 66.67% |
+| FoldBench-Pocket full | 558 | 72.04% | 75.63% | 95.16% | 72.94% |
+| FoldBench-Pocket post-cutoff | 66 | 68.18% | 71.21% | 89.39% | 66.67% |
 | OpenBind | 860 | 49.07% | 55.47% | 98.60% | 54.65% |
+
+As a separately reported endpoint-aligned PhiBench diagnostic, confidence
+Top-5 reaches `156/203` (`76.85%`) refined RMSD success and `150/203`
+(`73.89%`) same-pose PB-valid/RMSD joint success. This does not change the
+production Top-1 selector.
 
 U70k was not chosen from these external results. The cohorts had already been
 used during development, so the figures are descriptive. PhiBench and
@@ -69,7 +75,9 @@ silently performs refinement.
 Exact protocols and paired comparisons are in
 `docs/S50_RAW_REFINED_CONFIDENCE_100K_PROTOCOL.md`,
 `docs/S50_RAW_REFINED_CONFIDENCE_EXTERNAL_RESULTS.md`, and
-`docs/S50_RAW_REFINED_CONFIDENCE_TEMPORAL_EXTERNAL_RESULTS.md`.
+`docs/S50_RAW_REFINED_CONFIDENCE_TEMPORAL_EXTERNAL_RESULTS.md`. The current
+cross-model and Top-5 context is in `docs/BENCHMARK_RESULTS.md` and
+`benchmarks/results/external_models/phibench_u70k_top5.json`.
 
 This checkpoint is released together with the paired docking checkpoint under
 Apache-2.0. See `DOCKING_MODEL_CARD.md` and `MANIFEST.md` for the complete

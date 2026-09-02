@@ -1,13 +1,12 @@
 # EFF-Dock documentation
 
-This directory contains the public method contract, paper evidence, and
+This directory contains the public method contract, result evidence, and
 reproducibility records. Start with the short documents below; detailed
 protocols are retained as supporting evidence rather than as the primary user
 interface.
 
 ## Start here
 
-- [`PAPER_EVIDENCE.md`](PAPER_EVIDENCE.md): claim-to-evidence map for the paper.
 - [`MODEL.md`](MODEL.md): architecture, objectives, sampler, and confidence model.
 - [`DATA.md`](DATA.md): PLINDER processing, split, and leakage controls.
 - [`EVALUATION.md`](EVALUATION.md): RMSD, validity, ranking, and refinement definitions.
@@ -17,7 +16,7 @@ interface.
 
 ## Released-model evidence
 
-The paper's main model path is documented by:
+The released model path is documented by:
 
 1. [`EARLY_TIME_FINE_TUNE_50K_PROTOCOL.md`](EARLY_TIME_FINE_TUNE_50K_PROTOCOL.md)
    for the docking-model intervention and internal endpoint;
@@ -48,8 +47,8 @@ The paper's main model path is documented by:
   `GUIDANCE_SDF_POST_REFINEMENT_RESULTS.md` and
   `S50_REFINEMENT_BUDGET_CALIBRATION_PROTOCOL.md`.
 - External methods:
-  `EXTERNAL_MODEL_OFFICIAL_INFERENCE_PROTOCOL.md` and
-  `EXTERNAL_MODEL_EXECUTED_RMSD_RESULTS.md`.
+  `../benchmarks/external_models/docs/EXTERNAL_MODEL_OFFICIAL_INFERENCE_PROTOCOL.md`
+  and `../benchmarks/external_models/docs/EXTERNAL_MODEL_EXECUTED_RMSD_RESULTS.md`.
 
 ## Diagnostic-only studies
 

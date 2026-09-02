@@ -106,7 +106,7 @@
       {
         "package": "Reduce, obrms, and compiler runtimes",
         "resolved_distribution": "model-local native artifacts",
-        "reason": "uv owns the Python environment while non-Python tools and their ABI-specific libraries are isolated below others/interformer/bin"
+        "reason": "uv owns the Python environment while non-Python tools and their ABI-specific libraries are isolated below benchmarks/external_models/environments/interformer/bin"
       }
     ],
     "posebench-diffdock": [
@@ -213,7 +213,7 @@
       {
         "upstream_field": "precomputed_arrays environment variable",
         "declared_cli_field": "none",
-        "resolution": "store generated SO(3) and torsion lookup arrays in others/surfdock/.cache/precomputed_arrays",
+        "resolution": "store generated SO(3) and torsion lookup arrays in benchmarks/external_models/environments/surfdock/.cache/precomputed_arrays",
         "reason": "the released diffusion utilities require this variable during import but do not initialize it"
       }
     ],

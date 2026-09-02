@@ -40,7 +40,7 @@ def test_primary_comparison_is_supplied_pocket_only() -> None:
 
 def test_public_u70k_figure_source_has_exact_full_denominator_rates() -> None:
     source = json.loads(
-        (ROOT / "docs/results/external_models/effdock_u70k_benchmark.json").read_text()
+        (ROOT / "benchmarks/results/external_models/effdock_u70k_benchmark.json").read_text()
     )
 
     assert source["comparison_scope"] == "supplied_pocket_only"
@@ -58,6 +58,96 @@ def test_public_u70k_figure_source_has_exact_full_denominator_rates() -> None:
             assert abs(row["pct"] - 100.0 * row["count"] / expected_n) < 1e-12
 
 
+def test_public_foldbench_558_ledger_has_exact_rates_and_claim_boundary() -> None:
+    source = json.loads(
+        (ROOT / "benchmarks/results/external_models/foldbench_pocket_558.json").read_text()
+    )
+
+    assert source["comparison_scope"] == "holo_receptor_crystal_pocket_redocking"
+    assert source["directly_comparable_to_foldbench_source_native"] is False
+    for dataset in source["slices"].values():
+        denominator = dataset["n"]
+        for metric in (
+            "raw_top1_lt2",
+            "refined_top1_lt2",
+            "refined_oracle_lt2",
+            "refined_pb_valid",
+            "refined_joint_lt2_pb_valid",
+        ):
+            row = dataset[metric]
+            assert abs(row["pct"] - 100.0 * row["count"] / denominator) < 1e-12
+
+
+def test_public_phibench_top5_ledger_has_exact_rates_and_claim_boundary() -> None:
+    source = json.loads(
+        (ROOT / "benchmarks/results/external_models/phibench_u70k_top5.json").read_text()
+    )
+
+    assert source["comparison_scope"] == "holo_receptor_crystal_pocket_redocking"
+    assert source["directly_comparable_to_phibench_source_native"] is False
+    results = source["results"]
+    assert results["n"] == 203
+    for metric, row in results.items():
+        if metric == "n":
+            continue
+        assert abs(row["pct"] - 100.0 * row["count"] / results["n"]) < 1e-12
+    assert results["refined_top1_lt2"]["count"] == 131
+    assert results["refined_top5_lt2"]["count"] == 156
+    assert results["refined_top1_joint_lt2_pb_valid"]["count"] == 120
+    assert results["refined_top5_joint_lt2_pb_valid"]["count"] == 150
+
+
+def test_temporal_comparison_views_are_explicitly_non_rankable() -> None:
+    source = json.loads(
+        (ROOT / "benchmarks/results/external_models/temporal_literature.json").read_text()
+    )
+
+    comparison = source["comparison_views"]
+    assert comparison["direct_ranking_permitted"] is False
+    assert comparison["foldbench_protocol_matrix"]["directly_comparable"] is False
+    assert all(
+        row["directly_comparable"] is False
+        for row in comparison["phibench_pocket_guided"]
+    )
+
+    public = json.loads(
+        (ROOT / "benchmarks/results/external_models/foldbench_pocket_558.json").read_text()
+    )
+    matrix = comparison["foldbench_protocol_matrix"]
+    assert matrix["effdock_panel"]["endpoints"][
+        "refined_symmetry_lrmsd_lt_2_pct"
+    ] == public["slices"]["all_558"]["refined_top1_lt2"]["pct"]
+
+    phibench_public = json.loads(
+        (ROOT / "benchmarks/results/external_models/phibench_u70k_top5.json").read_text()
+    )
+    top5 = next(
+        row
+        for row in comparison["phibench_pocket_guided"]
+        if row["method"] == "EFF-Dock U70k"
+        and row["endpoint"] == "refined confidence Top-5"
+    )
+    assert top5["rmsd_lt_2_pct"] == phibench_public["results"]["refined_top5_lt2"][
+        "pct"
+    ]
+    assert top5["joint_pb_valid_pct"] == phibench_public["results"][
+        "refined_top5_joint_lt2_pb_valid"
+    ]["pct"]
+
+    reported = {
+        row["model"]: row["success_pct"]
+        for row in source["foldbench_source_native"]["after_2023_01_full"]
+    }
+    assert reported == {
+        "AlphaFold 3": 64.9,
+        "Boltz-1": 55.04,
+        "Chai-1": 51.23,
+        "HelixFold 3": 51.82,
+        "Protenix": 50.7,
+        "OpenFold 3 preview": 44.49,
+    }
+
+
 def test_literature_figure_source_keeps_excluded_methods_out_of_values() -> None:
     source = json.loads((ROOT / "docs/LITERATURE_RMSD_COMPARISON.json").read_text())
 
@@ -71,7 +161,7 @@ def test_literature_figure_source_keeps_excluded_methods_out_of_values() -> None
 
 def test_public_executed_reruns_are_exact_three_repeat_aggregates() -> None:
     source = json.loads(
-        (ROOT / "docs/results/external_models/pocket_only_executed_reruns.json").read_text()
+        (ROOT / "benchmarks/results/external_models/pocket_only_executed_reruns.json").read_text()
     )
 
     assert source["comparison_scope"] == "supplied_pocket_only"

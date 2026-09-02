@@ -3,7 +3,7 @@
 Each comparison model owns an isolated uv project:
 
 ```text
-others/<model>/
+benchmarks/external_models/environments/<model>/
 ├── pyproject.toml   # tracked dependency contract
 ├── uv.lock          # tracked resolved Python lock
 ├── .python-version  # tracked interpreter series
@@ -15,24 +15,24 @@ others/<model>/
 ```
 
 The active environment is never shared between models and micromamba is not
-part of this runtime path.  Existing source and weight downloads in the legacy
-`external_models/` archive may be linked into a model workspace without moving
-or deleting them.  The source revision is still checked against
-`configs/external_models.json` before synchronization.
+part of this runtime path. Existing sources and weights under the sibling
+`runtime/` tree are linked into each model workspace. The source revision is
+still checked against `benchmarks/external_models/models.json` before
+synchronization.
 
 Synchronize and verify one model with:
 
 ```bash
-bash scripts/others/sync_model.sh sigmadock
-bash scripts/others/sync_model.sh surfdock
-bash scripts/others/sync_model.sh diffbindfr
-bash scripts/others/sync_model.sh interformer
+bash benchmarks/external_models/tools/sync_model.sh sigmadock
+bash benchmarks/external_models/tools/sync_model.sh surfdock
+bash benchmarks/external_models/tools/sync_model.sh diffbindfr
+bash benchmarks/external_models/tools/sync_model.sh interformer
 ```
 
 Run a command in a synchronized model without touching another environment:
 
 ```bash
-bash scripts/others/run_model.sh interformer python -c \
+bash benchmarks/external_models/tools/run_model.sh interformer python -c \
   'import torch, pyvina_core; print(torch.__version__)'
 ```
 
@@ -41,7 +41,7 @@ Long installations run through `scripts/slurm/others_uv_sync.sbatch` on the
 environments. Interformer's Boost 1.84, Reduce 4.14, and `obrms` runtime are
 also model-local. If no archived copy exists, synchronization downloads the
 exact checksum-pinned native packages and materializes only the required files
-below `others/interformer/bin`.
+below `benchmarks/external_models/environments/interformer/bin`.
 
 SigmaDock uses the official `v0.1.0-beta` checkpoint and GNINA 1.3.2 from the
 ignored legacy artifact cache.  Both artifacts are checksum-verified before

@@ -58,6 +58,7 @@ wandb/
 /benchmarks/external_models/environments/*/bin/
 /benchmarks/external_models/environments/*/logs/
 /benchmarks/external_models/environments/*/state/
+/benchmarks/external_models/environments/logs/
 
 # Model-local external benchmark workspaces.  Keep only reproducible uv
 # manifests and documentation under version control.

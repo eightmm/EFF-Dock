@@ -257,11 +257,12 @@ def test_predicted_receptor_can_use_native_pre_esm_pocket_crop(
 
 
 def test_external_install_recovery_uses_model_local_uv_projects() -> None:
-    sync_script = (ROOT / "scripts/others/sync_model.sh").read_text()
-    runner = (ROOT / "scripts/others/run_model.sh").read_text()
+    tools_root = ROOT / "benchmarks/external_models/tools"
+    sync_script = (tools_root / "sync_model.sh").read_text()
+    runner = (tools_root / "run_model.sh").read_text()
 
     assert "micromamba" not in sync_script
-    assert 'model_root="$repo_root/others/$model"' in sync_script
+    assert 'model_root="$repo_root/benchmarks/external_models/environments/$model"' in sync_script
     assert 'UV_PROJECT_ENVIRONMENT="$model_root/.venv"' in sync_script
     assert 'uv sync --project "$model_root"' in sync_script
     assert 'uv run --project "$model_root" --no-sync' in runner
@@ -274,14 +275,15 @@ def test_external_install_recovery_uses_model_local_uv_projects() -> None:
         "interformer": "3.12",
     }
     for model, python_version in expected_python.items():
-        project_root = ROOT / "others" / model
+        project_root = ROOT / "benchmarks/external_models/environments" / model
         assert (project_root / "pyproject.toml").is_file()
         assert (project_root / ".python-version").read_text().strip() == python_version
 
-    sigmadock = (ROOT / "others/sigmadock/pyproject.toml").read_text()
-    surfdock = (ROOT / "others/surfdock/pyproject.toml").read_text()
-    diffbindfr = (ROOT / "others/diffbindfr/pyproject.toml").read_text()
-    interformer = (ROOT / "others/interformer/pyproject.toml").read_text()
+    environments = ROOT / "benchmarks/external_models/environments"
+    sigmadock = (environments / "sigmadock/pyproject.toml").read_text()
+    surfdock = (environments / "surfdock/pyproject.toml").read_text()
+    diffbindfr = (environments / "diffbindfr/pyproject.toml").read_text()
+    interformer = (environments / "interformer/pyproject.toml").read_text()
     assert '"torch==2.13.0"' in sigmadock
     assert '"torchvision==0.28.0"' in sigmadock
     assert 'name = "pytorch-cu126"' in sigmadock
@@ -294,8 +296,8 @@ def test_external_install_recovery_uses_model_local_uv_projects() -> None:
     assert '"setuptools==80.9.0"' in diffbindfr
     assert '"torch==2.4.0"' in interformer
 
-    interformer_wrapper = ROOT / "scripts/others/interformer_obrms.sh"
-    interformer_bootstrap = ROOT / "scripts/others/bootstrap_interformer_native.py"
+    interformer_wrapper = tools_root / "interformer_obrms.sh"
+    interformer_bootstrap = tools_root / "bootstrap_interformer_native.py"
     assert interformer_wrapper.is_file()
     assert interformer_bootstrap.is_file()
     assert "obrms-lib" in interformer_wrapper.read_text()

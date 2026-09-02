@@ -15,7 +15,6 @@ claims.
   `weights/CONFIDENCE_MODEL_CARD.md`.
 - External results: `BENCHMARK_RESULTS.md` and
   `S50_RAW_REFINED_CONFIDENCE_TEMPORAL_EXTERNAL_RESULTS.md`.
-- Paper claim map: `PAPER_EVIDENCE.md`.
 
 The older entries below are retained as an append-only narrative of negative
 and superseded studies. They do not define the released default.

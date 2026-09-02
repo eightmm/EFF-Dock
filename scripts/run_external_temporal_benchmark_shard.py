@@ -51,20 +51,37 @@ def require_complete(path: Path, protocol_id: str) -> dict[str, Any]:
     return value
 
 
-def source_tag(dataset: str) -> str:
-    return f"effdock-external-temporal-v1-{dataset}-n100-s10-sigma2-eta2"
+def source_tag(
+    dataset: str,
+    *,
+    prefix: str = "effdock-external-temporal-v1",
+    sampling_profile: str = "guided_eta2",
+) -> str:
+    suffix = "eta2" if sampling_profile == "guided_eta2" else "unguided"
+    return f"{prefix}-{dataset}-n100-s10-sigma2-{suffix}"
 
 
 def sampling_paths(
-    root: Path, dataset: str, *, num_shards: int, shard_index: int
+    root: Path,
+    dataset: str,
+    *,
+    num_shards: int,
+    shard_index: int,
+    prefix: str = "effdock-external-temporal-v1",
+    sampling_profile: str = "guided_eta2",
 ) -> tuple[Path, Path]:
-    tag = source_tag(dataset)
+    tag = source_tag(dataset, prefix=prefix, sampling_profile=sampling_profile)
     if num_shards > 1:
         tag += f".shard-{shard_index:03d}-of-{num_shards:03d}"
     return root / f"{tag}.csv", root / f"{tag}.summary.json"
 
 
 def sampling_command(args: argparse.Namespace, sampling_root: Path) -> list[str]:
+    tag = source_tag(
+        args.dataset,
+        prefix=args.run_name_prefix,
+        sampling_profile=args.sampling_profile,
+    )
     command = [
         ".venv/bin/eff-dock",
         "evaluate",
@@ -89,9 +106,9 @@ def sampling_command(args: argparse.Namespace, sampling_root: Path) -> list[str]
         "--output-dir",
         str(sampling_root),
         "--protocol-id",
-        PROTOCOL_ID,
+        args.protocol_id,
         "--run-name",
-        source_tag(args.dataset),
+        tag,
         "--num-samples",
         str(EXPECTED_POSES),
         "--num-steps",
@@ -110,28 +127,6 @@ def sampling_command(args: argparse.Namespace, sampling_root: Path) -> list[str]
         "0",
         "--refine",
         "none",
-        "--unified-guidance-mode",
-        "normalized_drift",
-        "--unified-guidance-scale",
-        "2",
-        "--unified-guidance-receptor-policy",
-        "geometry_only",
-        "--unified-guidance-start-t",
-        "0.5",
-        "--unified-guidance-ramp-power",
-        "1",
-        "--unified-guidance-max-force",
-        "20",
-        "--unified-guidance-max-velocity",
-        "5",
-        "--unified-guidance-max-angular-velocity",
-        "5",
-        "--unified-guidance-max-atom-displacement",
-        "0.25",
-        "--unified-guidance-max-backtracks",
-        "8",
-        "--unified-guidance-protein-shell",
-        "18",
         "--seed",
         "42",
         "--num-shards",
@@ -146,6 +141,33 @@ def sampling_command(args: argparse.Namespace, sampling_root: Path) -> list[str]
         "--eligibility-manifest",
         str(args.dataset_manifest),
     ]
+    if args.sampling_profile == "guided_eta2":
+        command.extend(
+            [
+                "--unified-guidance-mode",
+                "normalized_drift",
+                "--unified-guidance-scale",
+                "2",
+                "--unified-guidance-receptor-policy",
+                "geometry_only",
+                "--unified-guidance-start-t",
+                "0.5",
+                "--unified-guidance-ramp-power",
+                "1",
+                "--unified-guidance-max-force",
+                "20",
+                "--unified-guidance-max-velocity",
+                "5",
+                "--unified-guidance-max-angular-velocity",
+                "5",
+                "--unified-guidance-max-atom-displacement",
+                "0.25",
+                "--unified-guidance-max-backtracks",
+                "8",
+                "--unified-guidance-protein-shell",
+                "18",
+            ]
+        )
     if args.only_id is not None:
         command.extend(("--only-id", args.only_id))
     return command
@@ -160,10 +182,15 @@ def build_shard_manifest(
     output: Path,
 ) -> dict[str, Any]:
     records: list[dict[str, Any]] = []
+    expected_guidance_mode = (
+        "unified_normalized_drift"
+        if args.sampling_profile == "guided_eta2"
+        else "none"
+    )
     for row in rows:
         if int(row["all_poses_count"]) != EXPECTED_POSES:
             raise ValueError(f"{row['id']}: expected {EXPECTED_POSES} saved poses")
-        if row["guidance_mode"] != "unified_normalized_drift":
+        if row["guidance_mode"] != expected_guidance_mode:
             raise ValueError(f"{row['id']}: unexpected guidance mode")
         for path_key, hash_key in (
             ("all_poses_sdf", "all_poses_sdf_sha256"),
@@ -177,7 +204,7 @@ def build_shard_manifest(
             {
                 "dataset": args.dataset,
                 "id": row["id"].lower(),
-                "eta": 2.0,
+                "eta": 2.0 if args.sampling_profile == "guided_eta2" else 0.0,
                 "sigma": 2.0,
                 "pose_path": row["all_poses_sdf"],
                 "pose_sha256": row["all_poses_sdf_sha256"],
@@ -194,12 +221,13 @@ def build_shard_manifest(
         )
     manifest = {
         "schema_version": "effdock.external_temporal_shard_input.v1",
-        "protocol_id": PROTOCOL_ID,
-        "source_protocol_id": PROTOCOL_ID,
+        "protocol_id": args.protocol_id,
+        "source_protocol_id": args.protocol_id,
         "dataset": args.dataset,
         "stage": args.stage,
         "sigma": 2.0,
-        "eta": 2.0,
+        "eta": 2.0 if args.sampling_profile == "guided_eta2" else 0.0,
+        "sampling_profile": args.sampling_profile,
         "num_steps": 10,
         "poses_per_complex": EXPECTED_POSES,
         "expected_dataset_count": args.expected_count,
@@ -233,6 +261,13 @@ def main() -> None:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--docking-checkpoint", type=Path, required=True)
     parser.add_argument("--confidence-checkpoint", type=Path, required=True)
+    parser.add_argument("--protocol-id", default=PROTOCOL_ID)
+    parser.add_argument("--run-name-prefix", default="effdock-external-temporal-v1")
+    parser.add_argument(
+        "--sampling-profile",
+        choices=("guided_eta2", "unguided"),
+        default="guided_eta2",
+    )
     args = parser.parse_args()
     if not 0 <= args.shard_index < args.num_shards:
         raise ValueError("invalid shard index")
@@ -254,8 +289,10 @@ def main() -> None:
             args.dataset,
             num_shards=args.num_shards,
             shard_index=args.shard_index,
+            prefix=args.run_name_prefix,
+            sampling_profile=args.sampling_profile,
         )
-        sampling_summary = require_complete(sampling_summary_path, PROTOCOL_ID)
+        sampling_summary = require_complete(sampling_summary_path, args.protocol_id)
         if int(sampling_summary.get("num_failed", -1)) != 0:
             raise RuntimeError("sampling shard contains failures")
         with csv_path.open(newline="", encoding="utf-8") as handle:
@@ -304,7 +341,7 @@ def main() -> None:
                         "--dataset",
                         args.dataset,
                         "--eta",
-                        "2",
+                        "2" if args.sampling_profile == "guided_eta2" else "0",
                         "--complex-id",
                         complex_id,
                         "--output-dir",
@@ -387,7 +424,7 @@ def main() -> None:
 
         summary = {
             "schema_version": "effdock.external_temporal_shard.v1",
-            "protocol_id": PROTOCOL_ID,
+            "protocol_id": args.protocol_id,
             "status": "complete",
             "stage": args.stage,
             "dataset": args.dataset,
@@ -399,8 +436,12 @@ def main() -> None:
                 "num_samples": EXPECTED_POSES,
                 "num_steps": 10,
                 "sigma": 2.0,
-                "guidance_mode": "normalized_drift",
-                "guidance_eta": 2.0,
+                "guidance_mode": (
+                    "normalized_drift"
+                    if args.sampling_profile == "guided_eta2"
+                    else "none"
+                ),
+                "guidance_eta": 2.0 if args.sampling_profile == "guided_eta2" else 0.0,
             },
             "refinement": {
                 "maximum_steps": 100,

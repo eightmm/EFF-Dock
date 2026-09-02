@@ -631,7 +631,9 @@ def _foldbench_ligand(
     atom_site: dict[str, list[Any]],
     label_asym_id: str,
     ccd_record: dict[str, Any],
-) -> Chem.Mol:
+    *,
+    impute_missing_heavy: bool = False,
+) -> tuple[Chem.Mol, list[str]]:
     rows: dict[str, np.ndarray] = {}
     for index, asym_id in enumerate(atom_site["label_asym_id"]):
         if str(asym_id) != label_asym_id:
@@ -659,15 +661,57 @@ def _foldbench_ligand(
         for name, atom in zip(atom_names, mol.GetAtoms(), strict=True)
         if atom.GetAtomicNum() > 1 and name not in rows
     ]
-    if missing_heavy:
+    if missing_heavy and not impute_missing_heavy:
         raise ValueError(f"FoldBench ligand is missing heavy atoms: {missing_heavy[:8]}")
+    imputed_coordinates: dict[str, np.ndarray] = {}
+    if missing_heavy:
+        if mol.GetNumConformers() != 1:
+            raise ValueError("CCD missing-atom imputation requires one ideal conformer")
+        template = np.asarray(mol.GetConformer().GetPositions(), dtype=float)
+        name_to_index = {name: index for index, name in enumerate(atom_names)}
+        missing_indices = {name_to_index[name] for name in missing_heavy}
+        for missing_name in missing_heavy:
+            missing_index = name_to_index[missing_name]
+            distances = Chem.GetDistanceMatrix(mol)[missing_index]
+            local_indices = [
+                index
+                for index, name in enumerate(atom_names)
+                if index not in missing_indices and name in rows and distances[index] <= 2
+            ]
+            if len(local_indices) < 3:
+                local_indices = [
+                    index
+                    for index, name in enumerate(atom_names)
+                    if index not in missing_indices and name in rows
+                ]
+            if len(local_indices) < 3:
+                raise ValueError(
+                    f"FoldBench ligand cannot impute {missing_name}: fewer than 3 anchors"
+                )
+            source = template[local_indices]
+            target = np.asarray([rows[atom_names[index]] for index in local_indices])
+            source_center = source.mean(axis=0)
+            target_center = target.mean(axis=0)
+            left, _, right_t = np.linalg.svd(
+                (source - source_center).T @ (target - target_center)
+            )
+            rotation = left @ right_t
+            if np.linalg.det(rotation) < 0:
+                left[:, -1] *= -1
+                rotation = left @ right_t
+            imputed_coordinates[missing_name] = (
+                (template[missing_index] - source_center) @ rotation + target_center
+            )
     mol.RemoveAllConformers()
     conformer = Chem.Conformer(mol.GetNumAtoms())
     conformer.Set3D(True)
     for index, atom_name in enumerate(atom_names):
-        conformer.SetAtomPosition(index, rows.get(atom_name, np.zeros(3)).tolist())
+        coordinate = rows.get(atom_name, imputed_coordinates.get(atom_name))
+        if coordinate is None:
+            coordinate = np.zeros(3)
+        conformer.SetAtomPosition(index, coordinate.tolist())
     mol.AddConformer(conformer, assignId=True)
-    return _largest_heavy_fragment(mol)
+    return _largest_heavy_fragment(mol), missing_heavy
 
 
 def _foldbench_protein_pdb(atom_site: dict[str, list[Any]], label_asym_id: str) -> str:
@@ -737,6 +781,19 @@ def select_foldbench_postcut(
     ]
 
 
+def foldbench_complex_id(row: dict[str, str], *, cohort: str) -> str:
+    """Return a stable interface ID without changing the historical subset IDs."""
+    if cohort == "postcut":
+        return _safe_id(row["pdb_id"])
+    if cohort != "full":
+        raise ValueError(f"unsupported FoldBench cohort: {cohort}")
+    ccd_id = row["ligand_id"].strip("()")
+    return _safe_id(
+        f"{row['pdb_id']}__protein-{row['native_chain_id_1']}"
+        f"__ligand-{row['native_chain_id_2']}__ccd-{ccd_id}"
+    )
+
+
 def prepare_foldbench(
     *,
     csv_path: Path,
@@ -750,6 +807,7 @@ def prepare_foldbench(
     manifest_dir: Path,
     refresh_dates: bool,
     verify: bool,
+    cohort: str = "postcut",
 ) -> dict[str, object]:
     import gemmi
 
@@ -761,31 +819,46 @@ def prepare_foldbench(
         rows = list(csv.DictReader(handle))
     pdb_ids = sorted({row["pdb_id"].split("-")[0].lower() for row in rows})
     dates = load_or_fetch_rcsb_dates(pdb_ids, dates_path, refresh=refresh_dates)
-    selected = select_foldbench_postcut(rows, dates)
-    if len({row["pdb_id"] for row in selected}) != len(selected):
-        raise ValueError("FoldBench post-cutoff subset requires interface-qualified IDs")
+    if cohort == "postcut":
+        selected = select_foldbench_postcut(rows, dates)
+        cohort_label = "strict post-2024-06-30 protein-ligand interfaces"
+    elif cohort == "full":
+        selected = rows
+        cohort_label = "all official FoldBench protein-ligand interface rows"
+    else:
+        raise ValueError(f"unsupported FoldBench cohort: {cohort}")
+    selected_ids = [foldbench_complex_id(row, cohort=cohort) for row in selected]
+    if len(set(selected_ids)) != len(selected_ids):
+        raise ValueError(f"FoldBench {cohort} cohort does not have unique interface IDs")
 
     required_ccds = {row["ligand_id"].strip("()") for row in selected}
     fallback_ccds = _ensure_ccd_records(required_ccds, ccd_meta, ccd_cache_dir)
     mapping: dict[str, str] = {}
     records: list[dict[str, object]] = []
     failures: list[dict[str, str]] = []
+    reference_heavy_atom_imputations: dict[str, list[str]] = {}
     dataset_root = output_root / "foldbench"
-    for row in selected:
-        complex_id = _safe_id(row["pdb_id"])
+    for row, complex_id in zip(selected, selected_ids, strict=True):
         cif_path = structure_root / f"{row['pdb_id']}.cif"
         try:
             atom_site = gemmi.cif.read_file(str(cif_path)).sole_block().get_mmcif_category(
                 "_atom_site."
             )
             ccd_id = row["ligand_id"].strip("()")
-            mol = _foldbench_ligand(atom_site, row["native_chain_id_2"], ccd_meta[ccd_id])
+            mol, imputed_atoms = _foldbench_ligand(
+                atom_site,
+                row["native_chain_id_2"],
+                ccd_meta[ccd_id],
+                impute_missing_heavy=cohort == "full",
+            )
             protein = _foldbench_protein_pdb(atom_site, row["native_chain_id_1"])
             complex_dir = dataset_root / complex_id
             complex_dir.mkdir(parents=True, exist_ok=True)
             (complex_dir / f"{complex_id}_protein.pdb").write_text(protein)
             _write_sdf(mol, complex_dir / f"{complex_id}_ligand.sdf")
             mapping[complex_id] = ccd_meta[ccd_id].get("canonical_smiles") or _canonical_smiles(mol)
+            if imputed_atoms:
+                reference_heavy_atom_imputations[complex_id] = imputed_atoms
             pdb_id = row["pdb_id"].split("-")[0].lower()
             records.append(
                 {
@@ -810,7 +883,8 @@ def prepare_foldbench(
     manifest = {
         "schema_version": "effdock.external_benchmark.v1",
         "dataset": "foldbench",
-        "cohort_label": "strict post-2024-06-30 protein-ligand interfaces",
+        "cohort_label": cohort_label,
+        "cohort": cohort,
         "protocol_note": "EFF-Dock pocket-redocking adaptation; not the FoldBench leaderboard protocol",
         "source_verification_performed": verify,
         "source_row_count": len(rows),
@@ -818,6 +892,10 @@ def prepare_foldbench(
         "count": len(records),
         "ids_sha256": _stable_ids_sha256(list(mapping)),
         "failures": failures,
+        "reference_heavy_atom_imputations": reference_heavy_atom_imputations,
+        "reference_heavy_atom_imputation_method": (
+            "local ideal-CCD rigid alignment with all observed heavy-atom coordinates preserved"
+        ),
         "source": {
             "project": "https://github.com/BEAM-Labs/FoldBench",
             "portal": "https://portal.openfold.omsf.io/benchmarks/fold-bench",
@@ -957,6 +1035,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--refresh-rcsb-dates", action="store_true")
     parser.add_argument(
+        "--foldbench-cohort",
+        choices=("postcut", "full"),
+        default="postcut",
+        help="Use the historical temporal subset or all 558 official interface rows.",
+    )
+    parser.add_argument(
         "--skip-source-verification",
         action="store_true",
         help="Skip archive checksums. This also removes the safety boundary around official pickles.",
@@ -996,6 +1080,7 @@ def main(argv: list[str] | None = None) -> None:
             ccd_cache_dir=args.metadata_root / "ccd",
             refresh_dates=args.refresh_rcsb_dates,
             verify=verify,
+            cohort=args.foldbench_cohort,
             **common,
         )
     if "openbind" in datasets:

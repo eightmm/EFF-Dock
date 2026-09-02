@@ -69,13 +69,14 @@ def main() -> None:
     parser.add_argument("--input-root", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--expected-confidence-sha256")
+    parser.add_argument("--protocol-id", default=PROTOCOL_ID)
     args = parser.parse_args()
     if not 0 <= args.shard_index < args.num_shards:
         raise ValueError("invalid shard index")
     shard_name = f"{args.dataset}.shard-{args.shard_index:03d}-of-{args.num_shards:03d}"
     source_summary_path = args.input_root / "full" / "shards" / f"{shard_name}.json"
     source = read_json(source_summary_path)
-    if source.get("protocol_id") != PROTOCOL_ID or source.get("status") != "complete":
+    if source.get("protocol_id") != args.protocol_id or source.get("status") != "complete":
         raise ValueError("external benchmark shard is incomplete")
     records = source.get("records", [])
     if not isinstance(records, list) or not records:
@@ -184,7 +185,7 @@ def main() -> None:
         writer.writerows(results)
     summary = {
         "schema_version": "effdock.external_temporal_posebusters_shard.v1",
-        "protocol_id": PROTOCOL_ID,
+        "protocol_id": args.protocol_id,
         "status": "complete",
         "dataset": args.dataset,
         "num_shards": args.num_shards,

@@ -14,16 +14,16 @@ DEFAULT_PB_ROOT = (
     ROOT / "outputs/external_models/evaluation/official_selected_posebusters_20260901"
 )
 DEFAULT_CLASSICAL = (
-    ROOT / "docs/results/external_models/posebusters_classical_paper_values.json"
+    ROOT / "benchmarks/results/external_models/posebusters_classical_paper_values.json"
 )
 DEFAULT_EXECUTED = (
-    ROOT / "docs/results/external_models/pocket_only_executed_reruns.json"
+    ROOT / "benchmarks/results/external_models/pocket_only_executed_reruns.json"
 )
 DEFAULT_EFFDOCK = (
-    ROOT / "docs/results/external_models/effdock_u70k_benchmark.json"
+    ROOT / "benchmarks/results/external_models/effdock_u70k_benchmark.json"
 )
 DEFAULT_OUTPUT = (
-    ROOT / "docs/results/external_models/pocket_only_pb_valid_comparison.json"
+    ROOT / "benchmarks/results/external_models/pocket_only_pb_valid_comparison.json"
 )
 DATASETS = {
     "astex": ("astex_diverse", 85),

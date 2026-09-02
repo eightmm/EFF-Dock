@@ -33,7 +33,7 @@ when the modified path requires it.
 For repository layout and reproducibility requirements, see
 [`docs/STRUCTURE.md`](docs/STRUCTURE.md),
 [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md), and
-[`docs/PAPER_EVIDENCE.md`](docs/PAPER_EVIDENCE.md).
+[`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md).
 
 Unless explicitly stated otherwise, contributions intentionally submitted to
 EFF-Dock are accepted under the Apache License 2.0.

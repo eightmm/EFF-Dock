@@ -1,0 +1,42 @@
+{
+  "schema_version": "effdock.phibench_u70k_top5_public.v1",
+  "status": "complete_descriptive",
+  "protocol_id": "EFFDOCK-PHIBENCH-U70K-TOP5-V1",
+  "comparison_scope": "holo_receptor_crystal_pocket_redocking",
+  "directly_comparable_to_phibench_source_native": false,
+  "claim_boundary": "Closest available endpoint-aligned PhiBench context, not a direct comparison: EFF-Dock uses a deterministic derived 203-system cohort while the PhysDock source-native panel contains 206 systems.",
+  "source_report": {
+    "path": "outputs/benchmarks/phibench_u70k_top5_runs/265bf5f0906e2e05f6a3dc33967dd7964481195bb02987114173619aa87c977a/report/summary.json",
+    "sha256": "d1786a0566dad98042396ef053f369dcc9d4576aba28baff4d3ae9d4a9ae97b3"
+  },
+  "per_complex_sha256": "bfc5aaff8cf951ce697cdd855a4f6ced8e42f9d55efb1f7e38c4e5d7e51d1631",
+  "stack": {
+    "confidence_checkpoint": "U70k",
+    "confidence_checkpoint_sha256": "ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638",
+    "samples": 100,
+    "ode_steps": 10,
+    "translation_sigma": 2.0,
+    "top_k": 5,
+    "selector": "ascending_predicted_rmsd_stable_pose_index",
+    "refinement": "saved_adaptive_trajectory_max_100_steps"
+  },
+  "metric_contract": {
+    "rmsd": "symmetry-aware ligand heavy-atom RMSD without alignment",
+    "success": "any of the first five ranked poses has RMSD <2 A",
+    "pb_valid": "PoseBusters 0.6.5 redock pass-all validity excluding RMSD",
+    "joint": "the same one of the first five poses is PB-valid and has RMSD <2 A"
+  },
+  "results": {
+    "n": 203,
+    "raw_top1_lt2": {"count": 128, "pct": 63.05418719211823},
+    "raw_top5_lt2": {"count": 152, "pct": 74.8768472906404},
+    "raw_oracle_lt2": {"count": 177, "pct": 87.19211822660098},
+    "refined_top1_lt2": {"count": 131, "pct": 64.5320197044335},
+    "refined_top5_lt2": {"count": 156, "pct": 76.84729064039409},
+    "refined_oracle_lt2": {"count": 179, "pct": 88.17733990147784},
+    "refined_top1_pb_valid": {"count": 184, "pct": 90.64039408866995},
+    "refined_top5_pb_valid": {"count": 196, "pct": 96.55172413793103},
+    "refined_top1_joint_lt2_pb_valid": {"count": 120, "pct": 59.11330049261084},
+    "refined_top5_joint_lt2_pb_valid": {"count": 150, "pct": 73.89162561576354}
+  }
+}

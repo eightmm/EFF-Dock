@@ -7,9 +7,11 @@ if [[ -z "$model" ]]; then
   exit 2
 fi
 
-repo_root=${EFFDOCK_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}
-model_root="$repo_root/others/$model"
-legacy_source="$repo_root/external_models/src/$model"
+script_path=$(readlink -f "${BASH_SOURCE[0]}")
+repo_root=${EFFDOCK_REPO_ROOT:-$(cd "$(dirname "$script_path")/../../.." && pwd)}
+model_root="$repo_root/benchmarks/external_models/environments/$model"
+runtime_root="$repo_root/benchmarks/external_models/runtime"
+runtime_source="$runtime_root/src/$model"
 upstream="$model_root/upstream"
 python="$model_root/.venv/bin/python"
 uv_cache="$model_root/.cache/uv"
@@ -33,8 +35,8 @@ expected_revision=$(python3 -c \
 
 mkdir -p "$model_root/.cache" "$model_root/logs" "$model_root/state"
 if [[ ! -e "$upstream" && ! -L "$upstream" ]]; then
-  if [[ -d "$legacy_source/.git" ]]; then
-    ln -s "../../external_models/src/$model" "$upstream"
+  if [[ -d "$runtime_source/.git" ]]; then
+    ln -s "../../runtime/src/$model" "$upstream"
   else
     source_url=$(python3 -c \
       'import json, sys; print(json.load(open(sys.argv[1]))["sources"][sys.argv[2]]["url"])' \
@@ -52,7 +54,7 @@ if [[ "$actual_revision" != "$expected_revision" ]]; then
 fi
 
 case "$model" in
-  sigmadock) weight_target=../../external_models/weights/sigmadock ;;
+  sigmadock) weight_target=../../runtime/weights/sigmadock ;;
   surfdock) weight_target=upstream/model_weights ;;
   diffbindfr) weight_target=upstream/DiffBindFR/weights ;;
   interformer) weight_target=upstream/checkpoints ;;
@@ -64,7 +66,7 @@ fi
 
 if [[ "$model" == sigmadock ]]; then
   checkpoint="$model_root/weights/checkpoint.ckpt"
-  gnina_source="$repo_root/external_models/bin/gnina-sigmadock-v1.3.2"
+  gnina_source="$runtime_root/bin/gnina-sigmadock-v1.3.2"
   expected_checkpoint_sha256=db15427ca349e6f1e5f894bff841112c7360384886aa472667d8011307cad382
   expected_gnina_sha256=5d33538324b40050a03aa262d51832837e0ea6cc100945abbd2d7b732589690e
   [[ -f "$checkpoint" ]] || { echo "missing SigmaDock checkpoint: $checkpoint" >&2; exit 2; }
@@ -81,7 +83,7 @@ if [[ "$model" == sigmadock ]]; then
   }
   mkdir -p "$model_root/bin"
   if [[ ! -e "$model_root/bin/gnina" && ! -L "$model_root/bin/gnina" ]]; then
-    ln -s ../../../external_models/bin/gnina-sigmadock-v1.3.2 \
+    ln -s ../../../runtime/bin/gnina-sigmadock-v1.3.2 \
       "$model_root/bin/gnina"
   fi
   [[ -x "$model_root/bin/gnina" ]] || { echo "invalid model-local GNINA link" >&2; exit 2; }
@@ -120,7 +122,7 @@ case "$model" in
     PYTHONPATH="$upstream" "$python" -c \
       'import DiffBindFR, torch, torch_scatter; assert torch.__version__.startswith("1.13.1"), torch.__version__; print("diffbindfr", torch.__version__)'
     PYTHONPATH="$upstream" "$python" \
-      "$repo_root/scripts/external_models/run_seeded_upstream.py" \
+      "$repo_root/benchmarks/external_models/run_seeded_upstream.py" \
       --upstream-script "$upstream/DiffBindFR/app/predict.py" \
       --upstream-cwd "$upstream" \
       --seed 0 \
@@ -132,12 +134,12 @@ case "$model" in
     native_root="$model_root/bin"
     native_lib="$native_root/lib"
     native_include="$native_root/include"
-    legacy_env="$repo_root/external_models/envs/interformer"
+    legacy_env="$runtime_root/envs/interformer"
     mkdir -p "$native_lib" "$native_include"
     if [[ ! -d "$legacy_env" ]] && ! \
-      "$python" "$repo_root/scripts/others/bootstrap_interformer_native.py" \
+      "$python" "$repo_root/benchmarks/external_models/tools/bootstrap_interformer_native.py" \
         --model-root "$model_root" --verify-only >/dev/null 2>&1; then
-      "$python" "$repo_root/scripts/others/bootstrap_interformer_native.py" \
+      "$python" "$repo_root/benchmarks/external_models/tools/bootstrap_interformer_native.py" \
         --model-root "$model_root"
     fi
     if [[ ! -x "$native_root/reduce" ]]; then
@@ -170,7 +172,7 @@ case "$model" in
         "$obrms_lib/libopenbabel.so.7.0.0"
     fi
     ln -sfn libopenbabel.so.7.0.0 "$obrms_lib/libopenbabel.so.7"
-    ln -sfn ../../../scripts/others/interformer_obrms.sh "$native_root/obrms"
+    ln -sfn ../../../tools/interformer_obrms.sh "$native_root/obrms"
     if [[ ! -d "$native_root/share/openbabel/3.1.0" ]]; then
       [[ -d "$legacy_env/share/openbabel/3.1.0" ]] || {
         echo "Interformer requires OpenBabel data files" >&2
@@ -190,7 +192,7 @@ case "$model" in
         "$native_lib/libboost_system.so.1.84.0"
       ln -sfn libboost_system.so.1.84.0 "$native_lib/libboost_system.so"
     fi
-    "$python" "$repo_root/scripts/others/bootstrap_interformer_native.py" \
+    "$python" "$repo_root/benchmarks/external_models/tools/bootstrap_interformer_native.py" \
       --model-root "$model_root" --verify-only
     torch_lib=$($python -c 'import pathlib, torch; print(pathlib.Path(torch.__file__).parent / "lib")')
     if ! LD_LIBRARY_PATH="$torch_lib:$native_lib:${LD_LIBRARY_PATH:-}" \

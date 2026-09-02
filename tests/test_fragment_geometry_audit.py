@@ -196,6 +196,34 @@ def test_audited_smiles_helper_matches_public_loader() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("smiles", "seed"),
+    [
+        (
+            "CC(C)[C@H](O)c1nc(-c2cnc(N)c(OC(F)(F)F)c2)"
+            "cn1[C@]12C[C@](N3CCOCC3)(C1)C2",
+            416,
+        ),
+        (
+            "Nc1ncc(-c2cn([C@]34C[C@](F)(C3)C4)c([C@@H](O)C(F)(F)F)n2)"
+            "cc1OC(F)(F)F",
+            417,
+        ),
+    ],
+)
+def test_smiles_embedding_fallback_preserves_declared_stereochemistry(
+    smiles: str,
+    seed: int,
+) -> None:
+    mol, metadata = generate_smiles_conformer(smiles, random_seed=seed)
+
+    assert mol.GetNumConformers() == 1
+    assert mol.GetConformer().Is3D()
+    assert metadata["embed_status"] == 0
+    assert metadata["chirality_relaxed_fallback"] is True
+    assert "chirality-relaxed-verified" in str(metadata["recipe"])
+
+
 def test_heavy_only_policy_removes_stereo_defining_explicit_hydrogen() -> None:
     mol, _ = generate_smiles_conformer("C/C=N/[H]", random_seed=0)
 

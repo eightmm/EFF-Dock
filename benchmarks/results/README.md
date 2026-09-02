@@ -15,7 +15,12 @@ Each admitted benchmark result should provide:
 5. generation, reranking, refinement, and evaluation runtimes kept separate;
 6. hashes or stable references for the protocol, input manifest, and producing
    command; and
-7. the corresponding paper-ready figure when one is reported.
+7. the corresponding generated comparison figure when one is reported.
+
+Cross-protocol literature context must include an explicit comparability flag
+and retain receptor input, pocket information, selection endpoint, and metric
+definition. Such rows are contextual and must never be sorted or described as
+a direct leaderboard.
 
 Do not copy raw structures, complete pose ensembles, scheduler logs, private
 paths, or unredistributable model/data artifacts into this directory.

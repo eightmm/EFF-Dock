@@ -12,10 +12,10 @@ import numpy as np
 from matplotlib.patches import Patch
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_BENCHMARK = ROOT / "docs/results/external_models/effdock_u70k_benchmark.json"
+DEFAULT_BENCHMARK = ROOT / "benchmarks/results/external_models/effdock_u70k_benchmark.json"
 DEFAULT_LITERATURE = ROOT / "docs/LITERATURE_RMSD_COMPARISON.json"
 DEFAULT_EXECUTED = (
-    ROOT / "docs/results/external_models/pocket_only_executed_reruns.json"
+    ROOT / "benchmarks/results/external_models/pocket_only_executed_reruns.json"
 )
 DEFAULT_OUTPUT = ROOT / "outputs/figures/effdock_u70k_joint_oracle_comparison.png"
 

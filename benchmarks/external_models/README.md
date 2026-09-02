@@ -16,25 +16,30 @@ non-comparison archives and are never included in result tables or figures.
 - `evaluate_*.py`, `aggregate_*.py`, `summarize_*.py`: coverage and metric
   admission.
 - `slurm/`: installation, inference, native selection, and evaluation jobs.
+- `docs/`: external-model protocols, run records, audits, and result notes.
+- `tools/`: shared environment synchronization and execution wrappers.
+- `environments/<model>/`: tracked uv project/lock files plus ignored local
+  environments.
+- `runtime/`: ignored upstream repositories, weights, binaries, caches, and
+  logs.
+- `../results/external_models/`: compact public JSON, tables, and figures.
 
 The upstream repositories, installed environments, downloaded weights, caches,
 and raw outputs are intentionally excluded from Git. Their reproducible
 manifests and lock files are published; the populated runtime trees are not.
-The current installations remain reachable through `others/<model>/` and the
-ignored root `external_models/` workspace while active jobs complete. A later
-physical relocation under an ignored `benchmarks/external_models/runtime/`
-tree must retain those paths as compatibility aliases because several pinned
-environments contain absolute prefixes.
+The populated installations now live under ignored `runtime/` and
+`environments/` trees. Legacy `external_models/` and `others/` paths are
+relative compatibility links because several pinned environments contain
+absolute prefixes.
 
 Every reported campaign must retain its dataset manifest, receptor policy,
 model-native inference setting, candidate count, seed, selection stage,
-coverage gate, and runtime accounting. The current frozen protocol is
-documented in `docs/EXTERNAL_MODEL_OFFICIAL_INFERENCE_PROTOCOL.md`, and concrete
-job IDs are recorded in `docs/EXTERNAL_MODEL_SUBMISSION_20260831.md` and
-`docs/EXPERIMENTS.jsonl`.
+coverage gate, and runtime accounting. The frozen protocol and run records are
+under `docs/`; the root run ledger retains submission provenance.
 
-Use paths in this directory for new work. The corresponding paths under
-`scripts/` and `configs/` are compatibility aliases only.
+Use paths in this directory for new work. Corresponding top-level paths under
+`scripts/`, `configs/`, `others/`, and `external_models/` are compatibility
+aliases only.
 
 Final GitHub-facing summaries belong under `benchmarks/results/`. Full pose
 banks and raw PoseBusters tables remain ignored; the tracked summary must retain

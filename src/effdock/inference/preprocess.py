@@ -26,7 +26,7 @@ from effdock.preprocess.protein import parse_pocket_atoms
 def generate_smiles_conformer(
     smiles: str,
     random_seed: int = 0,
-) -> tuple[Chem.Mol, dict[str, int | str]]:
+) -> tuple[Chem.Mol, dict[str, bool | int | str]]:
     """Generate the production SMILES conformer and return its audit metadata."""
     mol = Chem.MolFromSmiles(smiles)
     assert mol is not None, f"Invalid SMILES: {smiles}"
@@ -35,14 +35,54 @@ def generate_smiles_conformer(
     rdkit_seed = int(random_seed) & 0x7FFFFFFF
     embed_params.randomSeed = rdkit_seed
     embed_status = int(AllChem.EmbedMolecule(mol, embed_params))
+    chirality_relaxed_fallback = False
+    if embed_status != 0:
+        expected_centers = dict(
+            Chem.FindMolChiralCenters(
+                mol,
+                includeUnassigned=False,
+                includeCIP=True,
+                useLegacyImplementation=False,
+            )
+        )
+        mol.RemoveAllConformers()
+        fallback_params = AllChem.ETKDGv3()
+        fallback_params.randomSeed = rdkit_seed
+        fallback_params.enforceChirality = False
+        embed_status = int(AllChem.EmbedMolecule(mol, fallback_params))
+        if embed_status == 0 and expected_centers:
+            embedded = Chem.Mol(mol)
+            Chem.RemoveStereochemistry(embedded)
+            Chem.AssignAtomChiralTagsFromStructure(embedded)
+            Chem.AssignStereochemistry(embedded, force=True, cleanIt=True)
+            embedded_centers = dict(
+                Chem.FindMolChiralCenters(
+                    embedded,
+                    includeUnassigned=False,
+                    includeCIP=True,
+                    useLegacyImplementation=False,
+                )
+            )
+            if any(
+                embedded_centers.get(index) != label
+                for index, label in expected_centers.items()
+            ):
+                embed_status = -1
+                mol.RemoveAllConformers()
+        chirality_relaxed_fallback = embed_status == 0
     assert embed_status == 0, f"3D embedding failed: {smiles}"
     mmff_status = int(AllChem.MMFFOptimizeMolecule(mol, maxIters=200))
     mol = Chem.RemoveHs(mol)
     return mol, {
-        "recipe": "ETKDGv3_MMFF_200_RemoveHs",
+        "recipe": (
+            "ETKDGv3_chirality-relaxed-verified_MMFF_200_RemoveHs"
+            if chirality_relaxed_fallback
+            else "ETKDGv3_MMFF_200_RemoveHs"
+        ),
         "rdkit_seed": rdkit_seed,
         "embed_status": embed_status,
         "mmff_status": mmff_status,
+        "chirality_relaxed_fallback": chirality_relaxed_fallback,
     }
 
 

@@ -16,7 +16,7 @@ DEFAULT_MANIFEST = (
 )
 DEFAULT_OUTPUT = (
     ROOT
-    / "docs/results/external_models/posebusters_classical_paper_values.json"
+    / "benchmarks/results/external_models/posebusters_classical_paper_values.json"
 )
 SOURCE_URL = (
     "https://zenodo.org/records/8278563/files/"

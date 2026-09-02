@@ -1,0 +1,78 @@
+{
+  "schema_version": "effdock.foldbench_pocket_558_public.v1",
+  "status": "complete_descriptive",
+  "comparison_scope": "holo_receptor_crystal_pocket_redocking",
+  "directly_comparable_to_foldbench_source_native": false,
+  "claim_boundary": "Descriptive holo-pocket redocking adaptation, not the native FoldBench cofolding leaderboard; the pre/on-cutoff 492-interface slice may overlap training data.",
+  "protocol_id": "EFFDOCK-FOLDBENCH-POCKET-558-V1",
+  "source_report": {
+    "path": "outputs/benchmarks/foldbench_pocket_558_runs/6ff75eb480e93c2ad3a67382040fb49793002c797e74a070c927cf180975a279/report/summary.json",
+    "sha256": "ea4490ffd04412fc3432ac876e07fbc74242155a051fc9f6400defc6682c0d05"
+  },
+  "manifest": {
+    "path": "data/external_benchmarks/foldbench_full/manifests/foldbench.json",
+    "sha256": "3546019734a708265f465c8c74e0fa019accee88242a2c7dcd446706d8fc4957"
+  },
+  "stack": {
+    "docking_checkpoint_sha256": "65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6",
+    "confidence_checkpoint": "U70k",
+    "confidence_checkpoint_sha256": "ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638",
+    "samples": 100,
+    "ode_steps": 10,
+    "translation_sigma": 2.0,
+    "pocket_cutoff_A": 10.0,
+    "time_schedule": "late_power_3",
+    "guidance": "none",
+    "selector": "stable_minimum_predicted_symmetry_aware_rmsd",
+    "refinement": "adaptive_deterministic_in_repo_physical_refinement_max_100_steps"
+  },
+  "metric_contract": {
+    "rmsd": "symmetry-aware ligand heavy-atom RMSD without alignment",
+    "success": "RMSD <2 A",
+    "pb_valid": "PoseBusters 0.6.5 redock pass-all validity excluding RMSD",
+    "joint": "refined Top-1 PB-valid and RMSD <2 A"
+  },
+  "reference_heavy_atom_imputation_ids": [
+    "8jik-assembly1__protein-a-2__ligand-b-2__ccd-plp",
+    "8ok4-assembly1__protein-a-2__ligand-c-2__ccd-glc"
+  ],
+  "slices": {
+    "all_558": {
+      "n": 558,
+      "raw_top1_lt2": {"count": 402, "pct": 72.04301075268818},
+      "refined_top1_lt2": {"count": 422, "pct": 75.62724014336918},
+      "refined_oracle_lt2": {"count": 513, "pct": 91.93548387096774},
+      "refined_pb_valid": {"count": 531, "pct": 95.16129032258064},
+      "refined_joint_lt2_pb_valid": {"count": 407, "pct": 72.93906810035843}
+    },
+    "postcut_66": {
+      "n": 66,
+      "raw_top1_lt2": {"count": 45, "pct": 68.18181818181819},
+      "refined_top1_lt2": {"count": 47, "pct": 71.21212121212122},
+      "refined_oracle_lt2": {"count": 57, "pct": 86.36363636363636},
+      "refined_pb_valid": {"count": 59, "pct": 89.39393939393939},
+      "refined_joint_lt2_pb_valid": {"count": 44, "pct": 66.66666666666667}
+    },
+    "pre_or_on_cutoff_492": {
+      "n": 492,
+      "raw_top1_lt2": {"count": 357, "pct": 72.5609756097561},
+      "refined_top1_lt2": {"count": 375, "pct": 76.21951219512195},
+      "refined_oracle_lt2": {"count": 456, "pct": 92.6829268292683},
+      "refined_pb_valid": {"count": 472, "pct": 95.9349593495935},
+      "refined_joint_lt2_pb_valid": {"count": 363, "pct": 73.78048780487805}
+    },
+    "fully_observed_reference_556": {
+      "n": 556,
+      "raw_top1_lt2": {"count": 401, "pct": 72.12230215827338},
+      "refined_top1_lt2": {"count": 421, "pct": 75.71942446043165},
+      "refined_oracle_lt2": {"count": 511, "pct": 91.90647482014388},
+      "refined_pb_valid": {"count": 529, "pct": 95.14388489208633},
+      "refined_joint_lt2_pb_valid": {"count": 406, "pct": 73.02158273381295}
+    }
+  },
+  "literature_context": {
+    "path": "benchmarks/results/external_models/temporal_literature.json",
+    "foldbench_source_metric": "LRMSD <2 A and LDDT-PLI >0.8",
+    "comparison_note": "EFF-Dock uses an experimental holo receptor and crystal pocket, whereas source-native FoldBench rows are complex-cofolding results."
+  }
+}

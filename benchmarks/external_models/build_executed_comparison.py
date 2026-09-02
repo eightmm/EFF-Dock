@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_EVALUATION_ROOT = (
     ROOT / "outputs/external_models/evaluation/official_repeat_rmsd_20260901"
 )
-DEFAULT_OUTPUT = ROOT / "docs/results/external_models/pocket_only_executed_reruns.json"
+DEFAULT_OUTPUT = ROOT / "benchmarks/results/external_models/pocket_only_executed_reruns.json"
 
 DATASETS = {
     "astex": ("astex_diverse", 85),

@@ -119,7 +119,8 @@ validity.
 | Astex Diverse | 85 | 81.18% | 85.88% | 94.12% | 81.18% |
 | PoseBusters v2 | 308 | 78.25% | 84.09% | 95.13% | 81.17% |
 | PhiBench | 203 | 63.05% | 64.53% | 90.64% | 59.11% |
-| FoldBench | 66 | 63.64% | 68.18% | 90.91% | 66.67% |
+| FoldBench-Pocket full | 558 | 72.04% | 75.63% | 95.16% | 72.94% |
+| FoldBench-Pocket post-cutoff | 66 | 68.18% | 71.21% | 89.39% | 66.67% |
 | OpenBind | 860 | 49.07% | 55.47% | 98.60% | 54.65% |
 
 These are supplied-pocket redocking results, not blind docking or prospective
@@ -129,9 +130,20 @@ fixed 1,035-complex PLINDER validation bank. PhiBench and FoldBench are the
 core temporal checks; OpenBind is reported separately as a dense
 single-protease auxiliary cohort.
 
-The paper-facing claim map and detailed tables are in
-[`docs/PAPER_EVIDENCE.md`](docs/PAPER_EVIDENCE.md) and
-[`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md).
+For endpoint-aligned PhiBench context, U70k refined confidence Top-5 reaches
+`156/203` (`76.85%`) RMSD success and `150/203` (`73.89%`) same-pose
+PB-valid/RMSD joint success. The source-native paper cohort has 206 systems,
+so this remains descriptive rather than a direct head-to-head claim.
+
+FoldBench-Pocket uses the 558 released protein-ligand interfaces as
+holo-receptor, crystal-pocket redocking targets. It is not the native
+FoldBench cofolding leaderboard. Contract-aware side-by-side literature tables
+are provided in
+[`benchmarks/results/external_models/TEMPORAL_LITERATURE.md`](benchmarks/results/external_models/TEMPORAL_LITERATURE.md).
+
+Released tables are in [`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md),
+with machine-readable comparison artifacts under
+[`benchmarks/results/`](benchmarks/results/).
 
 ## Repository map
 
@@ -141,7 +153,7 @@ The paper-facing claim map and detailed tables are in
 - `benchmarks/`: external-model adapters and compact result artifacts;
 - `scripts/`: experiment and Slurm launchers;
 - `tests/`: unit and scientific-contract tests;
-- `docs/`: method, data, evaluation, protocol, and paper-evidence documents.
+- `docs/`: method, data, evaluation, protocol, and result-evidence documents.
 
 Start with [`docs/README.md`](docs/README.md) for the documentation index and
 [`docs/STRUCTURE.md`](docs/STRUCTURE.md) for ownership boundaries. Raw data,

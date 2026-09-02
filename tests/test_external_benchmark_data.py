@@ -7,6 +7,7 @@ from effdock.workflows.benchmark_inputs import load_benchmark_inputs
 from effdock.workflows.external_benchmark_data import (
     PhiCandidate,
     _ccd_from_cif,
+    foldbench_complex_id,
     select_foldbench_postcut,
     select_openbind_clean,
     sequence_diverse_representatives,
@@ -77,6 +78,20 @@ def test_foldbench_postcut_is_strict() -> None:
         "after": {"initial_release_date": "2024-07-01T00:00:00Z"},
     }
     assert select_foldbench_postcut(rows, dates) == [rows[-1]]
+
+
+def test_foldbench_full_ids_disambiguate_interfaces_in_one_assembly() -> None:
+    first = {
+        "pdb_id": "7v36-assembly1",
+        "native_chain_id_1": "A",
+        "native_chain_id_2": "B",
+        "ligand_id": "(5P0)",
+    }
+    second = {**first, "native_chain_id_2": "C", "ligand_id": "(AKG)"}
+    assert foldbench_complex_id(first, cohort="postcut") == "7v36-assembly1"
+    assert foldbench_complex_id(first, cohort="full") != foldbench_complex_id(
+        second, cohort="full"
+    )
 
 
 def test_phibench_sequence_components_are_deterministic() -> None:

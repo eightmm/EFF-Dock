@@ -1,0 +1,21 @@
+{
+  "schema_version": "effdock.phibench_u70k_top5_inputs.v1",
+  "protocol_id": "EFFDOCK-PHIBENCH-U70K-TOP5-V1",
+  "dataset": "phibench",
+  "expected_complexes": 203,
+  "poses_per_complex": 100,
+  "top_k": 5,
+  "source_root": "outputs/benchmarks/s50_raw_refined_confidence_temporal_external_runs/d97d5eb907acc485dfde4b7fcf88d87b4d5fd8576014d2cfb89dd0518b9c9bb4",
+  "source_report_sha256": "3365e59753b13464f4911d28f0983e121f3f7be3ea00521f6942a17e167071bf",
+  "confidence_checkpoint_sha256": "ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638",
+  "docking_checkpoint_sha256": "65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6",
+  "posebusters_version": "0.6.5",
+  "posebusters_config": "redock",
+  "expected_reproduction_counts": {
+    "raw_top1_rmsd_lt2": 128,
+    "refined_top1_rmsd_lt2": 131,
+    "refined_top1_posebusters_valid": 184,
+    "refined_top1_joint_posebusters_valid_rmsd_lt2": 120
+  },
+  "claim_status": "complete_descriptive_only_after_execution"
+}

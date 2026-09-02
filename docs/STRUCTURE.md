@@ -15,13 +15,17 @@ EFF-Dock/
 ├── configs/                     docking and confidence training configs
 ├── benchmarks/                  benchmark adapters, jobs, and figure scripts
 │   ├── external_models/         external-model prepare/run/evaluate adapters
+│   │   ├── docs/                external protocols, audits, and run records
+│   │   ├── environments/        per-model uv locks; local venvs ignored
+│   │   ├── runtime/             local sources/weights/caches; fully ignored
+│   │   ├── tools/               environment/run compatibility wrappers
 │   │   └── slurm/               install, inference, selection, evaluation jobs
 │   ├── figures/                 benchmark plotting/rendering code
 │   └── results/                 compact public metrics and provenance
 ├── scripts/slurm/               training jobs plus benchmark compatibility links
 ├── tests/                       CPU/unit and focused smoke tests
 ├── weights/                     released docking/confidence pair and model cards
-├── docs/                        paper index, contracts, protocols, and results
+├── docs/                        method contracts, protocols, and results
 ├── data/                        preserved local datasets; ignored by Git
 ├── outputs/                     preserved runs/benchmarks; ignored by Git
 └── archive/flowfrag_legacy/     non-destructive historical code and experiments
@@ -51,9 +55,9 @@ public inference interface. The `eff-dock` command and Slurm launchers are thin
 workflow wrappers retained for exact experiment reproduction. The repository
 is run from its root so released config and weight paths remain explicit.
 
-The documentation entry point is `docs/README.md`; paper-facing claims are
-mapped in `docs/PAPER_EVIDENCE.md`. Detailed protocol/result files remain at
-stable paths because they are immutable scientific records. The complete
+The documentation entry point is `docs/README.md`; released tables are
+summarized in `docs/BENCHMARK_RESULTS.md`. Detailed protocol/result files remain
+at stable paths because they are immutable scientific records. The complete
 machine run ledger and historical checkpoints remain in the ignored local
 archive rather than the public documentation tree.
 

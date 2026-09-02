@@ -1,0 +1,241 @@
+{
+  "schema_version": "effdock.temporal_literature_context.v2",
+  "source_audit_date": "2026-09-02",
+  "directly_comparable_to_effdock": false,
+  "effdock": {
+    "checkpoint": "U70k",
+    "inference": {
+      "num_poses": 100,
+      "num_steps": 10,
+      "sigma": 2.0,
+      "selector": "confidence_top1",
+      "refinement": "adaptive"
+    },
+    "cohorts": {
+      "phibench_derived": {
+        "n": 203,
+        "raw_top1_rmsd_lt_2_pct": 63.05,
+        "raw_top5_rmsd_lt_2_pct": 74.8768472906404,
+        "refined_top1_rmsd_lt_2_pct": 64.53,
+        "refined_top5_rmsd_lt_2_pct": 76.84729064039409,
+        "pb_valid_pct": 90.64,
+        "top1_pb_valid_pct": 90.64,
+        "top5_pb_valid_pct": 96.55172413793103,
+        "joint_refined_rmsd_pb_valid_pct": 59.11,
+        "top1_joint_refined_rmsd_pb_valid_pct": 59.11,
+        "top5_joint_refined_rmsd_pb_valid_pct": 73.89162561576354
+      },
+      "foldbench_pocket_558_all": {
+        "n": 558,
+        "raw_top1_rmsd_lt_2_pct": 72.04301075268818,
+        "refined_top1_rmsd_lt_2_pct": 75.62724014336918,
+        "refined_oracle_rmsd_lt_2_pct": 91.93548387096774,
+        "pb_valid_pct": 95.16129032258064,
+        "joint_refined_rmsd_pb_valid_pct": 72.93906810035843
+      },
+      "foldbench_pocket_558_fully_observed": {
+        "n": 556,
+        "raw_top1_rmsd_lt_2_pct": 72.12230215827338,
+        "refined_top1_rmsd_lt_2_pct": 75.71942446043165,
+        "refined_oracle_rmsd_lt_2_pct": 91.90647482014388,
+        "pb_valid_pct": 95.14388489208633,
+        "joint_refined_rmsd_pb_valid_pct": 73.02158273381295
+      },
+      "foldbench_pocket_558_postcut_66": {
+        "n": 66,
+        "raw_top1_rmsd_lt_2_pct": 68.18181818181819,
+        "refined_top1_rmsd_lt_2_pct": 71.21212121212122,
+        "refined_oracle_rmsd_lt_2_pct": 86.36363636363636,
+        "pb_valid_pct": 89.39393939393939,
+        "joint_refined_rmsd_pb_valid_pct": 66.66666666666667
+      },
+      "foldbench_fixed_66_legacy": {
+        "n": 66,
+        "raw_top1_rmsd_lt_2_pct": 63.64,
+        "refined_top1_rmsd_lt_2_pct": 68.18,
+        "refined_oracle_rmsd_lt_2_pct": 87.88,
+        "pb_valid_pct": 90.91,
+        "joint_refined_rmsd_pb_valid_pct": 66.67,
+        "note": "Different per-complex seeds from the full-558 campaign; retained as a non-interchangeable legacy bank."
+      }
+    },
+    "foldbench_public_ledger": "benchmarks/results/external_models/foldbench_pocket_558.json",
+    "phibench_top5_public_ledger": "benchmarks/results/external_models/phibench_u70k_top5.json"
+  },
+  "comparison_views": {
+    "direct_ranking_permitted": false,
+    "foldbench_protocol_matrix": {
+      "directly_comparable": false,
+      "effdock_panel": {
+        "prediction_task": "holo_receptor_redocking",
+        "receptor_input": "experimental_holo_receptor",
+        "pocket_input": "crystal_pocket",
+        "selection": "U70k confidence Top-1",
+        "endpoints": {
+          "refined_symmetry_lrmsd_lt_2_pct": 75.62724014336918,
+          "refined_pb_valid_and_symmetry_lrmsd_lt_2_pct": 72.93906810035843
+        }
+      },
+      "source_native_panel": {
+        "prediction_task": "complete_complex_cofolding",
+        "receptor_input": "model_predicted",
+        "pocket_input": "none",
+        "selection": "model_native_rank",
+        "endpoint": "LRMSD <2 A and LDDT-PLI >0.8",
+        "results_key": "foldbench_source_native"
+      }
+    },
+    "phibench_pocket_guided": [
+      {
+        "method": "EFF-Dock U70k",
+        "source_type": "locally_executed_derived_cohort",
+        "n": 203,
+        "receptor_input": "experimental_holo_receptor_and_crystal_pocket",
+        "endpoint": "refined confidence Top-1",
+        "rmsd_lt_2_pct": 64.53,
+        "joint_pb_valid_pct": 59.11,
+        "directly_comparable": false
+      },
+      {
+        "method": "EFF-Dock U70k",
+        "source_type": "locally_executed_derived_cohort",
+        "n": 203,
+        "receptor_input": "experimental_holo_receptor_and_crystal_pocket",
+        "endpoint": "refined confidence Top-5",
+        "rmsd_lt_2_pct": 76.84729064039409,
+        "joint_pb_valid_pct": 73.89162561576354,
+        "directly_comparable": false
+      },
+      {
+        "method": "PhysDock",
+        "source_type": "paper_reported_source_native",
+        "n": 206,
+        "receptor_input": "paper_pocket_prior",
+        "endpoint": "paper pocket-guided Top-5",
+        "rmsd_lt_2_pct": 83.0,
+        "joint_pb_valid_pct": 77.7,
+        "directly_comparable": false
+      },
+      {
+        "method": "SurfDock",
+        "source_type": "paper_reported_source_native",
+        "n": 206,
+        "receptor_input": "paper_pocket_prior",
+        "endpoint": "paper pocket-guided Top-5",
+        "rmsd_lt_2_pct": 71.7,
+        "joint_pb_valid_pct": 71.2,
+        "directly_comparable": false
+      },
+      {
+        "method": "Interformer",
+        "source_type": "paper_reported_source_native",
+        "n": 206,
+        "receptor_input": "paper_pocket_prior",
+        "endpoint": "paper pocket-guided Top-5",
+        "rmsd_lt_2_pct": 68.3,
+        "joint_pb_valid_pct": 63.3,
+        "directly_comparable": false
+      },
+      {
+        "method": "Uni-Mol Docking V2",
+        "source_type": "paper_reported_source_native",
+        "n": 206,
+        "receptor_input": "paper_pocket_prior",
+        "endpoint": "paper pocket-guided Top-5",
+        "rmsd_lt_2_pct": 53.3,
+        "joint_pb_valid_pct": 52.2,
+        "directly_comparable": false
+      },
+      {
+        "method": "DiffDock-L",
+        "source_type": "paper_reported_source_native",
+        "n": 206,
+        "receptor_input": "paper_pocket_prior",
+        "endpoint": "paper pocket-guided Top-5",
+        "rmsd_lt_2_pct": 39.8,
+        "joint_pb_valid_pct": 35.5,
+        "directly_comparable": false
+      },
+      {
+        "method": "Glide",
+        "source_type": "paper_reported_source_native",
+        "n": 206,
+        "receptor_input": "paper_pocket_prior",
+        "endpoint": "paper pocket-guided Top-5",
+        "rmsd_lt_2_pct": 25.4,
+        "joint_pb_valid_pct": 24.3,
+        "directly_comparable": false
+      },
+      {
+        "method": "AutoDock Vina",
+        "source_type": "paper_reported_source_native",
+        "n": 206,
+        "receptor_input": "paper_pocket_prior",
+        "endpoint": "paper pocket-guided Top-5",
+        "rmsd_lt_2_pct": 23.7,
+        "joint_pb_valid_pct": 22.7,
+        "directly_comparable": false
+      },
+      {
+        "method": "DiffDock",
+        "source_type": "paper_reported_source_native",
+        "n": 206,
+        "receptor_input": "paper_pocket_prior",
+        "endpoint": "paper pocket-guided Top-5",
+        "rmsd_lt_2_pct": 30.7,
+        "joint_pb_valid_pct": 25.8,
+        "directly_comparable": false
+      }
+    ]
+  },
+  "phibench_source_native": {
+    "n": 206,
+    "metric": "paper-reported docking success; PAL-RMSD <2 A and PB-valid conjunction",
+    "endpoint_note": "The manuscript describes the pocket-guided endpoint as Top-5; it is not EFF-Dock Top-1.",
+    "source": {
+      "paper": "https://doi.org/10.1101/2025.04.28.650887",
+      "figure": "https://github.com/KexinZhangResearch/PhysDock/blob/7c26bffddde30856cd180a499be93f60d93aadfa/figs/F2.pdf",
+      "figure_sha256": "a9a1ffdac55e817ac28d4e19675fc8640fee5a20e5e96b241eea7d04e24e59ff"
+    },
+    "rows": [
+      {"model": "PhysDock", "pocket_prior": false, "rmsd_lt_2_pct": 61.2, "joint_pb_valid_pct": 49.5},
+      {"model": "AlphaFold 3", "pocket_prior": false, "rmsd_lt_2_pct": 51.0, "joint_pb_valid_pct": 47.6},
+      {"model": "Chai-1", "pocket_prior": false, "rmsd_lt_2_pct": 44.7, "joint_pb_valid_pct": 42.2},
+      {"model": "DynamicBind", "pocket_prior": false, "rmsd_lt_2_pct": 54.3, "joint_pb_valid_pct": 53.3},
+      {"model": "NeuralPLexer", "pocket_prior": false, "rmsd_lt_2_pct": 19.9, "joint_pb_valid_pct": 16.7},
+      {"model": "PhysDock", "pocket_prior": true, "rmsd_lt_2_pct": 83.0, "joint_pb_valid_pct": 77.7},
+      {"model": "SurfDock", "pocket_prior": true, "rmsd_lt_2_pct": 71.7, "joint_pb_valid_pct": 71.2},
+      {"model": "Interformer", "pocket_prior": true, "rmsd_lt_2_pct": 68.3, "joint_pb_valid_pct": 63.3},
+      {"model": "Uni-Mol Docking V2", "pocket_prior": true, "rmsd_lt_2_pct": 53.3, "joint_pb_valid_pct": 52.2},
+      {"model": "DiffDock-L", "pocket_prior": true, "rmsd_lt_2_pct": 39.8, "joint_pb_valid_pct": 35.5},
+      {"model": "Glide", "pocket_prior": true, "rmsd_lt_2_pct": 25.4, "joint_pb_valid_pct": 24.3},
+      {"model": "AutoDock Vina", "pocket_prior": true, "rmsd_lt_2_pct": 23.7, "joint_pb_valid_pct": 22.7},
+      {"model": "DiffDock", "pocket_prior": true, "rmsd_lt_2_pct": 30.7, "joint_pb_valid_pct": 25.8}
+    ]
+  },
+  "foldbench_source_native": {
+    "metric": "protein-ligand success: LRMSD <2 A and LDDT-PLI >0.8",
+    "source": {
+      "leaderboard": "https://github.com/BEAM-Labs/FoldBench/blob/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/README.md",
+      "paper": "https://doi.org/10.1038/s41467-025-67127-3"
+    },
+    "after_2023_01_full": [
+      {"model": "AlphaFold 3", "success_pct": 64.90},
+      {"model": "Boltz-1", "success_pct": 55.04},
+      {"model": "Chai-1", "success_pct": 51.23},
+      {"model": "HelixFold 3", "success_pct": 51.82},
+      {"model": "Protenix", "success_pct": 50.70},
+      {"model": "OpenFold 3 preview", "success_pct": 44.49}
+    ],
+    "after_2024_01": [
+      {"model": "AlphaFold 3", "success_pct": 67.59, "reference_only": false},
+      {"model": "Boltz-1", "success_pct": 51.33, "reference_only": false},
+      {"model": "Chai-1", "success_pct": 49.28, "reference_only": false},
+      {"model": "HelixFold 3", "success_pct": 50.68, "reference_only": false},
+      {"model": "Protenix", "success_pct": 53.25, "reference_only": false},
+      {"model": "OpenFold 3 preview", "success_pct": 40.85, "reference_only": false},
+      {"model": "Boltz-2", "success_pct": 53.90, "reference_only": true},
+      {"model": "RosettaFold3", "success_pct": 57.28, "reference_only": true}
+    ]
+  }
+}
