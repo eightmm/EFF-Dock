@@ -1,0 +1,15 @@
+dataset,n,method,family,source_type,repeats,top1_mean_pct,top1_sample_std_pct,joint_mean_pct,joint_sample_std_pct
+astex,85,EFF-Dock,ours,our_run,1,85.88235294,0.00000000,81.17647059,0.00000000
+astex,85,SigmaDock,hybrid,our_run,3,90.58823529,1.17647059,89.01960784,1.35847122
+astex,85,DiffDock-Pocket,learning,our_run,3,53.72549020,0.67923561,31.37254902,3.39617805
+astex,85,RLDiff RL++,hybrid,our_run,3,84.31372549,2.44901882,82.35294118,4.07541366
+astex,85,DiffBindFR + MDN/EC,hybrid,our_run,3,80.78431373,2.96071939,68.62745098,3.59417702
+astex,85,GOLD,classical,paper,1,67.05882353,0.00000000,63.52941176,0.00000000
+astex,85,AutoDock Vina,classical,paper,1,57.64705882,0.00000000,56.47058824,0.00000000
+posebusters,308,EFF-Dock,ours,our_run,1,84.09090909,0.00000000,81.16883117,0.00000000
+posebusters,308,SigmaDock,hybrid,our_run,3,78.89610390,0.32467532,76.40692641,0.18745139
+posebusters,308,DiffDock-Pocket,learning,our_run,3,31.81818182,0.64935065,14.82683983,0.67586558
+posebusters,308,RLDiff RL++,hybrid,our_run,3,74.45887446,1.35173117,72.94372294,0.67586558
+posebusters,308,DiffBindFR + MDN/EC,hybrid,our_run,3,54.22077922,2.27272727,36.03896104,2.45124495
+posebusters,308,GOLD,classical,paper,1,58.11688312,0.00000000,54.54545455,0.00000000
+posebusters,308,AutoDock Vina,classical,paper,1,59.74025974,0.00000000,58.11688312,0.00000000

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#SBATCH --job-name=effdock-pocket-prior-stage
+#SBATCH --partition=6000ada,heavy
+#SBATCH --qos=short
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem=32G
+#SBATCH --time=08:00:00
+#SBATCH --gres=gpu:1
+#SBATCH --output=outputs/benchmarks/logs/%x-%A_%a.out
+#SBATCH --error=outputs/benchmarks/logs/%x-%A_%a.err
+
+set -euo pipefail
+cd "${EFFDOCK_REPO_DIR:-${SLURM_SUBMIT_DIR:?}}"
+: "${EFFDOCK_OUTPUT_ROOT:?set EFFDOCK_OUTPUT_ROOT}"
+: "${EFFDOCK_STAGE:?set EFFDOCK_STAGE}"
+runtime_venv=${EFFDOCK_RUNTIME_VENV:-.venv}
+source benchmarks/effdock/slurm/pocket_prior_robustness_common.sh
+num_shards=32
+task_id=${SLURM_ARRAY_TASK_ID:?}
+[[ "${SLURM_ARRAY_TASK_COUNT:?}" -eq 864 ]] || { echo "stage requires 864 tasks" >&2; exit 2; }
+shard_index=$((task_id % num_shards))
+condition_index=$((task_id / num_shards))
+effdock_resolve_pocket_prior_condition "$condition_index"
+condition_root=$(effdock_pocket_prior_condition_root "$EFFDOCK_OUTPUT_ROOT")
+
+gpu_inventory=$(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader,nounits)
+[[ $(wc -l <<< "$gpu_inventory") -eq 1 ]] || { echo "exactly one visible GPU is required" >&2; exit 2; }
+IFS=, read -r gpu_name gpu_memory_mib <<< "$gpu_inventory"
+gpu_memory_mib=${gpu_memory_mib//[[:space:]]/}
+[[ "$gpu_memory_mib" =~ ^[0-9]+$ && "$gpu_memory_mib" -ge 48000 ]] || {
+  echo "at least 48000 MiB GPU memory required, got $gpu_name/$gpu_memory_mib" >&2
+  exit 2
+}
+
+"$runtime_venv/bin/python" scripts/run_guidance_sdf_post_refinement_shard.py \
+  --manifest "$condition_root/manifest.json" \
+  --benchmark-input-manifest docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json \
+  --protocol-file docs/EFFDOCK_POCKET_PRIOR_ROBUSTNESS_EXTENSION_PROTOCOL.md \
+  --external-dir data/external_test --output-root "$condition_root/full" \
+  --num-shards "$num_shards" --shard-index "$shard_index" \
+  --stage "$EFFDOCK_STAGE" --eta 2 \
+  --energy-convergence-absolute-kcal-mol 0.02 \
+  --energy-convergence-relative 0.001 \
+  --energy-convergence-patience 5 --energy-convergence-min-steps 25 \
+  --confidence-sigma "$EFFDOCK_CONDITION_SIGMA" --pocket-cutoff 10 \
+  --docking-checkpoint weights/effdock_docking_early_time_t0p10_50k.pt \
+  --confidence-checkpoint weights/effdock_confidence_s50_raw_refined_u70k.pt

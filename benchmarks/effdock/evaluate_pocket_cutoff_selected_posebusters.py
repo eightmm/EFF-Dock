@@ -30,7 +30,10 @@ EXPECTED = {"astex": 85, "posebusters": 308}
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--condition-root", type=Path, required=True)
-    parser.add_argument("--cutoff", type=int, choices=(6, 8, 10, 12), required=True)
+    parser.add_argument("--cutoff", type=int, choices=(6, 8, 10, 12, 14), required=True)
+    parser.add_argument("--jitter", type=int, choices=(0, 1, 2), default=0)
+    parser.add_argument("--sigma", type=int, choices=(1, 2, 4), default=2)
+    parser.add_argument("--extension", action="store_true")
     parser.add_argument("--repeat-index", type=int, choices=range(3), required=True)
     parser.add_argument("--num-shards", type=int, required=True)
     parser.add_argument("--shard-index", type=int, required=True)
@@ -73,9 +76,21 @@ def main() -> None:
     manifest_path = args.condition_root / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     condition = manifest.get("condition", {})
+    expected_manifest_protocol = (
+        "EFFDOCK-POCKET-PRIOR-ROBUSTNESS-EXTENSION-MANIFEST-V1"
+        if args.extension
+        else (
+            "EFFDOCK-POCKET-CUTOFF-JITTER-ROBUSTNESS-MANIFEST-V1"
+            if args.jitter > 0
+            else "EFFDOCK-POCKET-CUTOFF-ROBUSTNESS-MANIFEST-V1"
+        )
+    )
     if (
-        manifest.get("protocol_id") != "EFFDOCK-POCKET-CUTOFF-ROBUSTNESS-MANIFEST-V1"
+        manifest.get("protocol_id") != expected_manifest_protocol
+        or float(manifest.get("sigma", -1)) != args.sigma
         or int(condition.get("pocket_cutoff_angstrom", -1)) != args.cutoff
+        or float(condition.get("prior_sigma_angstrom", args.sigma)) != args.sigma
+        or int(condition.get("center_jitter_sigma_angstrom_per_axis", 0)) != args.jitter
         or int(condition.get("repeat_index", -1)) != args.repeat_index
     ):
         raise ValueError("manifest condition mismatch")
@@ -120,6 +135,8 @@ def main() -> None:
             "dataset": dataset,
             "id": complex_id,
             "cutoff_angstrom": args.cutoff,
+            "prior_sigma_angstrom": args.sigma,
+            "center_jitter_sigma_angstrom_per_axis": args.jitter,
             "repeat_index": args.repeat_index,
             "selected_pose_index": -1,
             "selected_rmsd": math.inf,
@@ -137,10 +154,14 @@ def main() -> None:
                 raise ValueError("refinement is incomplete")
             if float(refinement["inputs"].get("pocket_cutoff_angstrom", -1)) != 10.0:
                 raise ValueError("refinement crop is not fixed at 10 A")
+            if float(refinement["inputs"].get("source_sampling_sigma_angstrom", -1)) != args.sigma:
+                raise ValueError("refinement source sigma mismatch")
             if confidence.get("status") != "complete_descriptive":
                 raise ValueError("confidence is incomplete")
             if float(confidence.get("pocket_cutoff_angstrom", -1)) != 10.0:
                 raise ValueError("confidence crop is not fixed at 10 A")
+            if float(confidence.get("sigma", -1)) != args.sigma:
+                raise ValueError("confidence conditioning sigma mismatch")
             conf_inputs = confidence["inputs"]
             if conf_inputs["docking_checkpoint_sha256"] != DOCKING_SHA256:
                 raise ValueError("docking checkpoint mismatch")
@@ -187,7 +208,7 @@ def main() -> None:
             result.update({key: False for key in VALIDITY_CHECKS})
         results.append(result)
         print(
-            f"[{position}/{len(assigned)}] c{args.cutoff}/r{args.repeat_index}/"
+            f"[{position}/{len(assigned)}] c{args.cutoff}/j{args.jitter}/r{args.repeat_index}/"
             f"{dataset}/{complex_id} RMSD={result['selected_rmsd']:.3f} "
             f"PB={result['posebusters_valid']} error={bool(result['error'])}",
             flush=True,
@@ -200,8 +221,18 @@ def main() -> None:
     summary = {
         "schema_version": 1,
         "status": "complete",
-        "protocol_id": "EFFDOCK-POCKET-CUTOFF-ROBUSTNESS-V1",
+        "protocol_id": (
+            "EFFDOCK-POCKET-PRIOR-ROBUSTNESS-EXTENSION-V1"
+            if args.extension
+            else (
+                "EFFDOCK-POCKET-CUTOFF-JITTER-ROBUSTNESS-V1"
+                if args.jitter > 0
+                else "EFFDOCK-POCKET-CUTOFF-ROBUSTNESS-V1"
+            )
+        ),
         "cutoff_angstrom": args.cutoff,
+        "prior_sigma_angstrom": args.sigma,
+        "center_jitter_sigma_angstrom_per_axis": args.jitter,
         "repeat_index": args.repeat_index,
         "num_shards": args.num_shards,
         "shard_index": args.shard_index,

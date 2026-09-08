@@ -12,12 +12,15 @@ from typing import Any
 from effdock.workflows.evaluate import file_sha256
 
 PROTOCOL_ID = "EFFDOCK-POCKET-CUTOFF-ROBUSTNESS-MANIFEST-V1"
+JITTER_PROTOCOL_ID = "EFFDOCK-POCKET-CUTOFF-JITTER-ROBUSTNESS-MANIFEST-V1"
 SOURCE_PROTOCOL_ID = "EFFDOCK-POCKET-CUTOFF-ROBUSTNESS-V1"
+JITTER_SOURCE_PROTOCOL_ID = "EFFDOCK-POCKET-CUTOFF-JITTER-ROBUSTNESS-V1"
+EXTENSION_PROTOCOL_ID = "EFFDOCK-POCKET-PRIOR-ROBUSTNESS-EXTENSION-MANIFEST-V1"
+EXTENSION_SOURCE_PROTOCOL_ID = "EFFDOCK-POCKET-PRIOR-ROBUSTNESS-EXTENSION-V1"
 DATASETS = {"astex": 85, "posebusters": 308}
 SHARDS = 8
 POSES = 100
 STEPS = 10
-SIGMA = 2.0
 ETA = 2.0
 DOCKING_SHA256 = "65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6"
 CONFIDENCE_SHA256 = "ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638"
@@ -26,22 +29,41 @@ CONFIDENCE_SHA256 = "ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--condition-root", type=Path, required=True)
-    parser.add_argument("--cutoff", type=float, choices=(6.0, 8.0, 10.0, 12.0), required=True)
+    parser.add_argument(
+        "--cutoff", type=float, choices=(6.0, 8.0, 10.0, 12.0, 14.0), required=True
+    )
+    parser.add_argument("--jitter", type=float, choices=(0.0, 1.0, 2.0), default=0.0)
+    parser.add_argument("--sigma", type=float, choices=(1.0, 2.0, 4.0), default=2.0)
+    parser.add_argument("--extension", action="store_true")
     parser.add_argument("--repeat-index", type=int, choices=range(3), required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--smoke", action="store_true")
     return parser.parse_args()
 
 
-def require_summary(path: Path, dataset: str, cutoff: float, repeat: int) -> dict[str, Any]:
+def require_summary(
+    path: Path,
+    dataset: str,
+    cutoff: float,
+    jitter: float,
+    sigma: float,
+    repeat: int,
+    extension: bool,
+) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
+    source_protocol_id = (
+        EXTENSION_SOURCE_PROTOCOL_ID
+        if extension
+        else JITTER_SOURCE_PROTOCOL_ID if jitter > 0 else SOURCE_PROTOCOL_ID
+    )
     expected = {
-        "protocol_id": SOURCE_PROTOCOL_ID,
+        "protocol_id": source_protocol_id,
         "dataset": dataset,
         "num_samples": POSES,
         "num_steps": STEPS,
-        "sigma": SIGMA,
+        "sigma": sigma,
         "pocket_cutoff": cutoff,
+        "center_jitter_sigma": jitter,
         "unified_guidance_scale": ETA,
         "unified_guidance_mode": "normalized_drift",
         "checkpoint_sha256": DOCKING_SHA256,
@@ -68,10 +90,18 @@ def main() -> None:
     dataset_counts = {"astex": 1} if args.smoke else DATASETS
     shard_count = 1 if args.smoke else SHARDS
     for dataset, expected_count in dataset_counts.items():
-        stem = (
-            f"effdock-pocket-cutoff-v1-{dataset}-c{int(args.cutoff):02d}-"
-            f"r{args.repeat_index}-n100-s10"
-        )
+        if args.extension:
+            stem = (
+                f"effdock-pocket-prior-v1-{dataset}-c{int(args.cutoff):02d}-"
+                f"s{int(args.sigma):02d}-j{int(args.jitter):02d}-"
+                f"r{args.repeat_index}-n100-s10"
+            )
+        else:
+            jitter_token = f"-j{int(args.jitter):02d}" if args.jitter > 0 else ""
+            stem = (
+                f"effdock-pocket-cutoff-v1-{dataset}-c{int(args.cutoff):02d}-"
+                f"r{args.repeat_index}{jitter_token}-n100-s10"
+            )
         seen: set[str] = set()
         for shard in range(shard_count):
             if args.smoke:
@@ -83,7 +113,15 @@ def main() -> None:
                 summary_path = raw_root / f"{stem}.{suffix}.summary.json"
             if not csv_path.is_file() or not summary_path.is_file():
                 raise FileNotFoundError(f"missing source shard {csv_path} / {summary_path}")
-            require_summary(summary_path, dataset, args.cutoff, args.repeat_index)
+            require_summary(
+                summary_path,
+                dataset,
+                args.cutoff,
+                args.jitter,
+                args.sigma,
+                args.repeat_index,
+                args.extension,
+            )
             source_files.append({"path": str(csv_path), "sha256": file_sha256(csv_path)})
             source_summaries.append({"path": str(summary_path), "sha256": file_sha256(summary_path)})
             with csv_path.open(newline="", encoding="utf-8") as handle:
@@ -112,8 +150,9 @@ def main() -> None:
                         "dataset": dataset,
                         "id": complex_id,
                         "eta": ETA,
-                        "sigma": SIGMA,
+                        "sigma": args.sigma,
                         "pocket_cutoff_angstrom": args.cutoff,
+                        "center_jitter_sigma_angstrom_per_axis": args.jitter,
                         "repeat_index": args.repeat_index,
                         "pose_path": str(pose),
                         "pose_sha256": row["all_poses_sdf_sha256"],
@@ -133,11 +172,24 @@ def main() -> None:
     records.sort(key=lambda row: (str(row["dataset"]), str(row["id"])))
     payload = {
         "schema_version": 1,
-        "protocol_id": PROTOCOL_ID,
-        "source_protocol_id": SOURCE_PROTOCOL_ID,
-        "condition": {"pocket_cutoff_angstrom": args.cutoff, "repeat_index": args.repeat_index},
+        "protocol_id": (
+            EXTENSION_PROTOCOL_ID
+            if args.extension
+            else JITTER_PROTOCOL_ID if args.jitter > 0 else PROTOCOL_ID
+        ),
+        "source_protocol_id": (
+            EXTENSION_SOURCE_PROTOCOL_ID
+            if args.extension
+            else JITTER_SOURCE_PROTOCOL_ID if args.jitter > 0 else SOURCE_PROTOCOL_ID
+        ),
+        "condition": {
+            "pocket_cutoff_angstrom": args.cutoff,
+            "prior_sigma_angstrom": args.sigma,
+            "center_jitter_sigma_angstrom_per_axis": args.jitter,
+            "repeat_index": args.repeat_index,
+        },
         "eta": ETA,
-        "sigma": SIGMA,
+        "sigma": args.sigma,
         "num_steps": STEPS,
         "poses_per_complex": POSES,
         "datasets": dataset_counts,
