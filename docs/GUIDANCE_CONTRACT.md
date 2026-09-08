@@ -2,9 +2,10 @@
 
 ## Status
 
-- Protocol: `EFFDOCK-GUIDANCE-DIAGNOSTIC-V7`.
+- Protocol: `EFFDOCK-GUIDANCE-DIAGNOSTIC-V9`.
 - Implemented: one self-contained
-  `GuidanceEnergy = PhysicalEnergy + InteractionEnergy` Torch diagnostic,
+  `GuidanceEnergy = PhysicalEnergy + InteractionEnergy + ChemicalConstraintEnergy`
+  Torch diagnostic,
   fragment-force projection, crystal perturbation tracing, and
   saved-trajectory tracing. By explicit user request, all seven implemented
   interaction terms—hydrophobic contact, directional heavy-atom hydrogen bond,
@@ -13,6 +14,9 @@
   default as separately traceable diagnostics.
   The default physical profile also includes the compact, vdW-radius
   `protein_ligand_steric_barrier` as a separately traceable diagnostic guard.
+  Input-declared coordinate invariants are implemented as a separate,
+  opt-in chemical-constraint component. V1 contains signed tetrahedral and E/Z
+  barriers; its default runtime strength is zero until internal validation.
   `polar_unsatisfied_proxy` is implemented as dimensionless trace metadata
   only and contributes no energy or force.
 - Experimental sampler couplings: the guarded operator-split corrector and a
@@ -27,8 +31,9 @@
   frozen report-only Astex/PoseBusters characterization.
 
 The diagnostic CLI remains `eff-dock physical trace` for command
-compatibility, but V7 evaluates both physical and interaction layers plus their
-combined force. The code lives in the unified `effdock.guidance` package.
+compatibility, but V9 can evaluate physical, interaction, and opt-in chemical
+layers plus their combined force. The code lives in the unified
+`effdock.guidance` package.
 
 ## Flat code layout and ownership
 
@@ -39,6 +44,7 @@ subpackages:
 src/effdock/guidance/
 ├── physical.py          # scalar physical energies
 ├── interaction.py       # typed motif and formal-charge interaction energy
+├── chemical.py          # input-declared coordinate constraints
 ├── topology.py          # ligand cut-interface topology and reference targets
 ├── parameterization.py  # versioned in-repository parameter loading
 ├── system.py            # receptor shell and tensor system
@@ -47,10 +53,11 @@ src/effdock/guidance/
 ├── errors.py            # structured unsupported-chemistry failures
 └── parameters/
     ├── effff_v2.json
-    └── interaction_v1.json
+    ├── interaction_v1.json
+    └── chemical_constraints_v1.json
 ```
 
-The one guidance energy has two auditable components:
+The one guidance energy has three auditable components:
 
 - `PhysicalEnergy`: generic coordinate energies—ligand cut-interface
   geometry, ligand interfragment sterics/dispersion, and generic
@@ -61,6 +68,11 @@ The one guidance energy has two auditable components:
   user-requested default-on diagnostics, but the latter four remain
   scientifically and sampler-unadmitted. The polar-unsatisfied proxy belongs
   to diagnostics, not this energy sum.
+- `ChemicalConstraintEnergy`: coordinate constraints whose desired state is
+  explicitly declared by the inference ligand. V1 contains signed
+  tetrahedral-volume and E/Z-alignment barriers. It is independently normalized,
+  scheduled, capped, logged, and ablated because it preserves chemical identity
+  rather than approximating a physical interaction.
 
 There is no Vina or `HybridGuidance` component in this contract. Legacy Vina
 code and historical reports are preserved outside the active path, but their
@@ -256,12 +268,65 @@ Partial-charge electrostatics, solvation, receptor flexibility, and covalent
 docking are inactive and absent from the energy sum. Screened formal-charge
 groups and profile-dispatched metal handling belong to `InteractionEnergy`.
 
+## Input-defined chemical-constraint layer
+
+This layer may use only chemical information explicitly declared by the
+inference ligand graph or isomeric SMILES. V1 uses declared stereochemistry
+retained in the production heavy-atom graph. Its reference is the sanitized
+inference ligand conformer, never a crystal pose. A zero runtime strength is an
+exact no-op and preserves all historical guidance behavior.
+
+For a tetrahedral center `c` and three deterministically ordered heavy-atom
+neighbors `a,b,d`, define
+
+```text
+v = det(x_a-x_c, x_b-x_c, x_d-x_c)
+    / (|x_a-x_c| |x_b-x_c| |x_d-x_c| + eps)
+s_ref = sign(v_ref)
+q = s_ref * v
+```
+
+For an explicitly assigned E/Z double bond, `q` is the reference-signed cosine
+of its defining four-atom dihedral. Both use the one-sided barrier
+
+```text
+margin = margin_fraction * |q_ref|
+penetration = tau * softplus((margin - q) / tau)
+E_chemical,stereo = 0.5 * k * penetration^2
+```
+
+The barrier is negligible in the valid reference basin, rises before the
+orientation reaches its zero boundary, and remains differentiable after an
+inversion. It does not select a conformer within the same stereochemical basin.
+For normalized-drift ODE sampling, this component is normalized against the
+learned atom-velocity field separately from physical/interaction guidance and
+has its own ramp and displacement cap. It shares the unified-guidance start gate,
+which is t=0.5 by default; a separate chemical start-time interface is forbidden.
+The runtime exposes `--unified-guidance-chemical-constraint-strength`; the
+default `0` keeps it diagnostic-only pending an internal held-out validation.
+Output stereo tags must never be rewritten to disguise coordinate-derived
+violations.
+
+The information boundary is strict. Connectivity, bond order, formal charge,
+aromaticity, and explicitly assigned stereochemistry may determine whether a
+constraint exists. SMILES does not determine a preferred rotatable-bond
+conformer or a protein-frame binding orientation, so neither may be encoded as
+a chemical constraint. Generic geometry feasibility belongs to
+`PhysicalEnergy`; protein-conditioned preferences belong to
+`InteractionEnergy`.
+
+The completed three-case mechanism check and the superseded summed-energy
+comparison are recorded in `docs/CHEMICAL_CONSTRAINT_GUIDANCE_RESULTS.md`.
+The separate channel improved declared-stereo preservation without changing
+the aggregate RMSD-under-2-A candidate count, but the external cases are
+descriptive and do not admit a production strength.
+
 ## Interaction layer
 
 The parameter profile is `EFF-Interaction-v1-diagnostic` version `1.6.0`,
 formula version `effdock-interaction-diagnostic-7`. The combined profile is
-version `1.6.0`, formula
-`physical-v2.2_plus_interaction-v1.6`. By explicit user request, its default
+version `1.8.0`, formula
+`physical-v2.2_plus_interaction-v1.6_plus_chemical-v1`. By explicit user request, its default
 active terms are all seven implemented interaction energies:
 
 ```text
@@ -877,6 +942,24 @@ masking, and structured profile reason, the trace-only polar-unsatisfied
 proxy, and structured unsupported chemistry. The implementation identity
 includes ligand loading, fragmentation, and protein typing source, not only
 the energy kernel. It does not optimize coordinates.
+
+New post-refinement SDF outputs use energy-property schema
+`effdock.guidance_sdf_energy.v1`. Every saved pose/frame records
+`guidance_total_energy`, `guidance_physical_energy`,
+`guidance_interaction_energy`, `guidance_violation_energy`, and
+`guidance_energy_drop`, together with the terminal step, refinement status,
+and shell-envelope validity. `guidance_violation_energy` is the nonnegative
+sum of ligand bond, angle, improper, ligand-internal LJ repulsion,
+protein-ligand LJ repulsion, the protein-ligand steric barrier, and typed or
+generic receptor-obstacle repulsion. It deliberately excludes proper torsion,
+attractive LJ, and every signed interaction term, so attractive terms cannot
+cancel an explicit violation. It is a diagnostic subset: the identity is
+`guidance_total_energy = guidance_physical_energy +
+guidance_interaction_energy`, not `total = violation + interaction`.
+`guidance_energy_drop` is the initial combined energy minus the combined
+energy at that saved frame. These properties never alter the production
+confidence-only selector and are not affinity or binding-free-energy claims.
+Archived v1 refinement SDFs are not retroactively relabeled.
 
 Saved `results.pt` tracing is strict. Docking-results V2 stores an
 order-sensitive ligand identity containing atom attributes, indexed bond

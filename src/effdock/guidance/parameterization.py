@@ -34,6 +34,12 @@ def load_interaction_v1() -> dict:
     return json.loads(path.read_text())
 
 
+@lru_cache(maxsize=1)
+def load_chemical_constraints_v1() -> dict:
+    path = files("effdock.guidance.parameters").joinpath("chemical_constraints_v1.json")
+    return json.loads(path.read_text())
+
+
 def _parameter_identity(raw: dict) -> dict[str, str]:
     canonical = json.dumps(raw, sort_keys=True, separators=(",", ":")).encode()
     return {
@@ -56,26 +62,33 @@ def interaction_parameter_identity() -> dict[str, str]:
     return _parameter_identity(load_interaction_v1())
 
 
+def chemical_constraint_parameter_identity() -> dict[str, str]:
+    return _parameter_identity(load_chemical_constraints_v1())
+
+
 def guidance_parameter_identity() -> dict[str, object]:
     physical = parameter_identity()
     interaction = interaction_parameter_identity()
+    chemical = chemical_constraint_parameter_identity()
     payload = {
-        "schema_version": "effdock.guidance_parameter_set.v1",
+        "schema_version": "effdock.guidance_parameter_set.v2",
         "physical": physical,
         "interaction": interaction,
+        "chemical_constraints": chemical,
     }
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     return {
         **payload,
         "name": "EFF-Dock-Guidance",
-        "version": "1.6.0",
-        "formula_version": "physical-v2.2_plus_interaction-v1.6",
+        "version": "1.8.0",
+        "formula_version": "physical-v2.2_plus_interaction-v1.6_plus_chemical-v1",
         "sha256": sha256(canonical).hexdigest(),
         "energy_unit": "kcal/mol",
         "distance_unit": "angstrom",
         "claim": (
             "Unified self-contained diagnostic GuidanceEnergy = "
-            "PhysicalEnergy + InteractionEnergy; Vina is excluded."
+            "PhysicalEnergy + InteractionEnergy + ChemicalConstraintEnergy; "
+            "Vina is excluded."
         ),
     }
 
@@ -114,9 +127,11 @@ def element_parameters(
 
 __all__ = [
     "ElementTensorParameters",
+    "chemical_constraint_parameter_identity",
     "element_parameters",
     "guidance_parameter_identity",
     "interaction_parameter_identity",
+    "load_chemical_constraints_v1",
     "load_effff_v2",
     "load_interaction_v1",
     "parameter_identity",

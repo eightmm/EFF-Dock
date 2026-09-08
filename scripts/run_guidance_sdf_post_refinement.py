@@ -46,15 +46,81 @@ from effdock.workflows.relax_guidance import (
 )
 
 PROTOCOL_ID = "EFFDOCK-GUIDANCE-SDF-POST-REFINEMENT-V1"
-SCHEMA_VERSION = "effdock.guidance_sdf_post_refinement.v1"
+SCHEMA_VERSION = "effdock.guidance_sdf_post_refinement.v2"
+ENERGY_PROPERTY_SCHEMA = "effdock.guidance_sdf_energy.v1"
 EXPECTED_POSES = 100
+VIOLATION_ENERGY_TERMS = (
+    "ligand_intra_bond",
+    "ligand_intra_angle",
+    "ligand_intra_improper",
+    "ligand_intra_lj_repulsive",
+    "protein_ligand_lj_repulsive",
+    "protein_ligand_steric_barrier",
+    "receptor_geometry_obstacle_uff_repulsive",
+    "receptor_geometry_obstacle_generic_repulsive",
+)
+OPTIONAL_ZERO_VIOLATION_TERMS = frozenset(
+    {
+        "receptor_geometry_obstacle_uff_repulsive",
+        "receptor_geometry_obstacle_generic_repulsive",
+    }
+)
 SUPPORTED_SOURCE_PROTOCOLS = {
     "EFFDOCK-GUIDANCE-ALL-POSE-PB-ETA-V1",
     "EFFDOCK-GUIDANCE-SIGMA2-ETA2-REFINEMENT-INPUT-V1",
     "EFFDOCK-EXTERNAL-TEMPORAL-GUIDED-REFINED-V1",
     "EFFDOCK-FOLDBENCH-POCKET-558-V1",
     "EFFDOCK-POCKET-CUTOFF-ROBUSTNESS-MANIFEST-V1",
+    "EFFDOCK-POCKET-CUTOFF-JITTER-ROBUSTNESS-MANIFEST-V1",
+    "EFFDOCK-POCKET-PRIOR-ROBUSTNESS-EXTENSION-MANIFEST-V1",
 }
+
+
+def _persisted_energy_groups(metrics: dict[str, Any]) -> dict[str, float]:
+    """Return stable SDF-facing energy groups without attractive cancellation."""
+    energies = metrics["energies"]
+    groups = metrics["energy_groups"]
+    missing = [
+        name
+        for name in VIOLATION_ENERGY_TERMS
+        if name not in energies and name not in OPTIONAL_ZERO_VIOLATION_TERMS
+    ]
+    if missing:
+        raise ValueError(f"missing violation energy terms: {missing}")
+    raw_violation_terms = [float(energies.get(name, 0.0)) for name in VIOLATION_ENERGY_TERMS]
+    if any(value < -1e-6 for value in raw_violation_terms):
+        raise ValueError("violation energy terms must be non-negative")
+    violation_terms = [max(0.0, value) for value in raw_violation_terms]
+    values = {
+        "total": float(groups["combined"]),
+        "physical": float(groups["physical"]),
+        "interaction": float(groups["interaction"]),
+        "violation": sum(violation_terms),
+    }
+    if not all(math.isfinite(value) for value in values.values()):
+        raise FloatingPointError("non-finite persisted guidance energy group")
+    if not math.isclose(
+        values["total"],
+        values["physical"] + values["interaction"],
+        rel_tol=1e-5,
+        abs_tol=1e-4,
+    ):
+        raise ValueError("guidance total is not physical plus interaction energy")
+    return values
+
+
+def _energy_sdf_properties(pose_summary: dict[str, Any], step: int) -> dict[str, Any]:
+    groups = pose_summary["saved_energy_groups_by_step"][str(step)]
+    return {
+        "guidance_energy_schema": ENERGY_PROPERTY_SCHEMA,
+        "guidance_total_energy": groups["total"],
+        "guidance_physical_energy": groups["physical"],
+        "guidance_interaction_energy": groups["interaction"],
+        "guidance_violation_energy": groups["violation"],
+        "guidance_energy_drop": pose_summary["initial_total_energy"] - groups["total"],
+        "guidance_terminal_step": pose_summary["terminal_step"],
+        "guidance_shell_envelope_valid": pose_summary["shell_envelope_valid"],
+    }
 
 
 def _synchronize(device: torch.device) -> None:
@@ -217,12 +283,15 @@ def _step_frames(
             final_metrics = run.metrics[offset][-1]
             metrics_by_step = {int(row["step"]): row for row in run.metrics[offset]}
             saved_total_energy_by_step: dict[str, float] = {}
+            saved_energy_groups_by_step: dict[str, dict[str, float]] = {}
             for target_step in range(0, config.max_steps + 1, config.save_every):
                 available = [step for step in metrics_by_step if step <= target_step]
                 selected_step = max(available) if available else min(metrics_by_step)
-                saved_total_energy_by_step[str(target_step)] = float(
-                    metrics_by_step[selected_step]["energy_groups"]["combined"]
-                )
+                persisted = _persisted_energy_groups(metrics_by_step[selected_step])
+                saved_energy_groups_by_step[str(target_step)] = persisted
+                saved_total_energy_by_step[str(target_step)] = persisted["total"]
+            initial_energy_groups = _persisted_energy_groups(initial_metrics)
+            final_energy_groups = _persisted_energy_groups(final_metrics)
             pose_summaries.append(
                 {
                     "pose_index": start + offset,
@@ -230,9 +299,19 @@ def _step_frames(
                     "terminal_step": run.terminal_steps[offset],
                     "total_backtracks": run.total_backtracks[offset],
                     "shell_envelope_valid": run.shell_envelope_valid[offset],
-                    "initial_total_energy": initial_metrics["energy_groups"]["combined"],
-                    "final_total_energy": final_metrics["energy_groups"]["combined"],
+                    "initial_total_energy": initial_energy_groups["total"],
+                    "final_total_energy": final_energy_groups["total"],
+                    "initial_physical_energy": initial_energy_groups["physical"],
+                    "final_physical_energy": final_energy_groups["physical"],
+                    "initial_interaction_energy": initial_energy_groups["interaction"],
+                    "final_interaction_energy": final_energy_groups["interaction"],
+                    "initial_violation_energy": initial_energy_groups["violation"],
+                    "final_violation_energy": final_energy_groups["violation"],
+                    "final_energy_drop": (
+                        initial_energy_groups["total"] - final_energy_groups["total"]
+                    ),
                     "saved_total_energy_by_step": saved_total_energy_by_step,
+                    "saved_energy_groups_by_step": saved_energy_groups_by_step,
                     "initial_raw_rmsd_angstrom": initial_metrics["raw_rmsd_angstrom"],
                     "final_raw_rmsd_angstrom": final_metrics["raw_rmsd_angstrom"],
                     "initial_chiral_improper_inversion_count": initial_metrics.get(
@@ -437,6 +516,7 @@ def main() -> None:
                     "guidance_refinement_protocol": PROTOCOL_ID,
                     "guidance_refinement_step": step,
                     "guidance_refinement_status": pose_summaries[pose_index]["status"],
+                    **_energy_sdf_properties(pose_summaries[pose_index], step),
                 }
             )
             per_pose.append(kept)
@@ -476,6 +556,7 @@ def main() -> None:
     serialization_seconds = time.perf_counter() - serialization_started
     summary = {
         "schema_version": SCHEMA_VERSION,
+        "energy_property_schema": ENERGY_PROPERTY_SCHEMA,
         "protocol_id": PROTOCOL_ID,
         "created_at_utc": datetime.now(UTC).isoformat(),
         "status": "complete_descriptive",

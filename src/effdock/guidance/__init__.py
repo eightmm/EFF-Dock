@@ -1,4 +1,4 @@
-"""Self-contained physical and interaction guidance boundaries for EFF-Dock."""
+"""Self-contained physical, interaction, and chemical guidance for EFF-Dock."""
 
 # Import order follows the module dependency DAG; alphabetical sorting creates
 # a cycle because diagnostics imports interaction/runtime during package init.
@@ -14,6 +14,11 @@ from .system import (
 )
 from .topology import PhysicalTopology, build_physical_topology
 from .physical import PhysicalEnergyConfig, physical_energy
+from .chemical import (
+    ChemicalConstraintEnergyConfig,
+    chemical_constraint_diagnostics,
+    chemical_constraint_energy,
+)
 from .feynman_kac import (
     DEFAULT_FK_CONSTRAINT_TERMS,
     SUPPORTED_FK_CONSTRAINT_TERMS,
@@ -50,6 +55,7 @@ from .diagnostics import (
 
 __all__ = [
     "ACTIVE_INTERACTION_TERMS",
+    "ChemicalConstraintEnergyConfig",
     "DEFAULT_FK_CONSTRAINT_TERMS",
     "FKConstraintConfig",
     "FeynmanKacConstraintResampler",
@@ -70,6 +76,8 @@ __all__ = [
     "UnsupportedPhysicalChemistryError",
     "build_physical_system",
     "build_physical_topology",
+    "chemical_constraint_diagnostics",
+    "chemical_constraint_energy",
     "constraint_potential",
     "guidance_energy",
     "interaction_contact_stats",

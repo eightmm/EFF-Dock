@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field, replace
 
 import torch
@@ -10,6 +11,7 @@ from torch import Tensor
 from effdock.geometry.flow_matching import integrate_se3_step
 from effdock.geometry.se3 import quaternion_to_matrix
 
+from .chemical import ChemicalConstraintEnergyConfig, chemical_constraint_energy
 from .interaction import InteractionEnergyConfig, interaction_energy
 from .physical import PhysicalEnergyConfig, physical_energy
 from .system import PhysicalSystem
@@ -19,6 +21,7 @@ from .system import PhysicalSystem
 class GuidanceEnergyConfig:
     physical: PhysicalEnergyConfig = PhysicalEnergyConfig()
     interaction: InteractionEnergyConfig = InteractionEnergyConfig()
+    chemical_constraints: ChemicalConstraintEnergyConfig = ChemicalConstraintEnergyConfig()
 
 
 def guidance_energy(
@@ -29,11 +32,12 @@ def guidance_energy(
     """Return leaf terms plus one combined ``total``.
 
     Group totals are deliberately omitted from this flat mapping so summing
-    every value except ``total`` cannot double-count physical or interaction
-    energy.
+    every value except ``total`` cannot double-count physical, interaction, or
+    chemical-constraint energy.
     """
     physical = physical_energy(coords, system, config.physical)
     interaction = interaction_energy(coords, system, config.interaction)
+    chemical = chemical_constraint_energy(coords, system, config.chemical_constraints)
     components = {
         name: value
         for name, value in physical.items()
@@ -45,7 +49,13 @@ def guidance_energy(
         if name in components:
             raise RuntimeError(f"guidance energy term collision: {name}")
         components[name] = value
-    components["total"] = physical["total"] + interaction["total"]
+    for name, value in chemical.items():
+        if name == "total":
+            continue
+        if name in components:
+            raise RuntimeError(f"guidance energy term collision: {name}")
+        components[name] = value
+    components["total"] = physical["total"] + interaction["total"] + chemical["total"]
     return components
 
 
@@ -321,6 +331,9 @@ class UnifiedGuidanceConfig:
     max_backtracks: int = 8
     descent_atol: float = 1e-6
     descent_rtol: float = 1e-6
+    chemical_constraint_strength: float = 0.0
+    chemical_constraint_ramp_power: float = 1.0
+    chemical_constraint_max_atom_displacement: float = 0.10
     energy: GuidanceEnergyConfig = field(default_factory=GuidanceEnergyConfig)
 
     def __post_init__(self) -> None:
@@ -343,6 +356,15 @@ class UnifiedGuidanceConfig:
             raise ValueError("max_backtracks must be non-negative")
         if self.descent_atol < 0 or self.descent_rtol < 0:
             raise ValueError("descent tolerances must be non-negative")
+        if (
+            not math.isfinite(self.chemical_constraint_strength)
+            or self.chemical_constraint_strength < 0
+        ):
+            raise ValueError("chemical_constraint_strength must be finite and non-negative")
+        if self.chemical_constraint_ramp_power <= 0:
+            raise ValueError("chemical_constraint_ramp_power must be positive")
+        if self.chemical_constraint_max_atom_displacement <= 0:
+            raise ValueError("chemical_constraint_max_atom_displacement must be positive")
 
 
 def _fragment_pose_coords(
@@ -447,6 +469,12 @@ class UnifiedGuidance:
             "direct_max_translation_velocity": 0.0,
             "direct_max_angular_velocity": 0.0,
             "direct_max_estimated_atom_displacement": 0.0,
+            "direct_chemical_constraint_pose_applied": 0,
+            "direct_chemical_constraint_nonfinite_poses": 0,
+            "direct_chemical_constraint_raw_atom_speed_rms_sum": 0.0,
+            "direct_chemical_constraint_applied_atom_speed_rms_sum": 0.0,
+            "direct_chemical_constraint_cap_trigger_count": 0,
+            "direct_chemical_constraint_max_estimated_atom_displacement": 0.0,
         }
         self._direct_step_trace: list[dict[str, float | int | None]] = []
 
@@ -533,6 +561,55 @@ class UnifiedGuidance:
         }
         return translation, angular, total.detach(), finite.detach()
 
+    def _chemical_constraint_direction(
+        self,
+        coords: Tensor,
+        centers: Tensor,
+    ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+        """Project only input-defined chemical constraints into fragment motion."""
+        config = replace(self.config.energy.chemical_constraints, scale=1.0)
+        with torch.enable_grad():
+            variable = coords.detach().requires_grad_(True)
+            components = chemical_constraint_energy(variable, self.system, config)
+            total = components["total"]
+            if total.requires_grad:
+                atom_force = -torch.autograd.grad(total.sum(), variable)[0]
+            else:
+                atom_force = torch.zeros_like(variable)
+        finite = (
+            torch.isfinite(total)
+            & torch.isfinite(atom_force).all(dim=(1, 2))
+            & torch.isfinite(variable).all(dim=(1, 2))
+            & torch.isfinite(centers).all(dim=(1, 2))
+        )
+        safe_force = torch.where(
+            finite.view(-1, 1, 1),
+            atom_force,
+            torch.zeros_like(atom_force),
+        )
+        safe_force = _clip_vectors(safe_force, self.config.max_atom_force)
+        translation, angular = project_atom_forces(
+            safe_force,
+            variable.detach(),
+            centers,
+            self.system.topology.fragment_id,
+            self.system.topology.mass,
+        )
+        translation = torch.where(
+            finite.view(-1, 1, 1), translation, torch.zeros_like(translation)
+        )
+        angular = torch.where(finite.view(-1, 1, 1), angular, torch.zeros_like(angular))
+        if self.last_components is None:
+            self.last_components = {}
+        self.last_components.update(
+            {
+                name: value.detach()
+                for name, value in components.items()
+                if name != "total"
+            }
+        )
+        return translation, angular, total.detach(), finite.detach()
+
     def direct_velocity(
         self,
         atom_pos_flat: Tensor,
@@ -547,12 +624,11 @@ class UnifiedGuidance:
     ) -> tuple[Tensor, Tensor]:
         """Return the actual drift increment added to the learned ODE velocity.
 
-        Raw Newton--Euler guidance is normalized per pose against the learned
-        fragment field after both are mapped into atom velocity space.  One
-        scalar multiplies translation and rotation together, preserving their
-        coupled rigid-body direction.  ``strength`` is applied exactly once
-        here; the sampler integrates the returned velocity exactly once over
-        its normal ``dt``.
+        Physical/interaction guidance and input-defined chemical constraints
+        are normalized independently against the learned fragment field after
+        mapping into atom-velocity space. Each channel preserves its coupled
+        translation/rotation direction. The sampler integrates the returned
+        combined velocity exactly once over its normal ``dt``.
         """
         if strength < 0:
             raise ValueError("unified direct-guidance strength must be non-negative")
@@ -562,7 +638,16 @@ class UnifiedGuidance:
             guidance_start=self.config.start_t,
             power=self.config.ramp_power,
         )
-        if strength == 0 or ramp == 0:
+        chemical_strength = float(self.config.chemical_constraint_strength)
+        chemical_ramp = _interval_average_ramp(
+            t_start,
+            t_end,
+            guidance_start=self.config.start_t,
+            power=self.config.chemical_constraint_ramp_power,
+        )
+        if (strength == 0 or ramp == 0) and (
+            chemical_strength == 0 or chemical_ramp == 0
+        ):
             return torch.zeros_like(centers_flat), torch.zeros_like(centers_flat)
         if atom_pos_flat.shape[0] % self.n_atoms:
             raise ValueError("flattened direct-guidance coordinates are not whole poses")
@@ -646,18 +731,103 @@ class UnifiedGuidance:
         translation = coefficient.view(-1, 1, 1) * raw_translation
         angular = coefficient.view(-1, 1, 1) * raw_angular
 
+        fragment_id_d = fragment_id.to(device=coords.device, dtype=torch.long)
+        lever_radius = (coords - centers[:, fragment_id_d]).norm(dim=-1)
+        dt = float(t_end) - float(t_start)
+        chemical_raw_rms = torch.zeros_like(reference_rms)
+        chemical_applied_rms = torch.zeros_like(reference_rms)
+        chemical_applied = torch.zeros_like(finite)
+        chemical_finite = torch.ones_like(finite)
+        chemical_cap_trigger = torch.zeros_like(finite)
+        chemical_endpoint_bound_after = torch.zeros_like(reference_rms)
+        if chemical_strength != 0 and chemical_ramp != 0:
+            chemical_translation, chemical_angular, _, chemical_finite = (
+                self._chemical_constraint_direction(coords, centers)
+            )
+            chemical_angular = torch.where(
+                movable_rotation.unsqueeze(-1),
+                chemical_angular,
+                torch.zeros_like(chemical_angular),
+            )
+            chemical_raw_atom_velocity = _induced_atom_velocity(
+                chemical_translation,
+                chemical_angular,
+                coords,
+                centers,
+                fragment_id,
+            )
+            chemical_raw_rms = chemical_raw_atom_velocity.square().sum(dim=-1).mean(dim=1).sqrt()
+            chemical_has_direction = chemical_raw_rms > eps
+            chemical_normalization = torch.where(
+                chemical_finite & has_reference & chemical_has_direction,
+                reference_rms / chemical_raw_rms.clamp_min(eps),
+                torch.zeros_like(reference_rms),
+            )
+            chemical_coefficient = (
+                chemical_strength * float(chemical_ramp) * chemical_normalization
+            )
+            chemical_translation = (
+                chemical_coefficient.view(-1, 1, 1) * chemical_translation
+            )
+            chemical_angular = chemical_coefficient.view(-1, 1, 1) * chemical_angular
+            chemical_translation_max = chemical_translation.norm(dim=-1).amax(dim=1)
+            chemical_angular_max = chemical_angular.norm(dim=-1).amax(dim=1)
+            chemical_endpoint_speed = (
+                chemical_translation.norm(dim=-1)[:, fragment_id_d]
+                + chemical_angular.norm(dim=-1)[:, fragment_id_d] * lever_radius
+            ).amax(dim=1)
+            chemical_cap = torch.ones_like(reference_rms)
+            chemical_cap = torch.minimum(
+                chemical_cap,
+                float(self.config.max_translation_velocity)
+                / chemical_translation_max.clamp_min(eps),
+            )
+            chemical_cap = torch.minimum(
+                chemical_cap,
+                float(self.config.max_angular_velocity)
+                / chemical_angular_max.clamp_min(eps),
+            )
+            chemical_cap = torch.minimum(
+                chemical_cap,
+                float(self.config.chemical_constraint_max_atom_displacement)
+                / (dt * chemical_endpoint_speed).clamp_min(eps),
+            ).clamp(max=1.0)
+            chemical_cap_trigger = (
+                chemical_finite
+                & chemical_has_direction
+                & chemical_cap.lt(1.0)
+            )
+            chemical_translation = chemical_cap.view(-1, 1, 1) * chemical_translation
+            chemical_angular = chemical_cap.view(-1, 1, 1) * chemical_angular
+            chemical_applied_atom_velocity = _induced_atom_velocity(
+                chemical_translation,
+                chemical_angular,
+                coords,
+                centers,
+                fragment_id,
+            )
+            chemical_applied_rms = (
+                chemical_applied_atom_velocity.square().sum(dim=-1).mean(dim=1).sqrt()
+            )
+            chemical_applied = chemical_finite & chemical_applied_rms.gt(eps)
+            chemical_endpoint_bound_after = dt * (
+                chemical_translation.norm(dim=-1)[:, fragment_id_d]
+                + chemical_angular.norm(dim=-1)[:, fragment_id_d] * lever_radius
+            ).amax(dim=1)
+            translation = translation + chemical_translation
+            angular = angular + chemical_angular
+        else:
+            chemical_has_direction = torch.zeros_like(finite)
+
         # Apply all post-normalization limits through one positive pose scalar.
         # This keeps the Newton--Euler translation/rotation coupling intact.
         translation_max = translation.norm(dim=-1).amax(dim=1)
         angular_max = angular.norm(dim=-1).amax(dim=1)
-        fragment_id_d = fragment_id.to(device=coords.device, dtype=torch.long)
-        lever_radius = (coords - centers[:, fragment_id_d]).norm(dim=-1)
         endpoint_speed_bound = (
             translation.norm(dim=-1)[:, fragment_id_d]
             + angular.norm(dim=-1)[:, fragment_id_d] * lever_radius
         ).amax(dim=1)
-        dt = float(t_end) - float(t_start)
-        cap_eligible = finite & has_reference & has_direction
+        cap_eligible = finite & has_reference & (has_direction | chemical_has_direction)
         translation_cap_trigger = cap_eligible & (
             translation_max > float(self.config.max_translation_velocity)
         )
@@ -819,6 +989,37 @@ class UnifiedGuidance:
         }
         for name, value in maxima.items():
             self._stats[name] = max(float(self._stats[name]), float(value.item()))
+        self._stats["direct_chemical_constraint_pose_applied"] += int(
+            chemical_applied.sum().item()
+        )
+        self._stats["direct_chemical_constraint_nonfinite_poses"] += int(
+            (~chemical_finite).sum().item()
+        )
+        self._stats["direct_chemical_constraint_raw_atom_speed_rms_sum"] += float(
+            torch.where(
+                chemical_finite,
+                chemical_raw_rms,
+                torch.zeros_like(chemical_raw_rms),
+            ).sum().item()
+        )
+        self._stats["direct_chemical_constraint_applied_atom_speed_rms_sum"] += float(
+            torch.where(
+                chemical_finite,
+                chemical_applied_rms,
+                torch.zeros_like(chemical_applied_rms),
+            ).sum().item()
+        )
+        self._stats["direct_chemical_constraint_cap_trigger_count"] += int(
+            chemical_cap_trigger.sum().item()
+        )
+        self._stats["direct_chemical_constraint_max_estimated_atom_displacement"] = max(
+            float(
+                self._stats[
+                    "direct_chemical_constraint_max_estimated_atom_displacement"
+                ]
+            ),
+            float(chemical_endpoint_bound_after.max().item()),
+        )
         finite_count = int(finite.sum().item())
         self._direct_step_trace.append(
             {
@@ -827,6 +1028,12 @@ class UnifiedGuidance:
                 "dt": dt,
                 "ramp": float(ramp),
                 "eta": float(strength),
+                "chemical_constraint_ramp": float(chemical_ramp),
+                "chemical_constraint_strength": chemical_strength,
+                "chemical_constraint_applied_count": int(chemical_applied.sum().item()),
+                "chemical_constraint_cap_trigger_count": int(
+                    chemical_cap_trigger.sum().item()
+                ),
                 "pose_count": batch_size,
                 "finite_count": finite_count,
                 "applied_count": int(applied.sum().item()),

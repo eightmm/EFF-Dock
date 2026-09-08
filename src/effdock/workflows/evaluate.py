@@ -702,6 +702,9 @@ def evaluate_one(
     selector_profile: str = DEFAULT_SELECTOR_PROFILE,
     unified_guidance_steric_radius_scale: float | None = None,
     unified_guidance_chiral_improper_scale: float = 1.0,
+    unified_guidance_chemical_constraint_strength: float = 0.0,
+    unified_guidance_chemical_constraint_ramp_power: float = 1.0,
+    unified_guidance_chemical_constraint_max_atom_displacement: float = 0.10,
     fk_constraint_beta: float = 0.0,
     fk_resample_times: tuple[float, ...] = (),
     fk_resample_method: str = "systematic",
@@ -774,6 +777,19 @@ def evaluate_one(
         raise ValueError("unified_guidance_steric_radius_scale must be positive")
     if unified_guidance_chiral_improper_scale < 0.0:
         raise ValueError("unified_guidance_chiral_improper_scale must be non-negative")
+    if (
+        not math.isfinite(unified_guidance_chemical_constraint_strength)
+        or unified_guidance_chemical_constraint_strength < 0.0
+    ):
+        raise ValueError(
+            "unified_guidance_chemical_constraint_strength must be finite and non-negative"
+        )
+    if unified_guidance_chemical_constraint_strength > 0.0 and (
+        unified_guidance_scale <= 0.0 or unified_guidance_mode != "normalized_drift"
+    ):
+        raise ValueError(
+            "chemical-constraint guidance requires nonzero normalized-drift guidance"
+        )
     if unified_guidance_mode not in {"operator_split", "normalized_drift"}:
         raise ValueError(f"unknown unified guidance mode: {unified_guidance_mode!r}")
     if prior_pool_size and prior_pool_size < num_samples:
@@ -866,6 +882,7 @@ def evaluate_one(
         )
     elif unified_guidance_scale != 0.0 or fk_enabled:
         from effdock.guidance import (
+            ChemicalConstraintEnergyConfig,
             GuidanceEnergyConfig,
             PhysicalEnergyConfig,
             UnifiedGuidance,
@@ -895,9 +912,18 @@ def evaluate_one(
             ),
             chiral_improper_scale=unified_guidance_chiral_improper_scale,
         )
+        chemical_constraint_config = ChemicalConstraintEnergyConfig(scale=0.0)
         term_coefficients = {
             "protein_ligand_steric_radius_scale": physical_config.steric_radius_scale,
             "ligand_chiral_improper_scale": physical_config.chiral_improper_scale,
+            "chemical_constraint_strength": unified_guidance_chemical_constraint_strength,
+            "chemical_constraint_shared_start_t": unified_guidance_start_t,
+            "chemical_constraint_ramp_power": (
+                unified_guidance_chemical_constraint_ramp_power
+            ),
+            "chemical_constraint_max_atom_displacement": (
+                unified_guidance_chemical_constraint_max_atom_displacement
+            ),
         }
         if fk_enabled:
             coupling_metadata = {
@@ -973,6 +999,7 @@ def evaluate_one(
                 if system.interaction_topology is not None
                 else {}
             ),
+            "stereo_term_counts": system.topology.stereo_term_counts(),
             "receptor": receptor_metadata,
         }
         system = system.to(device=device, dtype=torch.float32)
@@ -1003,7 +1030,19 @@ def evaluate_one(
                     max_angular_velocity=unified_guidance_max_angular_velocity,
                     max_atom_displacement=unified_guidance_max_atom_displacement,
                     max_backtracks=unified_guidance_max_backtracks,
-                    energy=GuidanceEnergyConfig(physical=physical_config),
+                    chemical_constraint_strength=(
+                        unified_guidance_chemical_constraint_strength
+                    ),
+                    chemical_constraint_ramp_power=(
+                        unified_guidance_chemical_constraint_ramp_power
+                    ),
+                    chemical_constraint_max_atom_displacement=(
+                        unified_guidance_chemical_constraint_max_atom_displacement
+                    ),
+                    energy=GuidanceEnergyConfig(
+                        physical=physical_config,
+                        chemical_constraints=chemical_constraint_config,
+                    ),
                 ),
             )
             guidance_is_unified = True
@@ -1630,6 +1669,26 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "by unified guidance or FK constraints."
         ),
     )
+    parser.add_argument(
+        "--unified-guidance-chemical-constraint-strength",
+        type=float,
+        default=0.0,
+        help=(
+            "Independent normalized-drift strength for input-defined chemical "
+            "constraints (currently signed tetrahedral and E/Z barriers). "
+            "0 preserves the historical guidance behavior."
+        ),
+    )
+    parser.add_argument(
+        "--unified-guidance-chemical-constraint-ramp-power",
+        type=float,
+        default=1.0,
+    )
+    parser.add_argument(
+        "--unified-guidance-chemical-constraint-max-atom-displacement",
+        type=float,
+        default=0.10,
+    )
     parser.add_argument("--unified-guidance-protein-shell", type=float, default=18.0)
     parser.add_argument(
         "--unified-guidance-receptor-policy",
@@ -1838,6 +1897,21 @@ def main(argv: list[str] | None = None) -> None:
         parser.error("--unified-guidance-steric-radius-scale must be positive")
     if args.unified_guidance_chiral_improper_scale < 0.0:
         parser.error("--unified-guidance-chiral-improper-scale must be non-negative")
+    if (
+        not math.isfinite(args.unified_guidance_chemical_constraint_strength)
+        or args.unified_guidance_chemical_constraint_strength < 0.0
+    ):
+        parser.error(
+            "--unified-guidance-chemical-constraint-strength must be finite and non-negative"
+        )
+    if args.unified_guidance_chemical_constraint_strength > 0.0 and (
+        args.unified_guidance_scale <= 0.0
+        or args.unified_guidance_mode != "normalized_drift"
+    ):
+        parser.error(
+            "--unified-guidance-chemical-constraint-strength requires nonzero "
+            "--unified-guidance-scale with --unified-guidance-mode normalized_drift"
+        )
     if args.prior_pool_size < 0:
         parser.error("--prior-pool-size must be non-negative")
     if args.prior_pool_size and args.prior_pool_size < args.num_samples:
@@ -1971,6 +2045,15 @@ def main(argv: list[str] | None = None) -> None:
                 unified_guidance_steric_radius_scale=(args.unified_guidance_steric_radius_scale),
                 unified_guidance_chiral_improper_scale=(
                     args.unified_guidance_chiral_improper_scale
+                ),
+                unified_guidance_chemical_constraint_strength=(
+                    args.unified_guidance_chemical_constraint_strength
+                ),
+                unified_guidance_chemical_constraint_ramp_power=(
+                    args.unified_guidance_chemical_constraint_ramp_power
+                ),
+                unified_guidance_chemical_constraint_max_atom_displacement=(
+                    args.unified_guidance_chemical_constraint_max_atom_displacement
                 ),
                 fk_constraint_beta=args.fk_constraint_beta,
                 fk_resample_times=args.fk_resample_times,
@@ -2114,6 +2197,15 @@ def main(argv: list[str] | None = None) -> None:
         "unified_guidance_max_backtracks": args.unified_guidance_max_backtracks,
         "unified_guidance_steric_radius_scale": (args.unified_guidance_steric_radius_scale),
         "unified_guidance_chiral_improper_scale": (args.unified_guidance_chiral_improper_scale),
+        "unified_guidance_chemical_constraint_strength": (
+            args.unified_guidance_chemical_constraint_strength
+        ),
+        "unified_guidance_chemical_constraint_ramp_power": (
+            args.unified_guidance_chemical_constraint_ramp_power
+        ),
+        "unified_guidance_chemical_constraint_max_atom_displacement": (
+            args.unified_guidance_chemical_constraint_max_atom_displacement
+        ),
         "unified_guidance_protein_shell": args.unified_guidance_protein_shell,
         "unified_guidance_receptor_policy": args.unified_guidance_receptor_policy,
         "guidance_implementation": guidance_implementation_identity(),

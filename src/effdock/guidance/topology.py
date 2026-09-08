@@ -40,6 +40,12 @@ class PhysicalTopology:
     improper_phi0: Tensor
     improper_k: Tensor
     improper_planar: Tensor
+    stereo_tetra_index: Tensor
+    stereo_tetra_reference_sign: Tensor
+    stereo_tetra_reference_magnitude: Tensor
+    stereo_double_index: Tensor
+    stereo_double_reference_cos_sign: Tensor
+    stereo_double_reference_cos_magnitude: Tensor
     ligand_pair_index: Tensor
     ligand_pair_scale: Tensor
 
@@ -60,6 +66,8 @@ class PhysicalTopology:
             "proper_cut_bond_id",
             "improper_index",
             "improper_planar",
+            "stereo_tetra_index",
+            "stereo_double_index",
             "ligand_pair_index",
         }
         for item in fields(self):
@@ -81,6 +89,23 @@ class PhysicalTopology:
             "interfragment_nonbonded_pairs": int(self.ligand_pair_index.shape[1]),
         }
 
+    def stereo_term_counts(self) -> dict[str, int]:
+        tetrahedral = int(self.stereo_tetra_index.shape[1])
+        double_bond = int(self.stereo_double_index.shape[1])
+
+        def cross_fragment_count(indices: Tensor) -> int:
+            if not indices.numel():
+                return 0
+            fragments = self.fragment_id[indices]
+            return int(fragments.ne(fragments[:1]).any(dim=0).sum().item())
+
+        return {
+            "tetrahedral": tetrahedral,
+            "tetrahedral_cross_fragment": cross_fragment_count(self.stereo_tetra_index),
+            "double_bond": double_bond,
+            "double_bond_cross_fragment": cross_fragment_count(self.stereo_double_index),
+        }
+
     def reference_sha256(self) -> str:
         """Hash fragment topology and input-reference geometric targets."""
         names = (
@@ -98,6 +123,12 @@ class PhysicalTopology:
             "improper_index",
             "improper_phi0",
             "improper_planar",
+            "stereo_tetra_index",
+            "stereo_tetra_reference_sign",
+            "stereo_tetra_reference_magnitude",
+            "stereo_double_index",
+            "stereo_double_reference_cos_sign",
+            "stereo_double_reference_cos_magnitude",
             "ligand_pair_index",
             "ligand_pair_scale",
         )
@@ -158,6 +189,31 @@ def _reference_angle(coords: Tensor, indices: tuple[int, int, int]) -> float:
             "nonfinite_ligand_reference_geometry",
             "ligand input conformer produced a non-finite covalent angle",
             details={"atom_indices": list(indices)},
+        )
+    return float(value)
+
+
+def _normalized_signed_volume(
+    coords: Tensor,
+    indices: tuple[int, int, int, int],
+) -> float:
+    center, first, second, third = indices
+    a = coords[first] - coords[center]
+    b = coords[second] - coords[center]
+    c = coords[third] - coords[center]
+    denominator = a.norm() * b.norm() * c.norm()
+    if float(denominator) < 1e-12:
+        raise UnsupportedPhysicalChemistryError(
+            "degenerate_stereo_reference_geometry",
+            "ligand input conformer contains a degenerate tetrahedral stereo center",
+            details={"atom_indices": list(indices)},
+        )
+    value = torch.dot(torch.linalg.cross(a, b, dim=-1), c) / denominator
+    if not bool(torch.isfinite(value)) or abs(float(value)) < 1e-6:
+        raise UnsupportedPhysicalChemistryError(
+            "degenerate_stereo_reference_geometry",
+            "ligand input conformer has no stable signed volume at a declared stereo center",
+            details={"atom_indices": list(indices), "normalized_volume": float(value)},
         )
     return float(value)
 
@@ -306,6 +362,58 @@ def build_physical_topology(mol: Chem.Mol, fragment_id: Tensor) -> PhysicalTopol
             )
             improper_planar.append(planar)
 
+    stereo_tetra_rows: list[tuple[int, int, int, int]] = []
+    stereo_tetra_sign: list[float] = []
+    stereo_tetra_magnitude: list[float] = []
+    tetrahedral_tags = {
+        Chem.rdchem.ChiralType.CHI_TETRAHEDRAL_CW,
+        Chem.rdchem.ChiralType.CHI_TETRAHEDRAL_CCW,
+    }
+    for center in range(n_atoms):
+        atom = mol.GetAtomWithIdx(center)
+        if atom.GetChiralTag() not in tetrahedral_tags:
+            continue
+        neighbors = sorted(neighbor.GetIdx() for neighbor in atom.GetNeighbors())
+        if len(neighbors) < 3:
+            continue
+        row = (center, neighbors[0], neighbors[1], neighbors[2])
+        value = _normalized_signed_volume(coords, row)
+        stereo_tetra_rows.append(row)
+        stereo_tetra_sign.append(math.copysign(1.0, value))
+        stereo_tetra_magnitude.append(abs(value))
+
+    stereo_double_rows: list[tuple[int, int, int, int]] = []
+    stereo_double_sign: list[float] = []
+    stereo_double_magnitude: list[float] = []
+    explicit_double_stereo = {
+        Chem.rdchem.BondStereo.STEREOE,
+        Chem.rdchem.BondStereo.STEREOZ,
+        Chem.rdchem.BondStereo.STEREOCIS,
+        Chem.rdchem.BondStereo.STEREOTRANS,
+    }
+    for bond in mol.GetBonds():
+        if bond.GetStereo() not in explicit_double_stereo:
+            continue
+        stereo_atoms = tuple(int(index) for index in bond.GetStereoAtoms())
+        if len(stereo_atoms) != 2 or any(index < 0 for index in stereo_atoms):
+            continue
+        row = (
+            stereo_atoms[0],
+            bond.GetBeginAtomIdx(),
+            bond.GetEndAtomIdx(),
+            stereo_atoms[1],
+        )
+        cosine = math.cos(_reference_dihedral(coords, row))
+        if not math.isfinite(cosine) or abs(cosine) < 1e-6:
+            raise UnsupportedPhysicalChemistryError(
+                "degenerate_stereo_reference_geometry",
+                "ligand input conformer has no stable E/Z alignment",
+                details={"atom_indices": list(row), "dihedral_cosine": cosine},
+            )
+        stereo_double_rows.append(row)
+        stereo_double_sign.append(math.copysign(1.0, cosine))
+        stereo_double_magnitude.append(abs(cosine))
+
     distances = _graph_distances(n_atoms, all_bonds)
     pair_rows: list[tuple[int, int]] = []
     pair_scale: list[float] = []
@@ -344,6 +452,21 @@ def build_physical_topology(mol: Chem.Mol, fragment_id: Tensor) -> PhysicalTopol
         improper_phi0=torch.tensor(improper_phi0, dtype=torch.float64),
         improper_k=torch.tensor(improper_k, dtype=torch.float64),
         improper_planar=torch.tensor(improper_planar, dtype=torch.bool),
+        stereo_tetra_index=_index_tensor(stereo_tetra_rows, 4),
+        stereo_tetra_reference_sign=torch.tensor(stereo_tetra_sign, dtype=torch.float64),
+        stereo_tetra_reference_magnitude=torch.tensor(
+            stereo_tetra_magnitude,
+            dtype=torch.float64,
+        ),
+        stereo_double_index=_index_tensor(stereo_double_rows, 4),
+        stereo_double_reference_cos_sign=torch.tensor(
+            stereo_double_sign,
+            dtype=torch.float64,
+        ),
+        stereo_double_reference_cos_magnitude=torch.tensor(
+            stereo_double_magnitude,
+            dtype=torch.float64,
+        ),
         ligand_pair_index=_index_tensor(pair_rows, 2),
         ligand_pair_scale=torch.tensor(pair_scale, dtype=torch.float64),
     )

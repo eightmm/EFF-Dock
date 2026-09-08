@@ -640,7 +640,10 @@ def build_trace_report(args: argparse.Namespace) -> dict[str, object]:
                 "unitless burial times one-minus-polar-satisfaction trace; "
                 "never included in energy or force"
             ),
-            "total": ("unified GuidanceEnergy = PhysicalEnergy + InteractionEnergy; Vina excluded"),
+            "total": (
+                "unified GuidanceEnergy = PhysicalEnergy + InteractionEnergy + "
+                "ChemicalConstraintEnergy; Vina excluded"
+            ),
         },
         "warnings": warnings,
         "rows": rows,
@@ -652,7 +655,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="eff-dock physical trace",
         description=(
-            "Trace in-repository Torch physical and interaction guidance terms "
+            "Trace in-repository Torch physical, interaction, and stereo guidance terms "
             "on a crystal pose and optionally on saved EFF-Dock trajectories."
         ),
     )

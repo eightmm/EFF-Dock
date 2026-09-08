@@ -96,7 +96,7 @@ def trace_guidance_pose(
     step: int | None = None,
     t: float | None = None,
 ) -> dict[str, object]:
-    """Trace unified physical + interaction energy and coordinate gradients."""
+    """Trace unified physical + interaction + stereo energy and gradients."""
     work = coords.detach().to(
         device=system.protein_coords.device,
         dtype=system.protein_coords.dtype,

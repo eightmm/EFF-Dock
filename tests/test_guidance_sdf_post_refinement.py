@@ -11,6 +11,7 @@ Chem = pytest.importorskip("rdkit.Chem")
 
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
+from effdock.inference.io import write_multi_sdf  # noqa: E402
 from effdock.workflows.guidance_budget_posebusters_report import (  # noqa: E402
     VALIDITY_CHECKS,
 )
@@ -31,8 +32,11 @@ from scripts.report_s50_symmetry_confidence_refined_external import (  # noqa: E
     _stage,
 )
 from scripts.run_guidance_sdf_post_refinement import (  # noqa: E402
+    ENERGY_PROPERTY_SCHEMA,
+    _energy_sdf_properties,
     _graph_signature,
     _load_pose_batch,
+    _persisted_energy_groups,
     _select_record,
     _tensor_sha256,
 )
@@ -76,6 +80,115 @@ def test_tensor_hash_binds_shape_dtype_and_values() -> None:
     assert _tensor_sha256(value) == _tensor_sha256(value.clone())
     assert _tensor_sha256(value) != _tensor_sha256(value + 1)
     assert _tensor_sha256(value) != _tensor_sha256(value.reshape(1, 4, 3))
+
+
+def test_persisted_energy_groups_keep_violation_separate_from_attraction() -> None:
+    metrics = {
+        "energies": {
+            "ligand_intra_bond": 1.0,
+            "ligand_intra_angle": 2.0,
+            "ligand_intra_proper": 4.0,
+            "ligand_intra_improper": 3.0,
+            "ligand_intra_lj_repulsive": 5.0,
+            "ligand_intra_lj_attractive": -6.0,
+            "protein_ligand_lj_repulsive": 7.0,
+            "protein_ligand_lj_attractive": -8.0,
+            "protein_ligand_steric_barrier": 9.0,
+            "receptor_geometry_obstacle_uff_repulsive": 10.0,
+            "receptor_geometry_obstacle_generic_repulsive": 11.0,
+            "interaction_hydrophobic": -12.0,
+            "total": 26.0,
+        },
+        "energy_groups": {
+            "physical": 38.0,
+            "interaction": -12.0,
+            "combined": 26.0,
+        },
+    }
+    assert _persisted_energy_groups(metrics) == {
+        "total": 26.0,
+        "physical": 38.0,
+        "interaction": -12.0,
+        "violation": 48.0,
+    }
+
+
+def test_persisted_energy_groups_zero_fill_inapplicable_obstacle_terms() -> None:
+    metrics = {
+        "energies": {
+            "ligand_intra_bond": 1.0,
+            "ligand_intra_angle": 2.0,
+            "ligand_intra_improper": 3.0,
+            "ligand_intra_lj_repulsive": 4.0,
+            "protein_ligand_lj_repulsive": 5.0,
+            "protein_ligand_steric_barrier": 6.0,
+            "total": 21.0,
+        },
+        "energy_groups": {
+            "physical": 21.0,
+            "interaction": 0.0,
+            "combined": 21.0,
+        },
+    }
+    assert _persisted_energy_groups(metrics)["violation"] == 21.0
+
+
+def test_energy_sdf_properties_use_the_requested_saved_step() -> None:
+    pose_summary = {
+        "initial_total_energy": 20.0,
+        "terminal_step": 25,
+        "shell_envelope_valid": False,
+        "saved_energy_groups_by_step": {
+            "0": {"total": 20.0, "physical": 23.0, "interaction": -3.0, "violation": 8.0},
+            "25": {"total": 5.0, "physical": 9.0, "interaction": -4.0, "violation": 2.0},
+        },
+    }
+    assert _energy_sdf_properties(pose_summary, 25) == {
+        "guidance_energy_schema": ENERGY_PROPERTY_SCHEMA,
+        "guidance_total_energy": 5.0,
+        "guidance_physical_energy": 9.0,
+        "guidance_interaction_energy": -4.0,
+        "guidance_violation_energy": 2.0,
+        "guidance_energy_drop": 15.0,
+        "guidance_terminal_step": 25,
+        "guidance_shell_envelope_valid": False,
+    }
+
+
+def test_energy_properties_are_written_to_each_sdf_pose(tmp_path: Path) -> None:
+    molecule = Chem.MolFromSmiles("CC")
+    conformer = Chem.Conformer(molecule.GetNumAtoms())
+    conformer.SetAtomPosition(0, (0.0, 0.0, 0.0))
+    conformer.SetAtomPosition(1, (1.5, 0.0, 0.0))
+    molecule.AddConformer(conformer)
+    properties = {
+        "guidance_energy_schema": ENERGY_PROPERTY_SCHEMA,
+        "guidance_total_energy": -7.0,
+        "guidance_physical_energy": 3.0,
+        "guidance_interaction_energy": -10.0,
+        "guidance_violation_energy": 0.5,
+        "guidance_energy_drop": 12.0,
+        "guidance_terminal_step": 25,
+        "guidance_shell_envelope_valid": True,
+    }
+    path = tmp_path / "refined.sdf"
+    write_multi_sdf(
+        molecule,
+        [torch.tensor([[0.0, 0.0, 0.0], [1.5, 0.0, 0.0]])],
+        torch.zeros(3),
+        path,
+        per_pose_props=[properties],
+        force_v3000=True,
+    )
+    loaded = next(mol for mol in Chem.SDMolSupplier(str(path)) if mol is not None)
+    assert loaded.GetProp("guidance_energy_schema") == ENERGY_PROPERTY_SCHEMA
+    assert float(loaded.GetProp("guidance_total_energy")) == pytest.approx(-7.0)
+    assert float(loaded.GetProp("guidance_physical_energy")) == pytest.approx(3.0)
+    assert float(loaded.GetProp("guidance_interaction_energy")) == pytest.approx(-10.0)
+    assert float(loaded.GetProp("guidance_violation_energy")) == pytest.approx(0.5)
+    assert float(loaded.GetProp("guidance_energy_drop")) == pytest.approx(12.0)
+    assert loaded.GetProp("guidance_terminal_step") == "25"
+    assert loaded.GetProp("guidance_shell_envelope_valid") == "True"
 
 
 def test_pose_batch_loader_reads_record_after_64k_boundary(tmp_path: Path) -> None:

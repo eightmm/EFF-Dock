@@ -1,0 +1,34 @@
+{
+  "name": "EFF-Chemical-Constraints-v1-diagnostic",
+  "version": "1.0.0",
+  "energy_unit": "kcal/mol",
+  "distance_unit": "angstrom",
+  "formula_version": "effdock-chemical-constraints-1",
+  "claim": "Differentiable preservation of coordinate constraints explicitly declared by the inference ligand. V1 covers heavy-atom-observable tetrahedral and E/Z stereochemistry; it does not infer a conformer, binding orientation, strain, or protein interaction.",
+  "functional_form": {
+    "tetrahedral_alignment": "q = reference_sign * det(u_a,u_b,u_c) / (||u_a|| ||u_b|| ||u_c|| + eps)",
+    "double_bond_alignment": "q = reference_cos_sign * cos(dihedral(stereo_atom_a, bond_a, bond_b, stereo_atom_b))",
+    "barrier": "0.5 * k * (tau * softplus((margin_fraction * reference_magnitude - q) / tau))^2",
+    "combined_guidance": "GuidanceEnergy = PhysicalEnergy + InteractionEnergy + ChemicalConstraintEnergy"
+  },
+  "coefficient_units": {
+    "tetrahedral_k": "kcal/mol",
+    "double_bond_k": "kcal/mol",
+    "margin_fraction": "dimensionless",
+    "softness": "dimensionless",
+    "runtime_scale": "dimensionless"
+  },
+  "defaults": {
+    "runtime_scale": 0.0,
+    "tetrahedral_k": 20.0,
+    "double_bond_k": 20.0,
+    "margin_fraction": 0.25,
+    "softness": 0.05
+  },
+  "provenance": {
+    "status": "Opt-in diagnostic pending internal validation; zero runtime scale preserves historical guidance runs.",
+    "information_boundary": "Only explicit inference-ligand graph/isomeric-SMILES declarations may define the desired state.",
+    "reference": "Sanitized production-inference ligand conformer supplies only the sign/magnitude realization of declared stereo. No crystal coordinates or benchmark outcome are used.",
+    "v1_scope": "Explicit atom chirality and explicit E/Z bonds whose defining atoms remain in the heavy-atom graph."
+  }
+}

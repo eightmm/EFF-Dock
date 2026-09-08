@@ -960,8 +960,12 @@ def test_trace_reports_per_term_force_and_normalized_contact() -> None:
 def test_interaction_layer_default_enables_every_implemented_term() -> None:
     coords, system = _butane_system()
     combined_identity = guidance_parameter_identity()
-    assert combined_identity["version"] == "1.6.0"
-    assert combined_identity["formula_version"] == "physical-v2.2_plus_interaction-v1.6"
+    assert combined_identity["version"] == "1.8.0"
+    assert (
+        combined_identity["formula_version"]
+        == "physical-v2.2_plus_interaction-v1.6_plus_chemical-v1"
+    )
+    assert combined_identity["chemical_constraints"]["version"] == "1.0.0"
     components = interaction_energy(coords, system)
     assert set(components) == {
         "interaction_hydrophobic",
