@@ -41,9 +41,7 @@ COLORS = {
     "joint": "#6FAFA8",
     "valid": "#A8D5BA",
     "oracle": "#E7A77E",
-    "ours": "#7898C8",
-    "learning": "#A9C4E2",
-    "hybrid": "#B8AAD8",
+    "dl": "#8FA9D0",
     "classical": "#AED8C7",
 }
 
@@ -76,7 +74,7 @@ def save_figure(fig: plt.Figure, base: Path, dpi: int) -> None:
 def write_csv(path: Path, fieldnames: list[str], rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -402,24 +400,54 @@ def plot_external(payload: dict, output_dir: Path, dpi: int) -> None:
         raise ValueError("external comparison must be supplied-pocket-only")
     fig, axes = plt.subplots(1, 2, figsize=(14.2, 6.2), sharex=True)
     legend_handles = [
+        Patch(facecolor=COLORS["dl"], edgecolor=EDGE, label="DL"),
+        Patch(facecolor=COLORS["classical"], edgecolor=EDGE, label="Classical"),
         Patch(facecolor="#A7BBD2", edgecolor=EDGE, label="RMSD < 2 Å & PB-valid"),
         Patch(
             facecolor="#A7BBD2",
             edgecolor=EDGE,
             alpha=0.5,
             hatch="///",
-            label="RMSD < 2 Å but PB-invalid",
+            label="RMSD < 2 Å",
         ),
     ]
     csv_rows: list[dict] = []
     for ax, key, letter in zip(axes, ("astex", "posebusters"), ("A", "B"), strict=True):
         dataset = payload["datasets"][key]
-        methods = dataset["methods"]
+        # Keep the production EFF-Dock condition first, rank learned docking
+        # methods by Top-1, then retain classical docking as a bottom block.
+        methods = [method for method in dataset["methods"] if method["method"] != "SurfDock"]
+        effdock = [method for method in methods if method["method"] == "EFF-Dock"]
+        if len(effdock) != 1:
+            raise ValueError(f"expected exactly one EFF-Dock row for {key}")
+        rank_key = lambda method: (
+            -float(method["top1_rmsd_lt2"]["mean"]),
+            0 if method["method"] == "SigmaDock" else 1,
+            method["method"],
+        )
+        learned = sorted(
+            (
+                method
+                for method in methods
+                if method["method"] != "EFF-Dock" and method["family"] != "classical"
+            ),
+            key=rank_key,
+        )
+        classical = sorted(
+            (method for method in methods if method["family"] == "classical"),
+            key=rank_key,
+        )
+        methods = effdock + learned + classical
+        if any(method["source_type"] == "our_run" and method["repeat_count"] != 3 for method in methods):
+            raise ValueError(f"every locally executed method must have three repeats for {key}")
         y = np.arange(len(methods))[::-1]
         total = np.asarray([m["top1_rmsd_lt2"]["mean"] for m in methods])
         joint = np.asarray([m["top1_joint_rmsd_lt2_pb_valid"]["mean"] for m in methods])
         total_std = np.asarray([m["top1_rmsd_lt2"].get("std", 0.0) for m in methods])
-        colors = [COLORS[m["family"]] for m in methods]
+        colors = [
+            COLORS["classical"] if m["family"] == "classical" else COLORS["dl"]
+            for m in methods
+        ]
         if np.any(joint > total + 1e-10):
             raise ValueError(f"joint exceeds Top-1 for {key}")
 
@@ -463,12 +491,11 @@ def plot_external(payload: dict, output_dir: Path, dpi: int) -> None:
                     fontweight="bold",
                     color="white",
                 )
-        labels = [m["method"] for m in methods]
+        labels = [
+            "SurfDock" if method["method"] == "SurfDock + force optimization" else method["method"]
+            for method in methods
+        ]
         ax.set_yticks(y, labels)
-        for tick, method in zip(ax.get_yticklabels(), methods, strict=True):
-            if method["family"] == "ours":
-                tick.set_color(COLORS["ours"])
-                tick.set_fontweight("bold")
         ax.set_xlim(0, 101)
         ax.set_xticks(np.arange(0, 101, 20))
         ax.set_xlabel("Top-1 success rate (%)", fontsize=10, color=INK)
@@ -504,7 +531,7 @@ def plot_external(payload: dict, output_dir: Path, dpi: int) -> None:
         handles=legend_handles,
         loc="upper center",
         bbox_to_anchor=(0.5, 1.0),
-        ncol=2,
+        ncol=4,
         frameon=False,
         fontsize=9,
     )

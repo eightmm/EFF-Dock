@@ -13,8 +13,10 @@ excluded.
   results across Astex Diverse, PoseBusters v2, PhiBench, FoldBench pocket, and
   auxiliary OpenBind cohorts.
 - `figures/pocket_model_comparison.{png,pdf}`: supplied-pocket-only Top-1
-  comparison. Solid fill is joint RMSD `<2 Å` and PB-valid success; hatching is
-  the PB-invalid remainder of RMSD `<2 Å` success.
+  comparison. Every locally executed DL method, including EFF-Dock,
+  uses three repeats; error bars are sample SD. Solid fill is joint RMSD
+  `<2 Å` and PB-valid success; the hatched extension completes the RMSD
+  `<2 Å` rate.
 - `figures/pocket_cutoff_jitter_legacy_heatmap.{png,pdf}`: the complete legacy
   N80/S25 cutoff-by-center-jitter matrix. This is explicitly separated from
   the promoted U70k/N100/S10 production stack.
@@ -40,7 +42,7 @@ paper-reported cells do not claim repeat variance.
 
 - `outputs/benchmarks/effdock_pocket_cutoff_robustness_runs/cutoff-r3-production-20260901-r2/report.json`
 - `outputs/benchmarks/effdock_pocket_cutoff_jitter_robustness_runs/production-jitter-r3-20260904-v3/report.json`
-- `benchmarks/results/external_models/effdock_u70k_benchmark.json`
+- `outputs/benchmarks/effdock_pocket_prior_robustness_extension_runs/production-cutoff14-sigma-r3-20260906-v1/report.json`
 - `benchmarks/results/external_models/temporal_literature.json`
 - `outputs/benchmarks/s50_raw_refined_confidence_temporal_external_runs/d97d5eb907acc485dfde4b7fcf88d87b4d5fd8576014d2cfb89dd0518b9c9bb4/report/summary.json`
 - `benchmarks/results/external_models/pocket_only_pb_valid_comparison.json`
