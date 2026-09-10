@@ -34,12 +34,18 @@ complete repeats. Failed or missing targets remain denominator failures.
 |---|---|---|---|---|---|
 | SigmaDock | Euler S25; one independent pose per seed; 40 seeds per reported run; canonical fragmentation; sampled conformer; cutoff 5 A; official jitter/noise defaults; EMA checkpoint | Vinardo plus seven PoseBusters checks, `score_i = -Vinardo_i * p_i^4`; no coordinate minimization | fixed holo receptor; cognate ligand defines the pocket | pools 0–39, 40–79, 80–119 | paper Appendix F.2; `external_models/src/sigmadock/conf/sampling/base.yaml`; `external_models/src/sigmadock/src/sigmadock/chem/statistics.py` |
 | RLDiff RL++ | S20, N40, official RL checkpoint | released `--minimize_and_rerank`: smina minimization then GNINA ranking | benchmark-set fixed holo receptor; cognate pocket | seeds 0, 1, 2 | `external_models/src/rldiff/README.md` |
-| RLDiff raw | same generated candidates as RL++ | native confidence only; no minimization | same as RL++ | seeds 0, 1, 2 | retained as an ablation, not the paper's primary RL++ result |
 | DiffDock-Pocket | S30, N40, `keep_local_structures`, official score and confidence checkpoints | released confidence ranker; no optional relaxation | aligned predicted receptor used by the released model; cognate supplied pocket crop | seeds 0, 1, 2 | `external_models/src/diffdock-pocket/README.md` |
-| SurfDock | S20, N40, MDN distance threshold 3.0, official docking and posepredict checkpoints | posepredict MDN; no optional force optimization | fixed processed holo receptor; cognate 8 A surface pocket | seeds 0, 1, 2 | `external_models/src/surfdock/bash_scripts/test_scripts/eval_samples.sh` |
+| SurfDock | S20, N40, MDN distance threshold 3.0, official docking and posepredict checkpoints | released `--force_optimize` on all 40 candidates after ODE and before the native posepredict-MDN ranking; four concurrent OpenMM/OpenFF workers only batch independent minimizations | fixed processed holo receptor; cognate 8 A surface pocket | seeds 0, 1, 2 | `external_models/src/surfdock/inference_accelerate.py`; `utils/sampling.py` |
 | DiffBindFR | N40; native 20 effective diffusion steps; batch 16; paper checkpoints | official smina error correction enabled, followed by MDN ranking; `results_ec_mdn_top1.csv` | fixed holo receptor; cognate ligand; upstream 12 A pocket radius | seeds 0, 1, 2 | `external_models/src/diffbindfr/README.md`; `DiffBindFR/app/predict.py` |
-| Interformer | N20; v0.2 energy ensemble; native PyVina 64 Monte Carlo repeats × 2000 steps plus BFGS | four-checkpoint PoseScore ensemble; appended input pose excluded | fixed holo receptor; cognate supplied pocket | seeds 0, 1, 2 | `external_models/src/interformer/inference.py`; native reconstruction defaults |
-| PoseBench Vina | exhaustiveness 32, box 25 × 25 × 25 A, spacing 1 A, N40 | native Vina affinity | PoseBench predicted receptor; supplied cognate site for this pocket-specified arm | seeds 1, 2, 3 because upstream leaves seed random | `external_models/src/posebench/configs/model/vina_inference.yaml` |
+| GOLD (published) | published aggregate result; no local generation reported | deposited paper Top-1 value | supplied-pocket baseline in the source paper | not applicable | `benchmarks/results/external_models/posebusters_classical_paper_values.json` |
+| AutoDock Vina (published) | published aggregate result; no local generation reported | deposited paper Top-1 value | supplied-pocket baseline in the source paper | not applicable | `benchmarks/results/external_models/posebusters_classical_paper_values.json` |
+
+The SI-ready, row-by-row distinction between a ligand-contact shell, a receptor
+crop, a surface mask, a scoring radius, and an explicit pocket center is recorded
+in [SI_POCKET_INPUT_CONTRACTS.md](SI_POCKET_INPUT_CONTRACTS.md).  It covers the
+exact final variants shown in the comparison figure.  The single SurfDock row
+includes released force optimization; no separate native-SurfDock or RLDiff-raw
+result is reported.
 
 The frozen settings for excluded global-model diagnostics remain recoverable in
 the historical submission/audit records, but those rows are outside this
