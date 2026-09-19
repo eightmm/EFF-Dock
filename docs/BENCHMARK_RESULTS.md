@@ -7,7 +7,37 @@ Released checkpoint pair:
 Default inference preset: N100/S10, translation sigma 2.0, 10A pocket crop,
 late-power-3 time schedule, and stable minimum predicted-RMSD ranking.
 
-## Default U70k result
+## Current three-seed reporting baseline (2026-09-19)
+
+Use the current full-cohort three-seed values below for reporting; historical
+single-bank results remain in their own section. Values are percent mean ±
+sample SD for **unguided N100/S10 + own refinement + input-chirality selection**.
+
+| Dataset | N per seed | RMSD <2 A | PB-valid | Joint |
+| --- | ---: | ---: | ---: | ---: |
+| Astex | 85 | 82.35 ± 2.04 | 95.69 ± 0.68 | 79.22 ± 2.72 |
+| PoseBusters v2 | 308 | 81.60 ± 0.94 | 95.56 ± 0.50 | 79.22 ± 1.42 |
+| PhiBench reconstructed full | 206 | 62.62 ± 3.79 | 94.01 ± 0.28 | 60.19 ± 3.36 |
+| FoldBench holo-pocket | 558 | 74.49 ± 0.37 | 96.36 ± 0.37 | 72.82 ± 0.63 |
+| OpenBind full | 925 | 52.58 ± 0.61 | 99.64 ± 0.17 | 52.58 ± 0.61 |
+
+The former Astex/PB eta2 rows are retained as explicitly guided ablations in
+[the generated paper tables](paper/20260919/RESULTS.md), alongside completed
+N100/S10 and N40/S25 guided/unguided comparisons. This table now uses the same
+unguided sampling condition across datasets; no default or hyperparameter is
+changed. FoldBench is complete, including three PB shards using the disclosed
+energy-reference InChI compatibility repair. PhiBench includes three reconstructed
+systems; OpenBind includes flagged cases and two noncovalent approximations of
+covalent systems. PoseX has a separate relaxation/grouping contract.
+
+## Runtime accounting (current three-seed runs)
+
+For the current runs, see [runtime and memory](paper/20260919/RUNTIME.md):
+per-complex wall costs, per-generated-pose amortization, raw+refined scoring
+cost per evaluation, complete denominators and device identities. Official PB
+evaluation time is excluded and GPU peaks are not normalized per pose.
+
+## Historical single-bank U70k result
 
 All rows use the promoted early-time docking checkpoint and U70k confidence
 checkpoint on the same saved 100-pose candidate bank. RMSD is symmetry-aware
@@ -48,16 +78,18 @@ fewer than the requested 40 modes inside its default energy range.
 | Executed method | Astex Top-1 `<2A` | Astex Oracle `<2A` | PoseBusters Top-1 `<2A` | PoseBusters Oracle `<2A` |
 |---|---:|---:|---:|---:|
 | SigmaDock official selector | 90.59 ± 1.18 | 98.43 ± 0.68 | 78.90 ± 0.32 | 92.53 ± 1.17 |
+| SurfDock + force optimization | 90.59 ± 2.04 | 98.43 ± 0.68 | 84.31 ± 0.82 | 93.83 ± 0.65 |
 | RLDiff RL++ + GNINA | 84.31 ± 2.45 | 92.55 ± 2.45 | 74.46 ± 1.35 | 83.44 ± 0.56 |
 | DiffBindFR + MDN/EC | 80.78 ± 2.96 | 94.90 ± 1.36 | 54.22 ± 2.27 | 85.28 ± 1.50 |
 | DiffDock-Pocket + confidence | 53.73 ± 0.68 | 65.88 ± 1.18 | 31.82 ± 0.65 | 52.16 ± 0.75 |
 | Vina, exhaustiveness 32 | 15.29 ± 0.00 | 32.55 ± 1.36 | 9.63 ± 0.19 | 25.97 ± 0.86 |
 
-SigmaDock is the only external rerun in this table with a completed official
-PB-valid selector: its Joint mean is `89.02 ± 1.36%` on Astex and
-`76.41 ± 0.19%` on PoseBusters v2. Joint validity is not inferred for the
-other RMSD-only reruns. SurfDock and Interformer remain omitted until every
-generation, native-ranking, and three-repeat evaluation gate is complete.
+The force-optimized SurfDock arm completed its official PB-valid selector:
+its Joint mean is `85.88 ± 3.11%` on Astex and `77.81 ± 0.99%` on
+PoseBusters v2. SigmaDock's corresponding values are `89.02 ± 1.36%` and
+`76.41 ± 0.19%`. Joint validity is not inferred for the remaining RMSD-only
+reruns; Interformer remains omitted until its three-repeat evaluation gate is
+complete.
 
 Machine-readable rerun values are in
 [`pocket_only_executed_reruns.json`](results/external_models/pocket_only_executed_reruns.json).

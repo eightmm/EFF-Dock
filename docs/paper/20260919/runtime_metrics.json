@@ -1,0 +1,4935 @@
+{
+  "rows": [
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 72.9869257491034,
+          "median": 77.29935386602301,
+          "min": 18.807447996048722,
+          "max": 91.38087124499725
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.018015487764633315,
+          "median": 0.017584448971319944,
+          "min": 0.01004302897490561,
+          "max": 0.02950072003295645
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6402068039511933,
+          "median": 0.629558390006423,
+          "min": 0.4699212250416167,
+          "max": 1.1852417759946547
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 71.22630038141232,
+          "median": 75.48861115699401,
+          "min": 17.44473431800725,
+          "max": 89.81998164299875
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.994050603647552,
+          "median": 0.4962603870080784,
+          "min": 0.14020090794656426,
+          "max": 7.518700538028497
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 9.656868181086612,
+          "median": 9.532905381987803,
+          "min": 8.229951357003301,
+          "max": 13.353149301954545
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.393920629848863,
+          "median": 3.325859371048864,
+          "min": 2.612914722005371,
+          "max": 5.613337445014622
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.438866928443039,
+          "median": 2.425615378015209,
+          "min": 1.8881276979809627,
+          "max": 3.1665753969573416
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 5.832787558291902,
+          "median": 5.7488012940157205,
+          "min": 4.501042419986334,
+          "max": 8.114703032013495
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.25758646946564756,
+          "median": 0.24580386898014694,
+          "min": 0.1825095250387676,
+          "max": 0.3955517379799858
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.1467664458905347,
+          "median": 3.105129835952539,
+          "min": 3.0528500149957836,
+          "max": 3.7700496849720366
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.18462928258813918,
+          "median": 0.04868219600757584,
+          "min": 0.013584513973910362,
+          "max": 2.6722977419849485
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 6.20334703639588e-05,
+          "median": 6.036099512130022e-05,
+          "min": 4.8271031118929386e-05,
+          "max": 8.574099047109485e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 5.172219004153329e-05,
+          "median": 4.967098357155919e-05,
+          "min": 4.148000152781606e-05,
+          "max": 0.00012189196422696114
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 0.00011375566040549208,
+          "median": 0.00010925199603661895,
+          "min": 9.443098679184914e-05,
+          "max": 0.00018283299868926406
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 11894169600,
+          "median": 11981215488.0,
+          "min": 10967541248,
+          "max": 12653138944
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 28824567808,
+          "median": 28405923840.0,
+          "min": 19883098112,
+          "max": 39132856320
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 1103.3804988916454,
+          "median": 1100.6677597935195,
+          "min": 958.7905461629853,
+          "max": 1199.2480648160563
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 103.8475763662725
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 73.69526174433173,
+          "median": 78.03165230999002,
+          "min": 20.084642319008708,
+          "max": 88.71028799802298
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.01803706369143637,
+          "median": 0.017377217998728156,
+          "min": 0.010204338992480189,
+          "max": 0.029327206022571772
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6343446943415877,
+          "median": 0.6179851610213518,
+          "min": 0.4830242060124874,
+          "max": 0.9293892830028199
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 72.41035084761268,
+          "median": 76.27777733100811,
+          "min": 19.1901201250148,
+          "max": 87.51156656298554
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.5362829893875374,
+          "median": 0.38835129799554124,
+          "min": 0.1807953780516982,
+          "max": 3.0877524000243284
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 9.52308845398126,
+          "median": 9.435836702003144,
+          "min": 8.239968116977252,
+          "max": 12.885363114997745
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.3479266457930756,
+          "median": 3.327375657041557,
+          "min": 2.787333450978622,
+          "max": 4.160876994021237
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.4312693444566857,
+          "median": 2.410621624032501,
+          "min": 1.861225062981248,
+          "max": 3.1576961299870163
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 5.779195990249761,
+          "median": 5.734202128020115,
+          "min": 4.64855851395987,
+          "max": 7.286022812011652
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.25162156203775393,
+          "median": 0.24536908301524818,
+          "min": 0.18512303696479648,
+          "max": 0.37911888997768983
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.1024264440097955,
+          "median": 3.0839736760244705,
+          "min": 3.0436942700180225,
+          "max": 3.2685264039901085
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.12492635477923185,
+          "median": 0.03534041601233184,
+          "min": 0.012081983964890242,
+          "max": 3.6128755430108868
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 5.9800907996866636e-05,
+          "median": 5.8961042668670416e-05,
+          "min": 4.816096043214202e-05,
+          "max": 9.436096297577024e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 5.091384518891573e-05,
+          "median": 4.760100273415446e-05,
+          "min": 4.050100687891245e-05,
+          "max": 0.00020408298587426543
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 0.00011071475318578236,
+          "median": 0.00010646198643371463,
+          "min": 9.090197272598743e-05,
+          "max": 0.00026165397139266133
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 11909043200,
+          "median": 11977207552.0,
+          "min": 11086613504,
+          "max": 12711808512
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 28405661696,
+          "median": 28350349312.0,
+          "min": 19962789888,
+          "max": 35659972608
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 1108.3178844318827,
+          "median": 1114.1471963715157,
+          "min": 922.4390579460305,
+          "max": 1231.4674828930292
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 104.3122714759419
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 73.09405725416659,
+          "median": 78.31250804301817,
+          "min": 19.175364224996883,
+          "max": 89.3017698880285
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.018068242953021955,
+          "median": 0.017236030020285398,
+          "min": 0.010257349989842623,
+          "max": 0.029250886000227183
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6283763316131251,
+          "median": 0.6208204620052129,
+          "min": 0.4804596760077402,
+          "max": 0.9197742160176858
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 71.9637631876805,
+          "median": 77.19151815900113,
+          "min": 18.082970214018133,
+          "max": 88.33562480000546
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.4091937259640819,
+          "median": 0.38193608296569437,
+          "min": 0.1561342389904894,
+          "max": 1.1571105400216766
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 9.544612144517904,
+          "median": 9.515393081994262,
+          "min": 8.147868002008181,
+          "max": 11.284488297998905
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.4018972126684863,
+          "median": 3.416608312050812,
+          "min": 2.754568381991703,
+          "max": 4.206425883981865
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.4408701238852433,
+          "median": 2.4049821560038254,
+          "min": 1.8656582879484631,
+          "max": 3.205635506019462
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 5.84276733655373,
+          "median": 5.821590468054637,
+          "min": 4.620226669940166,
+          "max": 7.4065505570033565
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.263860209886779,
+          "median": 0.2503306799917482,
+          "min": 0.19117791298776865,
+          "max": 0.4322624130290933
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.1500589476816137,
+          "median": 3.108677585958503,
+          "min": 3.0425543510355055,
+          "max": 3.7520150680211373
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.06481882278287017,
+          "median": 0.03880583494901657,
+          "min": 0.015500531997531652,
+          "max": 0.7656402270076796
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 6.679599858163035e-05,
+          "median": 6.428099004551768e-05,
+          "min": 4.880101187154651e-05,
+          "max": 0.00011098198592662811
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 5.539132775190999e-05,
+          "median": 5.402101669460535e-05,
+          "min": 3.786105662584305e-05,
+          "max": 9.436102118343115e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 0.00012218732633354032,
+          "median": 0.00011941202683374286,
+          "min": 9.266199776902795e-05,
+          "max": 0.00018413306679576635
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 11917350464,
+          "median": 12017092096.0,
+          "min": 10992230912,
+          "max": 12762847232
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 28868608000,
+          "median": 28399632384.0,
+          "min": 20002635776,
+          "max": 39116079104
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 1100.5774259953832,
+          "median": 1106.3548876605055,
+          "min": 939.1299511220423,
+          "max": 1190.3301756579895
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 103.58375774074196
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 73.55513204455372,
+          "median": 77.15222804949735,
+          "min": 15.59786903503118,
+          "max": 96.59272672398947
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.022547246406554824,
+          "median": 0.018622170493472368,
+          "min": 0.00731102901045233,
+          "max": 0.4288447260041721
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.8112733924044024,
+          "median": 0.769459587027086,
+          "min": 0.5754934480064549,
+          "max": 3.4333656819653697
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 72.10734635340742,
+          "median": 75.71012717997655,
+          "min": 14.484526144980919,
+          "max": 93.9476330880425
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.536386299567477,
+          "median": 0.3629352785064839,
+          "min": 0.1520151710137725,
+          "max": 3.8069011329789646
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 9.990277856588552,
+          "median": 9.845545997028239,
+          "min": 8.141864541044924,
+          "max": 14.494757882028352
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.4544848405261668,
+          "median": 3.4325996469997335,
+          "min": 2.6414750010007992,
+          "max": 4.981786366959568
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.5145538156457525,
+          "median": 2.4979712149943225,
+          "min": 1.6849966029985808,
+          "max": 3.974209969979711
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 5.969038656171919,
+          "median": 5.9260614730010275,
+          "min": 4.32647160399938,
+          "max": 8.955996336939279
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.4114036809410386,
+          "median": 0.38602059200638905,
+          "min": 0.30745198496151716,
+          "max": 2.535084069997538
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.1868469894802436,
+          "median": 3.111241518519819,
+          "min": 3.0419885180308484,
+          "max": 8.35946798598161
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.1647082691473203,
+          "median": 0.03538146801292896,
+          "min": 0.005001239012926817,
+          "max": 4.586561561038252
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 6.571708662078607e-05,
+          "median": 6.27209956292063e-05,
+          "min": 4.250003257766366e-05,
+          "max": 0.00011371297296136618
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 6.426293641032481e-05,
+          "median": 5.3050462156534195e-05,
+          "min": 3.789097536355257e-05,
+          "max": 0.002771702012978494
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 0.0001299800230311109,
+          "median": 0.00011423701653257012,
+          "min": 8.861004607751966e-05,
+          "max": 0.0028356430120766163
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 15657367104,
+          "median": 15644680192.0,
+          "min": 13164556800,
+          "max": 17905463808
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 41280077824,
+          "median": 41195405312.0,
+          "min": 33168556032,
+          "max": 49893343232
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 4025.265745052886,
+          "median": 4025.1437777444953,
+          "min": 3893.4215723650414,
+          "max": 4177.974649398995
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 104.55235701436067
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 73.05800019153855,
+          "median": 76.92801744150347,
+          "min": 16.412946806987748,
+          "max": 92.63638001302024
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.022537247830769047,
+          "median": 0.018626299017341807,
+          "min": 0.007324375037569553,
+          "max": 0.42972661001840606
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.8092488048984835,
+          "median": 0.7650961875042412,
+          "min": 0.5867973830318078,
+          "max": 3.1186035569990054
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 71.39126676918603,
+          "median": 75.14104199697613,
+          "min": 15.436582852969877,
+          "max": 91.55800685001304
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.7350010767066171,
+          "median": 0.3914422479865607,
+          "min": 0.13228752900613472,
+          "max": 6.813314088038169
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 9.809640244684559,
+          "median": 9.689661657466786,
+          "min": 7.972186552011408,
+          "max": 13.182086060987785
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.3899435758896477,
+          "median": 3.3747668784926645,
+          "min": 2.5951758589944802,
+          "max": 4.876535023038741
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.5007327673926514,
+          "median": 2.482445217494387,
+          "min": 1.6811748830368742,
+          "max": 3.9829939390183426
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 5.8906763432822995,
+          "median": 5.866009047982516,
+          "min": 4.2763507420313545,
+          "max": 8.859528962057084
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.40951168577261604,
+          "median": 0.38390562654240057,
+          "min": 0.3133372369920835,
+          "max": 1.8633923269808292
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.120647895910555,
+          "median": 3.087773137493059,
+          "min": 3.0345234170090407,
+          "max": 3.5989496529800817
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.15556681565388542,
+          "median": 0.03795912946225144,
+          "min": 0.005853629030752927,
+          "max": 2.672893100010697
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 5.8113149436819666e-05,
+          "median": 5.7875498896464705e-05,
+          "min": 4.3091014958918095e-05,
+          "max": 8.52899975143373e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 4.923133978577839e-05,
+          "median": 4.7780515160411596e-05,
+          "min": 3.8232014048844576e-05,
+          "max": 0.0001097510103136301
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 0.00010734448922259805,
+          "median": 0.00010563101386651397,
+          "min": 8.220202289521694e-05,
+          "max": 0.00017379102064296603
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 15684220224,
+          "median": 15755285760.0,
+          "min": 13178540032,
+          "max": 17943345664
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 40445149184,
+          "median": 42439016448.0,
+          "min": 24853348352,
+          "max": 50105155584
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 4000.5465460027335,
+          "median": 4027.5806300714903,
+          "min": 3882.087612200994,
+          "max": 4121.835479076952
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 103.91029989617489
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 72.23050439424678,
+          "median": 76.19985099846963,
+          "min": 14.371547629009001,
+          "max": 93.09219727496384
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.022472067920917452,
+          "median": 0.018589410494314507,
+          "min": 0.0073467029724270105,
+          "max": 0.429224481980782
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.8029087570697363,
+          "median": 0.7612000159861054,
+          "min": 0.5626362999901175,
+          "max": 2.9487839569919743
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 70.49386465106542,
+          "median": 74.79892366949935,
+          "min": 13.291102426010184,
+          "max": 91.43799050000962
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.7967853956323271,
+          "median": 0.4020631285093259,
+          "min": 0.11849107401212677,
+          "max": 7.895921409013681
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 9.77709112215017,
+          "median": 9.619865946500795,
+          "min": 8.043856549018528,
+          "max": 13.76458726299461
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.3949366857017265,
+          "median": 3.3616587739961687,
+          "min": 2.546129480993841,
+          "max": 4.887799963995349
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.484954506942742,
+          "median": 2.4522248300199863,
+          "min": 1.676379979995545,
+          "max": 3.9280226469854824
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 5.879891192644469,
+          "median": 5.8194500420067925,
+          "min": 4.222509460989386,
+          "max": 8.815822610980831
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.4080755634264727,
+          "median": 0.37791469850344583,
+          "min": 0.3076017909916118,
+          "max": 2.019754532026127
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.12384143402171,
+          "median": 3.0866797674971167,
+          "min": 3.0429038610309362,
+          "max": 3.7025792700005695
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.12908340950251568,
+          "median": 0.038746814971091226,
+          "min": 0.008835380023811013,
+          "max": 2.8071581149706617
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 5.853425219274041e-05,
+          "median": 5.815201438963413e-05,
+          "min": 4.2429950553923845e-05,
+          "max": 9.652302833274007e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 4.8889993431421556e-05,
+          "median": 4.755103145726025e-05,
+          "min": 3.715098137035966e-05,
+          "max": 8.691201219335198e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 0.00010742424562416197,
+          "median": 0.00010618602391332388,
+          "min": 8.496100781485438e-05,
+          "max": 0.00015008199261501431
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 15659549888,
+          "median": 15685475584.0,
+          "min": 13106608640,
+          "max": 17899399168
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 40740061184,
+          "median": 42344644608.0,
+          "min": 24901582848,
+          "max": 50008686592
+        }
+      }
+    },
+    {
+      "arm": "unguided_n100_s10",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 3948.1160665413554,
+          "median": 3923.3469001049816,
+          "min": 3829.175935837964,
+          "max": 4075.6874649599777
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 102.54846926081443
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 29.442799932968473,
+          "median": 31.322479206020944,
+          "min": 7.201673832023516,
+          "max": 37.28894996398594
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.007648329836015096,
+          "median": 0.0074539060005918145,
+          "min": 0.004219092952553183,
+          "max": 0.012190641020424664
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6176643114502761,
+          "median": 0.6079398990259506,
+          "min": 0.4656583790201694,
+          "max": 0.9075545929954387
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 28.30248904473573,
+          "median": 30.12391982099507,
+          "min": 6.238968729041517,
+          "max": 36.09296267904574
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.40156048264916,
+          "median": 0.29305439098970965,
+          "min": 0.10571152705233544,
+          "max": 2.963544141035527
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 6.563623068557696,
+          "median": 6.508115122967865,
+          "min": 5.949992038018536,
+          "max": 11.358163393044379
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 1.8748570736038828,
+          "median": 1.872359371976927,
+          "min": 1.6521493420004845,
+          "max": 2.193279034050647
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 0.9695901566356256,
+          "median": 0.9694651400204748,
+          "min": 0.7462140989955515,
+          "max": 1.2463507910142653
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 2.8444472302395085,
+          "median": 2.833409398968797,
+          "min": 2.4314038730226457,
+          "max": 3.434130965033546
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.24989384527126438,
+          "median": 0.2417885339818895,
+          "min": 0.19041535700671375,
+          "max": 0.35684163798578084
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.122402663035181,
+          "median": 3.0879012150107883,
+          "min": 3.0478961640037596,
+          "max": 3.7865258989622816
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.12502619322348277,
+          "median": 0.027442122984211892,
+          "min": 0.011721624003257602,
+          "max": 4.971351451007649
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.2163176493828785e-05,
+          "median": 3.176002064719796e-05,
+          "min": 2.182001480832696e-05,
+          "max": 4.30400250479579e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.423591144821223e-05,
+          "median": 2.4210952688008547e-05,
+          "min": 1.890998100861907e-05,
+          "max": 3.374001244083047e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 5.639908794204102e-05,
+          "median": 5.5870041251182556e-05,
+          "min": 4.156096838414669e-05,
+          "max": 7.095001637935638e-05
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 4657735872,
+          "median": 4710536192.0,
+          "min": 4259575296,
+          "max": 4941826048
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 11357650944,
+          "median": 10376708096.0,
+          "min": 7944011776,
+          "max": 16663969792
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 600.8635299616217,
+          "median": 608.2913494959648,
+          "min": 510.4617680279771,
+          "max": 655.8239928489784
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 56.55186164344675
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 29.311131571670856,
+          "median": 31.534004932036623,
+          "min": 6.941508712014183,
+          "max": 35.71812536998186
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.007631006819086478,
+          "median": 0.007393761014100164,
+          "min": 0.004213354957755655,
+          "max": 0.012157555960584432
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6205867957878475,
+          "median": 0.6116458410397172,
+          "min": 0.4518881550175138,
+          "max": 1.0207366659888066
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 28.24920763638665,
+          "median": 30.556446880975273,
+          "min": 5.9644258440239355,
+          "max": 34.79436241101939
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.36117331495590727,
+          "median": 0.27707309601828456,
+          "min": 0.08238597901072353,
+          "max": 1.6346327820210718
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 6.473985911588705,
+          "median": 6.446717263024766,
+          "min": 5.930673427996226,
+          "max": 7.199768226011656
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 1.8654265591340577,
+          "median": 1.8499318339745514,
+          "min": 1.646863411006052,
+          "max": 2.1981833999743685
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 0.9678449802819694,
+          "median": 0.962321660015732,
+          "min": 0.7518430449999869,
+          "max": 1.2452756600105204
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 2.8332715394160273,
+          "median": 2.817304833966773,
+          "min": 2.4261810080497526,
+          "max": 3.4009573950315826
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.25067542383707514,
+          "median": 0.2435711770085618,
+          "min": 0.19687619805335999,
+          "max": 0.3481070109992288
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.1208349548793834,
+          "median": 3.0877898749895394,
+          "min": 3.040488493978046,
+          "max": 3.553140743984841
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.04809069121187991,
+          "median": 0.03150831803213805,
+          "min": 0.007971854007337242,
+          "max": 0.4909905180102214
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.136754967272282e-05,
+          "median": 3.1190982554107904e-05,
+          "min": 2.2599997464567423e-05,
+          "max": 4.425097722560167e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.455758341752431e-05,
+          "median": 2.4161010514944792e-05,
+          "min": 1.9369996152818203e-05,
+          "max": 3.168999683111906e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 5.5925133090247127e-05,
+          "median": 5.614099791273475e-05,
+          "min": 4.492001608014107e-05,
+          "max": 6.808096077293158e-05
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 4654275520,
+          "median": 4695863040.0,
+          "min": 4299076608,
+          "max": 4965015552
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 11307319296,
+          "median": 11175723008.0,
+          "min": 7883194368,
+          "max": 14218690560
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 598.6319722425033,
+          "median": 597.5444189429691,
+          "min": 518.0635074810125,
+          "max": 651.0430033810553
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 56.34183268164737
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 29.26401590005536,
+          "median": 31.746862252999563,
+          "min": 6.825717517000157,
+          "max": 36.6337577989907
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.00762188468772151,
+          "median": 0.007432125974446535,
+          "min": 0.004239870002493262,
+          "max": 0.012057989020831883
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6099352228900363,
+          "median": 0.6009450949495658,
+          "min": 0.4423431789618917,
+          "max": 1.1508624299895018
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 28.217939013083164,
+          "median": 30.535506182990503,
+          "min": 5.870335279032588,
+          "max": 35.1811451750109
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.3564198207295061,
+          "median": 0.26009350595995784,
+          "min": 0.11509839200880378,
+          "max": 1.8380114680039696
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 6.437285797315759,
+          "median": 6.467528400011361,
+          "min": 5.903647034952883,
+          "max": 7.164006354985759
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 1.86257754399044,
+          "median": 1.8419172519934364,
+          "min": 1.6091047680238262,
+          "max": 2.145625686040148
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 0.9653889204690452,
+          "median": 0.9670553629985079,
+          "min": 0.748209631012287,
+          "max": 1.2342167000169866
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 2.827966464459485,
+          "median": 2.8181807499495335,
+          "min": 2.369078298972454,
+          "max": 3.319203302031383
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.2502449631725219,
+          "median": 0.2482509349938482,
+          "min": 0.194271540036425,
+          "max": 0.413572836027015
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.100419712645988,
+          "median": 3.0828450369881466,
+          "min": 3.0441934719565324,
+          "max": 3.519297120976262
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.04776874898508301,
+          "median": 0.02837513596750796,
+          "min": 0.014468131004832685,
+          "max": 0.47198448597919196
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.164845778990318e-05,
+          "median": 3.09899915009737e-05,
+          "min": 2.025999128818512e-05,
+          "max": 4.422100028023124e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.4634280570727938e-05,
+          "median": 2.4569977540522814e-05,
+          "min": 1.9880011677742004e-05,
+          "max": 3.771099727600813e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 5.6282738360631114e-05,
+          "median": 5.606102058663964e-05,
+          "min": 4.163099220022559e-05,
+          "max": 7.661199197173119e-05
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 4687323904,
+          "median": 4751090432.0,
+          "min": 4299688960,
+          "max": 5041188864
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 11369447424,
+          "median": 11369709568.0,
+          "min": 8004829184,
+          "max": 14220787712
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 596.8003882741323,
+          "median": 601.7048089384916,
+          "min": 510.7084249430336,
+          "max": 643.0779980500229
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 56.169448308153626
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 29.660863887190565,
+          "median": 31.477458622452104,
+          "min": 6.673234598012641,
+          "max": 39.683521377970465
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.009431145060391697,
+          "median": 0.007942504511447623,
+          "min": 0.003165745991282165,
+          "max": 0.17197445000056177
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.7829050216825706,
+          "median": 0.7493696744786575,
+          "min": 0.5666158359963447,
+          "max": 3.385513717017602
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 28.315144117536438,
+          "median": 29.9964583175024,
+          "min": 5.505838489974849,
+          "max": 37.931472661031876
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.46777293053640856,
+          "median": 0.25911535951308906,
+          "min": 0.08089717896655202,
+          "max": 8.032323935010936
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 6.719584255870666,
+          "median": 6.622954230988398,
+          "min": 5.921591536025517,
+          "max": 9.551993866043631
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 1.8920381086936686,
+          "median": 1.8911537200037856,
+          "min": 1.553744561970234,
+          "max": 2.450646044977475
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 0.9956617114213885,
+          "median": 0.9810563974897377,
+          "min": 0.6688508659717627,
+          "max": 1.565182386955712
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 2.887699820115057,
+          "median": 2.8765121320611797,
+          "min": 2.25472093798453,
+          "max": 4.015828431933187
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.4008353619031947,
+          "median": 0.37604292752803303,
+          "min": 0.3040650279726833,
+          "max": 2.517373815004248
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.1016498552461447,
+          "median": 3.080029768490931,
+          "min": 3.042905678972602,
+          "max": 3.549684694968164
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.08249665453501633,
+          "median": 0.029699116974370554,
+          "min": 0.00432052300311625,
+          "max": 2.3918983369949274
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.1416633056005e-05,
+          "median": 3.1420495361089706e-05,
+          "min": 2.089003100991249e-05,
+          "max": 6.190099520608783e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.454887348372344e-05,
+          "median": 2.4479988496750593e-05,
+          "min": 1.9350030925124884e-05,
+          "max": 3.8021011278033257e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 5.5965506539728446e-05,
+          "median": 5.5961019825190306e-05,
+          "min": 4.3749925680458546e-05,
+          "max": 8.849101141095161e-05
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 6119730944,
+          "median": 6135611904.0,
+          "min": 5143758848,
+          "max": 6975699968
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 16912744448,
+          "median": 16984834048.0,
+          "min": 13205766144,
+          "max": 20478689280
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 2177.0456892960137,
+          "median": 2179.599323104514,
+          "min": 2126.9967166369897,
+          "max": 2230.948064820026
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 56.54664128041594
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 29.61553444063299,
+          "median": 31.466878912528045,
+          "min": 6.446048791985959,
+          "max": 37.76435448200209
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.009407894832895489,
+          "median": 0.007929742481792346,
+          "min": 0.003185545967426151,
+          "max": 0.17176639602985233
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.7832665681421709,
+          "median": 0.7410463334817905,
+          "min": 0.5543048360268585,
+          "max": 2.7438517439877614
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 28.176545098837646,
+          "median": 30.212572309508687,
+          "min": 5.06187046301784,
+          "max": 36.555857285973616
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.5699358855214653,
+          "median": 0.2749364650226198,
+          "min": 0.07013752602506429,
+          "max": 5.203687144967262
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 6.6894293437532735,
+          "median": 6.624696694983868,
+          "min": 5.9274719809764065,
+          "max": 9.314147647004575
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 1.8965562973916077,
+          "median": 1.8806647370220162,
+          "min": 1.5958984710159712,
+          "max": 2.4812343420344405
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 0.9970790492540812,
+          "median": 0.9829964069940615,
+          "min": 0.6672552320524119,
+          "max": 1.5893999839900061
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 2.8936353466456888,
+          "median": 2.863221726496704,
+          "min": 2.263153703068383,
+          "max": 4.070634326024447
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.4047978930128058,
+          "median": 0.3815094699966721,
+          "min": 0.31138256896520033,
+          "max": 2.1610201059957035
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.109661328278228,
+          "median": 3.082527442544233,
+          "min": 3.0423136110184714,
+          "max": 3.7532100019743666
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.057528859463992055,
+          "median": 0.026889267523074523,
+          "min": 0.004232841019984335,
+          "max": 2.5004781039897352
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.168807200960476e-05,
+          "median": 3.1471019610762596e-05,
+          "min": 2.1570012904703617e-05,
+          "max": 4.623999120667577e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.4911611342451887e-05,
+          "median": 2.42904934566468e-05,
+          "min": 1.9530009012669325e-05,
+          "max": 0.00011169200297445059
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 5.659968335205665e-05,
+          "median": 5.626652273349464e-05,
+          "min": 4.301004810258746e-05,
+          "max": 0.0001403520000167191
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 6125211584,
+          "median": 6135524608.0,
+          "min": 5122558464,
+          "max": 7013698048
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 16172974080,
+          "median": 16993222656.0,
+          "min": 9862905856,
+          "max": 20520632320
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 2177.837085550862,
+          "median": 2175.642959609977,
+          "min": 2093.5197574009653,
+          "max": 2251.499283530982
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 56.567197027295116
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 29.814331834780337,
+          "median": 31.525853580475086,
+          "min": 6.653147400997113,
+          "max": 39.45892395300325
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.009438418822367555,
+          "median": 0.00791708446922712,
+          "min": 0.003085243981331587,
+          "max": 0.17423713899916038
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.7894691129943792,
+          "median": 0.7489517460053321,
+          "min": 0.553420431970153,
+          "max": 3.166257155011408
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 28.320556172831385,
+          "median": 30.188088730501477,
+          "min": 5.081632858025841,
+          "max": 37.06164519797312
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.6136232287237079,
+          "median": 0.293017311982112,
+          "min": 0.06453529704594985,
+          "max": 5.09391911001876
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 6.766131720949205,
+          "median": 6.6703388364985585,
+          "min": 5.926896504999604,
+          "max": 10.311168221000116
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 1.8944047790755103,
+          "median": 1.882256126991706,
+          "min": 1.5918982470175251,
+          "max": 2.461152156989556
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 0.9951691395380495,
+          "median": 0.982870409527095,
+          "min": 0.6861849800334312,
+          "max": 1.5780350040295161
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 2.88957391861356,
+          "median": 2.852746249991469,
+          "min": 2.289748761046212,
+          "max": 4.039187161019072
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.4051364159389919,
+          "median": 0.3841022839769721,
+          "min": 0.3140619370387867,
+          "max": 2.0079697130131535
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.1282853776599997,
+          "median": 3.0821558515017387,
+          "min": 3.037103839975316,
+          "max": 3.688412661955226
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.11854511170531623,
+          "median": 0.03066417999798432,
+          "min": 0.0043234010227024555,
+          "max": 2.4776164449867792
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.182942364455576e-05,
+          "median": 3.215100150555372e-05,
+          "min": 2.169999061152339e-05,
+          "max": 4.3599982745945454e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.4693527647487625e-05,
+          "median": 2.463549026288092e-05,
+          "min": 1.9509985577315092e-05,
+          "max": 4.469999112188816e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 5.652295129204338e-05,
+          "median": 5.686999065801501e-05,
+          "min": 4.519097274169326e-05,
+          "max": 7.79799884185195e-05
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 6120118208,
+          "median": 6125695744.0,
+          "min": 5164492800,
+          "max": 6943012864
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 16018309120,
+          "median": 15966666752.0,
+          "min": 9865003008,
+          "max": 20545798144
+        }
+      }
+    },
+    {
+      "arm": "unguided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 2200.063822823373,
+          "median": 2184.7105964979855,
+          "min": 2137.876517431985,
+          "max": 2277.631380984036
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 57.144514878529165
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 30.334329809016985,
+          "median": 32.808197168051265,
+          "min": 7.304140391992405,
+          "max": 40.05100134003442
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.007618209633373601,
+          "median": 0.007372211024630815,
+          "min": 0.0044076889753341675,
+          "max": 0.012450395966880023
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6473803173798575,
+          "median": 0.6262187520042062,
+          "min": 0.4794345370028168,
+          "max": 1.1595502729760483
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 29.22969249590533,
+          "median": 31.783651756995823,
+          "min": 6.259356841968838,
+          "max": 37.55833299702499
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.3040536644122125,
+          "median": 0.2254240459878929,
+          "min": 0.09914840699639171,
+          "max": 2.1983044229564257
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 6.84821000191698,
+          "median": 6.6100955290021375,
+          "min": 5.97887545597041,
+          "max": 13.4739765029517
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 1.950300026220023,
+          "median": 1.8705948109854944,
+          "min": 1.661106662999373,
+          "max": 4.766364626993891
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 0.991230702835053,
+          "median": 0.970533401996363,
+          "min": 0.7543177760089748,
+          "max": 2.375648099987302
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 2.941530729055076,
+          "median": 2.841721865988802,
+          "min": 2.452496400976088,
+          "max": 6.734264325990807
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.30616823836325613,
+          "median": 0.2624393349979073,
+          "min": 0.19144843594403937,
+          "max": 3.289713240985293
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.2730582912089576,
+          "median": 3.094930060033221,
+          "min": 3.043074038985651,
+          "max": 7.911469065991696
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.06579616647898494,
+          "median": 0.025104706990532577,
+          "min": 0.010614047991111875,
+          "max": 1.1160291089909151
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.348938942722538e-05,
+          "median": 3.347999881953001e-05,
+          "min": 2.125999890267849e-05,
+          "max": 7.081101648509502e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.492290291496936e-05,
+          "median": 2.4640990886837244e-05,
+          "min": 1.9759987480938435e-05,
+          "max": 3.6689976695925e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 5.841229234219474e-05,
+          "median": 5.793996388092637e-05,
+          "min": 4.44399775005877e-05,
+          "max": 9.679101640358567e-05
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 4666204800,
+          "median": 4720005376.0,
+          "min": 4267356160,
+          "max": 4950579200
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 11375738880,
+          "median": 10400825344.0,
+          "min": 7958691840,
+          "max": 16691232768
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 629.2008083601322,
+          "median": 630.2643821189704,
+          "min": 543.098684710043,
+          "max": 692.4468866449897
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 59.21889961036538
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 30.316801839636174,
+          "median": 32.551542720990255,
+          "min": 6.169167888991069,
+          "max": 41.083426293043885
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.007610780523186002,
+          "median": 0.007460431021172553,
+          "min": 0.0042899479740299284,
+          "max": 0.012148012989200652
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6781553805518128,
+          "median": 0.6686460570199415,
+          "min": 0.4779767670552246,
+          "max": 1.1667107720277272
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 28.802533957755934,
+          "median": 31.16722064599162,
+          "min": 5.043413588020485,
+          "max": 36.30578857898945
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.7559028125874808,
+          "median": 0.27207835600711405,
+          "min": 0.12696274096379057,
+          "max": 4.991617704974487
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 6.820726337763207,
+          "median": 6.804005298996344,
+          "min": 5.971475896018092,
+          "max": 10.127279217995238
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 1.910839155275265,
+          "median": 1.8900700809899718,
+          "min": 1.675996167003177,
+          "max": 2.211654444981832
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 0.973808665469508,
+          "median": 0.9611789500340819,
+          "min": 0.7622002640273422,
+          "max": 1.2359136120066978
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 2.884647820744773,
+          "median": 2.8574443249963224,
+          "min": 2.450137790001463,
+          "max": 3.4410504659754224
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.2695718352251467,
+          "median": 0.26624906598590314,
+          "min": 0.1884680090006441,
+          "max": 0.3911351709975861
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.337521893554367,
+          "median": 3.1850158469751477,
+          "min": 3.0574559859815054,
+          "max": 3.867446687014308
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.09551506858004039,
+          "median": 0.023110494017601013,
+          "min": 0.004121866018977016,
+          "max": 3.7921907560084946
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.30748940434526e-05,
+          "median": 3.33010102622211e-05,
+          "min": 2.256000880151987e-05,
+          "max": 4.55109984613955e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.488057841272915e-05,
+          "median": 2.5061017367988825e-05,
+          "min": 1.9799976143985987e-05,
+          "max": 3.2170035410672426e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 5.795547245618175e-05,
+          "median": 5.77520695514977e-05,
+          "min": 4.873995203524828e-05,
+          "max": 7.354200351983309e-05
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 4662683264,
+          "median": 4703531008.0,
+          "min": 4306519552,
+          "max": 4973652992
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 11360010240,
+          "median": 11328815104.0,
+          "min": 7897874432,
+          "max": 14245953536
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 629.2572325930014,
+          "median": 637.1886314585281,
+          "min": 529.4872481829952,
+          "max": 681.454550274997
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 59.22421012640013
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 85,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 29.934245834261972,
+          "median": 32.67953314294573,
+          "min": 6.352190470963251,
+          "max": 38.23266794101801
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 85,
+          "mean": 0.007616654460948399,
+          "median": 0.007318660034798086,
+          "min": 0.004213990003336221,
+          "max": 0.012093844008632004
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.6363684304620084,
+          "median": 0.6312492319848388,
+          "min": 0.48356239002896473,
+          "max": 0.9329563520150259
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 85,
+          "mean": 28.539968487353285,
+          "median": 31.39477570395684,
+          "min": 5.497122616972774,
+          "max": 37.03922999103088
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 85,
+          "mean": 0.665377790195977,
+          "median": 0.2771933670155704,
+          "min": 0.12577313696965575,
+          "max": 4.816409291990567
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 85,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 85,
+          "mean": 6.485172109839315,
+          "median": 6.458881004014984,
+          "min": 5.9712481460301206,
+          "max": 7.262654600956012
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 1.8683084279517916,
+          "median": 1.847968599991873,
+          "min": 1.6507491049706005,
+          "max": 2.172927609994076
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 0.9731404963552075,
+          "median": 0.9560320969903842,
+          "min": 0.7641668360447511,
+          "max": 1.2592056510038674
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 85,
+          "mean": 2.841448924306999,
+          "median": 2.8046159030054696,
+          "min": 2.4188765070284717,
+          "max": 3.4088766740169376
+        },
+        "stage_seconds.input_preparation": {
+          "count": 85,
+          "mean": 0.2585708499790224,
+          "median": 0.24545637000119314,
+          "min": 0.1940193410264328,
+          "max": 0.4231552069541067
+        },
+        "stage_seconds.model_load": {
+          "count": 85,
+          "mean": 3.1195662938469253,
+          "median": 3.078035450016614,
+          "min": 3.040823052986525,
+          "max": 3.7161299120052718
+        },
+        "stage_seconds.score_serialization": {
+          "count": 85,
+          "mean": 0.03782590102226309,
+          "median": 0.02273875003447756,
+          "min": 0.008856799977365881,
+          "max": 0.24282615102129057
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 85,
+          "mean": 3.3004607950501584e-05,
+          "median": 3.317097434774041e-05,
+          "min": 2.4990004021674395e-05,
+          "max": 4.197104135528207e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 85,
+          "mean": 2.4840143947478604e-05,
+          "median": 2.4731038138270378e-05,
+          "min": 1.7879996448755264e-05,
+          "max": 3.6559998989105225e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 85,
+          "mean": 5.784475189798019e-05,
+          "median": 5.826103733852506e-05,
+          "min": 4.602095577865839e-05,
+          "max": 7.355998968705535e-05
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 85,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 4695732608,
+          "median": 4759568128.0,
+          "min": 4307440128,
+          "max": 5049447424
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 11387535360,
+          "median": 11385438208.0,
+          "min": 8019509248,
+          "max": 14248050688
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "astex",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 85,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 616.0918092142601,
+          "median": 621.8658347935416,
+          "min": 529.4356890540221,
+          "max": 659.6932693039998
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 57.98511145545978
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 30.151161882337696,
+          "median": 32.23835347898421,
+          "min": 6.074295368976891,
+          "max": 41.6400333379861
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.009418687916038764,
+          "median": 0.007950161991175264,
+          "min": 0.0031691750045865774,
+          "max": 0.17205718997865915
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.8265527757190851,
+          "median": 0.7852851859934162,
+          "min": 0.5826932669733651,
+          "max": 3.905093078967184
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 28.79818013694206,
+          "median": 30.82228836097056,
+          "min": 5.293630405969452,
+          "max": 40.67618642997695
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.445200584756472,
+          "median": 0.24603685701731592,
+          "min": 0.06218031595926732,
+          "max": 4.578534780011978
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 6.7797444377076745,
+          "median": 6.718913762044394,
+          "min": 5.928025922970846,
+          "max": 9.868224014004227
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 1.904812405047471,
+          "median": 1.9026431505044457,
+          "min": 1.5704547070199624,
+          "max": 2.52928903902648
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 1.0021680171435923,
+          "median": 0.9903476880281232,
+          "min": 0.678171620995272,
+          "max": 1.5739203850389458
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 2.9069804221910633,
+          "median": 2.8926537034858484,
+          "min": 2.259860414022114,
+          "max": 4.103209424065426
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.41561860695776875,
+          "median": 0.390271162497811,
+          "min": 0.30857632402330637,
+          "max": 2.7749683919828385
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.1623840544619615,
+          "median": 3.0921472834888846,
+          "min": 3.042525027994998,
+          "max": 3.8083517890190706
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.04400589896570861,
+          "median": 0.023727935476927087,
+          "min": 0.0043142399517819285,
+          "max": 0.9276995889958926
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.319466732254905e-05,
+          "median": 3.352551721036434e-05,
+          "min": 2.1169951651245356e-05,
+          "max": 4.829105455428362e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.5039902350006553e-05,
+          "median": 2.4665496312081814e-05,
+          "min": 1.9409984815865755e-05,
+          "max": 4.258099943399429e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 5.82345696725556e-05,
+          "median": 5.8140954934060574e-05,
+          "min": 4.2359926737844944e-05,
+          "max": 7.454102160409093e-05
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 6128805952,
+          "median": 6145234944.0,
+          "min": 5152401920,
+          "max": 6985065984
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 16945250304,
+          "median": 17014194176.0,
+          "min": 13243514880,
+          "max": 20510146560
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 2251.0483881357504,
+          "median": 2260.2037818015087,
+          "min": 2176.576028276002,
+          "max": 2304.3255831329734
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 58.468789302227286
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 30.08257813560633,
+          "median": 32.14897370454855,
+          "min": 5.612118460005149,
+          "max": 40.60542932001408
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.009428670346380102,
+          "median": 0.007886008999776095,
+          "min": 0.0030176129657775164,
+          "max": 0.17163809400517493
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.8461573721182173,
+          "median": 0.8044172899972182,
+          "min": 0.6133851009653881,
+          "max": 2.779650942014996
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 28.753959346255144,
+          "median": 31.008323503483552,
+          "min": 4.754330186988227,
+          "max": 39.55291823699372
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.3943646354440149,
+          "median": 0.23584549649967812,
+          "min": 0.0777546830358915,
+          "max": 4.099183202022687
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 6.867495649974822,
+          "median": 6.796409302507527,
+          "min": 5.894130942993797,
+          "max": 9.309946157969534
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 1.9117553607392874,
+          "median": 1.8969758130260743,
+          "min": 1.5759931980283,
+          "max": 2.459473408991471
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 1.004905429031842,
+          "median": 0.9983430110150948,
+          "min": 0.6711008080164902,
+          "max": 1.5515929029788822
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 2.9166607897711296,
+          "median": 2.8916601705132052,
+          "min": 2.24709400604479,
+          "max": 4.011066311970353
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.42173773576785184,
+          "median": 0.39892452899948694,
+          "min": 0.3084524690057151,
+          "max": 2.070537501014769
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.2107944975188683,
+          "median": 3.104192830505781,
+          "min": 3.046045369002968,
+          "max": 3.809473495988641
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.06431088361540634,
+          "median": 0.02564863397856243,
+          "min": 0.004381758044473827,
+          "max": 2.432672609051224
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.376340152629252e-05,
+          "median": 3.368098987266421e-05,
+          "min": 2.2919964976608753e-05,
+          "max": 4.9820984713733196e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.4987260324203156e-05,
+          "median": 2.4860026314854622e-05,
+          "min": 1.8780003301799297e-05,
+          "max": 3.6120007280260324e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 5.875066185049567e-05,
+          "median": 5.8796023949980736e-05,
+          "min": 4.387996159493923e-05,
+          "max": 7.535098120570183e-05
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 6134056256,
+          "median": 6144612864.0,
+          "min": 5131554304,
+          "max": 7022347264
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 16204955648,
+          "median": 17021534208.0,
+          "min": 9898557440,
+          "max": 20552089600
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 2250.777176198484,
+          "median": 2254.3873283974826,
+          "min": 2170.2229067709995,
+          "max": 2322.895324714016
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 58.461744836324264
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 308,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 30.366515906695646,
+          "median": 32.44613974550157,
+          "min": 6.034830338030588,
+          "max": 40.178704159043264
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 308,
+          "mean": 0.009431094814329287,
+          "median": 0.007866888510761783,
+          "min": 0.0030622989870607853,
+          "max": 0.17411088099470362
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.8501955337757048,
+          "median": 0.8036885625042487,
+          "min": 0.6079696739907376,
+          "max": 3.2123700339579955
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 308,
+          "mean": 28.94285589578246,
+          "median": 31.21495157998288,
+          "min": 5.1882543779793195,
+          "max": 39.11168345401529
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 308,
+          "mean": 0.47618284453762627,
+          "median": 0.3046838515147101,
+          "min": 0.08897304499987513,
+          "max": 5.825734528014436
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 308,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 308,
+          "mean": 6.907069416529599,
+          "median": 6.801481138973031,
+          "min": 6.072039675025735,
+          "max": 10.549128582992125
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 1.8992599102830237,
+          "median": 1.8886738180008251,
+          "min": 1.5315056190011092,
+          "max": 2.7941279259976
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 1.003583324173172,
+          "median": 0.988001969497418,
+          "min": 0.6691973839770071,
+          "max": 1.6146743429708295
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 308,
+          "mean": 2.9028432344561956,
+          "median": 2.884708381490782,
+          "min": 2.2074785019503906,
+          "max": 4.104077892960049
+        },
+        "stage_seconds.input_preparation": {
+          "count": 308,
+          "mean": 0.4171183080432858,
+          "median": 0.39752023699111305,
+          "min": 0.3134270529844798,
+          "max": 2.315130377013702
+        },
+        "stage_seconds.model_load": {
+          "count": 308,
+          "mean": 3.2179018246522477,
+          "median": 3.1093988154898398,
+          "min": 3.0424657320254482,
+          "max": 3.8212168749887496
+        },
+        "stage_seconds.score_serialization": {
+          "count": 308,
+          "mean": 0.11846367305000283,
+          "median": 0.03687708798679523,
+          "min": 0.0071620839880779386,
+          "max": 2.870733257033862
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 308,
+          "mean": 3.3674548665823586e-05,
+          "median": 3.407051553949714e-05,
+          "min": 2.1810003090649843e-05,
+          "max": 4.736101254820824e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 308,
+          "mean": 2.574409012737164e-05,
+          "median": 2.5190471205860376e-05,
+          "min": 1.960096415132284e-05,
+          "max": 5.683099152520299e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 308,
+          "mean": 5.9418638793195226e-05,
+          "median": 5.9420999605208635e-05,
+          "min": 4.347105277702212e-05,
+          "max": 8.905201684683561e-05
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 8,
+      "complexes": 308,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 8,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 8,
+          "mean": 6128686976,
+          "median": 6134829824.0,
+          "min": 5173087232,
+          "max": 6951395328
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 8,
+          "mean": 16050028544,
+          "median": 15997075456.0,
+          "min": 9898557440,
+          "max": 20577255424
+        }
+      }
+    },
+    {
+      "arm": "guided_n40_s25",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 8,
+      "complexes": 308,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 8,
+          "mean": 2284.1765461507457,
+          "median": 2289.1295484715083,
+          "min": 2214.86241236201,
+          "max": 2336.533991678967
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 59.32926093898041
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 206,
+      "complexes": 206,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 206,
+          "mean": 74.15075899134966,
+          "median": 76.83359232400835,
+          "min": 19.822631351009477,
+          "max": 93.96522780400119
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 206,
+          "mean": 0.027038172715302847,
+          "median": 0.02141911900253035,
+          "min": 0.00902085000416264,
+          "max": 0.4029340599954594
+        },
+        "stage_seconds.input_preparation": {
+          "count": 206,
+          "mean": 0.6501448838351332,
+          "median": 0.6362095975055126,
+          "min": 0.4343404279788956,
+          "max": 1.0038272649981081
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 206,
+          "mean": 71.90310305437778,
+          "median": 74.89381641699583,
+          "min": 16.202746054012096,
+          "max": 92.39472703597858
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 206,
+          "mean": 1.3507981393255974,
+          "median": 0.9852460465044715,
+          "min": 0.34618072799639776,
+          "max": 6.271664936997695
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 206,
+      "complexes": 206,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 206,
+          "mean": 10.04237354040859,
+          "median": 9.97456600649457,
+          "min": 7.874953239981551,
+          "max": 13.224592944985488
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 206,
+          "mean": 3.323242568577644,
+          "median": 3.2935061954922276,
+          "min": 2.4585521729895845,
+          "max": 4.554820760007715
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 206,
+          "mean": 2.452729581285876,
+          "median": 2.431893360000686,
+          "min": 1.6151819969818462,
+          "max": 3.550582776981173
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 206,
+          "mean": 5.77597214986352,
+          "median": 5.710607387998607,
+          "min": 4.073734169971431,
+          "max": 8.105403536988888
+        },
+        "stage_seconds.input_preparation": {
+          "count": 206,
+          "mean": 0.31731574329094353,
+          "median": 0.3050748040113831,
+          "min": 0.18923103899578564,
+          "max": 0.8977720609982498
+        },
+        "stage_seconds.model_load": {
+          "count": 206,
+          "mean": 3.3378073547621208,
+          "median": 3.198769728493062,
+          "min": 3.0494883510109503,
+          "max": 4.668858503020601
+        },
+        "stage_seconds.score_serialization": {
+          "count": 206,
+          "mean": 0.28634705047549236,
+          "median": 0.20348222950997297,
+          "min": 0.016311454004608095,
+          "max": 1.8506602699926589
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 206,
+          "mean": 6.184478398317525e-05,
+          "median": 5.974101077299565e-05,
+          "min": 4.129999433644116e-05,
+          "max": 9.347102604806423e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 206,
+          "mean": 5.359337758385911e-05,
+          "median": 5.186549969948828e-05,
+          "min": 3.94810049328953e-05,
+          "max": 7.672200445085764e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 206,
+          "mean": 0.00011543816156703436,
+          "median": 0.00011200101289432496,
+          "min": 8.770197746343911e-05,
+          "max": 0.000166502024512738
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 206,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 14487118304,
+          "median": 14198872320.0,
+          "min": 12124026880,
+          "max": 18612228096
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 32847429632,
+          "median": 30820794368.0,
+          "min": 19824377856,
+          "max": 49983520768
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 206,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 1412.433143268563,
+          "median": 1420.2808538269892,
+          "min": 1204.9301674299932,
+          "max": 1507.577765087015
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 109.7035451082379
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 206,
+      "complexes": 206,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 206,
+          "mean": 73.86664620000424,
+          "median": 76.16737325100985,
+          "min": 20.985266505012987,
+          "max": 92.68137020803988
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 206,
+          "mean": 0.027080150274644624,
+          "median": 0.021635576005792245,
+          "min": 0.009182041976600885,
+          "max": 0.41019679501187056
+        },
+        "stage_seconds.input_preparation": {
+          "count": 206,
+          "mean": 0.6368020671495809,
+          "median": 0.6202759060251992,
+          "min": 0.44767635100288317,
+          "max": 1.0688604429597035
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 206,
+          "mean": 72.09613524544312,
+          "median": 74.24001151250559,
+          "min": 19.712597951001953,
+          "max": 91.61007864604471
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 206,
+          "mean": 0.9657297247080686,
+          "median": 0.7066750425146893,
+          "min": 0.2852709189755842,
+          "max": 4.923337507003453
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 206,
+      "complexes": 206,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 206,
+          "mean": 9.804436238846392,
+          "median": 9.666794080490945,
+          "min": 7.748403692006832,
+          "max": 12.584729596041143
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 206,
+          "mean": 3.3377613958942782,
+          "median": 3.3147642650001217,
+          "min": 2.449349522998091,
+          "max": 4.547391536005307
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 206,
+          "mean": 2.4494903205569836,
+          "median": 2.4231463909964077,
+          "min": 1.6003333929984365,
+          "max": 3.5624199640005827
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 206,
+          "mean": 5.787251716451261,
+          "median": 5.739100493985461,
+          "min": 4.06618865497876,
+          "max": 8.10981150000589
+        },
+        "stage_seconds.input_preparation": {
+          "count": 206,
+          "mean": 0.30537792160619365,
+          "median": 0.29371589147194754,
+          "min": 0.18674279301194474,
+          "max": 0.6896185700315982
+        },
+        "stage_seconds.model_load": {
+          "count": 206,
+          "mean": 3.2711247806164643,
+          "median": 3.174765164993005,
+          "min": 3.041658761969302,
+          "max": 4.14965831200243
+        },
+        "stage_seconds.score_serialization": {
+          "count": 206,
+          "mean": 0.17934144234148564,
+          "median": 0.11717923400283325,
+          "min": 0.013562054024077952,
+          "max": 1.3886522999964654
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 206,
+          "mean": 5.992668035476315e-05,
+          "median": 5.787098780274391e-05,
+          "min": 4.260000423528254e-05,
+          "max": 9.60330362431705e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 206,
+          "mean": 5.193941283279361e-05,
+          "median": 5.061601405031979e-05,
+          "min": 3.989998367615044e-05,
+          "max": 8.644000627100468e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 206,
+          "mean": 0.00011186609318755675,
+          "median": 0.0001065959659172222,
+          "min": 8.380101644434035e-05,
+          "max": 0.000168115075211972
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 206,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 14491460384,
+          "median": 14224684544.0,
+          "min": 11986087936,
+          "max": 18519725056
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 32794476544,
+          "median": 30174871552.0,
+          "min": 19920846848,
+          "max": 50147098624
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 206,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 1397.125761147745,
+          "median": 1392.664165227019,
+          "min": 1298.5111546330154,
+          "max": 1507.8326455109636
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 108.51462222506757
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 206,
+      "complexes": 206,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 206,
+          "mean": 74.77220791104226,
+          "median": 76.86486744898139,
+          "min": 21.99605660699308,
+          "max": 95.99398578502587
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 206,
+          "mean": 0.029098729655407687,
+          "median": 0.02153382750111632,
+          "min": 0.0089596479665488,
+          "max": 0.4039373620180413
+        },
+        "stage_seconds.input_preparation": {
+          "count": 206,
+          "mean": 0.7143058184671636,
+          "median": 0.6413522375223693,
+          "min": 0.464171327999793,
+          "max": 2.4772702409827616
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 206,
+          "mean": 72.69123009400435,
+          "median": 74.65812336847011,
+          "min": 20.855890328006353,
+          "max": 91.44135552598163
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 206,
+          "mean": 1.1331002067142162,
+          "median": 0.8408188100147527,
+          "min": 0.3030801240238361,
+          "max": 6.8731476700049825
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 206,
+      "complexes": 206,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 206,
+          "mean": 17.54969066715979,
+          "median": 9.813734032504726,
+          "min": 7.889456594013609,
+          "max": 1569.2980476779921
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 206,
+          "mean": 10.833497684212313,
+          "median": 3.314586098000291,
+          "min": 2.3996687290491536,
+          "max": 1545.2627133710193
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 206,
+          "mean": 2.4451972570778064,
+          "median": 2.421542727504857,
+          "min": 1.6029844199656509,
+          "max": 3.4805365939973854
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 206,
+          "mean": 13.278694941290118,
+          "median": 5.743911832018057,
+          "min": 4.0026531490148045,
+          "max": 1548.1501888240164
+        },
+        "stage_seconds.input_preparation": {
+          "count": 206,
+          "mean": 0.37113332831486157,
+          "median": 0.2976517165079713,
+          "min": 0.1900437169824727,
+          "max": 7.998888605012326
+        },
+        "stage_seconds.model_load": {
+          "count": 206,
+          "mean": 3.2735186511886902,
+          "median": 3.1331079765222967,
+          "min": 3.0476338990265504,
+          "max": 7.783485282998299
+        },
+        "stage_seconds.score_serialization": {
+          "count": 206,
+          "mean": 0.27082420669163204,
+          "median": 0.1517014884739183,
+          "min": 0.005970079015241936,
+          "max": 3.440445460000774
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 206,
+          "mean": 5.7089783915870106e-05,
+          "median": 5.342101212590933e-05,
+          "min": 4.227104363963008e-05,
+          "max": 0.0005268609966151416
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 206,
+          "mean": 4.8587001657827746e-05,
+          "median": 4.802050534635782e-05,
+          "min": 3.868999192491174e-05,
+          "max": 8.924200665205717e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 206,
+          "mean": 0.00010567678557369786,
+          "median": 0.00010157146607525647,
+          "min": 8.640997111797333e-05,
+          "max": 0.0005821309750899673
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 206,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 14512055232,
+          "median": 14239236864.0,
+          "min": 12122723328,
+          "max": 18562743296
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 32554745856,
+          "median": 30764171264.0,
+          "min": 19889389568,
+          "max": 50098864128
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "phibench",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 206,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 1663.256259645117,
+          "median": 1428.1549890665046,
+          "min": 1288.1069471979863,
+          "max": 3417.600358646014
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 129.184952205446
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 558,
+      "complexes": 558,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 558,
+          "mean": 70.60385823352718,
+          "median": 74.56999614099914,
+          "min": 14.678938921017107,
+          "max": 94.18175782001344
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 558,
+          "mean": 0.020558752951086633,
+          "median": 0.019192065490642563,
+          "min": 0.007350785017479211,
+          "max": 0.07604338598321192
+        },
+        "stage_seconds.input_preparation": {
+          "count": 558,
+          "mean": 0.794713990219819,
+          "median": 0.738347030011937,
+          "min": 0.5732623789808713,
+          "max": 12.170943123986945
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 558,
+          "mean": 68.89811980583062,
+          "median": 72.93082121749467,
+          "min": 13.437507664959412,
+          "max": 92.00577569397865
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 558,
+          "mean": 0.760907085729979,
+          "median": 0.6512036670028465,
+          "min": 0.23134282196406275,
+          "max": 3.888507233990822
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 558,
+      "complexes": 558,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 558,
+          "mean": 9.609626640457154,
+          "median": 9.611407589487499,
+          "min": 6.9392167730256915,
+          "max": 22.288249637000263
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 558,
+          "mean": 3.2176327615138476,
+          "median": 3.2166684135154355,
+          "min": 1.9515678700408898,
+          "max": 9.097830400976818
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 558,
+          "mean": 2.3053614074636775,
+          "median": 2.3111830149864545,
+          "min": 1.0409496770007536,
+          "max": 3.87213975697523
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 558,
+          "mean": 5.522994168977525,
+          "median": 5.526420580485137,
+          "min": 2.9925175470416434,
+          "max": 11.835792534984648
+        },
+        "stage_seconds.input_preparation": {
+          "count": 558,
+          "mean": 0.4229417190707404,
+          "median": 0.3665661350096343,
+          "min": 0.28614043100969866,
+          "max": 11.724342108005658
+        },
+        "stage_seconds.model_load": {
+          "count": 558,
+          "mean": 3.1917867017412824,
+          "median": 3.1210616630123695,
+          "min": 3.038769915001467,
+          "max": 5.083730906015262
+        },
+        "stage_seconds.score_serialization": {
+          "count": 558,
+          "mean": 0.18949613525506315,
+          "median": 0.14618800599419046,
+          "min": 0.01358700098353438,
+          "max": 1.7948917869944125
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 558,
+          "mean": 5.744080038158737e-05,
+          "median": 5.634099943563342e-05,
+          "min": 4.1601015254855156e-05,
+          "max": 9.833200601860881e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 558,
+          "mean": 4.911105190011536e-05,
+          "median": 4.8191024689003825e-05,
+          "min": 3.7650985177606344e-05,
+          "max": 8.120099664665759e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 558,
+          "mean": 0.00010655185228170274,
+          "median": 0.00010380649473518133,
+          "min": 8.558097761124372e-05,
+          "max": 0.00015974300913512707
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 558,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 14418463264,
+          "median": 14032162816.0,
+          "min": 12527254016,
+          "max": 18231133184
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 40046166016,
+          "median": 41562406912.0,
+          "min": 27667726336,
+          "max": 49935286272
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 558,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 3636.168631193692,
+          "median": 3649.265040901999,
+          "min": 3418.558651473024,
+          "max": 4002.7046387010196
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 104.26289981917397
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 558,
+      "complexes": 558,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 558,
+          "mean": 70.36263853096635,
+          "median": 74.69852815799823,
+          "min": 15.217596302973107,
+          "max": 94.10412578500109
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 558,
+          "mean": 0.020400996587517102,
+          "median": 0.018919889989774674,
+          "min": 0.007474206009646878,
+          "max": 0.07299768397933803
+        },
+        "stage_seconds.input_preparation": {
+          "count": 558,
+          "mean": 0.7883262195498503,
+          "median": 0.7269425620033871,
+          "min": 0.5637098519946449,
+          "max": 11.163728255982278
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 558,
+          "mean": 68.5940533067898,
+          "median": 72.79103832150577,
+          "min": 13.929223594022915,
+          "max": 92.95429005898768
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 558,
+          "mean": 0.8286533643888797,
+          "median": 0.6162072524894029,
+          "min": 0.235616766003659,
+          "max": 5.552723477972904
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 558,
+      "complexes": 558,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 558,
+          "mean": 9.637587946240602,
+          "median": 9.528829907503678,
+          "min": 6.702840326004662,
+          "max": 20.938511610002024
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 558,
+          "mean": 3.1966987957091066,
+          "median": 3.196219953999389,
+          "min": 1.8303014150005765,
+          "max": 4.609926092991373
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 558,
+          "mean": 2.308655059385267,
+          "median": 2.3088917754939757,
+          "min": 1.0416299990029074,
+          "max": 3.994182547001401
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 558,
+          "mean": 5.5053538550943735,
+          "median": 5.512789621483535,
+          "min": 2.890740877017379,
+          "max": 8.442273839988047
+        },
+        "stage_seconds.input_preparation": {
+          "count": 558,
+          "mean": 0.419757634880335,
+          "median": 0.371521639986895,
+          "min": 0.2822678569937125,
+          "max": 10.81703869102057
+        },
+        "stage_seconds.model_load": {
+          "count": 558,
+          "mean": 3.194591476324229,
+          "median": 3.113625203506672,
+          "min": 3.032319773978088,
+          "max": 8.351586967997719
+        },
+        "stage_seconds.score_serialization": {
+          "count": 558,
+          "mean": 0.20510031204331852,
+          "median": 0.1387808790022973,
+          "min": 0.011522496002726257,
+          "max": 2.51911856001243
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 558,
+          "mean": 5.894202258526331e-05,
+          "median": 5.837601202074438e-05,
+          "min": 4.248999175615609e-05,
+          "max": 0.00010000102338381112
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 558,
+          "mean": 4.825753919858699e-05,
+          "median": 4.73495019832626e-05,
+          "min": 3.766099689528346e-05,
+          "max": 8.921101107262075e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 558,
+          "mean": 0.0001071995617838503,
+          "median": 0.00010566701530478895,
+          "min": 8.31700162962079e-05,
+          "max": 0.00016411900287494063
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 558,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 14426260416,
+          "median": 14030210304.0,
+          "min": 12594632704,
+          "max": 18264056832
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 40240545792,
+          "median": 41644195840.0,
+          "min": 26457669632,
+          "max": 50132418560
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 558,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 3612.070699144755,
+          "median": 3623.804511402501,
+          "min": 3339.9556236290373,
+          "max": 3855.2966495429864
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 103.57191968873849
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 558,
+      "complexes": 558,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 558,
+          "mean": 71.66162975356336,
+          "median": 75.46987550301128,
+          "min": 15.40349403800792,
+          "max": 95.78957586799515
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 558,
+          "mean": 0.020383729759643796,
+          "median": 0.018992505996720865,
+          "min": 0.007395675987936556,
+          "max": 0.07227572498959489
+        },
+        "stage_seconds.input_preparation": {
+          "count": 558,
+          "mean": 0.7457876865841544,
+          "median": 0.7003453770012129,
+          "min": 0.5562937119975686,
+          "max": 12.007822438987205
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 558,
+          "mean": 68.6461796971855,
+          "median": 72.53723192399775,
+          "min": 14.176928234985098,
+          "max": 91.27540049000527
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 558,
+          "mean": 1.9799276429531936,
+          "median": 1.0975241915002698,
+          "min": 0.14347750501474366,
+          "max": 15.924830147996545
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 558,
+      "complexes": 558,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 558,
+          "mean": 9.921821795476612,
+          "median": 9.653054327514837,
+          "min": 6.707597957982216,
+          "max": 22.714070683025056
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 558,
+          "mean": 3.1731419101282143,
+          "median": 3.184138743992662,
+          "min": 1.7727617069613189,
+          "max": 4.7385630829958245
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 558,
+          "mean": 2.3089498259328676,
+          "median": 2.316379499010509,
+          "min": 1.0377679910161532,
+          "max": 3.89552171799005
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 558,
+          "mean": 5.482091736061082,
+          "median": 5.506139972989331,
+          "min": 2.810529697977472,
+          "max": 8.634084800985875
+        },
+        "stage_seconds.input_preparation": {
+          "count": 558,
+          "mean": 0.41821715127295767,
+          "median": 0.36632236049626954,
+          "min": 0.2857858730130829,
+          "max": 11.851560373004759
+        },
+        "stage_seconds.model_load": {
+          "count": 558,
+          "mean": 3.174935862594735,
+          "median": 3.0977367464947747,
+          "min": 3.048046770010842,
+          "max": 4.131837521010311
+        },
+        "stage_seconds.score_serialization": {
+          "count": 558,
+          "mean": 0.4393539893340551,
+          "median": 0.06117575148527976,
+          "min": 0.005038348987000063,
+          "max": 6.984689347998938
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 558,
+          "mean": 5.876883403539965e-05,
+          "median": 5.845549458172172e-05,
+          "min": 4.2159983422607183e-05,
+          "max": 7.690099300816655e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 558,
+          "mean": 4.778643064434543e-05,
+          "median": 4.6721004764549434e-05,
+          "min": 3.693098551593721e-05,
+          "max": 9.723799303174019e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 558,
+          "mean": 0.00010655526467974508,
+          "median": 0.00010567797289695591,
+          "min": 8.707097731530666e-05,
+          "max": 0.00016950699500739574
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 558,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 14414986944,
+          "median": 14042909440.0,
+          "min": 12490905088,
+          "max": 18354189824
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 41279553536,
+          "median": 43120590848.0,
+          "min": 27422359552,
+          "max": 50056921088
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "foldbench",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 558,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 3624.8891259802476,
+          "median": 3656.914391490005,
+          "min": 3352.754338042985,
+          "max": 3800.2117805989983
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 103.93947314638703
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 0,
+      "stage": "refinement",
+      "records": 925,
+      "complexes": 925,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 925,
+          "mean": 75.50015598367132,
+          "median": 76.51444763099425,
+          "min": 16.365180617023725,
+          "max": 98.33298260101583
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 925,
+          "mean": 0.016192554402624484,
+          "median": 0.01595507498132065,
+          "min": 0.00698913200176321,
+          "max": 0.030008925998117775
+        },
+        "stage_seconds.input_preparation": {
+          "count": 925,
+          "mean": 0.7392054940916509,
+          "median": 0.7339538590167649,
+          "min": 0.6305660999787506,
+          "max": 1.6918834160023835
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 925,
+          "mean": 72.08807502784936,
+          "median": 73.68964166200021,
+          "min": 13.214506670017727,
+          "max": 95.33398103702348
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 925,
+          "mean": 2.1820596308160787,
+          "median": 0.9192268080078065,
+          "min": 0.16414074000203982,
+          "max": 19.290387593995547
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 0,
+      "stage": "confidence",
+      "records": 925,
+      "complexes": 925,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 925,
+          "mean": 10.186905546308356,
+          "median": 9.60642015101621,
+          "min": 6.31627447201754,
+          "max": 21.403053376998287
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 925,
+          "mean": 3.0651241346398,
+          "median": 3.0871339209843427,
+          "min": 1.6340822250058409,
+          "max": 3.877609952003695
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 925,
+          "mean": 2.2272549789953926,
+          "median": 2.236792684008833,
+          "min": 0.8335568440088537,
+          "max": 2.9695623840088956
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 925,
+          "mean": 5.292379113635193,
+          "median": 5.315709339018213,
+          "min": 2.5609831610054243,
+          "max": 6.847172336012591
+        },
+        "stage_seconds.input_preparation": {
+          "count": 925,
+          "mean": 0.4206630141610229,
+          "median": 0.40713279097690247,
+          "min": 0.3491862250084523,
+          "max": 0.6719647360150702
+        },
+        "stage_seconds.model_load": {
+          "count": 925,
+          "mean": 3.2364932668065287,
+          "median": 3.127053606993286,
+          "min": 3.0500788599892985,
+          "max": 4.207779827003833
+        },
+        "stage_seconds.score_serialization": {
+          "count": 925,
+          "mean": 0.6130548916667121,
+          "median": 0.05473917900235392,
+          "min": 0.0049799029948189855,
+          "max": 10.10311729600653
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 925,
+          "mean": 5.866872602947862e-05,
+          "median": 5.856002098880708e-05,
+          "min": 3.811001079156995e-05,
+          "max": 8.376099867746234e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 925,
+          "mean": 4.7170812849307785e-05,
+          "median": 4.669101326726377e-05,
+          "min": 3.774100332520902e-05,
+          "max": 6.91730238031596e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 925,
+          "mean": 0.0001058395388787864,
+          "median": 0.00010529201244935393,
+          "min": 8.361999061889946e-05,
+          "max": 0.00014231199747882783
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 0,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 925,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 50865307648,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 50865307648
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 11690381696,
+          "median": 11577190400.0,
+          "min": 11033694208,
+          "max": 12648992768
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 43792728064,
+          "median": 44477448192.0,
+          "min": 31698452480,
+          "max": 49958354944
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 0,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 925,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 6212.155210090192,
+          "median": 6214.971873012502,
+          "min": 6006.961288596009,
+          "max": 6342.763596944016
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 107.45349552588439
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 1,
+      "stage": "refinement",
+      "records": 925,
+      "complexes": 925,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 925,
+          "mean": 74.07018907363765,
+          "median": 75.32773187701241,
+          "min": 16.06148623302579,
+          "max": 95.07090411402169
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 925,
+          "mean": 0.016242938180001,
+          "median": 0.01599819300463423,
+          "min": 0.006966735003516078,
+          "max": 0.030375878006452695
+        },
+        "stage_seconds.input_preparation": {
+          "count": 925,
+          "mean": 0.7477682226363922,
+          "median": 0.7313242550007999,
+          "min": 0.6271628399845213,
+          "max": 3.1115123000054155
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 925,
+          "mean": 72.37095228794965,
+          "median": 73.7021824149997,
+          "min": 14.922397062007803,
+          "max": 92.65215006499784
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 925,
+          "mean": 0.8385541113497488,
+          "median": 0.3712527729803696,
+          "min": 0.145978754007956,
+          "max": 7.6556023489974905
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 1,
+      "stage": "confidence",
+      "records": 925,
+      "complexes": 925,
+      "devices": [
+        "NVIDIA H100 PCIe",
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 925,
+          "mean": 9.510319333863697,
+          "median": 9.355232061992865,
+          "min": 6.177911946986569,
+          "max": 13.581097871996462
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 925,
+          "mean": 3.139592489197479,
+          "median": 3.1161492170067504,
+          "min": 1.6224114369833842,
+          "max": 5.374160972016398
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 925,
+          "mean": 2.2711829447728658,
+          "median": 2.248351868998725,
+          "min": 0.9008791020023637,
+          "max": 3.5388871720060706
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 925,
+          "mean": 5.410775433970345,
+          "median": 5.364855413994519,
+          "min": 2.523290538985748,
+          "max": 8.22029356402345
+        },
+        "stage_seconds.input_preparation": {
+          "count": 925,
+          "mean": 0.4272118249533673,
+          "median": 0.41083027701824903,
+          "min": 0.34704279000288807,
+          "max": 0.6532842129818164
+        },
+        "stage_seconds.model_load": {
+          "count": 925,
+          "mean": 3.2401766073408638,
+          "median": 3.1234194900025614,
+          "min": 2.803404756996315,
+          "max": 4.30021869999473
+        },
+        "stage_seconds.score_serialization": {
+          "count": 925,
+          "mean": 0.16351825015732666,
+          "median": 0.03470045799622312,
+          "min": 0.004901018022792414,
+          "max": 3.3331571989983786
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 925,
+          "mean": 5.869515174118852e-05,
+          "median": 5.8397999964654446e-05,
+          "min": 3.9300997741520405e-05,
+          "max": 9.145899093709886e-05
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 925,
+          "mean": 4.731455455987236e-05,
+          "median": 4.640099359676242e-05,
+          "min": 3.3144024200737476e-05,
+          "max": 8.396801422350109e-05
+        },
+        "stage_seconds.selector_total": {
+          "count": 925,
+          "mean": 0.00010600970630106089,
+          "median": 0.0001052510051522404,
+          "min": 7.268600165843964e-05,
+          "max": 0.0001629960024729371
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 1,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 925,
+      "devices": [
+        "NVIDIA H100 PCIe",
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 52999819264,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 85017493504
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 11681543360,
+          "median": 11543404032.0,
+          "min": 11111381504,
+          "max": 12668456448
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 44051726336,
+          "median": 44477448192.0,
+          "min": 31664898048,
+          "max": 49658462208
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 1,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 925,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 6092.485438541742,
+          "median": 6041.9582695149875,
+          "min": 5873.40377216402,
+          "max": 7083.21846814896
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 105.38353190991121
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 2,
+      "stage": "refinement",
+      "records": 925,
+      "complexes": 925,
+      "devices": [],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 925,
+          "mean": 75.46120683212818,
+          "median": 76.1722740890109,
+          "min": 14.846338605013443,
+          "max": 95.87663641700055
+        },
+        "stage_seconds.common_rmsd_evaluation_excluded": {
+          "count": 925,
+          "mean": 0.016274541213548415,
+          "median": 0.015981872973497957,
+          "min": 0.0069767120003234595,
+          "max": 0.030545678979251534
+        },
+        "stage_seconds.input_preparation": {
+          "count": 925,
+          "mean": 0.7762769540584005,
+          "median": 0.7390238930238411,
+          "min": 0.6242419239715673,
+          "max": 1.679015697009163
+        },
+        "stage_seconds.minimization_refinement": {
+          "count": 925,
+          "mean": 73.64389573965803,
+          "median": 74.6137174689793,
+          "min": 13.268013235996477,
+          "max": 94.55200628598686
+        },
+        "stage_seconds.pose_serialization": {
+          "count": 925,
+          "mean": 0.8830626740178245,
+          "median": 0.5016073549631983,
+          "min": 0.15400303801288828,
+          "max": 9.96347207800136
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 2,
+      "stage": "confidence",
+      "records": 925,
+      "complexes": 925,
+      "devices": [
+        "NVIDIA H100 PCIe",
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "wall_seconds_before_summary_write": {
+          "count": 925,
+          "mean": 9.874411928958851,
+          "median": 9.561397015990224,
+          "min": 6.318458658002783,
+          "max": 15.344456551014446
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_000": {
+          "count": 925,
+          "mean": 3.280194827265773,
+          "median": 3.179779336991487,
+          "min": 1.650544573989464,
+          "max": 5.056768415030092
+        },
+        "stage_seconds.confidence_forward_by_pose_stage.step_100": {
+          "count": 925,
+          "mean": 2.36328509117162,
+          "median": 2.2931936649838462,
+          "min": 0.822850122989621,
+          "max": 3.6993071490433067
+        },
+        "stage_seconds.confidence_forward_total": {
+          "count": 925,
+          "mean": 5.643479918437393,
+          "median": 5.45930981496349,
+          "min": 2.609508708002977,
+          "max": 8.566252327058464
+        },
+        "stage_seconds.input_preparation": {
+          "count": 925,
+          "mean": 0.4471607556015354,
+          "median": 0.41386435501044616,
+          "min": 0.34483362798346207,
+          "max": 0.9273808309808373
+        },
+        "stage_seconds.model_load": {
+          "count": 925,
+          "mean": 3.3645602864006885,
+          "median": 3.1985261240042746,
+          "min": 2.808259369980078,
+          "max": 7.775242456002161
+        },
+        "stage_seconds.score_serialization": {
+          "count": 925,
+          "mean": 0.13902251785328434,
+          "median": 0.048489249020349234,
+          "min": 0.005286679981509224,
+          "max": 3.3493073059944436
+        },
+        "stage_seconds.selector_by_pose_stage.step_000": {
+          "count": 925,
+          "mean": 5.865769306625667e-05,
+          "median": 5.751103162765503e-05,
+          "min": 3.2266019843518734e-05,
+          "max": 0.00012382102431729436
+        },
+        "stage_seconds.selector_by_pose_stage.step_100": {
+          "count": 925,
+          "mean": 4.851084759433729e-05,
+          "median": 4.6689994633197784e-05,
+          "min": 3.111199475824833e-05,
+          "max": 0.00012159199104644358
+        },
+        "stage_seconds.selector_total": {
+          "count": 925,
+          "mean": 0.00010716854066059396,
+          "median": 0.00010497902985662222,
+          "min": 6.533804116770625e-05,
+          "max": 0.00022691302001476288
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 2,
+      "stage": "sampling",
+      "records": 16,
+      "complexes": 925,
+      "devices": [
+        "NVIDIA H100 PCIe",
+        "NVIDIA RTX 6000 Ada Generation"
+      ],
+      "metrics": {
+        "gpu_total_memory_bytes": {
+          "count": 16,
+          "mean": 57268842496,
+          "median": 50865307648.0,
+          "min": 50865307648,
+          "max": 85017493504
+        },
+        "cuda_max_memory_allocated_bytes": {
+          "count": 16,
+          "mean": 11696601984,
+          "median": 11581720576.0,
+          "min": 11001994240,
+          "max": 12635841536
+        },
+        "cuda_max_memory_reserved_bytes": {
+          "count": 16,
+          "mean": 43913052160,
+          "median": 44773146624.0,
+          "min": 32707182592,
+          "max": 48022683648
+        }
+      }
+    },
+    {
+      "arm": "temporal_n100_s10",
+      "dataset": "openbind",
+      "repeat": 2,
+      "stage": "full_shard",
+      "records": 16,
+      "complexes": 925,
+      "devices": [],
+      "metrics": {
+        "elapsed_seconds": {
+          "count": 16,
+          "mean": 6296.1423444468055,
+          "median": 6154.3870292484935,
+          "min": 5923.21874784198,
+          "max": 7128.689607971988
+        }
+      },
+      "aggregate_shard_wall_seconds_per_complex": 108.90624595799879
+    }
+  ],
+  "notes": [
+    "Sampling-only wall time was not recorded; no subtraction-based estimate is called sampling time.",
+    "Full-shard elapsed includes sampling, refinement, both raw/refined confidence, imports and I/O; excludes separate official selected-pose PB jobs.",
+    "Per-complex wall is a descriptive throughput normalization, not isolated kernel latency.",
+    "Confidence forward totals score BOTH raw and refined banks; per-stage forward fields are separate.",
+    "CUDA allocator peaks are per sampling process/shard, not per ligand or whole-process/nvidia-smi peaks.",
+    "Host RSS and refinement/confidence GPU peaks are unavailable in these records; requested RAM is not measured usage.",
+    "Guided N100 historical pipeline runtime is not mixed with the matched current driver comparison."
+  ],
+  "source_manifest": {
+    "path": "outputs/benchmarks/paper_analysis_20260919/runtime_sources.json",
+    "sha256": "015f4feb3a4438553dc1bceec99420b391be94461458da1563e43e3ce0fe26ba"
+  }
+}

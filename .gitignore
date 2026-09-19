@@ -114,6 +114,11 @@ AGENTS.md
 .agents/
 .codex/
 *.pdf
+!docs/paper/20260919/*.pdf
+# Paper evidence release contains aggregates, not third-party per-case metadata.
+/docs/paper/20260919/candidate_cases.csv
+/docs/paper/20260919/overlap_metrics.json
+/logs/
 /archive/
 data/
 !src/effdock/data/

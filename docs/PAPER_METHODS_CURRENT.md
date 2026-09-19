@@ -54,9 +54,9 @@ U70k was selected only on the fixed 1,035-complex PLINDER bank: 622/1,035 (60.10
 
 The primary endpoint is selected Top-1 symmetry-aware no-alignment heavy-atom RMSD below 2 A. Secondary reports include Top-k and oracle success, official PoseBusters validity, and their same-pose conjunction. Crystal ligand coordinates are labels only; explicit frozen pocket centers are mandatory inputs and missing IDs fail before sampling.
 
-Completed cohorts are Astex Diverse (85), PoseBusters v2 (308), PhiBench (203 reconstructed systems), FoldBench-Pocket full (558), and auxiliary OpenBind (860). PhiBench and FoldBench are temporal checks; OpenBind is a dense single-protease auxiliary cohort. All headline rows are supplied-pocket redocking, not blind docking or co-folding. Astex and PoseBusters were opened during development, so they are descriptive rather than independent model-selection evidence. U70k was selected on the internal PLINDER bank, not external metrics.
+Completed three-seed cohorts are Astex Diverse (85), PoseBusters v2 (308), PhiBench (206, including three reconstructed systems), FoldBench-Pocket full (558), and auxiliary OpenBind (925, including flagged systems and two noncovalent approximations of covalent systems). PhiBench and FoldBench are temporal checks; OpenBind is a dense single-protease auxiliary cohort. All headline rows are supplied-pocket redocking, not blind docking or co-folding. Astex and PoseBusters were opened during development, so they are descriptive rather than independent model-selection evidence. U70k was selected on the internal PLINDER bank, not external metrics. The uniform unguided main table and separate guided/budget ablations are generated in [the paper results](paper/20260919/RESULTS.md). FoldBench PB includes three explicitly disclosed energy-reference InChI-repair shards.
 
-PoseX-SD/CD is separate ongoing work. Raw export uses the official alignment/evaluation scripts. The relaxation condition is explicitly `fixed-receptor relaxed`: it preserves observed receptor residues and adds missing atoms/hydrogens before upstream OpenMM/OpenFF relaxation because upstream CIF sequence-gap reconstruction fails for some supplied receptor PDBs. Do not place PoseX aggregates in a result table until all three seeds and strict coverage checks complete.
+PoseX-SD/CD evaluation is complete for SD718/CD1312 and three seeds (101/202/303), including the original confidence and input-chirality+E/Z selection arms followed by the separately recorded PoseX relaxation protocol. SD and CD follow native evaluation/grouping; CD aggregates 109 groups and is not a simple per-case success percentage. The earlier fixed-receptor recovery attempts are historical, not interchangeable with the final recovered upstream results. See `POSEX_RECOVERED_EVALUATION.md`, `POSEX_STEREO_RELAX_CHAIN.md`, and the final CSV/summary identities when describing relaxation; do not describe EFF-Dock's own refinement as PoseX relaxation.
 
 ## 6. Paper map and boundaries
 
@@ -77,4 +77,4 @@ Do not claim blind docking, affinity prediction, calibrated confidence, or prosp
 - `EARLY_TIME_FINE_TUNE_50K_PROTOCOL.md`: docking lineage.
 - `S50_RAW_REFINED_CONFIDENCE_100K_PROTOCOL.md`: confidence training record.
 - `BENCHMARK_RESULTS.md`: completed external results.
-- `POSEX_OFFICIAL_PROTOCOL.md`: separate ongoing PoseX protocol.
+- `POSEX_OFFICIAL_PROTOCOL.md`: separate PoseX protocol; final recovered evaluation is complete.

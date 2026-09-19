@@ -107,21 +107,33 @@ checkpoint selection, and exact evaluation definitions are documented in:
 
 ## Main results
 
-All rows below use the released docking/U70k pair on the same saved
-N100/S10/sigma-2 candidates. RMSD is symmetry-aware heavy-atom RMSD without
-alignment. `Raw` is the sampler output. `Refined` is the separately evaluated
-deterministic physical refinement and is not silently applied by `dock()`.
-`Joint` requires both refined RMSD below 2 Angstrom and official PoseBusters
-validity.
+The current reporting baseline is **three seeds, unguided N100/S10/sigma2**, using the
+released docking/U70k pair, explicit physical refinement and input-chirality
+selection. These postprocessing steps are not silently applied by `dock()`.
+RMSD is symmetry-aware heavy-atom RMSD without alignment; Joint requires both
+RMSD <2 Angstrom and PB-validity. Values are percent mean ± sample SD.
 
-| Dataset | N | Raw Top-1 `<2A` | Refined Top-1 `<2A` | Refined PB-valid | Refined joint `<2A` |
-|---|---:|---:|---:|---:|---:|
-| Astex Diverse | 85 | 81.18% | 85.88% | 94.12% | 81.18% |
-| PoseBusters v2 | 308 | 78.25% | 84.09% | 95.13% | 81.17% |
-| PhiBench | 203 | 63.05% | 64.53% | 90.64% | 59.11% |
-| FoldBench-Pocket full | 558 | 72.04% | 75.63% | 95.16% | 72.94% |
-| FoldBench-Pocket post-cutoff | 66 | 68.18% | 71.21% | 89.39% | 66.67% |
-| OpenBind | 860 | 49.07% | 55.47% | 98.60% | 54.65% |
+| Dataset | N per seed | Refined + filtered `<2A` | PB-valid | Joint |
+|---|---:|---:|---:|---:|
+| Astex Diverse | 85 | 82.35 ± 2.04 | 95.69 ± 0.68 | 79.22 ± 2.72 |
+| PoseBusters v2 | 308 | 81.60 ± 0.94 | 95.56 ± 0.50 | 79.22 ± 1.42 |
+| PhiBench reconstructed full | 206 | 62.62 ± 3.79 | 94.01 ± 0.28 | 60.19 ± 3.36 |
+| FoldBench-Pocket full | 558 | 74.49 ± 0.37 | 96.36 ± 0.37 | 72.82 ± 0.63 |
+| OpenBind full | 925 | 52.58 ± 0.61 | 99.64 ± 0.17 | 52.58 ± 0.61 |
+
+The matched Astex/PB guided/unguided N100/S10 and N40/S25 comparisons are
+complete; the earlier eta2 rows remain separate ablations. FoldBench includes
+three PB shards with a disclosed energy-reference InChI compatibility repair.
+Historical single-bank numbers remain in the [benchmark report](docs/BENCHMARK_RESULTS.md).
+Current tables, reproducible figures and condition-specific captions are in
+the [paper results](docs/paper/20260919/RESULTS.md).
+
+PoseX is reported separately: input chirality+E/Z selection followed by
+PoseX relaxation, not our own refinement. Across three seeds, SD718 gives
+72.89 ± 1.08% RMSD success and 69.64 ± 0.64% Joint; CD1312 gives
+59.94 ± 3.71% and 59.33 ± 3.47%. CD uses the official-style 109-group
+aggregation, not per-case success; these endpoints are not interchangeable
+with the table above. See the inventory for baseline comparisons and provenance.
 
 These are supplied-pocket redocking results, not blind docking or prospective
 screening. Astex, PoseBusters, and the temporal cohorts were inspected during
@@ -130,7 +142,7 @@ fixed 1,035-complex PLINDER validation bank. PhiBench and FoldBench are the
 core temporal checks; OpenBind is reported separately as a dense
 single-protease auxiliary cohort.
 
-For endpoint-aligned PhiBench context, U70k refined confidence Top-5 reaches
+For historical endpoint-aligned PhiBench context, U70k refined confidence Top-5 reaches
 `156/203` (`76.85%`) RMSD success and `150/203` (`73.89%`) same-pose
 PB-valid/RMSD joint success. The source-native paper cohort has 206 systems,
 so this remains descriptive rather than a direct head-to-head claim.
@@ -146,6 +158,12 @@ with machine-readable comparison artifacts under
 [`benchmarks/results/`](benchmarks/results/).
 
 ## Repository map
+
+The [manuscript evidence package](docs/paper/20260919/README.md) includes
+six figures, source-hashed aggregates and manuscript text. Its
+[runtime report](docs/paper/20260919/RUNTIME.md) distinguishes seconds per
+complex, amortized seconds per generated/scored pose, and sampling-process
+GPU peaks; these are saved-run costs, not isolated single-pose latency.
 
 - `src/effdock/`: reusable Python package;
 - `configs/`: training and evaluation configurations;
