@@ -2,7 +2,7 @@
 
 Blue #8FB9D8, peach #E8B395, mint #9AC9B4, lavender #B8A6CE,
 blue-gray #B9C3CE, light blue #B1CDDF.
-All 16 selected manuscript figures use these colors consistently where the
+All 14 selected manuscript figures use these colors consistently where the
 same semantic roles recur. Neutral text and SD bars retain dark contrast.
 PB-valid is solid; PB-invalid extensions are hatched.
 Pocket/prior heatmap uses a focused cool-to-warm palette: teal at 70%, cream

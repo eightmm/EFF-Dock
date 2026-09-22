@@ -16,6 +16,10 @@ Dated supporting aggregates retain their own conditions; they are not substitute
 captions for the current figure set. Historical exploratory analyses and redundant
 exports remain local.
 
+The manuscript draft and narrative reports in `20260919/` describe an earlier
+figure layout. Use the current captions linked above for manuscript assembly;
+do not copy those earlier page numbers or draft captions into the current paper.
+
 Prism LaTeX blocks are reference material: adapt figure numbering, placement and
 bibliography keys to the manuscript. The package has not been compiled locally
 with XeLaTeX/LuaLaTeX.
