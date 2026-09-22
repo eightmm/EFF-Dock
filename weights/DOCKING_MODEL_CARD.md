@@ -16,7 +16,7 @@ time grid. The paired U70k confidence model ranks the generated poses.
 ## Training intervention
 
 The 50,000-update run initialized from the previous geometry checkpoint and
-used all 47,277 filtered training systems from the preserved PLINDER split.
+used the 47,277-sample filtered training loader from the preserved PLINDER split.
 Its time distribution was `0.80 SimpleFold + 0.10 U(0,0.3) + 0.10 exact t=0`.
 The run used fresh AdamW state, EMA decay 0.999, and a registered internal
 PLINDER-validation endpoint.
@@ -38,6 +38,8 @@ complexes, not universal coverage improvement.
   descriptive rather than independent model-selection sets.
 - The pinned public environment targets Linux and NVIDIA CUDA 13.
 
-The registered training and external characterization are documented in
-`docs/EARLY_TIME_FINE_TUNE_50K_PROTOCOL.md` and
-`docs/EARLY_TIME_T0P10_50K_EXTERNAL_PAIRED_RESULTS.md`.
+Exact sample IDs, exclusions and hashes are in
+[training membership](../benchmarks/inputs/training_membership/README.md).
+The public [training specification](../docs/methods/06_training_and_checkpoint_selection.md)
+and [current benchmark report](../docs/BENCHMARK_RESULTS.md) separate this
+checkpoint's provenance from later three-repeat external characterization.

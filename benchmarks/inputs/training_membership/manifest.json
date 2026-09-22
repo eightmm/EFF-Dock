@@ -1,0 +1,459 @@
+{
+  "schema": "effdock.training_membership.v1",
+  "unit": "PLINDER system and ligand-instance sample ID",
+  "scope": "Released docking fine-tune and confidence input split; not union of predecessor training exposures or per-update read logs.",
+  "provenance": {
+    "docking": {
+      "checkpoint_sha256": "65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6",
+      "step": 50000,
+      "data_pass_epoch": 67,
+      "split_file": "data/splits/plinder.json",
+      "dataset_samples": 47277,
+      "unique_systems": 45441,
+      "unique_pdbs": 43392,
+      "fail_on_nonfinite": true
+    },
+    "confidence": {
+      "checkpoint_sha256": "ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638",
+      "step": 70000,
+      "split_file": "outputs/eff-dock/s50-confidence-matched-runs/14cb2840f040b05127610a1f3dccd8aa5b2573c41156ff446898e2d212f1164b/full/filtered_split.json",
+      "split_counts": {
+        "train": 43092,
+        "val": 1035
+      },
+      "split_sha256": "1f23b50ef3a5eff73fd8cad683c1f3adfe4e1ab235199274d0dbc220c1d22507",
+      "train_limit": null
+    }
+  },
+  "sources": [
+    {
+      "local_record": "data/splits/plinder.json",
+      "sha256": "3ac570bf08bced053f1ce040b57efca27c3be616f29a82cd66ef887c08860e6b"
+    },
+    {
+      "local_record": "data/plinder_processed/.effdock_index/dcee3e1d58c79520dbbfee8b7904e7c0a1dd2196b38a2bbc0e223f94fe1844ce.json",
+      "sha256": "21b194112242d0645cd61faeddec09d3188c0c5e15b66ab0ffee4c6ccf2a02b4"
+    },
+    {
+      "local_record": "outputs/eff-dock/s50-confidence-matched-runs/14cb2840f040b05127610a1f3dccd8aa5b2573c41156ff446898e2d212f1164b/full/filtered_split.json",
+      "sha256": "1f23b50ef3a5eff73fd8cad683c1f3adfe4e1ab235199274d0dbc220c1d22507"
+    },
+    {
+      "local_record": "outputs/eff-dock/s50-confidence-matched-runs/14cb2840f040b05127610a1f3dccd8aa5b2573c41156ff446898e2d212f1164b/frozen/input_manifest.json",
+      "sha256": "6a991e964715f9ddb51ce48ccbea5a948eb3b2d3c51de1f26929389365aec5f3"
+    },
+    {
+      "local_record": "docs/paper/split_exclusion_audit/generator_filter_exclusions.json",
+      "sha256": "8a2408e847dad59c1d521a19bffd4f2dfc388dfaff7c23b82ccd5ef0171a01ef"
+    },
+    {
+      "local_record": "docs/paper/split_exclusion_audit/audit.json",
+      "sha256": "d834714dd35f1f80589cb7dfb9452756393e6ec2e0e87a2a9ab7d89a1470b78c"
+    },
+    {
+      "local_record": "docs/paper/plinder_exposure/plinder_exposure.json",
+      "sha256": "0d11843ece7252f82db64d468b60b895b7f0898443ebd8a408f932831641d11e"
+    }
+  ],
+  "sets": {
+    "docking_train_member": {
+      "count": 47277,
+      "sorted_ids_sha256": "0e678bc712166ee98c6a26f24e0a2524f955ec5c77d8fd714e32609d481c2daa"
+    },
+    "confidence_train_member": {
+      "count": 43092,
+      "sorted_ids_sha256": "3d443ad0aa7f5bcf62d489ef5735e603a7f86a6723da9853351e05e1fec534a8"
+    },
+    "confidence_validation_member": {
+      "count": 1035,
+      "sorted_ids_sha256": "005577bbf2b0c1c1e98bac3092b8e5350a6aa06597442b4c86d05f24e763593f"
+    }
+  },
+  "id_hash_encoding": "UTF-8; lexicographically sorted unique sample IDs; LF after every ID including last",
+  "samples_sha256": "cf0e1b2b5cd15c937b0e474348ee0e3e64102b366a98bb51401cb5bb71a74a50",
+  "preserved_split_counts": {
+    "train": 47310,
+    "val": 1076
+  },
+  "exclusion_counts": {
+    "train": {
+      "docking_exclusion": {
+        "protein_residues_lt50": 32,
+        "fragments_gt30": 1
+      },
+      "confidence_exclusion": {
+        "processed_reference_mapping_failed": 3466,
+        "canonical_ligand_preparation_failed": 752
+      }
+    },
+    "val": {
+      "docking_exclusion": {},
+      "confidence_exclusion": {
+        "processed_reference_mapping_failed": 22,
+        "canonical_ligand_preparation_failed": 19
+      }
+    }
+  },
+  "train_intersection_count": 43067,
+  "docking_only_count": 4210,
+  "confidence_only_count": 25,
+  "historical_split_audit": {
+    "scope": "Frozen community-based audit of the preserved split; distinct from the current direct sequence-relatedness figures.",
+    "exclusion_summary": {
+      "pool_processed": 50213,
+      "external_smiles": 511,
+      "external_pdbs": 513,
+      "external_pockets": 217,
+      "excluded": 904,
+      "preserved_train_matches": 0,
+      "executed_train_matches": 0,
+      "val_matches": 0,
+      "witness_reasons": {
+        "astex": {
+          "old_pocket_no__old_ligand_yes": 6,
+          "old_pocket_yes__old_ligand_no": 1
+        },
+        "posebusters": {
+          "old_pocket_no__old_ligand_yes": 27
+        }
+      }
+    },
+    "validation_community_overlap": [
+      {
+        "metric": "protein_fident_qcov_weighted_sum__70__community",
+        "train_clusters": 10277,
+        "val_clusters": 210,
+        "shared_clusters": 12,
+        "val_members_shared": 43,
+        "train_missing": 0,
+        "val_missing": 0
+      },
+      {
+        "metric": "pocket_fident__70__community",
+        "train_clusters": 6719,
+        "val_clusters": 156,
+        "shared_clusters": 0,
+        "val_members_shared": 0,
+        "train_missing": 0,
+        "val_missing": 0
+      },
+      {
+        "metric": "pocket_lddt_qcov__70__community",
+        "train_clusters": 9349,
+        "val_clusters": 227,
+        "shared_clusters": 49,
+        "val_members_shared": 460,
+        "train_missing": 0,
+        "val_missing": 0
+      }
+    ],
+    "external_witnesses": [
+      {
+        "dataset": "astex",
+        "id": "1gm8",
+        "train_sample": "1gm9__1__1.A_1.B__1.M_1.O__1.O",
+        "pocket": "c1328",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "astex",
+        "id": "1hp0",
+        "train_sample": "1kie__1__1.A__1.C_1.E__1.E",
+        "pocket": "c1223",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "astex",
+        "id": "1hq2",
+        "train_sample": "3ilo__1__1.A__1.B_1.C_1.D__1.D",
+        "pocket": "c548",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "astex",
+        "id": "1jla",
+        "train_sample": "1s1v__1__1.A_1.B__1.C__1.C",
+        "pocket": "c110",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "astex",
+        "id": "1meh",
+        "train_sample": "1meh__1__1.A__1.C_1.D__1.D",
+        "pocket": "c50",
+        "old_pocket_matched": true,
+        "old_ligand_matched": false,
+        "benchmark_pdb_in_processed_pool": true
+      },
+      {
+        "dataset": "astex",
+        "id": "1n2j",
+        "train_sample": "1n2b__1__1.A__1.C_1.E_1.F__1.F",
+        "pocket": "c286",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "astex",
+        "id": "1t40",
+        "train_sample": "1t41__1__1.A__1.B_1.C__1.C",
+        "pocket": "c120",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "6xht_v2v",
+        "train_sample": "6xhq__1__1.A_1.B__1.C__1.C",
+        "pocket": "c3036",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "6yja_2ba",
+        "train_sample": "8ad6__1__1.A_1.B__1.C__1.C",
+        "pocket": "c2587",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "6zae_acv",
+        "train_sample": "1qje__1__1.A__1.C_1.D_1.E__1.D",
+        "pocket": "c636",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7an5_rdh",
+        "train_sample": "7an7__1__1.A__1.D__1.D",
+        "pocket": "c1991",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7c0u_fgo",
+        "train_sample": "7c15__1__1.A__1.H_1.K__1.K",
+        "pocket": "c990",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7c3u_azg",
+        "train_sample": "4hrw__1__1.A_1.B__1.E__1.E",
+        "pocket": "c934",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7kc5_bjz",
+        "train_sample": "3m6f__1__1.A__1.B__1.B",
+        "pocket": "c27",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7m31_tdr",
+        "train_sample": "8f6n__1__1.A_1.B__1.I_1.K__1.K",
+        "pocket": "c448",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7mmh_zjy",
+        "train_sample": "7mm6__1__1.A__1.C_1.I__1.C",
+        "pocket": "c222",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7n7b_t3f",
+        "train_sample": "4lxu__1__1.A_1.B__1.F_1.N_1.P__1.P",
+        "pocket": "c789",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7nf0_byn",
+        "train_sample": "6r3l__1__1.A__1.B_1.C_1.E_1.F_1.G__1.F",
+        "pocket": "c403",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7nf3_4lu",
+        "train_sample": "4zab__1__1.A__1.B_1.C_1.D_1.E_1.G__1.B",
+        "pocket": "c403",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7omx_cna",
+        "train_sample": "7omy__1__1.A__1.B_1.C__1.C",
+        "pocket": "c4077",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7p2i_mfu",
+        "train_sample": "6su0__1__1.C_1.H_1.I__1.W__1.W",
+        "pocket": "c100",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7pt3_3kk",
+        "train_sample": "7pt2__1__1.A_1.B__1.C_1.D_1.E__1.D",
+        "pocket": "c1822",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7r3d_apr",
+        "train_sample": "7r5t__1__1.A__1.C_1.D_1.E__1.D",
+        "pocket": "c1315",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7rc3_sah",
+        "train_sample": "7rc2__1__1.A__1.B__1.B",
+        "pocket": "c3811",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7tm6_gpj",
+        "train_sample": "3nvs__1__1.A__1.B_1.C_1.D_1.M__1.D",
+        "pocket": "c214",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7uj4_oq4",
+        "train_sample": "8e90__1__1.A__1.C_1.D__1.C",
+        "pocket": "c695",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7utw_nai",
+        "train_sample": "8e7u__1__1.A_1.B__1.C_1.E_1.F__1.E",
+        "pocket": "c93",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7v3n_akg",
+        "train_sample": "7v34__1__1.A__1.C_1.D_1.G__1.D",
+        "pocket": "c2446",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "7xg5_plp",
+        "train_sample": "8x1f__1__1.B__1.D__1.D",
+        "pocket": "c549",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "8auh_l9i",
+        "train_sample": "8aug__1__1.A_1.B__1.G_1.H_1.I__1.H",
+        "pocket": "c143",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "8c3n_adp",
+        "train_sample": "4uqo__1__1.A__1.C_1.D__1.C",
+        "pocket": "c274",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "8c5m_mta",
+        "train_sample": "8ot0__1__1.A__1.BA_1.S__1.S",
+        "pocket": "c495",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "8csd_c5p",
+        "train_sample": "8csb__1__1.A__1.C_1.F_1.G__1.F",
+        "pocket": "c1138",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      },
+      {
+        "dataset": "posebusters",
+        "id": "8slg_g5a",
+        "train_sample": "8u2p__1__1.A__1.B_1.H_1.I__1.B",
+        "pocket": "c1096",
+        "old_pocket_matched": false,
+        "old_ligand_matched": true,
+        "benchmark_pdb_in_processed_pool": false
+      }
+    ]
+  }
+}

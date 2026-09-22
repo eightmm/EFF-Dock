@@ -26,7 +26,8 @@ explicitly.
 
 ## Training and internal selection
 
-The run initialized from the terminal U50k symmetry-confidence state and used
+The run used 43,092 training samples and initialized from the terminal U50k
+symmetry-confidence state, with
 one balanced per-complex mixture of 32 raw sigma-2 poses, 32 deterministically
 refined poses, and one mapped crystal anchor. Pose-level training and selection
 labels use RDKit `CalcRMS` symmetry-aware no-alignment heavy-atom RMSD.
@@ -38,29 +39,24 @@ state, not the deployment checkpoint.
 
 ## External characterization
 
-All rows reuse the same N100/S10/sigma-2 candidates. `Raw` is the sampled
-ensemble. `Refined` uses the separately evaluated deterministic physical
-refinement. `Joint` additionally requires official PoseBusters validity.
+The current characterization uses three seeds, unguided N100/S10/sigma-2
+sampling, explicit energy refinement and input-chirality-filtered confidence
+selection. Values are mean ± sample SD (%); PB-valid success requires RMSD
+<2 Å and PB validity of the same selected pose. These are the full current
+cohorts, replacing the historical PhiBench203/OpenBind860 subset table.
 
-| Dataset | N | Raw Top-1 `<2A` | Refined Top-1 `<2A` | Refined PB-valid | Refined joint valid + `<2A` |
-|---|---:|---:|---:|---:|---:|
-| Astex Diverse | 85 | 81.18% | 85.88% | 94.12% | 81.18% |
-| PoseBusters v2 | 308 | 78.25% | 84.09% | 95.13% | 81.17% |
-| PhiBench | 203 | 63.05% | 64.53% | 90.64% | 59.11% |
-| FoldBench-Pocket full | 558 | 72.04% | 75.63% | 95.16% | 72.94% |
-| FoldBench-Pocket post-cutoff | 66 | 68.18% | 71.21% | 89.39% | 66.67% |
-| OpenBind | 860 | 49.07% | 55.47% | 98.60% | 54.65% |
+| Dataset | N per seed | RMSD <2 Å | PB-valid poses | PB-valid success |
+|---|---:|---:|---:|---:|
+| Astex Diverse Set | 85 | 82.35 ± 2.04 | 95.69 ± 0.68 | 79.22 ± 2.72 |
+| PoseBusters v2 | 308 | 81.60 ± 0.94 | 95.56 ± 0.50 | 79.22 ± 1.42 |
+| PhiBench reconstructed full | 206 | 62.62 ± 3.79 | 94.01 ± 0.28 | 60.19 ± 3.36 |
+| FoldBench-Pocket full | 558 | 74.49 ± 0.37 | 96.36 ± 0.37 | 72.82 ± 0.63 |
+| OpenBind full | 925 | 52.58 ± 0.61 | 99.64 ± 0.17 | 52.58 ± 0.61 |
 
-As a separately reported endpoint-aligned PhiBench diagnostic, confidence
-Top-5 reaches `156/203` (`76.85%`) refined RMSD success and `150/203`
-(`73.89%`) same-pose PB-valid/RMSD joint success. This does not change the
-production Top-1 selector.
-
-U70k was not chosen from these external results. The cohorts had already been
-used during development, so the figures are descriptive. PhiBench and
-FoldBench are the core temporal checks; OpenBind is a dense single-protease
-auxiliary cohort. The refinement numbers do not imply that `eff-dock dock`
-silently performs refinement.
+Raw, refined and chirality-selection ablations remain separate in
+[Figure 2](../docs/paper/FIGURE_CAPTIONS.md). U70k was selected on internal
+validation; external results are descriptive. These postprocessing results do
+not imply that the public inference API silently performs refinement.
 
 ## Limitations
 
@@ -72,12 +68,12 @@ silently performs refinement.
   discovery or prospective screening.
 - The model does not predict affinity or binder/non-binder status.
 
-Exact protocols and paired comparisons are in
-`docs/S50_RAW_REFINED_CONFIDENCE_100K_PROTOCOL.md`,
-`docs/S50_RAW_REFINED_CONFIDENCE_EXTERNAL_RESULTS.md`, and
-`docs/S50_RAW_REFINED_CONFIDENCE_TEMPORAL_EXTERNAL_RESULTS.md`. The current
-cross-model and Top-5 context is in `docs/BENCHMARK_RESULTS.md` and
-`benchmarks/results/external_models/phibench_u70k_top5.json`.
+Exact [training membership](../benchmarks/inputs/training_membership/README.md),
+[method equations](../docs/methods/05_confidence_model_and_loss.md),
+[training settings](../docs/methods/06_training_and_checkpoint_selection.md), and
+[current benchmark results](../docs/BENCHMARK_RESULTS.md) are public. The
+43,092 confidence training IDs and 47,277 docking IDs are independently filtered
+sets sharing 43,067 IDs, not a nested pair.
 
 This checkpoint is released together with the paired docking checkpoint under
 Apache-2.0. See `DOCKING_MODEL_CARD.md` and `MANIFEST.md` for the complete

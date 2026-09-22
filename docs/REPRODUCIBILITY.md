@@ -49,6 +49,23 @@ CUDA scatter/atomic kernels and multi-GPU reduction order can remain
 nondeterministic; do not claim bitwise reproducibility unless separately
 verified.
 
+The [released membership manifest](../benchmarks/inputs/training_membership/README.md)
+publishes original sample IDs, separate docking/confidence eligibility and
+hashes. It preserves the released split; the newer strict split builder is not
+a reproduction of those checkpoint inventories.
+
+The current 14 manuscript figures can be reconstructed without raw structures
+or weights from [versioned source data](../benchmarks/results/paper/README.md):
+
+```bash
+uv run python -m benchmarks.figures.paper --check
+uv run python -m benchmarks.figures.paper --output outputs/paper_figures
+```
+
+This produces individual PDFs/PNGs and `source_data.csv`. The figure renderer
+does not rerun scientific evaluations. Selected original PDFs remain unchanged
+until explicitly replaced and packaged with `scripts/package_paper_figures.py`.
+
 GPU work runs through the project Slurm scripts. `confidence_prepare.sbatch`
 generates immutable-by-default labeled pose shards and
 `confidence_train.sbatch` consumes them. The Slurm files record the original

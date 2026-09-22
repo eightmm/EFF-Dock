@@ -5,6 +5,7 @@
 - [Figure PDF](paper/paper_figures.pdf): 11 main figures and 3 supplementary figures.
 - [English figure captions](paper/FIGURE_CAPTIONS.md)
 - [Prism package](paper/prism/prism_figure_reference.zip)
+- [Editable LaTeX methods](paper/prism/methods.tex)
 - [Figure index](paper/README.md)
 
 These are manuscript working materials, not a published paper. See the
@@ -18,6 +19,8 @@ These are manuscript working materials, not a published paper. See the
 - [Reproducibility and checkpoints](REPRODUCIBILITY.md)
 - [Benchmark report](BENCHMARK_RESULTS.md)
 - [Detailed methods](methods/README.md)
+- [Released training IDs and eligibility](../benchmarks/inputs/training_membership/README.md)
+- [Figure numerical data and reproduction](../benchmarks/results/paper/README.md)
 - [Repository structure](STRUCTURE.md)
 
 Historical experiment protocols, intermediate results and superseded plots are

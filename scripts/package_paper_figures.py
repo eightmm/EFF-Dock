@@ -54,6 +54,9 @@ def bundle_captions(metadata):
 def bundle_manifest(metadata):
     portable = json.loads(json.dumps(metadata))
     portable["pdf"] = "paper_figures.pdf"
+    portable["repository_numerical_inputs"] = portable.pop("numerical_inputs", [])
+    if "render_command" in portable:
+        portable["repository_render_command"] = portable.pop("render_command")
     for row in portable["figures"]:
         row["repository_source"] = row["source"]
         row["source"] = row["bundle_file"]
@@ -69,12 +72,15 @@ Working materials for writing the EFF-Dock manuscript, not a published paper.
 
 - [Combined PDF](paper_figures.pdf)
 - [English captions and author notes](FIGURE_CAPTIONS.md)
+- `methods.tex`: editable equations and current methods.
 - `main.tex` and `figure_captions.tex`: reference LaTeX document and figure blocks.
 - `figures/`: 14 individual PDFs in manuscript page order.
-- `captions.json`: file, caption, label and checksum mapping.
+- `captions.json`: file, caption, label and checksum mapping. The
+  `repository_numerical_inputs` entries refer to the GitHub source checkout.
 
 Use XeLaTeX or LuaLaTeX for the reference document. Adapt numbering, placement
-and citation keys to the manuscript. Local TeX compilation is unverified.
+and citation keys to the manuscript. Methods are working manuscript text;
+the repository methods and parameter tables provide implementation detail.
 """
     with ZipFile(temporary, "w", ZIP_DEFLATED) as archive:
         archive.writestr("README.md", readme)
@@ -82,7 +88,7 @@ and citation keys to the manuscript. Local TeX compilation is unverified.
         archive.writestr(
             "captions.json", json.dumps(bundle_manifest(metadata), ensure_ascii=False, indent=2) + "\n"
         )
-        for name in ("main.tex", "figure_captions.tex"):
+        for name in ("main.tex", "figure_captions.tex", "methods.tex"):
             archive.write(PRISM / name, name)
         archive.write(ROOT / metadata["pdf"], "paper_figures.pdf")
         for row in metadata["figures"]:
@@ -109,7 +115,7 @@ def verify(metadata):
         assert json.loads(archive.read("captions.json")) == bundle_manifest(metadata)
         assert archive.read("FIGURE_CAPTIONS.md").decode() == bundle_captions(metadata)
         assert archive.read("paper_figures.pdf") == combined.read_bytes()
-        for name in ("main.tex", "figure_captions.tex"):
+        for name in ("main.tex", "figure_captions.tex", "methods.tex"):
             assert archive.read(name) == (PRISM / name).read_bytes()
         for row, path in zip(metadata["figures"], paths, strict=True):
             assert archive.read(row["bundle_file"]) == path.read_bytes()
@@ -152,7 +158,7 @@ def main():
             ))
         write_bundle(metadata)
     verify(metadata)
-    print("Verified 14 source PDFs, merged page order, captions, manifest and Prism ZIP")
+    print("Verified 14 source PDFs, merged page order, captions, methods, manifest and Prism ZIP")
 
 
 if __name__ == "__main__":

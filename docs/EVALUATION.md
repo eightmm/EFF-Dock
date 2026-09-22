@@ -10,13 +10,14 @@ single-protease cohort.
 The primary metric is selected top-1 symmetry-aware ligand RMSD success at
 `<2A`. Secondary reporting includes oracle success, official PoseBusters
 validity, the conjunction of validity and `<2A`, and slices by ligand size,
-fragment count, rotatable bonds, ligand similarity to train, and pocket
-similarity to train.
+fragment count, rotatable bonds, ligand similarity to train, and binding-chain
+sequence identity to train. Sequence relatedness does not establish pocket identity.
 
 Evaluation requires a JSON mapping each benchmark complex ID to an explicit
-`[x, y, z]` pocket center. Missing IDs fail before sampling. Crystal ligand
-coordinates are used only as RMSD targets and never to define the model input
-pocket.
+`[x, y, z]` pocket center. Missing IDs fail before sampling. Frozen benchmark
+pocket centres may be derived from reference ligands in this
+retrospective redocking setting. The reference pose is used for mapping and RMSD
+evaluation, not as a learned model/scorer input or an energy-refinement target.
 
 ```bash
 uv run eff-dock evaluate \
@@ -53,7 +54,9 @@ may be used to tune a new external-test selector post hoc.
 
 The public sampler writes raw poses. The benchmark's `Refined` columns use a
 separate deterministic physical-refinement pass and must not be interpreted as
-an implicit `eff-dock dock` step. Exact U70k counts, the U50k/U100k comparisons,
+an implicit `eff-dock dock` step. Equations, numerical settings and the
+chirality-selector fallback are specified in
+[the inference methods](methods/07_inference_and_evaluation.md). Exact U70k counts, the U50k/U100k comparisons,
 and the repeated-use evaluation boundary are in `BENCHMARK_RESULTS.md`.
 
 ## Candidate SDF outputs

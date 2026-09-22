@@ -8,10 +8,10 @@ Implementation sources: `src/effdock/models/effdock.py` and
 
 Every node type in the heterogeneous graph uses the same O(3) state
 
-\[
+$$
 384\!\times\!0e + 32\!\times\!1o + 32\!\times\!1e +
 16\!\times\!2e + 16\!\times\!2o.
-\]
+$$
 
 The flattened feature width is `736`:
 
@@ -66,15 +66,15 @@ harmonics, gated residual update, and time-conditioned equivariant adaptive
 layer normalization. Schematically, with `h_i^(l)` an irrep state and
 `Y_{<=2}(r_ij)` the real spherical harmonics,
 
-\[
+$$
 m_{ij}^{(l)} = g_{ij}^{(l)}\,\mathcal{T}^{(l)}
 \left(h_i^{(l)},Y_{<=2}(x_j-x_i);\phi_e(e_{ij})\right),
-\]
-\[
+$$
+$$
 h_j^{(l+1)}=h_j^{(l)}+
 \operatorname{AdaLN}_t\!\left(\sum_{i\to j}
 \alpha_{ij}^{(l)}m_{ij}^{(l)}\right).
-\]
+$$
 
 `phi_e` is the radial/edge MLP; `g` and `alpha` are learned gates. Attention
 is normalized over incoming edges and also has a learned edge-type distance
@@ -83,9 +83,13 @@ edge type and attributes, not ten separate full GNNs. Dropout is 0.1.
 
 ## 4. Equivariance boundary
 
-Only relative coordinates, source local-frame coordinates, distances, and
-spherical harmonics enter geometric messages. Consequently a joint rigid
-O(3) transform of ligand and receptor rotates vector/tensor outputs and leaves
-scalar predictions invariant. Categorical chemistry and graph topology are
-coordinate independent. The supplied pocket centre chooses the conditional
-translation frame but is not learned from a target crystal ligand.
+Geometric messages use relative coordinates, source local-frame coordinates,
+distances and spherical harmonics. Tensor-product channels use O(3) irreps,
+while fragment orientations are proper rotations in SO(3). The docking contract
+and joint-rotation tests concern SE(3): jointly rotating/translating ligand,
+receptor, fragment frames and pocket centre transforms vector outputs and
+leaves scalar predictions invariant. Do not infer complete reflection
+equivariance of stereochemical inputs from the irrep notation alone.
+Categorical chemistry and graph topology are coordinate independent.
+The pocket centre is supplied; benchmark centres may be frozen from reference
+ligands in this retrospective redocking setting.

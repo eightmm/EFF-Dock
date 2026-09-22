@@ -15,16 +15,16 @@ largest adjacent fragment. Thus every fragment has at least two heavy atoms.
 Let `f(a)` map ligand atom `a` to one of `F` fragments. Crystal coordinates
 are decomposed into centroid `T_f in R^3` and local coordinates `ell_a`:
 
-\[
+$$
 T_f = |f|^{-1}\sum_{a:f(a)=f}x_a, \qquad
 \ell_a=x_a-T_f.
-\]
+$$
 
 At any state, the reconstructed atom coordinate is
 
-\[
+$$
 x_a(T,q)=R(q_{f(a)})\ell_a+T_{f(a)},
-\]
+$$
 
 where `q_f` is a unit quaternion and `R(q_f)` its `3 x 3` rotation matrix.
 The state tensors per collated batch are `T_frag [F_total,3]`,
@@ -45,16 +45,16 @@ identity rotation, although the released fragmenter avoids such fragments.
 For target pose `(T^1,q^1)` and sampled `t in [0,1]`, translation is linearly
 interpolated and rotation is interpolated by SLERP:
 
-\[
+$$
 T_f^t=(1-t)T_f^0+tT_f^1, \qquad q_f^t=\operatorname{SLERP}(q_f^0,q_f^1;t).
-\]
+$$
 
 The translation target and global-frame angular target are
 
-\[
+$$
 v_f^*=T_f^1-T_f^0,\qquad
 \omega_f^*=\operatorname{axisAngle}(q_f^1\otimes(q_f^0)^{-1}).
-\]
+$$
 
 The angular convention is left multiplication,
 `q_{t+dt}=exp(dt omega) tensor-product q_t`. The implied atom field is
@@ -72,9 +72,20 @@ released endpoint.
 The released docking fine-tune is the early-time/t=0 50k run. Its exact time
 law is
 
-\[
+$$
 p(t)=0.80p_{\mathrm{SimpleFold}}(t)+0.10\,U(0,0.3)+0.10\,\delta_0.
-\]
+$$
+
+The retained component is implemented by drawing `U(0,1)` with probability
+0.02 and otherwise setting `t=sigmoid(0.8+1.7Z)`, `Z~N(0,1)`:
+
+$$
+p_{\mathrm{SimpleFold}}=0.02\,U(0,1)
++0.98\,\operatorname{Law}\!\left[\operatorname{sigmoid}(0.8+1.7Z)\right].
+$$
+
+This specifies the implemented sampling law; the exact-zero replay is a
+point mass and is not approximated by a small positive time.
 
 At deployment, sampling fixes `sigma=2.0 A`; time integration uses the
 late-power-3 grid specified in `07_inference_and_evaluation.md`. The model

@@ -17,8 +17,10 @@ released EFF-Dock weights, not to third-party structures or annotations.
 - Preserved compatibility split: `data/splits/plinder.json` (47,310 train,
   1,076 validation). This split is usable for legacy compatibility work, but it
   predates the strict EFF-Dock external-exclusion contract.
-- Raw data, processed tensors, splits, external structures, and manifests stay
-  local and are ignored by Git. Cleanup must never delete or rewrite them.
+- Raw data, processed tensors and external structures stay local and ignored.
+  The frozen [released membership](../benchmarks/inputs/training_membership/README.md)
+  publishes sample IDs, eligibility reasons and hashes without structures.
+  Original split files and full local audit inputs are preserved unchanged.
 
 Each processed sample contains protein, ligand, and metadata tensor mappings.
 Invalid structures must be quarantined with an explicit reason; scientific

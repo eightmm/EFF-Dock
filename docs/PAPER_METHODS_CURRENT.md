@@ -1,80 +1,134 @@
-# EFF-Dock paper methods and experimental record
+# Current manuscript methods
 
-This is the manuscript source of truth for the released EFF-Dock stack. It separates deployed components from diagnostics and completed results from ongoing work. Linked protocols remain the immutable evidence.
+This overview describes the released docking/confidence pair and the current
+14-figure package. The [detailed methods](methods/README.md) contain equations,
+dimensions, parameter tables and implementation links. [Prism methods](paper/prism/methods.tex)
+provide editable LaTeX; [figure captions](paper/FIGURE_CAPTIONS.md) define each
+reported condition.
 
-## 1. Scope and released deployment contract
+## Task and checkpoints
 
-EFF-Dock performs supplied-pocket protein-ligand redocking. Inputs are a receptor structure, ligand chemistry, and an explicit pocket center; output is a ranked ligand-pose ensemble. It does not discover pockets, predict affinity, classify binders, or co-fold receptors and ligands.
+EFF-Dock performs supplied-pocket protein–ligand redocking. Inputs are a
+receptor structure, ligand chemistry and an explicit pocket centre. The
+released pair consists of the early-time/t=0-replay 50k docking EMA and the
+S50 raw+refined U70k confidence checkpoint. Exact SHA-256 identities are in
+[weights/MANIFEST.md](../weights/MANIFEST.md).
 
-| Component | Current paper identity |
-|---|---|
-| Docking model | `effdock_docking_early_time_t0p10_50k.pt`, 50k-update EMA, SHA256 `65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6` |
-| Confidence model | `effdock_confidence_s50_raw_refined_u70k.pt`, U70k, SHA256 `ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638` |
-| Generation | 100 poses, 10 ODE steps, translation-prior sigma 2.0 |
-| Context | 10-A receptor crop; late time schedule, power 3 |
-| Selection | Minimum predicted pose RMSD from U70k confidence |
+Main sampling is unguided N100/S10, translation sigma 2 Å, 10 Å receptor crop
+and a late-power-3 time grid. Ordinary ranking minimizes predicted pose RMSD.
+The public sampler returns raw poses; the main benchmark condition additionally
+applies energy refinement and tetrahedral-chirality-filtered confidence
+selection. These are explicitly separate stages.
 
-The sampler emits raw poses. Any `refined` result is a separate labelled post-sampling evaluation condition and is not an implicit public API step.
+## Data and training membership
 
-## 2. Data, split, and molecular representation
+PLINDER 2024-06/v2 sample identity is `(system_id, ligand_instance_chain)`.
+The preserved compatibility split has 47,310 training and 1,076 validation IDs.
+The released docking loader contains 47,277 samples (45,441 unique systems;
+43,392 PDB IDs). Confidence uses 43,092 training and 1,035 validation samples.
+The two training sets share 43,067 IDs, with 4,210 docking-only and 25
+confidence-only entries. Public [ID lists, exclusions and hashes](../benchmarks/inputs/training_membership/README.md)
+make these distinctions auditable. They describe loader/split membership,
+not an exhaustive audit of all predecessor checkpoint exposure.
 
-Training structures originate from PLINDER 2024-06/v2. Coordinates are in Angstroms and the immutable sample key is `<system_id>__<ligand_instance_chain>`. Invalid structures are quarantined with an explicit reason instead of being zero-filled.
+The historical split used relaxed external exclusion: exact ligand match AND
+membership in an external pocket-community set constructed from benchmark PDB
+hits in the processed pool. This is not equivalent to the newer strict split
+builder, which removes all matching external canonical SMILES and enforces
+sample/SMILES/pocket70 disjointness. The newer builder must not be cited as the
+procedure that produced the released checkpoint. Broader relatedness matches
+remain and are reported, not retrospectively removed.
 
-The released docking fine-tune used the preserved PLINDER compatibility split: 47,310 train and 1,076 validation identities before filtering, and 47,277 filtered train systems in the 50k run. This is released-checkpoint provenance; it predates the stricter current external-exclusion split contract.
+The [membership manifest and historical audit](../benchmarks/inputs/training_membership/README.md)
+retain the original 904 exclusions, the validation community-overlap counts,
+and the 34 broader external-overlap witnesses. Community membership is not a
+direct pairwise-identity bound; the released cohorts must not be described as
+fully disjoint under the broader mapping.
 
-For future replacement training, the strict split builder excludes canonical ligand SMILES in frozen external mappings and groups validation by `pocket_fident__70__community`. It requires train/validation disjointness by sample key, canonical SMILES, and pocket70 community.
+Ligands are sanitized heavy-atom graphs split at eligible rotatable bonds;
+planar-conjugated bonds remain rigid and singleton fragments are merged.
+Training augments pocket crops from 6–12 Å and translation-prior sigma with
+{0.5,1,2,3,4} Å and probabilities {0.10,0.25,0.30,0.25,0.10}.
+Detailed [graph features](methods/01_graph_features.md) and
+[fragment representation](methods/02_fragment_se3_flow.md) specify the schema.
 
-Ligands are sanitized RDKit heavy-atom graphs. EFF-Dock cuts rotatable bonds that are single, non-ring, non-planar-conjugated, and have two nonterminal heavy-atom endpoints. Amide-like, ester-like, urea/carbamate, and sulfonamide bonds remain rigid. A deterministic greedy pass and singleton merging guarantee no one-atom fragment. Each fragment has a centroid, local atom coordinates, and a rotation; cut-bond, adjacency, and triangulation edges retain cross-fragment constraints.
+## Model, objective and internal selection
 
-Base training samples pocket crops uniformly from 6 to 12 A, applies uniform ligand rotation augmentation, and samples translation-prior sigmas `{0.5, 1, 2, 3, 4}` A with weights `{0.10, 0.25, 0.30, 0.25, 0.10}`. The deployed endpoint fixes sigma at 2.0 and crop at 10 A.
+The graph contains ligand atoms, fragments, protein atoms and residue virtual
+nodes. Six equivariant docking layers use degree-2 spherical harmonics,
+32 radial basis functions, dynamic 5 Å protein–ligand contacts and
+`384x0e+32x1o+32x1e+16x2e+16x2o` hidden irreps. The learned atom field is
+aggregated into fragment translation and observable angular velocity by
+unit-weight Newton–Euler equations.
 
-## 3. Fragment-level SE(3) flow model
+The active docking objective is translation MSE + 8 × angular MSE + 0.3 ×
+**atom-velocity MSE** + 3 × distance-geometry loss. The latter compares
+inter-fragment pair distances after one-step endpoint reconstruction, using
+a normalized `t²`-weighted mean across complexes. It is distinct from the
+atom-velocity auxiliary term. [Exact equations and reductions](methods/04_docking_head_and_objective.md)
+also specify observability and distributed normalization.
 
-One heterogeneous graph contains ligand atoms, ligand fragments, protein atoms, and protein residue virtual nodes. Ligand atoms encode element, charge, aromaticity, hybridization, ring, valence, chirality, and pharmacophore features. Protein atoms encode residue/atom identity and backbone, metal, and pharmacophore flags. Static edges encode ligand bonds, fragment ownership, cut bonds, triangulation, protein structure, and residue relations. Protein-ligand contact edges are rebuilt at a 5-A cutoff from evolving ligand coordinates.
+The 50k continuation starts from the preceding geometry model and samples
+`0.80 SimpleFold-style + 0.10 Uniform(0,0.3) + 0.10 exact t=0`. It uses fresh
+AdamW state, global batch 64 across four GPUs, peak LR 2e-5 and EMA 0.999.
+The complete retained time law and schedules are in the
+[training specification](methods/06_training_and_checkpoint_selection.md).
 
-The docking network contains six edge-type-specific O(3)-equivariant interaction layers, spherical harmonics through `l=2`, 32 radial basis functions, dropout 0.1, and a 128-dimensional time embedding. Node irreps contain 384 scalar, 32 odd-vector, 32 even-vector, 16 even rank-2, and 16 odd rank-2 channels.
+The four-layer confidence scorer uses paired docking hidden features and
+contact/global pooling to predict pose RMSD/success and atom displacement/
+success. Each training bank supplies 32 raw poses, 32 refined poses and a
+mapped crystal anchor; the loader draws a bounded subset. Its Huber, BCE,
+pairwise-ranking and smoothed-success listwise terms are specified in
+[the confidence objective](methods/05_confidence_model_and_loss.md).
+U70k was selected only on the fixed 1,035-complex internal validation bank:
+622/1,035 (60.10%) Top-1 RMSD <2 Å, compared with 617/1,035 at U100k.
+Confidence is a within-ensemble ranking signal, not calibrated affinity.
 
-The network predicts atom vector fields. Mean atom force yields fragment translation, while torque about the centroid is converted into angular velocity by rank-aware Newton-Euler aggregation. Unobservable rotation axes of single-atom or rank-deficient fragments are projected out. Rigid fragment transforms reconstruct full ligand coordinates.
+## Refinement and evaluation
 
-Conditional flow matching regresses fragment translation and observable angular velocity. The base objective uses translation MSE, angular MSE (weight 8.0), atom auxiliary loss (0.3), and a one-step inter-fragment distance-geometry loss (3.0).
+Energy refinement minimizes the in-repository physical plus seven-term
+interaction energy with a fixed receptor, using mass/inertia-preconditioned
+rigid-fragment descent and independent per-pose backtracking. The executed
+external protocol allows at most 100 iterations, caps translation/rotation/
+atom displacement at 0.10 Å / 5 degrees / 0.10 Å, and enables an energy-plateau
+stop from iteration 25. Chiral improper restraints are active; the separate
+chemical-constraint channel is zero-weight. [Inference and evaluation methods](methods/07_inference_and_evaluation.md)
+define all terms, constants, stopping rules, failure handling and the
+all-candidates-fail chirality fallback.
 
-The released docking checkpoint starts from the preceding geometry model and uses `0.80 * SimpleFold + 0.10 * Uniform(0, 0.3) + 0.10 * delta(t=0)`. It ran 50,000 fresh AdamW updates on four GPUs with global batch 64, peak LR `2e-5`, weight decay 0.01, gradient clipping 1.0, EMA decay 0.999, 1,000-update warmup, and cosine decay from update 40,000 to final LR `2e-6`.
+RMSD is symmetry-aware, no-alignment heavy-atom RDKit CalcRMS, with strict
+threshold <2 Å. PB-valid success requires that same selected pose to pass the
+official PoseBusters evaluator. All original denominators remain. Benchmarks
+are Astex Diverse Set (85), PoseBusters v2 (308), PhiBench (206; three reconstructed
+cases), FoldBench (558) and OpenBind (925; auxiliary single-protease set including
+two flagged noncovalent approximations of covalent systems). FoldBench PB uses
+three disclosed energy-reference InChI compatibility repairs. Dataset v2 and
+PoseBusters software version are distinct identifiers.
 
-## 4. Sampling and confidence ranking
+Frozen benchmark pocket centres can be reference-ligand-derived, and receptors
+can be holo structures. Reference coordinates serve mapping/evaluation
+purposes, not the learned field, confidence ranking or minimized energy.
+These retrospective redocking results do not establish blind docking,
+prospective screening, affinity prediction or cofolding performance.
 
-Fragment translations start from a pocket-centered Gaussian prior and follow a deterministic learned ODE. Main paper inference is N100/S10, sigma 2.0, late power-3 time grid, and no FK-SDE, Vina, or differentiable-energy guidance. All 100 candidate poses are persisted in sampling order with ensemble identity and confidence fields, enabling auditable label-blind reranking and Top-k/oracle analyses.
+## Figure data and statistical interpretation
 
-The confidence model uses the same graph and saved `t=1` ligand hidden representations from the paired docking model. It has four equivariant interaction layers with the same `l=2`, 32-RBF, and 5-A contact setup, followed by global-contact-attention pose readout. It predicts pose RMSD, pose success, atom displacement, and atom success.
+The [numerical source package](../benchmarks/results/paper/README.md) renders
+all 14 figures from versioned files. It includes 24,984 selected-outcome rows,
+3,158 relatedness records across six cohorts and the original aggregate values.
+Figures retain three-seed sample SD; paired differences use 2,000-resample
+95% percentile CIs, comparing complex and exact-PDB-group resampling.
 
-U70k was warm-started from the terminal S50 symmetry-confidence state. Each complex contributes 32 raw sigma-2 poses, 32 deterministic-refinement poses, and one mapped crystal anchor. Labels are symmetry-aware no-alignment heavy-atom RDKit `CalcRMS`; crystal anchors have exact zero RMSD and are excluded from validation selection. The loss weights are atom 0.2, atom-success 0.2, pose 0.3, pose-success 0.4, rank 0.1, and success-listwise 1.0.
+Relatedness uses the 47,277 docking samples. Binding-chain identity is
+query-normalized over one-to-one chain assignments within a training sample;
+exact-ligand AND sequence≥70% overlap requires the same training witness.
+It does not certify pocket identity or proven leakage. Definitions and known
+sequence-reference limitations are in [RELATEDNESS.md](paper/RELATEDNESS.md).
+Validation is included in relatedness composition but has no matched
+three-repeat external performance bank.
 
-U70k was selected only on the fixed 1,035-complex PLINDER bank: 622/1,035 (60.10%) Top-1 below 2 A. U100k reached 617/1,035 (59.61%) and is not the default. Confidence is a within-ensemble ranking signal, not a calibrated cross-target RMSD, probability, or affinity estimate.
-
-## 5. Evaluation and claims
-
-The primary endpoint is selected Top-1 symmetry-aware no-alignment heavy-atom RMSD below 2 A. Secondary reports include Top-k and oracle success, official PoseBusters validity, and their same-pose conjunction. Crystal ligand coordinates are labels only; explicit frozen pocket centers are mandatory inputs and missing IDs fail before sampling.
-
-Completed three-seed cohorts are Astex Diverse (85), PoseBusters v2 (308), PhiBench (206, including three reconstructed systems), FoldBench-Pocket full (558), and auxiliary OpenBind (925, including flagged systems and two noncovalent approximations of covalent systems). PhiBench and FoldBench are temporal checks; OpenBind is a dense single-protease auxiliary cohort. All headline rows are supplied-pocket redocking, not blind docking or co-folding. Astex and PoseBusters were opened during development, so they are descriptive rather than independent model-selection evidence. U70k was selected on the internal PLINDER bank, not external metrics. The uniform unguided main table and separate guided/budget ablations are generated in [the paper results](paper/FIGURE_CAPTIONS.md). FoldBench PB includes three explicitly disclosed energy-reference InChI-repair shards.
-
-PoseX-SD/CD evaluation is complete for SD718/CD1312 and three seeds (101/202/303), including the original confidence and input-chirality+E/Z selection arms followed by the separately recorded PoseX relaxation protocol. SD and CD follow native evaluation/grouping; CD aggregates 109 groups and is not a simple per-case success percentage. The earlier fixed-receptor recovery attempts are historical, not interchangeable with the final recovered upstream results. See `POSEX_RECOVERED_EVALUATION.md`, `POSEX_STEREO_RELAX_CHAIN.md`, and the final CSV/summary identities when describing relaxation; do not describe EFF-Dock's own refinement as PoseX relaxation.
-
-## 6. Paper map and boundaries
-
-| Paper section | Current source |
-|---|---|
-| Task and data | This document sections 1-2; `DATA.md` |
-| Architecture and objective | This document section 3; `MODEL.md`; `configs/train.yaml` |
-| Inference and ranking | This document section 4; model cards; `EVALUATION.md` |
-| Evaluation and results | This document section 5; `BENCHMARK_RESULTS.md` |
-| Training provenance | `EARLY_TIME_FINE_TUNE_50K_PROTOCOL.md`; `S50_RAW_REFINED_CONFIDENCE_100K_PROTOCOL.md` |
-
-Do not claim blind docking, affinity prediction, calibrated confidence, or prospective screening. Do not merge raw and refined conditions. Do not present guidance, FK-SDE, Vina guidance, or fixed-receptor PoseX relaxation as the default sampler. Do not use opened external cohorts for post-hoc selection of a checkpoint, sigma, schedule, selector, or pocket center.
-
-## 7. Evidence links
-
-- `README.md`, `weights/MANIFEST.md`, and model cards: released identity.
-- `DATA.md`, `MODEL.md`, `EVALUATION.md`: public method contracts.
-- `EARLY_TIME_FINE_TUNE_50K_PROTOCOL.md`: docking lineage.
-- `S50_RAW_REFINED_CONFIDENCE_100K_PROTOCOL.md`: confidence training record.
-- `BENCHMARK_RESULTS.md`: completed external results.
-- `POSEX_OFFICIAL_PROTOCOL.md`: separate PoseX protocol; final recovered evaluation is complete.
+Opened external cohorts are descriptive and do not select checkpoints.
+Guidance/budget, guided pocket/prior robustness, and literature baselines
+retain their separately captioned protocols. PoseX is outside this figure
+package. No new training, inference or external-outcome tuning accompanies
+this documentation/source-data release.

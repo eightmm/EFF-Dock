@@ -16,6 +16,14 @@ not a claim that every historical checkpoint has the same schema.
 | [`06_training_and_checkpoint_selection.md`](06_training_and_checkpoint_selection.md) | Which data, optimization, and internal selection rules produced the released pair? |
 | [`07_inference_and_evaluation.md`](07_inference_and_evaluation.md) | What exact inference contract and endpoints define paper results? |
 
+The [Prism methods block](../paper/prism/methods.tex) is an editable LaTeX
+companion. [Training membership](../../benchmarks/inputs/training_membership/README.md)
+and [figure source data](../../benchmarks/results/paper/README.md) provide the
+sample inventories and numerical evidence. The inference document includes
+energy equations, the executed refinement stopping rules, and chirality fallback.
+
 Notation: `N` is total nodes in a batched graph, `E` edges, `A` ligand atoms,
 `F` ligand fragments, and `B` complexes. Coordinates are Angstroms. A tensor
-shape such as `[N, d]` is after collation unless stated otherwise.
+shape such as `[N, d]` is after collation unless stated otherwise. In the
+sampling/evaluation document `N` instead denotes the candidate budget, as
+specified locally; do not confuse node count and pose count.

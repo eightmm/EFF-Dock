@@ -1,6 +1,7 @@
 # Binding-chain sequence relatedness
 
-Reference: 47,277 executed docking-training samples; not the 43k confidence subset.
+Reference: 47,277 executed docking-training samples; distinct from the 43,092-sample confidence training set.
+Exact IDs and hashes are in [training membership](../../benchmarks/inputs/training_membership/README.md).
 Six cohorts: Astex Diverse Set (85), PoseBusters v2 (308), PhiBench (206),
 FoldBench (558), OpenBind (925), Validation (1,076).
 
@@ -37,7 +38,8 @@ satisfies both. Ligand only/sequence only mean only that respective condition ha
 a match; neither observed means neither has a match under the stated evidence.
 One unparseable training ligand was excluded for every query by differing heavy
 atom element inventories. Per-complex constrained maxima and witness IDs are
-retained in the local per_complex.csv analysis record; all 3,158 queries have
+published in the `sequence.records` field of
+[figure_data.json](../../benchmarks/results/paper/figure_data.json); all 3,158 queries have
 numerical sequence scores.
 
 This analysis describes ligand–protein relatedness, not confirmed pocket overlap

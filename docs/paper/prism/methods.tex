@@ -1,0 +1,308 @@
+% Editable manuscript methods, matched to docs/methods and the released stack.
+% Requires amsmath and amssymb. Include with \input{methods.tex}.
+% Implementation references and full typed-energy parameter tables are in docs/methods.
+\section{Methods}
+\label{sec:effdock-methods}
+
+\subsection{Task, data and information boundary}
+EFF-Dock predicts ligand poses given a receptor, ligand chemistry and a
+supplied pocket centre. The experiments are retrospective supplied-pocket
+redocking: pocket centres may be reference-ligand-derived and receptors may
+be holo structures. The reference pose supplies supervision, mapping and
+evaluation labels; its coordinates do not enter the learned vector field,
+confidence ranker or minimized refinement objective.
+
+Training structures originate from PLINDER 2024-06/v2. A sample is a system
+and ligand-instance pair. The preserved split contains 47,310 training and
+1,076 validation IDs. The released docking fine-tune loader contains 47,277
+samples; confidence uses 43,092 training and 1,035 validation samples. Their
+training intersection is 43,067, with 4,210 docking-only and 25 confidence-only
+samples. These independently filtered inventories are not nested and do not
+represent the union of every predecessor checkpoint's training exposure.
+Public membership records provide IDs, exclusions and SHA-256 hashes.
+
+The historical external exclusion combined a ligand-match condition with a
+pocket-community-match condition whose reference communities were identified
+from benchmark PDB hits in the processed pool. It is distinct from the newer
+strict split builder. No post-hoc exclusion changes the released benchmarks.
+
+\subsection{Fragment representation and equivariant model}
+Ligands are partitioned at eligible single, non-ring, non-planar-conjugated
+rotatable bonds, retaining at least two heavy atoms per fragment after
+singleton merging. Let $f(a)$ assign atom $a$ to fragment $f$, $T_f$ be its
+centroid, $q_f$ a unit quaternion and $\ell_a$ its fixed local coordinate:
+\begin{equation}
+ T_f=\frac{1}{|f|}\sum_{a\in f}x_a,\qquad
+ x_a(T,q)=R(q_{f(a)})\ell_a+T_{f(a)}.
+ \label{eq:effdock-reconstruction}
+\end{equation}
+The heterogeneous graph contains ligand atoms, fragments, protein atoms and
+residue virtual nodes. Static topology and dynamic protein--ligand contacts
+within $5\,\mathrm{\AA}$ condition six equivariant interaction layers, using
+32 radial basis functions and spherical harmonics through degree two. Hidden
+irreps are $384\times0e+32\times1o+32\times1e+16\times2e+16\times2o$,
+with flattened width 736. Irrep notation alone does not establish full
+reflection equivariance of stereochemical inputs; the pose contract uses
+proper rotations and joint SE(3) transformations.
+
+The model outputs atom vector fields $g_a$. Define $r_a=x_a-T_{f(a)}$.
+Unit-weight Newton--Euler aggregation gives
+\begin{align}
+ v_f&=\frac{1}{|f|}\sum_{a\in f}g_a,&
+ \tau_f&=\sum_{a\in f}r_a\times g_a,\\
+ I_f&=\sum_{a\in f}(\|r_a\|^2I_3-r_ar_a^{\mathsf T}),&
+ \omega_f&=I_f^+\tau_f.
+ \label{eq:effdock-head}
+\end{align}
+The pseudoinverse retains inertia eigenvalues strictly above 1\% of the
+largest eigenvalue, yielding an observable-rotation projector $P_f$.
+
+\subsection{Conditional flow and training objective}
+For supplied centre $c$, translation priors are
+$T_f^0=c+\sigma\epsilon_f$, $\epsilon_f\sim\mathcal N(0,I_3)$;
+initial orientations are uniform on SO(3). Conditional interpolation is
+\begin{align}
+ T_f^t&=(1-t)T_f^0+tT_f^1,&
+ q_f^t&=\operatorname{SLERP}(q_f^0,q_f^1;t),\\
+ v_f^*&=T_f^1-T_f^0,&
+ \omega_f^*&=\operatorname{axisAngle}(q_f^1\otimes(q_f^0)^{-1}).
+ \label{eq:effdock-flow-targets}
+\end{align}
+Quaternion updates use left multiplication. With $F$ fragments and
+$F_\omega$ fragments having more than one atom, the flow terms are
+\begin{equation}
+ L_v=\frac{1}{3F}\sum_f\|v_f-v_f^*\|^2,\qquad
+ L_\omega=\frac{1}{3F_\omega}\sum_{f:|f|>1}
+ \|\omega_f-P_f\omega_f^*\|^2.
+ \label{eq:effdock-flow-loss}
+\end{equation}
+A zero eligible count yields zero angular loss. The angular denominator is
+not the number of observable eigenvectors. The released fragmenter avoids
+singletons. Optional time weighting of these flow terms is disabled.
+
+The atom auxiliary loss compares instantaneous velocities, not endpoint
+coordinates. For $r_a^t=x_a^t-T_{f(a)}^t$,
+\begin{equation}
+ u_a=v_{f(a)}+\omega_{f(a)}\times r_a^t,\quad
+ u_a^*=v_{f(a)}^*+\omega_{f(a)}^*\times r_a^t,\quad
+ L_{\rm atom}=\frac{1}{3A}\sum_a\|u_a-u_a^*\|^2.
+ \label{eq:effdock-atom-loss}
+\end{equation}
+The auxiliary target uses the unprojected angular field; an exactly
+unobservable rotation induces zero atom motion.
+
+A separate distance-geometry term uses the one-step endpoint
+\begin{equation}
+ \widehat T_f^1=T_f^t+(1-t)v_f,\qquad
+ \widehat q_f^1=\operatorname{Exp}_q((1-t)\omega_f)\otimes q_f^t.
+\end{equation}
+Here $\operatorname{Exp}_q$ converts an axis-angle vector to a quaternion.
+For unordered inter-fragment atom pairs $\mathcal P_b$ in complex $b$,
+\begin{align}
+ D_b&=\frac{1}{|\mathcal P_b|}\sum_{(a,c)\in\mathcal P_b}
+ \left(\|\widehat x_a^1-\widehat x_c^1\|-\|x_a^1-x_c^1\|\right)^2,\\
+ L_{\rm DG}&=\frac{\sum_{b:|\mathcal P_b|>0}t_b^2D_b}
+ {\sum_{b:|\mathcal P_b|>0}t_b^2},\qquad
+ L=L_v+8L_\omega+0.3L_{\rm atom}+3L_{\rm DG}.
+ \label{eq:effdock-total-loss}
+\end{align}
+A zero denominator yields zero $L_{\rm DG}$. Distributed reductions reproduce
+global fragment, atom and weighted-complex means for the respective terms;
+these are not equal-weight-per-complex reductions throughout.
+
+The released 50k fine-tune samples
+\begin{align}
+ p(t)&=0.80p_{\rm SF}(t)+0.10U(0,0.3)+0.10\delta_0,\\
+ p_{\rm SF}&=0.02U(0,1)+0.98\operatorname{Law}
+ [\operatorname{sigmoid}(0.8+1.7Z)],\quad Z\sim\mathcal N(0,1).
+\end{align}
+It uses fresh AdamW state, global batch 64 on four GPUs, peak learning rate
+$2\times10^{-5}$, weight decay 0.01, gradient clipping 1, and EMA decay 0.999.
+Warmup lasts 1,000 updates; cosine decay begins at 40,000 and reaches
+$2\times10^{-6}$ at 50,000. The released docking state is terminal EMA.
+
+\subsection{Sampling and confidence}
+Main sampling uses $N=100$ candidates, $S=10$ steps, $\sigma=2\,\mathrm{\AA}$
+and a $10\,\mathrm{\AA}$ crop. The late-power-three Euler grid and updates are
+\begin{align}
+ t_j&=1-(1-j/S)^3,\quad j=0,\ldots,S,\\
+ T_f^{j+1}&=T_f^j+\Delta t_jv_{\theta,f}(t_j),\qquad
+ q_f^{j+1}=\operatorname{Exp}_q(\Delta t_j\omega_{\theta,f}(t_j))\otimes q_f^j.
+ \label{eq:effdock-sampler}
+\end{align}
+Raw and refined banks preserve generation indices and are independently scored.
+
+The confidence scorer uses four equivariant layers, paired docking features,
+and attention pooling over global and contact features. It predicts log-one-plus pose
+RMSD $\widehat y_k$, pose-success logit $z_k$, atom log displacement
+$\widehat y_{ka}$ and atom-success logit $z_{ka}$. Atom and pose regression
+use Huber loss with transition one; classification uses BCE with logits and
+strict $2\,\mathrm{\AA}$ labels. Let $y_k=\log(1+r_k)$:
+\begin{align}
+ L_{\rm rank}&=\underset{y_j-y_i>0.3}{\operatorname{mean}}
+ \max(0,0.05-(\widehat y_j-\widehat y_i)),\\
+ q_k&=\operatorname{sigmoid}((2-r_k)/0.2),\quad
+ p_k=\frac{q_k}{\sum_jq_j},\qquad
+ L_{\rm list}=-\sum_kp_k\log\operatorname{softmax}(z)_k,\\
+ L_{\rm conf}&=0.2L_{\rm atom}+0.2L_{\rm atom\mbox{-}ok}
+ +0.3L_{\rm pose}+0.4L_{\rm pose\mbox{-}ok}
+ +0.1L_{\rm rank}+L_{\rm list}.
+ \label{eq:effdock-confidence}
+\end{align}
+Here the confidence atom term is displacement regression, distinct from the
+docking atom-velocity term in Eq.~\ref{eq:effdock-atom-loss}. Empty eligible
+pairs give zero rank loss. Numerically zero quality sums use a uniform target;
+one-candidate pools have zero listwise loss.
+
+Training banks contain 32 raw poses, 32 refined poses and a crystal anchor;
+the loader samples a bounded subset. Validation excludes crystal anchors.
+The continuation uses Muon at $2\times10^{-4}$ plus AdamW at $3\times10^{-6}$,
+effective global batch two, seed 45, 2,000-update warmup and cosine decay over
+the final 50,000 of 100,000 updates, ending at 0.05 of the peak rates.
+U70k was selected only on 1,035 internal complexes, scoring 622/1,035 (60.10\%)
+Top-1 RMSD success, compared with 617/1,035 at U100k.
+
+\subsection{Energy-based rigid refinement}
+Refinement is a separate post-sampling operation with a fixed receptor:
+\begin{equation}
+ E=E_{\rm physical}+E_{\rm interaction},\qquad F_a=-\nabla_{x_a}E.
+ \label{eq:effdock-energy}
+\end{equation}
+The physical terms are harmonic bond/angle restraints, periodic proper
+torsions, planar/chiral impropers, softened Lennard--Jones interactions,
+compact protein--ligand overlap barriers and repulsive receptor obstacles.
+Physical parameters use EFF-FF version 2.2.0 and interaction parameters version
+1.6.0. The chemical-constraint channel has scale zero, while the physical
+chiral-improper scale is one. The input conformer's geometry, not the target
+crystal pose, defines restraint reference values.
+Bond restraints act on cut bonds, angles and impropers span fragments, and
+proper-torsion weights sum to one per cut bond over its retained quadruplets.
+\begin{align}
+ E_{\rm bond}&=\tfrac12\sum_bk_b(d_b-d_b^0)^2,&
+ E_{\rm angle}&=\tfrac12\sum_ak_a(\theta_a-\theta_a^0)^2,\\
+ E_{\rm proper}&=\sum_pk_pw_p[1+\cos(n_p\phi_p-\delta_p)],\\
+ E_{\rm improper}&=\tfrac12\sum_{i\in\rm planar}k_i[1-\cos(2\phi_i)]
+ +\tfrac12\sum_{i\in\rm chiral}k_i\operatorname{wrap}(\phi_i-\phi_i^0)^2.
+\end{align}
+For $Q(u)=u^3(10-15u+6u^2)$, $S(d)=Q(\operatorname{clip}((8-d)/2,0,1))$
+and $\rho=\sqrt{d^2+0.75^2}$,
+\begin{equation}
+ E_{{\rm LJ},ij}=s_{ij}S(d_{ij})D_{ij}
+ [(X_{ij}/\rho_{ij})^{12}-2(X_{ij}/\rho_{ij})^6].
+\end{equation}
+Pair atom parameters use geometric mixing; the versioned table specifies
+exclusions and the default 1--4 scale of 0.5. The steric term is
+\begin{align}
+ d_{ij}^{\rm safe}&=0.8(r_i^{\rm vdW}+r_j^{\rm vdW}),&
+ p_{ij}&=0.1\log[1+e^{(d_{ij}^{\rm safe}-d_{ij})/0.1}],\\
+ E_{\rm steric}&=10\sum_{ij}p_{ij}^2
+ Q\!\left(\operatorname{clip}\left(\frac{d_{ij}^{\rm safe}+0.5-d_{ij}}{0.5},0,1\right)\right).
+\end{align}
+The interaction terms are hydrophobic, hydrogen bond, screened formal charge,
+pi stacking, cation--pi, halogen bond and profile-specific metal coordination.
+For bounded pair weights $w_{ij}$, site saturation is
+\begin{equation}
+ O_i=1-\prod_j[1-(1-10^{-7})w_{ij}],\qquad E_{\rm site}=-\epsilon\sum_iO_i.
+\end{equation}
+Symmetric ring-system saturation averages occupancies in both directions.
+Screened formal-charge energy uses
+\begin{equation}
+ E_{\rm charge}=\sum_{ij}\frac{332.06371}{78.5}q_iq_j
+ \frac{e^{-0.127\rho_{ij}}}{\rho_{ij}}S_q(d_{ij}^2),\quad
+ \rho_{ij}=\sqrt{d_{ij}^2+0.75^2},
+\end{equation}
+with the quintic switch between squared distances $8^2$ and $10^2$.
+The parameter tables and implementation specify all typed geometric gates,
+metal profiles and repulsive-only obstacle terms. These diagnostic energies
+are not calibrated binding free energies.
+
+Energy-force projection uses atomic masses, unlike the learned head. For
+fragment mass $M_f$, centre of mass $C_f$, centroid $T_f$ and $r_a=x_a-C_f$,
+\begin{align}
+ C_f&=\frac{\sum_{a\in f}m_ax_a}{M_f},&
+ I_f&=\sum_{a\in f}m_a(\|r_a\|^2I_3-r_ar_a^{\mathsf T}),\\
+ \Omega_f&=I_f^+\sum_{a\in f}r_a\times F_a,&
+ V_f&=\frac{\sum_{a\in f}F_a}{M_f}+\Omega_f\times(T_f-C_f).
+ \label{eq:effdock-energy-projection}
+\end{align}
+Independent per-pose backtracking tries $\alpha=0.5^b$, $b=0,\ldots,12$,
+accepting finite energy no greater than
+$E+10^{-10}\max(1,|E|)$. Each step is capped at $0.10\,\mathrm{\AA}$
+translation, five degrees rotation and $0.10\,\mathrm{\AA}$ actual atom
+movement. At most 100 iterations are run. Stop after 20 consecutive accepted
+steps with maximum atom movement below $10^{-5}\,\mathrm{\AA}$, or, from
+iteration 25, five consecutive steps with energy decrease at most
+$0.02+0.001\max(1,|E|)$. External runs use an $18\,\mathrm{\AA}$ receptor
+shell, $8\,\mathrm{\AA}$ physical cutoff and $10\,\mathrm{\AA}$ maximum
+interaction cutoff. Training-bank refinement instead used displacement
+threshold $0.01\,\mathrm{\AA}$ with patience five. Failed line searches retain
+the last accepted pose and an explicit status.
+
+\subsection{Guided-sampling diagnostics}
+The separately captioned guidance/budget and pocket/prior figures use
+direct ODE guidance with $\eta=2$; the main condition has $\eta=0$.
+Let $U(v,\omega)$ be the induced atom velocity and
+$\operatorname{RMS}(U)=\sqrt{A^{-1}\sum_a\|U_a\|^2}$. Before capping,
+\begin{equation}
+ (\Delta v,\Delta\omega)=\eta\bar r_j
+ \frac{\operatorname{RMS}(U(v_\theta,\omega_\theta))}
+ {\operatorname{RMS}(U(V,\Omega))}(V,\Omega),\qquad
+ \bar r_j=\frac{1}{\Delta t_j}\int_{t_j}^{t_{j+1}}\max(0,2t-1)\,dt.
+\end{equation}
+Here $(V,\Omega)$ projects energy forces capped at atom norm 20. The physical
+LJ softcore decreases from 1.5 to $0.75\,\mathrm{\AA}$ over the active
+half-interval, evaluated at the active interval midpoint. The drift vanishes
+when either RMS is at most $10^{-8}$ or the direction is nonfinite.
+One scale per pose enforces added translation/angular velocity limits of
+5 and 5 per unit flow time, and an estimated atom-displacement bound of
+$0.25\,\mathrm{\AA}$. The sampler adds the drift to the learned field before
+its Euler update. Chemical-constraint drift is zero. This is separate from
+the subsequent energy-based refinement.
+
+\subsection{Selection, metrics and relatedness}
+Predicted RMSD is $\widehat r_k=\max(0,\operatorname{expm1}
+(\operatorname{clip}(\widehat y_k,-2,5)))$. Ordinary selection minimizes
+$(\widehat r_k,k)$ lexicographically. Chirality filtering restricts this
+minimum to candidates consistent with input tetrahedral stereochemistry,
+falling back to ordinary selection if none passes. The main mask contains no
+reference RMSD, PB test or E/Z criterion.
+
+For $M$ complexes, selected index $k_i^*$, RMSD $r_{ik}$ and official
+selected-pose PB validity $b_{ik}$,
+\begin{equation}
+ \mathrm{SR}=\frac{100}{M}\sum_i\mathbf1[r_{i,k_i^*}<2\,\mathrm{\AA}],\quad
+ \mathrm{SR}_{\rm PB}=\frac{100}{M}\sum_i\mathbf1[r_{i,k_i^*}<2\,\mathrm{\AA}]b_{i,k_i^*}.
+\end{equation}
+RMSD uses symmetry-aware no-alignment heavy-atom CalcRMS. Solid bars show
+$\mathrm{SR}_{\rm PB}$; hatched extensions show $\mathrm{SR}-\mathrm{SR}_{\rm PB}$.
+Top-$k$ uses the full-bank confidence order, while generation-prefix coverage
+uses saved generation indices. Both reach the RMSD-only oracle at 100; prefix
+reselection is a distinct, potentially nonmonotone selected-pose endpoint.
+
+The external cohorts are Astex Diverse Set (85), PoseBusters v2 (308),
+PhiBench (206), FoldBench (558) and auxiliary OpenBind (925). PhiBench includes
+three reconstructed cases; OpenBind includes two flagged noncovalent
+approximations of covalent systems. FoldBench PB evaluation includes three
+energy-reference InChI compatibility-repair shards. Original denominators are
+retained. Report three-seed means and sample SD, except paired bootstrap
+figures: average paired differences over seeds within each complex, then
+resample complexes or exact-PDB groups 2,000 times and report percentile
+95\% CIs in percentage points. Group resampling retains member complexes
+and uses their complex-weighted mean; it is not protein-family clustering.
+
+Sequence relatedness uses the 47,277 docking samples. For query binding
+chains $Q$ and a training sample $h$, define
+\begin{equation}
+ s(Q,h)=100\frac{\max_{\pi}\sum_{q\in Q}n_{\rm identical}(q,\pi(q))}
+ {\sum_{q\in Q}|q|},\qquad s_{\max}(Q)=\max_{h\in\mathcal H}s(Q,h),
+\end{equation}
+where $\pi$ is a one-to-one assignment to eligible binding chains within
+that training sample. Unaligned residues, unmatched chains and unknown
+residues do not contribute identical-residue evidence; all observed query
+residues remain in the denominator. Ligand--protein overlap requires exact
+canonical heavy-isomeric ligand identity and $s(Q,h)\ge70$ in the same
+training sample, searching all exact-ligand witnesses. The threshold is
+descriptive, not a certified pocket match or binary leakage definition.
+Six-cohort composition adds Validation (1,076), without implying a matched
+three-seed validation performance bank. Opened external results are
+descriptive and do not select checkpoints or tune settings.

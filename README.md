@@ -143,6 +143,12 @@ individual PDF/PNG files, captions and a Prism reference package. They are
 working materials for writing the manuscript; figure numbering and placement
 can change. Their presence here does not indicate a published paper.
 
+[Detailed equations](docs/methods/README.md), [editable LaTeX methods](docs/paper/prism/methods.tex),
+[training membership](benchmarks/inputs/training_membership/README.md), and
+[figure source data](benchmarks/results/paper/README.md) connect the manuscript
+to the released implementation. Recreate all 14 figures from public numerical
+records with `uv run python -m benchmarks.figures.paper`.
+
 ## Repository map
 
 - `src/effdock/`: reusable Python package;

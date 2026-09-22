@@ -1,8 +1,15 @@
 \documentclass[11pt]{article}
 \usepackage[a4paper,margin=20mm]{geometry}
 \usepackage{graphicx}
+\usepackage{amsmath,amssymb}
 \usepackage{fontspec}
-\setmainfont{Latin Modern Roman}
+\setmainfont{lmroman10-regular.otf}[
+  BoldFont=lmroman10-bold.otf,
+  ItalicFont=lmroman10-italic.otf,
+  BoldItalicFont=lmroman10-bolditalic.otf
+]
 \begin{document}
+\input{methods.tex}
+\clearpage
 \input{figure_captions.tex}
 \end{document}

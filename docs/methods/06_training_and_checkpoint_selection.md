@@ -1,24 +1,33 @@
 # Training data, optimization, and checkpoint selection
 
-Evidence sources: `docs/DATA.md`,
-`docs/EARLY_TIME_FINE_TUNE_50K_PROTOCOL.md`,
-`docs/S50_RAW_REFINED_CONFIDENCE_100K_PROTOCOL.md`,
-`configs/train.yaml`, and
-`configs/train_confidence_s50_raw_refined_100k.yaml`.
+Evidence: [released model cards](../../weights/MANIFEST.md),
+[public membership manifest](../../benchmarks/inputs/training_membership/README.md),
+[50k docking configuration](../../configs/train_early_time_ft_50k.yaml), and
+[confidence configuration](../../configs/train_confidence_s50_raw_refined_100k.yaml).
 
 ## 1. Data and split boundary
 
 Training structures are PLINDER 2024-06/v2. The immutable identity is
 `<system_id>__<ligand_instance_chain>`. The released docking fine-tune used the
 preserved compatibility split (47,310 train / 1,076 validation identities
-before filtering; 47,277 filtered train systems). This is checkpoint
+before filtering; 47,277 filtered training samples). This is checkpoint
 provenance, not the split recommended for a future claim-bearing replacement.
 
 The current strict split builder removes external canonical ligand-SMILES
 matches and assigns validation by `pocket_fident__70__community`. It verifies
-disjointness by identity, canonical SMILES, and pocket70 community. Crystal
-coordinates are supervision only. At inference EFF-Dock is supplied a ligand,
-receptor, and frozen pocket definition; it never reads a reference pose.
+disjointness by identity, canonical SMILES, and pocket70 community. Reference
+pose coordinates provide supervision and evaluation labels. Frozen
+pocket definitions in retrospective redocking can be reference-ligand-derived;
+the reference pose is not a model/scorer feature or refinement target.
+
+The confidence checkpoint uses 43,092 eligible training samples and 1,035
+validation samples. Docking and confidence share 43,067 training samples;
+4,210 are docking-only and 25 are confidence-only. Both pipelines started from
+the preserved 47,310 IDs and applied different input filters. Exact IDs,
+exclusion reasons and set hashes are public in the linked membership manifest.
+Relatedness figures use the docking set, not this confidence set or their union.
+These are loader/split inventories, not a union of every predecessor checkpoint's
+training exposure.
 
 ## 2. Released docking fine-tune
 
@@ -47,8 +56,9 @@ excluded from validation selection.
 
 The run is configured for 100k updates, Muon at `2e-4` plus `3e-6` learning
 rate for the remaining optimizer path, weight decay `0.01`, clipping `1.0`,
-2% warmup, 50% cosine cooldown, final-LR ratio 0.05, batch one complex, and
-seed 45. It saves a latest checkpoint every 500 updates; `best` selection is
+2% warmup, 50% cosine cooldown, final-LR ratio 0.05, batch one complex per rank
+(two ranks, effective global batch two), and seed 45. It saves a latest
+checkpoint every 500 updates; `best` selection is
 separate from recovery checkpoints.
 
 ## 4. Selection rule and release decision

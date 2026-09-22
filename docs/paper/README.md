@@ -6,7 +6,9 @@ numbering and placement may change during writing.
 - [Combined PDF](paper_figures.pdf): 14 pages.
 - [Figure captions](FIGURE_CAPTIONS.md): English captions and author notes.
 - [Sequence-relatedness definitions](RELATEDNESS.md)
-- [Prism package](prism/prism_figure_reference.zip): PDFs and LaTeX reference blocks.
+- [Prism package](prism/prism_figure_reference.zip): PDFs, equations and LaTeX reference blocks.
+- [Editable methods](prism/methods.tex)
+- [Numerical source data and reproduction](../../benchmarks/results/paper/README.md)
 - [Source and caption manifest](manifest.json)
 
 ## Figures
@@ -31,14 +33,23 @@ numbering and placement may change during writing.
 Pages 1–11 are currently main figures; pages 12–14 are supplementary.
 PB-valid success is solid; only RMSD-passing but PB-invalid portions are hatched.
 
-Frozen numerical inputs for retained analysis helpers are in
-[benchmarks/results/paper](../../benchmarks/results/paper). Their conditions
-must be distinguished from the current figure captions. Older drafts, layout
-notes and internal verification logs are retained locally.
+All 14 selected figures can be rendered using the versioned numerical inputs:
+
+```bash
+uv run python -m benchmarks.figures.paper --check
+uv run python -m benchmarks.figures.paper --output outputs/paper_figures
+```
+
+The renderer produces PDF/PNG pairs and a long-form source-data CSV. It verifies
+hashes, counts, repeat statistics, outcome joins and training-witness membership.
+This rebuild starts from frozen numerical records; it does not rerun docking,
+PB evaluation, sequence alignment or bootstrap sampling. Historical collection
+helpers still require separately supplied pose banks. Older drafts and internal
+verification logs remain local.
 
 Replace the selected figure files with new analysis outputs before running
 `uv run python scripts/package_paper_figures.py` to rebuild the combined PDF,
 manifest and Prism ZIP. Use `--check` to verify the existing package. Packaging
 requires Poppler's `pdfinfo`, `pdftotext` and `pdfunite` on PATH and does not
 rerun scientific analyses. LaTeX blocks need manuscript-specific
-numbering and bibliography keys; local XeLaTeX/LuaLaTeX compilation is unverified.
+numbering and bibliography keys. See [Prism notes](prism/README.md) for compilation.

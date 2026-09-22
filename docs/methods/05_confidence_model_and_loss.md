@@ -63,36 +63,45 @@ inference.
 For `y_a=log(1+atom_disp_a)` and `y_k=log(1+RMSD_k)`, the regression terms are
 Huber losses and the binary terms are BCE-with-logits:
 
-\[
+Huber uses PyTorch's default transition `delta=1` and mean reduction:
+`h(e)=e²/2` for `|e|≤1`, and `h(e)=|e|-1/2` otherwise. Atom terms average over
+candidate–atom entries; pose terms average over candidates of one complex.
+
+$$
 L_{atom}=Huber(\hat y_a,y_a),\quad L_{pose}=Huber(\hat y_k,y_k),
-\]
-\[
+$$
+$$
 L_{atom-ok}=BCE(z_a,[d_a<2]),\quad
 L_{pose-ok}=BCE(z_k,[r_k<2]).
-\]
+$$
 
 Pairwise RMSD ranking is active only for pairs whose target log-RMSD gap
 exceeds 0.3:
 
-\[
+$$
 L_{rank}=\operatorname{mean}_{y_j-y_i>0.3}
 \max(0,0.05-(\hat y_j-\hat y_i)).
-\]
+$$
 
 The active ensemble loss is a cross-entropy from the smoothed success target
 to the pose-success logits. Let `q_k=sigmoid((2-r_k)/0.2)` and
 `p_k=q_k/sum_j q_j`; then
 
-\[
+$$
 L_{success-list}=-\sum_k p_k\log\operatorname{softmax}(z)_k.
-\]
+$$
+
+If the quality sum numerically underflows to zero, the implementation uses a
+uniform target. Pairwise loss is zero when no pair meets the gap; the listwise
+term is zero for a one-candidate pool. These are numerical/empty-set rules,
+not exclusions from the training split.
 
 The released configuration is
 
-\[
+$$
 0.2L_{atom}+0.2L_{atom-ok}+0.3L_{pose}+0.4L_{pose-ok}
 +0.1L_{rank}+1.0L_{success-list}.
-\]
+$$
 
 Ordinary listwise, setwise, pairwise-success, and hard-negative alternatives
 exist as explicitly configured zero-weight options; they are not active in the
