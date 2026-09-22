@@ -1,11 +1,14 @@
 # EFF-Dock documentation
 
-## Current manuscript materials
+## Manuscript drafting materials
 
-- [Final figure PDF](paper/figure_gallery/paper_figures.pdf): 11 main figures and 3 supplementary figures.
+- [Figure PDF](paper/figure_gallery/paper_figures.pdf): 11 main figures and 3 supplementary figures.
 - [English figure captions](paper/prism/FIGURE_CAPTIONS.md)
 - [Prism package](paper/prism/prism_figure_reference.zip)
 - [Figure index](paper/figure_gallery/PDF_EXPORTS.md)
+
+These are manuscript working materials, not a published paper. See the
+[paper guide](paper/README.md) for version and usage notes.
 
 ## Model and evaluation
 

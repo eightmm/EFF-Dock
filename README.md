@@ -2,8 +2,8 @@
 
 EFF-Dock is a fragment-level SE(3)-equivariant flow-matching model for
 protein-ligand docking. The repository contains the Python implementation,
-training and evaluation workflows, the promoted docking/confidence weights,
-and the evidence used for the accompanying paper.
+training and evaluation workflows, released docking/confidence weights,
+and benchmark figures prepared for manuscript drafting.
 
 EFF-Dock predicts ligand poses inside an explicitly supplied binding pocket.
 It does not perform blind pocket discovery, binding-affinity prediction, or
@@ -110,30 +110,20 @@ checkpoint selection, and exact evaluation definitions are documented in:
 The current reporting baseline is **three seeds, unguided N100/S10/sigma2**, using the
 released docking/U70k pair, explicit physical refinement and input-chirality
 selection. These postprocessing steps are not silently applied by `dock()`.
-RMSD is symmetry-aware heavy-atom RMSD without alignment; Joint requires both
-RMSD <2 Angstrom and PB-validity. Values are percent mean ± sample SD.
+RMSD is symmetry-aware heavy-atom RMSD without alignment. PB-valid success
+requires the same pose to have RMSD <2 Angstrom and pass PoseBusters. Values
+are percent mean ± sample SD.
 
-| Dataset | N per seed | Refined + filtered `<2A` | PB-valid | Joint |
+| Dataset | N per seed | RMSD <2 Å | PB-valid poses | PB-valid success |
 |---|---:|---:|---:|---:|
-| Astex Diverse | 85 | 82.35 ± 2.04 | 95.69 ± 0.68 | 79.22 ± 2.72 |
+| Astex Diverse Set | 85 | 82.35 ± 2.04 | 95.69 ± 0.68 | 79.22 ± 2.72 |
 | PoseBusters v2 | 308 | 81.60 ± 0.94 | 95.56 ± 0.50 | 79.22 ± 1.42 |
 | PhiBench reconstructed full | 206 | 62.62 ± 3.79 | 94.01 ± 0.28 | 60.19 ± 3.36 |
 | FoldBench-Pocket full | 558 | 74.49 ± 0.37 | 96.36 ± 0.37 | 72.82 ± 0.63 |
 | OpenBind full | 925 | 52.58 ± 0.61 | 99.64 ± 0.17 | 52.58 ± 0.61 |
 
-The matched Astex/PB guided/unguided N100/S10 and N40/S25 comparisons are
-complete; the earlier eta2 rows remain separate ablations. FoldBench includes
-three PB shards with a disclosed energy-reference InChI compatibility repair.
-Historical single-bank numbers remain in the [benchmark report](docs/BENCHMARK_RESULTS.md).
-Current tables, reproducible figures and condition-specific captions are in
-the [paper results](docs/paper/20260919/RESULTS.md).
-
-PoseX is reported separately: input chirality+E/Z selection followed by
-PoseX relaxation, not our own refinement. Across three seeds, SD718 gives
-72.89 ± 1.08% RMSD success and 69.64 ± 0.64% Joint; CD1312 gives
-59.94 ± 3.71% and 59.33 ± 3.47%. CD uses the official-style 109-group
-aggregation, not per-case success; these endpoints are not interchangeable
-with the table above. See the inventory for baseline comparisons and provenance.
+Postprocessing and metric definitions are in the
+[figure captions](docs/paper/prism/FIGURE_CAPTIONS.md).
 
 These are supplied-pocket redocking results, not blind docking or prospective
 screening. Astex, PoseBusters, and the temporal cohorts were inspected during
@@ -142,41 +132,32 @@ fixed 1,035-complex PLINDER validation bank. PhiBench and FoldBench are the
 core temporal checks; OpenBind is reported separately as a dense
 single-protease auxiliary cohort.
 
-For historical endpoint-aligned PhiBench context, U70k refined confidence Top-5 reaches
-`156/203` (`76.85%`) RMSD success and `150/203` (`73.89%`) same-pose
-PB-valid/RMSD joint success. The source-native paper cohort has 206 systems,
-so this remains descriptive rather than a direct head-to-head claim.
+FoldBench-Pocket uses holo-receptor, crystal-pocket redocking targets, rather
+than the native FoldBench cofolding task. Benchmark conditions and comparisons
+are documented in [the benchmark report](docs/BENCHMARK_RESULTS.md).
 
-FoldBench-Pocket uses the 558 released protein-ligand interfaces as
-holo-receptor, crystal-pocket redocking targets. It is not the native
-FoldBench cofolding leaderboard. Contract-aware side-by-side literature tables
-are provided in
-[`benchmarks/results/external_models/TEMPORAL_LITERATURE.md`](benchmarks/results/external_models/TEMPORAL_LITERATURE.md).
+## Manuscript figures
 
-Released tables are in [`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md),
-with machine-readable comparison artifacts under
-[`benchmarks/results/`](benchmarks/results/).
+[Paper materials](docs/paper/README.md) contain a 14-page figure PDF,
+individual PDF/PNG files, captions and a Prism reference package. They are
+working materials for writing the manuscript; figure numbering and placement
+can change. Their presence here does not indicate a published paper.
 
 ## Repository map
-
-The [manuscript evidence package](docs/paper/20260919/README.md) includes
-six figures, source-hashed aggregates and manuscript text. Its
-[runtime report](docs/paper/20260919/RUNTIME.md) distinguishes seconds per
-complex, amortized seconds per generated/scored pose, and sampling-process
-GPU peaks; these are saved-run costs, not isolated single-pose latency.
 
 - `src/effdock/`: reusable Python package;
 - `configs/`: training and evaluation configurations;
 - `weights/`: the two released model artifacts and model cards;
 - `benchmarks/`: external-model adapters and compact result artifacts;
-- `scripts/`: experiment and Slurm launchers;
+- `scripts/`: retained workflow helpers, checks and Slurm entry points;
 - `tests/`: unit and scientific-contract tests;
-- `docs/`: method, data, evaluation, protocol, and result-evidence documents.
+- `docs/`: model, data, evaluation and manuscript documentation.
 
 Start with [`docs/README.md`](docs/README.md) for the documentation index and
 [`docs/STRUCTURE.md`](docs/STRUCTURE.md) for ownership boundaries. Raw data,
 pose banks, scheduler logs, complete run ledgers, and historical checkpoints
-remain local and are not part of the public repository.
+remain local and are not part of the public repository. Superseded campaign
+launchers and intermediate experiment records are also kept outside the public tree.
 
 ## License
 
