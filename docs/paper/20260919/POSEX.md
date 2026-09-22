@@ -34,9 +34,9 @@ These post-hoc comparisons do not establish statistical significance.
 - Baseline: `outputs/benchmarks/posex_official_protocol/upstream_recovered_evaluation_v1_summary.json`.
 - Masked: `outputs/benchmarks/posex_official_protocol/chirality_ez_posex_relaxed_summary.json`.
 - Both reports retain all three seed summaries and original result CSV paths.
-- [Recovered evaluation procedure](../../POSEX_RECOVERED_EVALUATION.md).
-- [Relaxation recovery contract](../../POSEX_RELAX_RECOVERY_20260914.md).
-- [Mask → relaxation chain](../../POSEX_STEREO_RELAX_CHAIN.md).
+- Recovered evaluation procedure (local historical record: `POSEX_RECOVERED_EVALUATION.md`).
+- Relaxation recovery contract (local historical record: `POSEX_RELAX_RECOVERY_20260914.md`).
+- Mask → relaxation chain (local historical record: `POSEX_STEREO_RELAX_CHAIN.md`).
 
 This package only consolidates completed PoseX results; it launches no new
 PoseX docking or relaxation.

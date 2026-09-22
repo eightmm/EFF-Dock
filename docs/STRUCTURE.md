@@ -56,8 +56,8 @@ workflow wrappers retained for exact experiment reproduction. The repository
 is run from its root so released config and weight paths remain explicit.
 
 The documentation entry point is `docs/README.md`; released tables are
-summarized in `docs/BENCHMARK_RESULTS.md`. Detailed protocol/result files remain
-at stable paths because they are immutable scientific records. The complete
+summarized in `docs/BENCHMARK_RESULTS.md`. Historical protocol/result files remain at stable local paths but are no
+longer included in the public checkout. The complete
 machine run ledger and historical checkpoints remain in the ignored local
 archive rather than the public documentation tree.
 
