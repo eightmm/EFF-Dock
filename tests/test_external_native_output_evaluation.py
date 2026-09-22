@@ -1,7 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from scripts.external_models.evaluate_native_outputs import no_align_rmsd
+from benchmarks.external_models.evaluate_native_outputs import no_align_rmsd
 
 
 def _molecule(smiles: str, seed: int) -> Chem.Mol:

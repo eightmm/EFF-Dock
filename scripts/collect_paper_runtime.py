@@ -133,7 +133,7 @@ def collect():
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--output", type=Path, default=ROOT / "docs/paper/20260919")
+    p.add_argument("--output", type=Path, default=ROOT / "benchmarks/results/paper")
     args = p.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     result = collect()

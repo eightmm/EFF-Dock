@@ -25,5 +25,5 @@ fi
 if test "${ALLOW_NATIVE_UNSUPPORTED:-0}" = 1; then
   aggregate_args+=(--allow-native-unsupported)
 fi
-.venv/bin/python scripts/external_models/aggregate_inference_coverage.py \
+.venv/bin/python benchmarks/external_models/aggregate_inference_coverage.py \
   "${aggregate_args[@]}"

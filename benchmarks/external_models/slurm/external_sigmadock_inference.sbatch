@@ -26,7 +26,7 @@ RECEPTOR_POLICY="${RECEPTOR_POLICY:-caller-declared input CSV receptor}"
 SITE_POLICY="${SITE_POLICY:-cognate crystal ligand supplied pocket}"
 MODEL_ROOT="${SIGMADOCK_MODEL_ROOT:-$SLURM_SUBMIT_DIR/others/sigmadock}"
 UPSTREAM="$MODEL_ROOT/upstream"
-MODEL_RUNNER="$SLURM_SUBMIT_DIR/scripts/others/run_model.sh"
+MODEL_RUNNER="$SLURM_SUBMIT_DIR/benchmarks/external_models/tools/run_model.sh"
 CHECKPOINT="$MODEL_ROOT/weights/checkpoint.ckpt"
 
 INPUT_CSV="$(readlink -f "$INPUT_CSV")"
@@ -61,7 +61,7 @@ fi
 
 if ! test -f "$PREDICTION_DIR/coverage.json"; then
   "$MODEL_RUNNER" sigmadock python \
-    scripts/external_models/run_sigmadock_sample.py \
+    benchmarks/external_models/run_sigmadock_sample.py \
     "ckpt=$CHECKPOINT" \
     "inference.inference_datafront=$INPUT_CSV" \
     "output_dir=$OUTPUT_ROOT" \
@@ -121,7 +121,7 @@ path.write_text(json.dumps(payload, indent=2) + "\n")
 '
 
 "$MODEL_RUNNER" sigmadock python \
-  scripts/external_models/summarize_sigmadock.py \
+  benchmarks/external_models/summarize_sigmadock.py \
   --input-csv "$INPUT_CSV" \
   --prediction-path "$PREDICTION_PATH" \
   --output-json "$PREDICTION_DIR/coverage.json" \

@@ -1,1 +1,0 @@
-../../benchmarks/external_models/slurm/external_temporal_posebusters.sbatch

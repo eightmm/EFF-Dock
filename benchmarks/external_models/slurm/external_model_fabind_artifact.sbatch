@@ -21,8 +21,8 @@ cd "$repo_dir"
 mkdir -p external_models/logs
 runtime_dir="${SLURM_TMPDIR:-/tmp}/effdock-ext-fabind-${SLURM_JOB_ID:-manual}"
 mkdir -p "$runtime_dir"
-cp scripts/external_models/download_fabind_artifact.sh "$runtime_dir/download_fabind_artifact.sh"
-cp scripts/external_models/parallel_download.py "$runtime_dir/parallel_download.py"
+cp benchmarks/external_models/download_fabind_artifact.sh "$runtime_dir/download_fabind_artifact.sh"
+cp benchmarks/external_models/parallel_download.py "$runtime_dir/parallel_download.py"
 
 echo "host=$(hostname)"
 echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"

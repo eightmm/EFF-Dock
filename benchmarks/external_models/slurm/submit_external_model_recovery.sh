@@ -16,7 +16,7 @@ filter_manifest() {
   for target_id in "$@"; do
     args+=(--target-id "$target_id")
   done
-  .venv/bin/python scripts/external_models/filter_target_manifest.py \
+  .venv/bin/python benchmarks/external_models/filter_target_manifest.py \
     --input-csv "$source_csv" \
     --output-csv "$output_csv" \
     "${args[@]}"
@@ -52,69 +52,69 @@ job_id() {
 DBINDFR_JOB="$(job_id \
   --partition=6000ada --qos=normal --time=12:00:00 \
   --export=ALL,INPUT_CSV="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/posebusters_benchmark/shards/shard_005/diffbindfr_inputs.csv",OUTPUT_DIR="$PROJECT_ROOT/outputs/external_models/runs/diffbindfr/posebusters_native_s20_n40_seed0/seed_0/shard_005",SEED=0,SAMPLES_PER_COMPLEX=40,FAIL_ON_INCOMPLETE=1 \
-  scripts/slurm/external_diffbindfr_inference.sbatch)"
+  benchmarks/external_models/slurm/external_diffbindfr_inference.sbatch)"
 
 SURF_ASTEX_JOB="$(job_id \
   --partition=6000ada --qos=normal --time=1-00:00:00 \
   --export=ALL,INPUT_CSV="$INPUT_ROOT/surfdock_astex_missing.csv",OUTPUT_DIR="$PROJECT_ROOT/outputs/external_models/runs/surfdock/$TAG/astex_diverse",SEED=0,INFERENCE_STEPS=20,SAMPLES_PER_COMPLEX=40,FAIL_ON_INCOMPLETE=1 \
-  scripts/slurm/external_surfdock_inference.sbatch)"
+  benchmarks/external_models/slurm/external_surfdock_inference.sbatch)"
 SURF_PB_JOB="$(job_id \
   --partition=6000ada --qos=normal --time=1-00:00:00 \
   --export=ALL,INPUT_CSV="$INPUT_ROOT/surfdock_posebusters_missing.csv",OUTPUT_DIR="$PROJECT_ROOT/outputs/external_models/runs/surfdock/$TAG/posebusters_benchmark",SEED=0,INFERENCE_STEPS=20,SAMPLES_PER_COMPLEX=40,FAIL_ON_INCOMPLETE=1 \
-  scripts/slurm/external_surfdock_inference.sbatch)"
+  benchmarks/external_models/slurm/external_surfdock_inference.sbatch)"
 
 DDOCK_ASTEX_JOB="$(job_id \
   --partition=6000ada --qos=normal --time=12:00:00 \
   --export=ALL,INPUT_CSV="$INPUT_ROOT/diffdock_astex_missing.csv",OUTPUT_DIR="$PROJECT_ROOT/outputs/external_models/runs/posebench_diffdock/$TAG/astex_diverse",SEED=0,INFERENCE_STEPS=20,ACTUAL_STEPS=19,SAMPLES_PER_COMPLEX=5,BATCH_SIZE=1,FAIL_ON_INCOMPLETE=0 \
-  scripts/slurm/external_diffdock_inference.sbatch)"
+  benchmarks/external_models/slurm/external_diffdock_inference.sbatch)"
 DDOCK_PB_JOB="$(job_id \
   --partition=6000ada --qos=normal --time=1-00:00:00 \
   --export=ALL,INPUT_CSV="$INPUT_ROOT/diffdock_posebusters_missing.csv",OUTPUT_DIR="$PROJECT_ROOT/outputs/external_models/runs/posebench_diffdock/$TAG/posebusters_benchmark",SEED=0,INFERENCE_STEPS=20,ACTUAL_STEPS=19,SAMPLES_PER_COMPLEX=5,BATCH_SIZE=1,FAIL_ON_INCOMPLETE=0 \
-  scripts/slurm/external_diffdock_inference.sbatch)"
+  benchmarks/external_models/slurm/external_diffdock_inference.sbatch)"
 
 DYN_BASE="$PROJECT_ROOT/outputs/external_models/runs/posebench_dynamicbind/$TAG"
 DYN_GATE="$(job_id \
   --partition=test --qos=veryshort --time=04:00:00 \
   --export=ALL,DATASET=astex_diverse,LIGAND_CSV_DIR="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/astex_diverse/dynamicbind_astex_diverse_smoke_inputs",PROTEIN_DIR="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/astex_diverse/astex_diverse_smoke_proteins",OUTPUT_DIR="$DYN_BASE/gate",SEED=0,INFERENCE_STEPS=2,SAMPLES_PER_COMPLEX=1,BATCH_SIZE=1,FAIL_ON_INCOMPLETE=1 \
-  scripts/slurm/external_posebench_dynamicbind_inference.sbatch)"
+  benchmarks/external_models/slurm/external_posebench_dynamicbind_inference.sbatch)"
 DYN_ASTEX="$(job_id \
   --dependency="afterok:$DYN_GATE" --partition=6000ada --qos=long --time=2-00:00:00 --array=0-3%2 \
   --export=ALL,DATASET=astex_diverse,SHARD_INPUT_ROOT="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/astex_diverse/shards",OUTPUT_ROOT="$DYN_BASE/full/astex_diverse",SEED=0,INFERENCE_STEPS=20,SAMPLES_PER_COMPLEX=40,BATCH_SIZE=5,FAIL_ON_INCOMPLETE=0 \
-  scripts/slurm/external_posebench_dynamicbind_inference.sbatch)"
+  benchmarks/external_models/slurm/external_posebench_dynamicbind_inference.sbatch)"
 DYN_PB="$(job_id \
   --dependency="afterok:$DYN_GATE" --partition=6000ada --qos=long --time=2-00:00:00 --array=0-11%2 \
   --export=ALL,DATASET=posebusters_benchmark,SHARD_INPUT_ROOT="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/posebusters_benchmark/shards",OUTPUT_ROOT="$DYN_BASE/full/posebusters_benchmark",SEED=0,INFERENCE_STEPS=20,SAMPLES_PER_COMPLEX=40,BATCH_SIZE=5,FAIL_ON_INCOMPLETE=0 \
-  scripts/slurm/external_posebench_dynamicbind_inference.sbatch)"
+  benchmarks/external_models/slurm/external_posebench_dynamicbind_inference.sbatch)"
 DYN_ASTEX_AGG="$(job_id \
   --dependency="afterany:$DYN_ASTEX" \
   --export=ALL,EXPECTED_CSV="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/astex_diverse/vina_astex_diverse_inputs.csv",RUN_ROOT="$DYN_BASE/full/astex_diverse",OUTPUT_JSON="$DYN_BASE/full/astex_diverse/aggregate.json",STRICT=0 \
-  scripts/slurm/external_coverage_aggregate.sbatch)"
+  benchmarks/external_models/slurm/external_coverage_aggregate.sbatch)"
 DYN_PB_AGG="$(job_id \
   --dependency="afterany:$DYN_PB" \
   --export=ALL,EXPECTED_CSV="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/posebusters_benchmark/vina_posebusters_benchmark_inputs.csv",RUN_ROOT="$DYN_BASE/full/posebusters_benchmark",OUTPUT_JSON="$DYN_BASE/full/posebusters_benchmark/aggregate.json",STRICT=0 \
-  scripts/slurm/external_coverage_aggregate.sbatch)"
+  benchmarks/external_models/slurm/external_coverage_aggregate.sbatch)"
 
 VINA_BASE="$PROJECT_ROOT/outputs/external_models/runs/posebench_vina/$TAG"
 VINA_GATE="$(job_id \
   --partition=cpu_only --qos=short --time=12:00:00 \
   --export=ALL,DATASET=astex_diverse,INPUT_CSV="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/astex_diverse/vina_astex_diverse_smoke_inputs.csv",OUTPUT_DIR="$VINA_BASE/gate",SEED=0,EXHAUSTIVENESS=8,NUM_MODES=1,FAIL_ON_INCOMPLETE=1 \
-  scripts/slurm/external_posebench_vina_inference.sbatch)"
+  benchmarks/external_models/slurm/external_posebench_vina_inference.sbatch)"
 VINA_ASTEX="$(job_id \
   --dependency="afterok:$VINA_GATE" --partition=cpu_only --qos=long --time=3-00:00:00 --array=0-3%1 \
   --export=ALL,DATASET=astex_diverse,SHARD_INPUT_ROOT="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/astex_diverse/shards",OUTPUT_ROOT="$VINA_BASE/full/astex_diverse",SEED=0,EXHAUSTIVENESS=32,NUM_MODES=40,FAIL_ON_INCOMPLETE=0 \
-  scripts/slurm/external_posebench_vina_inference.sbatch)"
+  benchmarks/external_models/slurm/external_posebench_vina_inference.sbatch)"
 VINA_PB="$(job_id \
   --dependency="afterok:$VINA_GATE" --partition=cpu_only --qos=long --time=3-00:00:00 --array=0-11%1 \
   --export=ALL,DATASET=posebusters_benchmark,SHARD_INPUT_ROOT="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/posebusters_benchmark/shards",OUTPUT_ROOT="$VINA_BASE/full/posebusters_benchmark",SEED=0,EXHAUSTIVENESS=32,NUM_MODES=40,FAIL_ON_INCOMPLETE=0 \
-  scripts/slurm/external_posebench_vina_inference.sbatch)"
+  benchmarks/external_models/slurm/external_posebench_vina_inference.sbatch)"
 VINA_ASTEX_AGG="$(job_id \
   --dependency="afterany:$VINA_ASTEX" \
   --export=ALL,EXPECTED_CSV="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/astex_diverse/vina_astex_diverse_inputs.csv",RUN_ROOT="$VINA_BASE/full/astex_diverse",OUTPUT_JSON="$VINA_BASE/full/astex_diverse/aggregate.json",STRICT=0 \
-  scripts/slurm/external_coverage_aggregate.sbatch)"
+  benchmarks/external_models/slurm/external_coverage_aggregate.sbatch)"
 VINA_PB_AGG="$(job_id \
   --dependency="afterany:$VINA_PB" \
   --export=ALL,EXPECTED_CSV="$PROJECT_ROOT/outputs/external_models/inputs/posebench_native/posebusters_benchmark/vina_posebusters_benchmark_inputs.csv",RUN_ROOT="$VINA_BASE/full/posebusters_benchmark",OUTPUT_JSON="$VINA_BASE/full/posebusters_benchmark/aggregate.json",STRICT=0 \
-  scripts/slurm/external_coverage_aggregate.sbatch)"
+  benchmarks/external_models/slurm/external_coverage_aggregate.sbatch)"
 
 # These exact chains are permanently blocked on failed/superseded gates.  New
 # jobs above are accepted before they are cancelled.

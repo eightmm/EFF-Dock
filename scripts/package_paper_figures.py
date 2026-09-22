@@ -1,115 +1,158 @@
-"""Package the current manuscript selection without rasterizing PDF plots."""
+"""Build or verify the manuscript PDF and portable Prism reference package."""
 
+import argparse
 import hashlib
 import json
+import re
+import shutil
 import subprocess
 from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / "docs/paper"
-OUT = BASE / "figure_gallery"
-SELECTED = [
-    ("recent_benchmarks", "07_recent_model_comparison"),
-    ("20260919", "01_stage_ablation"),
-    ("20260920", "complexity_overview"),
-    ("combined_panels", "pose_order_comparison"),
-    ("20260920", "pose_budget_refined"),
-    ("20260919", "02_guidance_budget"),
-    ("20260919", "05_runtime_memory"),
-    ("20260919", "03_pocket_prior_robustness"),
-    ("combined_panels", "training_relatedness"),
-    ("20260919", "06_training_exposure"),
-    ("sequence_overlap", "sequence_performance"),
-    ("manuscript_support", "paired_uncertainty"),
-    ("20260919", "04_candidate_bottleneck"),
-    ("20260920", "complexity_failure_explanation"),
-]
-MAIN_COUNT = 11
+OUT = BASE
+MANIFEST = BASE / "manifest.json"
+PRISM = BASE / "prism"
+
+# Kept for local gallery builders that import the published selection.
+_FIGURES = json.loads(MANIFEST.read_text())["figures"]
+MAIN_COUNT = sum(row["section"] == "main" for row in _FIGURES)
+SELECTED = [("figures", Path(row["source"]).stem) for row in _FIGURES]
+TITLES = [row["title"] for row in _FIGURES]
 
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-TITLES = [
-    "외부 모델 비교",
-    "Raw/refined·chirality 효과",
-    "리간드 복잡도별 성능",
-    "누적 성능: confidence 순위·생성 순서",
-    "생성 후보 수별 선택 성능",
-    "Guidance·계산 예산별 성능",
-    "Runtime·memory",
-    "Pocket cutoff·prior 민감도",
-    "학습 관련성: 서열·리간드–단백질 중복",
-    "리간드 유사도·성능",
-    "서열 유사도별 성능",
-    "보충 S1: 개선량과 95% 신뢰구간",
-    "보충 S2: Top-k 요약·near-native 밀도",
-    "보충 S3: 복잡도별 실패 분해",
-]
+def pdf_text(path):
+    return subprocess.check_output(["pdftotext", "-layout", str(path), "-"], text=True)
+
+
+def sources(metadata):
+    rows = metadata["figures"]
+    paths = [ROOT / row["source"] for row in rows]
+    assert len(paths) == len(set(paths)) == 14
+    assert [row["page"] for row in rows] == list(range(1, 15))
+    assert len({row["latex_label"] for row in rows}) == 14
+    for path in paths:
+        assert path.is_relative_to(BASE / "figures")
+        info = subprocess.check_output(["pdfinfo", str(path)], text=True)
+        assert re.search(r"^Pages:\s+1\s*$", info, re.M), path
+    return paths
+
+
+def bundle_captions(metadata):
+    text = (BASE / "FIGURE_CAPTIONS.md").read_text()
+    for row in metadata["figures"]:
+        relative = (ROOT / row["source"]).relative_to(BASE).as_posix()
+        text = text.replace(f"]({relative})", f"]({row['bundle_file']})")
+    return text.replace("manifest.json", "captions.json")
+
+
+def bundle_manifest(metadata):
+    portable = json.loads(json.dumps(metadata))
+    portable["pdf"] = "paper_figures.pdf"
+    for row in portable["figures"]:
+        row["repository_source"] = row["source"]
+        row["source"] = row["bundle_file"]
+    return portable
+
+
+def write_bundle(metadata):
+    target = PRISM / "prism_figure_reference.zip"
+    temporary = target.with_suffix(".build.zip")
+    readme = """# Manuscript figure reference
+
+Working materials for writing the EFF-Dock manuscript, not a published paper.
+
+- [Combined PDF](paper_figures.pdf)
+- [English captions and author notes](FIGURE_CAPTIONS.md)
+- `main.tex` and `figure_captions.tex`: reference LaTeX document and figure blocks.
+- `figures/`: 14 individual PDFs in manuscript page order.
+- `captions.json`: file, caption, label and checksum mapping.
+
+Use XeLaTeX or LuaLaTeX for the reference document. Adapt numbering, placement
+and citation keys to the manuscript. Local TeX compilation is unverified.
+"""
+    with ZipFile(temporary, "w", ZIP_DEFLATED) as archive:
+        archive.writestr("README.md", readme)
+        archive.writestr("FIGURE_CAPTIONS.md", bundle_captions(metadata))
+        archive.writestr(
+            "captions.json", json.dumps(bundle_manifest(metadata), ensure_ascii=False, indent=2) + "\n"
+        )
+        for name in ("main.tex", "figure_captions.tex"):
+            archive.write(PRISM / name, name)
+        archive.write(ROOT / metadata["pdf"], "paper_figures.pdf")
+        for row in metadata["figures"]:
+            archive.write(ROOT / row["source"], row["bundle_file"])
+    temporary.replace(target)
+
+
+def verify(metadata):
+    paths = sources(metadata)
+    combined = ROOT / metadata["pdf"]
+    assert digest(combined) == metadata["pdf_sha256"], combined
+    assert pdf_text(combined) == "".join(pdf_text(path) for path in paths)
+    for row, path in zip(metadata["figures"], paths, strict=True):
+        assert digest(path) == row["sha256"], path
+        assert path.with_suffix(".png").is_file(), path
+    tex = (PRISM / "figure_captions.tex").read_text()
+    inclusions = re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}", tex)
+    assert inclusions == [row["bundle_file"] for row in metadata["figures"]]
+    assert re.findall(r"\\label\{([^}]+)\}", tex) == [
+        row["latex_label"] for row in metadata["figures"]
+    ]
+    with ZipFile(PRISM / "prism_figure_reference.zip") as archive:
+        assert archive.testzip() is None
+        assert json.loads(archive.read("captions.json")) == bundle_manifest(metadata)
+        assert archive.read("FIGURE_CAPTIONS.md").decode() == bundle_captions(metadata)
+        assert archive.read("paper_figures.pdf") == combined.read_bytes()
+        for name in ("main.tex", "figure_captions.tex"):
+            assert archive.read(name) == (PRISM / name).read_bytes()
+        for row, path in zip(metadata["figures"], paths, strict=True):
+            assert archive.read(row["bundle_file"]) == path.read_bytes()
+        for text_name in ("README.md", "FIGURE_CAPTIONS.md"):
+            for link in re.findall(r"\]\(([^)]+)\)", archive.read(text_name).decode()):
+                if "://" not in link and not link.startswith("#"):
+                    assert link.split("#")[0] in archive.namelist(), link
 
 
 def main():
-    files = [BASE / directory / (name + ".pdf") for directory, name in SELECTED]
-    assert len(files) == len(set(files)) == len(TITLES)
-    entries = []
-    source_text = []
-    for page, (pdf, title) in enumerate(zip(files, TITLES, strict=True), 1):
-        info = subprocess.check_output(["pdfinfo", str(pdf)], text=True)
-        count = next(
-            line.split(":", 1)[1].strip() for line in info.splitlines() if line.startswith("Pages:")
-        )
-        assert count == "1", pdf
-        source_text.append(
-            subprocess.check_output(["pdftotext", "-layout", str(pdf), "-"], text=True)
-        )
-        entries.append(
-            dict(
-                page=page,
-                title=title,
-                section="main" if page <= MAIN_COUNT else "supplement",
-                source=str(pdf.relative_to(ROOT)),
-                sha256=digest(pdf),
-            )
-        )
-    final = OUT / "paper_figures.pdf"
-    temporary = OUT / "paper_figures.build.pdf"
-    subprocess.run(["pdfunite", *map(str, files), str(temporary)], check=True)
-    combined = subprocess.check_output(["pdftotext", "-layout", str(temporary), "-"], text=True)
-    assert combined == "".join(source_text), "Merged PDF text differs from source pages"
-    temporary.replace(final)
-    manifest = dict(
-        pdf=str(final.relative_to(ROOT)),
-        sha256=digest(final),
-        pages=entries,
-        excluded="Historical PLINDER community/pocket comparisons; sequence ECDF redundant with composition. Superseded combined PDFs were removed.",
-        verification=f"{len(files)} unique single-page vector PDFs; merged text equals ordered source text",
-    )
-    (OUT / "paper_figures_manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
-    )
-    lines = [
-        "# 논문 그림 통합본",
-        "",
-        "**현재 사용할 파일: [paper_figures.pdf](paper_figures.pdf)**",
-        "",
-        f"핵심 그림 {MAIN_COUNT}개(1–{MAIN_COUNT}페이지)와 보충 진단 {len(files) - MAIN_COUNT}개({MAIN_COUNT + 1}–{len(files)}페이지)를 함께 묶은 단일 PDF.",
-        "",
-        "| 페이지 | 내용 |",
-        "|---:|---|",
-    ]
-    lines += [f"| {r['page']} | {r['title']} |" for r in entries]
-    lines += [
-        "",
-        "기존 pocket/community 비교와 서열 구성비에 중복되는 서열 누적 분포는 제외했다. 리간드 유사도 분석은 별도 정보를 제공하므로 유지했다.",
-        "현재 통합본은 위 파일 하나다. 원본 분석·개별 그림은 재현용으로 보존했다. PB-valid는 단색, RMSD 통과·PB-invalid 구간만 빗금이다.",
-        "",
-        "서열 점수/동일 학습 샘플 교집합 정의: [캡션](../sequence_overlap/CAPTIONS.md). 확정 leakage 또는 동일 pocket을 뜻하지 않는다.",
-        "",
-        "페이지별 영문 캡션 및 Prism 자료: [캡션 문서](../prism/FIGURE_CAPTIONS.md) · [Prism 패키지](../prism/prism_figure_reference.zip).",
-    ]
-    (OUT / "PDF_EXPORTS.md").write_text("\n".join(lines) + "\n")
-    print(f"Created {final}: {len(files)} verified pages")
+    parser = argparse.ArgumentParser(description=__doc__)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true", help="Verify existing files without rewriting")
+    mode.add_argument("--bundle-only", action="store_true", help="Refresh ZIP without merging PDFs")
+    args = parser.parse_args()
+    required = ["pdfinfo", "pdftotext"]
+    if not (args.check or args.bundle_only):
+        required.append("pdfunite")
+    missing = [name for name in required if shutil.which(name) is None]
+    if missing:
+        parser.error("Poppler utilities required on PATH: " + ", ".join(missing))
+    metadata = json.loads(MANIFEST.read_text())
+    paths = sources(metadata)
+    if not args.check:
+        if not args.bundle_only:
+            combined = ROOT / metadata["pdf"]
+            temporary = combined.with_suffix(".build.pdf")
+            subprocess.run(["pdfunite", *map(str, paths), str(temporary)], check=True)
+            assert pdf_text(temporary) == "".join(pdf_text(path) for path in paths)
+            temporary.replace(combined)
+            metadata["pdf_sha256"] = digest(combined)
+            for row, path in zip(metadata["figures"], paths, strict=True):
+                row["sha256"] = digest(path)
+            MANIFEST.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
+            caption_path = BASE / "FIGURE_CAPTIONS.md"
+            caption_path.write_text(re.sub(
+                r"PDF SHA-256: `[0-9a-f]{64}`",
+                f"PDF SHA-256: `{metadata['pdf_sha256']}`",
+                caption_path.read_text(),
+            ))
+        write_bundle(metadata)
+    verify(metadata)
+    print("Verified 14 source PDFs, merged page order, captions, manifest and Prism ZIP")
 
 
 if __name__ == "__main__":

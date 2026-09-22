@@ -197,7 +197,7 @@ def collect():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "docs/paper/20260919")
+    parser.add_argument("--output", type=Path, default=ROOT / "benchmarks/results/paper")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     result, cases = collect()

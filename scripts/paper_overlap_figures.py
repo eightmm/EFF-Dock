@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "docs/paper/20260919"
+OUT = ROOT / "benchmarks/results/paper"
 NAMES = {
     "astex": "Astex",
     "posebusters": "PoseBusters",

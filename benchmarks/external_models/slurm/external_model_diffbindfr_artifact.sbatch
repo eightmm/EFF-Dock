@@ -21,7 +21,7 @@ cd "$repo_dir"
 mkdir -p external_models/logs
 runtime_dir="${SLURM_TMPDIR:-/tmp}/effdock-ext-diffbindfr-${SLURM_JOB_ID:-manual}"
 mkdir -p "$runtime_dir"
-cp scripts/external_models/materialize_diffbindfr_artifact.sh "$runtime_dir/materialize_diffbindfr_artifact.sh"
+cp benchmarks/external_models/materialize_diffbindfr_artifact.sh "$runtime_dir/materialize_diffbindfr_artifact.sh"
 
 echo "host=$(hostname)"
 echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"

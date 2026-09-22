@@ -2,10 +2,10 @@
 
 ## Manuscript drafting materials
 
-- [Figure PDF](paper/figure_gallery/paper_figures.pdf): 11 main figures and 3 supplementary figures.
-- [English figure captions](paper/prism/FIGURE_CAPTIONS.md)
+- [Figure PDF](paper/paper_figures.pdf): 11 main figures and 3 supplementary figures.
+- [English figure captions](paper/FIGURE_CAPTIONS.md)
 - [Prism package](paper/prism/prism_figure_reference.zip)
-- [Figure index](paper/figure_gallery/PDF_EXPORTS.md)
+- [Figure index](paper/README.md)
 
 These are manuscript working materials, not a published paper. See the
 [paper guide](paper/README.md) for version and usage notes.

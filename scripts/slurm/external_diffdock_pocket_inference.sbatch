@@ -1,1 +1,0 @@
-../../benchmarks/external_models/slurm/external_diffdock_pocket_inference.sbatch

@@ -69,4 +69,4 @@ run_args=(
 if test "$FAIL_ON_INCOMPLETE" = 1; then
   run_args+=(--fail-on-incomplete)
 fi
-"$POSEBENCH_PYTHON" scripts/external_models/run_posebench_vina.py "${run_args[@]}"
+"$POSEBENCH_PYTHON" benchmarks/external_models/run_posebench_vina.py "${run_args[@]}"

@@ -344,7 +344,7 @@ def stratify(annotations):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--output", type=Path, default=ROOT / "docs/paper/20260919")
+    p.add_argument("--output", type=Path, default=ROOT / "benchmarks/results/paper")
     args = p.parse_args()
     annotations, metadata, paths = annotate()
     repeats, summary, pb_sources = stratify(annotations)

@@ -15,9 +15,9 @@ runner=scripts/rescore_external_temporal_u50_shard.py
 scorer=scripts/score_guidance_sdf_post_refinement_confidence.py
 evaluator=scripts/evaluate_external_temporal_posebusters_shard.py
 reporter=scripts/report_external_temporal_benchmark.py
-rescore_job_file=scripts/slurm/external_temporal_u50_rescore.sbatch
-pb_job_file=scripts/slurm/external_temporal_u50_posebusters.sbatch
-report_job_file=scripts/slurm/external_temporal_u50_report.sbatch
+rescore_job_file=benchmarks/external_models/slurm/external_temporal_u50_rescore.sbatch
+pb_job_file=benchmarks/external_models/slurm/external_temporal_u50_posebusters.sbatch
+report_job_file=benchmarks/external_models/slurm/external_temporal_u50_report.sbatch
 
 required=(
   .venv/bin/python "$source_root/report/summary.json" "$protocol" "$runner" "$scorer"

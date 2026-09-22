@@ -26,7 +26,7 @@ fi
 output_dir="${OUTPUT_DIR:-$SLURM_SUBMIT_DIR/outputs/external_models/evaluation/official_repeat_rmsd_20260901}"
 output_dir="$output_dir/$model/$dataset/repeat_$repeat_index"
 
-uv run python scripts/external_models/evaluate_native_outputs.py \
+uv run python benchmarks/external_models/evaluate_native_outputs.py \
   --model "$model" \
   --dataset "$dataset" \
   --official-seed "$seed" \

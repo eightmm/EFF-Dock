@@ -133,7 +133,7 @@ environment.
 
 ```bash
 MODEL=surfdock sbatch benchmarks/external_models/slurm/others_uv_sync.sbatch
-bash scripts/others/run_model.sh surfdock python -c \
+bash benchmarks/external_models/tools/run_model.sh surfdock python -c \
   'import torch; print(torch.__version__)'
 ```
 

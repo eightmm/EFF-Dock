@@ -1,1 +1,0 @@
-../../benchmarks/external_models/slurm/submit_external_temporal_guided_refined.sh

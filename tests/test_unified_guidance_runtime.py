@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import torch
 from rdkit import Chem
 
@@ -320,7 +322,7 @@ def test_unified_direct_velocity_matches_pose_atom_speed_and_preserves_singleton
     assert stats["direct_atom_speed_rms_valid_count"] == 2
     assert stats["direct_applied_to_model_rms_ratio_sum"] == 0.5
     assert stats["direct_applied_to_model_rms_ratio_valid_count"] == 2
-    assert stats["direct_model_guide_cosine_sum"] == -2.0
+    assert math.isclose(stats["direct_model_guide_cosine_sum"], -2.0, rel_tol=0.0, abs_tol=1e-12)
     assert stats["direct_model_guide_cosine_valid_count"] == 2
     assert stats["direct_guide_parallel_to_model_ratio_sum"] == -0.5
     assert stats["direct_guide_parallel_to_model_ratio_valid_count"] == 2
@@ -340,7 +342,7 @@ def test_unified_direct_velocity_matches_pose_atom_speed_and_preserves_singleton
     assert step["applied_to_model_rms_ratio_valid_count"] == 2
     assert step["applied_to_model_rms_ratio_p05"] == 0.25
     assert step["applied_to_model_rms_ratio_p99"] == 0.25
-    assert step["model_guide_cosine_p50"] == -1.0
+    assert math.isclose(step["model_guide_cosine_p50"], -1.0, rel_tol=0.0, abs_tol=1e-12)
     assert step["guide_parallel_to_model_ratio_p95"] == -0.25
     assert step["cap_scale_p99"] == 1.0
 

@@ -13,5 +13,5 @@ values and enforce the supplied-pocket comparison boundary. Their individual
 input conditions must be preserved. Intermediate fixed-NFE and pocket/prior
 plot scripts are no longer included in the public tree.
 
-`scripts/figures` remains a compatibility alias. Introduction and visualization
+Use the scripts in this directory directly. Introduction and visualization
 helpers are separate from the manuscript's benchmark figure selection.

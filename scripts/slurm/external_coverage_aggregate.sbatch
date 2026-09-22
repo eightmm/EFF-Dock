@@ -1,1 +1,0 @@
-../../benchmarks/external_models/slurm/external_coverage_aggregate.sbatch

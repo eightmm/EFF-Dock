@@ -112,7 +112,7 @@ case "$model" in
     ln -sfn transfer/APBS-3.4.1.Linux "$tools_dir/APBS-3.4.1.Linux"
     ln -sfn transfer/pdb2pqr-linux-bin64-2.1.1 "$tools_dir/pdb2pqr-linux-bin64-2.1.1"
     PYTHONPATH="$upstream:$repo_root" "$python" -c \
-      'import accelerate, esm, openmm, pymesh, rdkit, torch, torch_geometric; from pathlib import Path; from scripts.external_models.prepare_surfdock_runtime import configure_surface_imports; configure_surface_imports(Path(__import__("sys").argv[1])); print("surfdock", torch.__version__)' \
+      'import accelerate, esm, openmm, pymesh, rdkit, torch, torch_geometric; from pathlib import Path; from benchmarks.external_models.prepare_surfdock_runtime import configure_surface_imports; configure_surface_imports(Path(__import__("sys").argv[1])); print("surfdock", torch.__version__)' \
       "$upstream"
     ;;
 

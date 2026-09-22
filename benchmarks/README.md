@@ -20,9 +20,9 @@ plotting scripts are retained locally. The public checkout is not a complete
 archive of every experiment performed during development. Retained historical
 analysis helpers provide context and regression coverage, not production defaults.
 
-Compatibility links under `scripts/external_models`, `scripts/figures` and
-`scripts/slurm` resolve to the canonical benchmark code. Slurm launchers have
-site-specific resource defaults and must be adapted to the execution environment.
+Use `benchmarks/external_models` and `benchmarks/figures` directly. External
+Slurm launchers are under `benchmarks/external_models/slurm`; duplicate aliases
+under `scripts/` are no longer published. Resource defaults remain site-specific.
 
 ## Inputs and reference data
 

@@ -40,8 +40,8 @@ test -d "$RAW_OUTPUT_DIR"
 
 mkdir -p external_models/logs "$OUTPUT_DIR"
 RUNTIME_DIR="$(mktemp -d -p "${TMPDIR:-/tmp}" "effdock_external_rlpp_${SLURM_JOB_ID}_XXXXXX")"
-cp scripts/external_models/postprocess_rldiff_rlpp.py "$RUNTIME_DIR/postprocess_rldiff_rlpp.py"
-cp scripts/external_models/gnina_cpu_wrapper.sh "$RUNTIME_DIR/gnina_cpu_wrapper.sh"
+cp benchmarks/external_models/postprocess_rldiff_rlpp.py "$RUNTIME_DIR/postprocess_rldiff_rlpp.py"
+cp benchmarks/external_models/gnina_cpu_wrapper.sh "$RUNTIME_DIR/gnina_cpu_wrapper.sh"
 chmod +x "$RUNTIME_DIR/gnina_cpu_wrapper.sh"
 
 export INPUT_CSV RAW_OUTPUT_DIR OUTPUT_DIR SEED SAMPLES_PER_COMPLEX

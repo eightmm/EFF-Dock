@@ -8,20 +8,20 @@ import pytest
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from scripts.external_models.aggregate_inference_coverage import main as aggregate_coverage
-from scripts.external_models.posebench_vina_compat import install_rdkit_six_compat
-from scripts.external_models.postprocess_rldiff_rlpp import prepare_smina_receptor
-from scripts.external_models.prepare_posebench_vina_receptor import (
+from benchmarks.external_models.aggregate_inference_coverage import main as aggregate_coverage
+from benchmarks.external_models.posebench_vina_compat import install_rdkit_six_compat
+from benchmarks.external_models.postprocess_rldiff_rlpp import prepare_smina_receptor
+from benchmarks.external_models.prepare_posebench_vina_receptor import (
     meeko_output_prefix,
     select_meeko_receptor_source,
 )
-from scripts.external_models.repair_diffbindfr_output_pdb import repair_pdb
-from scripts.external_models.run_posebench_dynamicbind import prepare_compatible_runner
-from scripts.external_models.run_seeded_diffdock import (
+from benchmarks.external_models.repair_diffbindfr_output_pdb import repair_pdb
+from benchmarks.external_models.run_posebench_dynamicbind import prepare_compatible_runner
+from benchmarks.external_models.run_seeded_diffdock import (
     TargetFailureRecorder,
     _has_complete_output,
 )
-from scripts.external_models.surfdock_compat import (
+from benchmarks.external_models.surfdock_compat import (
     assign_missing_stereochemistry_from_3d,
     preserve_biopython_pdb_on_rdkit_failure,
 )

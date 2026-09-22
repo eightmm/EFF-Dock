@@ -53,7 +53,7 @@ fi
 
 mkdir -p external_models/logs "$OUTPUT_DIR" "$OUTPUT_DIR/cache"
 RUNTIME_DIR="$(mktemp -d -p "${TMPDIR:-/tmp}" "effdock_external_rldiff_${SLURM_JOB_ID}_XXXXXX")"
-cp scripts/external_models/run_seeded_upstream.py "$RUNTIME_DIR/run_seeded_upstream.py"
+cp benchmarks/external_models/run_seeded_upstream.py "$RUNTIME_DIR/run_seeded_upstream.py"
 
 export INPUT_CSV OUTPUT_DIR SEED INFERENCE_STEPS SAMPLES_PER_COMPLEX BATCH_SIZE
 export RUN_VARIANT RLDIFF_ROOT EXTERNAL_ROOT PYTHONHASHSEED="$SEED"

@@ -15,7 +15,7 @@ cd "${SLURM_SUBMIT_DIR:?SLURM_SUBMIT_DIR is required}"
 : "${OUTPUT_JSON:?Set OUTPUT_JSON}"
 
 mkdir -p others/logs
-python3 scripts/external_models/aggregate_sigmadock_coverage.py \
+python3 benchmarks/external_models/aggregate_sigmadock_coverage.py \
   --run-root "$RUN_ROOT" \
   --expected-seeds 40 \
   --expected-targets "$EXPECTED_TARGETS" \

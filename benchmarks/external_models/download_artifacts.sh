@@ -13,8 +13,8 @@ source_root="$external_root/src"
 weight_root="$external_root/weights"
 artifact_root="$external_root/artifacts"
 bin_root="$external_root/bin"
-parallel_downloader=${EFFDOCK_PARALLEL_DOWNLOADER:-$repo_root/scripts/external_models/parallel_download.py}
-fabind_downloader=${EFFDOCK_FABIND_DOWNLOADER:-$repo_root/scripts/external_models/download_fabind_artifact.sh}
+parallel_downloader=${EFFDOCK_PARALLEL_DOWNLOADER:-$repo_root/benchmarks/external_models/parallel_download.py}
+fabind_downloader=${EFFDOCK_FABIND_DOWNLOADER:-$repo_root/benchmarks/external_models/download_fabind_artifact.sh}
 mkdir -p "$weight_root" "$artifact_root" "$bin_root"
 
 extract_zip() {

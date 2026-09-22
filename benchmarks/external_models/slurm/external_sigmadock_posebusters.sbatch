@@ -17,7 +17,7 @@ SEED="${SEED:-${SLURM_ARRAY_TASK_ID:?Set SEED or submit an array}}"
 SEED_DIR="$MODEL_ROOT/seed_$SEED"
 PREDICTION_PATH="$SEED_DIR/predictions.pt"
 OUTPUT_PATH="$SEED_DIR/posebusters.pt"
-MODEL_RUNNER="$SLURM_SUBMIT_DIR/scripts/others/run_model.sh"
+MODEL_RUNNER="$SLURM_SUBMIT_DIR/benchmarks/external_models/tools/run_model.sh"
 
 test -f "$PREDICTION_PATH"
 test -f "$SEED_DIR/rescoring.pt"
@@ -27,7 +27,7 @@ if test -f "$OUTPUT_PATH"; then
 fi
 
 "$MODEL_RUNNER" sigmadock python \
-  scripts/external_models/postprocess_sigmadock_posebusters.py \
+  benchmarks/external_models/postprocess_sigmadock_posebusters.py \
   --prediction-path "$PREDICTION_PATH" \
   --output-path "$OUTPUT_PATH" \
   --expected-targets "$EXPECTED_TARGETS" \

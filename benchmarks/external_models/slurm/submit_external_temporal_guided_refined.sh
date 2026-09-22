@@ -22,9 +22,9 @@ required=(
   scripts/report_external_temporal_benchmark.py
   scripts/run_guidance_sdf_post_refinement.py
   scripts/score_guidance_sdf_post_refinement_confidence.py
-  scripts/slurm/external_temporal_guided_refined.sbatch
-  scripts/slurm/external_temporal_posebusters.sbatch
-  scripts/slurm/external_temporal_report.sbatch
+  benchmarks/external_models/slurm/external_temporal_guided_refined.sbatch
+  benchmarks/external_models/slurm/external_temporal_posebusters.sbatch
+  benchmarks/external_models/slurm/external_temporal_report.sbatch
 )
 for path in "${required[@]}"; do
   [[ -e "$path" ]] || { echo "missing required input: $path" >&2; exit 2; }
@@ -89,9 +89,9 @@ copy_files=(
   scripts/report_external_temporal_benchmark.py
   scripts/run_guidance_sdf_post_refinement.py
   scripts/score_guidance_sdf_post_refinement_confidence.py
-  scripts/slurm/external_temporal_guided_refined.sbatch
-  scripts/slurm/external_temporal_posebusters.sbatch
-  scripts/slurm/external_temporal_report.sbatch
+  benchmarks/external_models/slurm/external_temporal_guided_refined.sbatch
+  benchmarks/external_models/slurm/external_temporal_posebusters.sbatch
+  benchmarks/external_models/slurm/external_temporal_report.sbatch
 )
 capsule_args=()
 for path in "${copy_files[@]}"; do capsule_args+=(--copy-file "$path"); done
@@ -136,19 +136,19 @@ trap cleanup EXIT
 export_spec="ALL,EFFDOCK_EXECUTION_ROOT=$execution_root,EFFDOCK_OUTPUT_ROOT=$output_root,EFFDOCK_PROTOCOL_SHA256=$protocol_sha256"
 raw=$(sbatch --parsable --hold --array=0-2%3 \
   --export="$export_spec,EFFDOCK_STAGE=smoke" \
-  "$execution_root/scripts/slurm/external_temporal_guided_refined.sbatch")
+  "$execution_root/benchmarks/external_models/slurm/external_temporal_guided_refined.sbatch")
 smoke_job=${raw%%;*}; [[ "$smoke_job" =~ ^[0-9]+$ ]] || exit 2; submitted+=("$smoke_job")
 raw=$(sbatch --parsable --dependency="afterok:$smoke_job" --array=0-71%8 \
   --export="$export_spec,EFFDOCK_STAGE=full" \
-  "$execution_root/scripts/slurm/external_temporal_guided_refined.sbatch")
+  "$execution_root/benchmarks/external_models/slurm/external_temporal_guided_refined.sbatch")
 full_job=${raw%%;*}; [[ "$full_job" =~ ^[0-9]+$ ]] || exit 2; submitted+=("$full_job")
 raw=$(sbatch --parsable --dependency="afterok:$full_job" --array=0-71%16 \
   --export="$export_spec" \
-  "$execution_root/scripts/slurm/external_temporal_posebusters.sbatch")
+  "$execution_root/benchmarks/external_models/slurm/external_temporal_posebusters.sbatch")
 posebusters_job=${raw%%;*}; [[ "$posebusters_job" =~ ^[0-9]+$ ]] || exit 2; submitted+=("$posebusters_job")
 raw=$(sbatch --parsable --dependency="afterok:$posebusters_job" \
   --export="$export_spec" \
-  "$execution_root/scripts/slurm/external_temporal_report.sbatch")
+  "$execution_root/benchmarks/external_models/slurm/external_temporal_report.sbatch")
 report_job=${raw%%;*}; [[ "$report_job" =~ ^[0-9]+$ ]] || exit 2; submitted+=("$report_job")
 
 printf '%s\n' \

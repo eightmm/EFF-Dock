@@ -93,7 +93,7 @@ the pinned GNINA executable could not resolve `libcudart.so.12` on 6000ada and
 therefore returned status 127 after sampling. Those outputs are invalid and are
 not evaluated.
 
-`scripts/others/run_model.sh` now exposes every NVIDIA runtime directory from
+`benchmarks/external_models/tools/run_model.sh` now exposes every NVIDIA runtime directory from
 SigmaDock's pinned uv environment to external subprocesses, and the Slurm entry
 point fails before sampling unless `gnina --version` succeeds. The 6000ada
 one-target regression job `61248` completed with GNINA 1.3.2 and coverage 1/1,

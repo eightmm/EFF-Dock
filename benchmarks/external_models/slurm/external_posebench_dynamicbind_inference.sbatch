@@ -74,4 +74,4 @@ if test -n "$ONLY_TARGET"; then
   run_args+=(--target-id "$ONLY_TARGET")
 fi
 
-"$DYNAMICBIND_PYTHON" scripts/external_models/run_posebench_dynamicbind.py "${run_args[@]}"
+"$DYNAMICBIND_PYTHON" benchmarks/external_models/run_posebench_dynamicbind.py "${run_args[@]}"

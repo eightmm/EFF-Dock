@@ -28,6 +28,6 @@ echo "effdock_commit=$(git rev-parse HEAD)"
 oms run-ledger \
   --file "others/$model/logs/install-ledger.jsonl" \
   --note "model-local uv sync: $model" \
-  -- bash scripts/others/sync_model.sh "$model"
+  -- bash benchmarks/external_models/tools/sync_model.sh "$model"
 
 echo "finished_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"

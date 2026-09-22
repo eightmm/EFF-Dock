@@ -19,7 +19,7 @@ SCORE_DIR="$SCORE_ROOT/shard_$SHARD_ID"
 
 INTERFORMER_MODEL_ROOT="${INTERFORMER_MODEL_ROOT:-$SLURM_SUBMIT_DIR/others/interformer}"
 INTERFORMER_ROOT="$INTERFORMER_MODEL_ROOT/upstream"
-MODEL_RUNNER="$SLURM_SUBMIT_DIR/scripts/others/run_model.sh"
+MODEL_RUNNER="$SLURM_SUBMIT_DIR/benchmarks/external_models/tools/run_model.sh"
 TORCH_LIB="$INTERFORMER_MODEL_ROOT/.venv/lib/python3.12/site-packages/torch/lib"
 EXPECTED_POSES="${EXPECTED_POSES:-20}"
 
@@ -31,7 +31,7 @@ test -f "$TORCH_LIB/libc10.so"
 mkdir -p others/logs "$SCORE_DIR"
 export LD_LIBRARY_PATH="$TORCH_LIB:${LD_LIBRARY_PATH:-}"
 
-"$MODEL_RUNNER" interformer python scripts/external_models/prepare_interformer_pose_score.py \
+"$MODEL_RUNNER" interformer python benchmarks/external_models/prepare_interformer_pose_score.py \
   --source-shard "$SOURCE_SHARD" \
   --score-dir "$SCORE_DIR" \
   --expected-poses "$EXPECTED_POSES"

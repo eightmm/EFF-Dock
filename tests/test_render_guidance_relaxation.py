@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import torch
 
-RENDERER = Path(__file__).parents[1] / "scripts" / "figures" / "render_guidance_relaxation.py"
+RENDERER = Path(__file__).parents[1] / "benchmarks" / "figures" / "render_guidance_relaxation.py"
 
 
 def _write_fixture(tmp_path: Path) -> tuple[Path, Path]:

@@ -1,1 +1,0 @@
-../../benchmarks/external_models/slurm/others_uv_sync.sbatch

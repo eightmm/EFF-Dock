@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.external_models.parallel_download import (  # noqa: E402
+from benchmarks.external_models.parallel_download import (  # noqa: E402
     MIN_PART_BYTES,
     download_range,
     split_ranges,

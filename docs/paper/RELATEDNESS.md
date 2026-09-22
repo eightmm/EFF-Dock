@@ -37,7 +37,8 @@ satisfies both. Ligand only/sequence only mean only that respective condition ha
 a match; neither observed means neither has a match under the stated evidence.
 One unparseable training ligand was excluded for every query by differing heavy
 atom element inventories. Per-complex constrained maxima and witness IDs are
-in per_complex.csv; all 3,158 queries have numerical sequence scores.
+retained in the local per_complex.csv analysis record; all 3,158 queries have
+numerical sequence scores.
 
 This analysis describes ligand–protein relatedness, not confirmed pocket overlap
 or proven data leakage. The original PLINDER community-based train exclusion

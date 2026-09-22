@@ -16,11 +16,11 @@ cd "${SLURM_SUBMIT_DIR:?SLURM_SUBMIT_DIR is required}"
 : "${EVAL_ROOT:?Set EVAL_ROOT}"
 : "${DATASET_LABEL:?Set DATASET_LABEL}"
 
-MODEL_RUNNER="$SLURM_SUBMIT_DIR/scripts/others/run_model.sh"
+MODEL_RUNNER="$SLURM_SUBMIT_DIR/benchmarks/external_models/tools/run_model.sh"
 for repeat in 0 1 2; do
   seed_start=$((repeat * 40))
   "$MODEL_RUNNER" sigmadock python \
-    scripts/external_models/evaluate_sigmadock_official.py \
+    benchmarks/external_models/evaluate_sigmadock_official.py \
     --input-csv "$INPUT_CSV" \
     --model-root "$MODEL_ROOT" \
     --seed-start "$seed_start" \
@@ -29,7 +29,7 @@ for repeat in 0 1 2; do
     --output-dir "$EVAL_ROOT/repeat_$repeat"
 done
 
-python3 scripts/external_models/aggregate_repeat_metrics.py \
+python3 benchmarks/external_models/aggregate_repeat_metrics.py \
   --input "$EVAL_ROOT/repeat_0/summary.json" \
   --input "$EVAL_ROOT/repeat_1/summary.json" \
   --input "$EVAL_ROOT/repeat_2/summary.json" \

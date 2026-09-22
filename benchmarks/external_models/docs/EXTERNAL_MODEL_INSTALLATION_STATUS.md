@@ -26,7 +26,7 @@ others/<model>/{pyproject.toml,uv.lock,.python-version,.venv,upstream,weights,bi
   ignored runtime artifacts owned by exactly one model.
 - `uv sync --project others/<model>` creates the environment; inference uses
   `uv run --project others/<model> --no-sync` through
-  `scripts/others/run_model.sh`.
+  `benchmarks/external_models/tools/run_model.sh`.
 - The old ignored `external_models/` tree is retained as an archive and initial
   source/weight cache. It is no longer the active environment path for the
   models below.
@@ -106,8 +106,8 @@ processes while the remaining models move to `others/`.
 ## Verification
 
 ```bash
-bash scripts/others/sync_model.sh <model>
-bash scripts/others/run_model.sh <model> python -c 'import torch; print(torch.__version__)'
+bash benchmarks/external_models/tools/sync_model.sh <model>
+bash benchmarks/external_models/tools/run_model.sh <model> python -c 'import torch; print(torch.__version__)'
 ```
 
 The focused repository test verifies the isolated layout and native ABI pins:

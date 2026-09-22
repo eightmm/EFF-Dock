@@ -3,7 +3,7 @@ from pathlib import Path
 
 from rdkit import Chem
 
-from scripts.external_models.prepare_posebench_diffdock_inputs import localize_manifest
+from benchmarks.external_models.prepare_posebench_diffdock_inputs import localize_manifest
 
 
 def test_reference_sdf_mode_uses_documented_file_input(tmp_path: Path) -> None:

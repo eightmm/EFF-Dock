@@ -21,7 +21,7 @@ model="${arms[$((task_id / 2))]}"
 dataset="${datasets[$((task_id % 2))]}"
 output_dir="${OUTPUT_DIR:-$SLURM_SUBMIT_DIR/outputs/external_models/evaluation/common_rmsd_v1}"
 
-uv run python scripts/external_models/evaluate_native_outputs.py \
+uv run python benchmarks/external_models/evaluate_native_outputs.py \
   --model "$model" \
   --dataset "$dataset" \
   --output-dir "$output_dir"

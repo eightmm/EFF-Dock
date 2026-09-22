@@ -28,7 +28,7 @@ esac
 
 DIFFBINDFR_MODEL_ROOT="${DIFFBINDFR_MODEL_ROOT:-$SLURM_SUBMIT_DIR/others/diffbindfr}"
 DIFFBINDFR_ROOT="$DIFFBINDFR_MODEL_ROOT/upstream"
-MODEL_RUNNER="$SLURM_SUBMIT_DIR/scripts/others/run_model.sh"
+MODEL_RUNNER="$SLURM_SUBMIT_DIR/benchmarks/external_models/tools/run_model.sh"
 SEED="${SEED:-0}"
 SAMPLES_PER_COMPLEX="${SAMPLES_PER_COMPLEX:-40}"
 BATCH_SIZE="${BATCH_SIZE:-16}"
@@ -99,7 +99,7 @@ run_predict() {
   (
     cd "$DIFFBINDFR_ROOT"
     "$MODEL_RUNNER" diffbindfr python \
-      "$SLURM_SUBMIT_DIR/scripts/external_models/run_seeded_upstream.py" \
+      "$SLURM_SUBMIT_DIR/benchmarks/external_models/run_seeded_upstream.py" \
       --upstream-script "$DIFFBINDFR_ROOT/DiffBindFR/app/predict.py" \
       --upstream-cwd "$DIFFBINDFR_ROOT" \
       --seed "$SEED" \
@@ -121,7 +121,7 @@ else
   run_predict --no_mdn_scoring --no_error_correction
 fi
 "$MODEL_RUNNER" diffbindfr python \
-  scripts/external_models/repair_diffbindfr_output_pdb.py \
+  benchmarks/external_models/repair_diffbindfr_output_pdb.py \
   --results-csv "$RESULTS_CSV"
 if test "$ERROR_CORRECTION" = 1; then
   run_predict
@@ -141,4 +141,4 @@ summary_args=(
 if test "$FAIL_ON_INCOMPLETE" = 1; then
   summary_args+=(--fail-on-incomplete)
 fi
-"$MODEL_RUNNER" diffbindfr python scripts/external_models/summarize_diffbindfr.py "${summary_args[@]}"
+"$MODEL_RUNNER" diffbindfr python benchmarks/external_models/summarize_diffbindfr.py "${summary_args[@]}"

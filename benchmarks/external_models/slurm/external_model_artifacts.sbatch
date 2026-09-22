@@ -26,9 +26,9 @@ echo "host=$(hostname)"
 echo "started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 runtime_dir="${SLURM_TMPDIR:-/tmp}/effdock-ext-artifacts-${SLURM_JOB_ID:-manual}"
 mkdir -p "$runtime_dir"
-cp scripts/external_models/download_artifacts.sh "$runtime_dir/download_artifacts.sh"
-cp scripts/external_models/download_fabind_artifact.sh "$runtime_dir/download_fabind_artifact.sh"
-cp scripts/external_models/parallel_download.py "$runtime_dir/parallel_download.py"
+cp benchmarks/external_models/download_artifacts.sh "$runtime_dir/download_artifacts.sh"
+cp benchmarks/external_models/download_fabind_artifact.sh "$runtime_dir/download_fabind_artifact.sh"
+cp benchmarks/external_models/parallel_download.py "$runtime_dir/parallel_download.py"
 EFFDOCK_REPO_ROOT="$repo_dir" \
 EFFDOCK_PARALLEL_DOWNLOADER="$runtime_dir/parallel_download.py" \
 EFFDOCK_FABIND_DOWNLOADER="$runtime_dir/download_fabind_artifact.sh" \

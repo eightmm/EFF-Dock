@@ -123,7 +123,7 @@ are percent mean ± sample SD.
 | OpenBind full | 925 | 52.58 ± 0.61 | 99.64 ± 0.17 | 52.58 ± 0.61 |
 
 Postprocessing and metric definitions are in the
-[figure captions](docs/paper/prism/FIGURE_CAPTIONS.md).
+[figure captions](docs/paper/FIGURE_CAPTIONS.md).
 
 These are supplied-pocket redocking results, not blind docking or prospective
 screening. Astex, PoseBusters, and the temporal cohorts were inspected during

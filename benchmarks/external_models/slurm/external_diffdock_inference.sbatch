@@ -52,7 +52,7 @@ test -f "$DIFFDOCK_ROOT/workdir/v1.1/confidence_model/best_model_epoch75.pt"
 
 mkdir -p external_models/logs "$OUTPUT_DIR"
 RUNTIME_DIR="$(mktemp -d -p "${TMPDIR:-/tmp}" "effdock_external_diffdock_${SLURM_JOB_ID}_XXXXXX")"
-cp scripts/external_models/run_seeded_diffdock.py "$RUNTIME_DIR/run_seeded_diffdock.py"
+cp benchmarks/external_models/run_seeded_diffdock.py "$RUNTIME_DIR/run_seeded_diffdock.py"
 
 RUN_METADATA="$OUTPUT_DIR/run_metadata.json"
 export RUN_METADATA INPUT_CSV OUTPUT_DIR SEED INFERENCE_STEPS ACTUAL_STEPS

@@ -1,25 +1,44 @@
 # Manuscript figures
 
-These figures and captions are working materials for writing the EFF-Dock
-manuscript. They are not a published paper or a finalized submission; numbering,
-placement and prose may change during writing.
+Working figures and captions for writing the EFF-Dock manuscript. Figure
+numbering and placement may change during writing.
 
-- [Figure PDF](figure_gallery/paper_figures.pdf): 14 pages, currently grouped as 11 main and 3 supplementary figures.
-- [Page index](figure_gallery/PDF_EXPORTS.md)
-- [English captions and author notes](prism/FIGURE_CAPTIONS.md)
-- [Prism reference package](prism/prism_figure_reference.zip): individual PDFs and LaTeX figure blocks.
-- [Page, caption and source mapping](prism/captions.json)
+- [Combined PDF](paper_figures.pdf): 14 pages.
+- [Figure captions](FIGURE_CAPTIONS.md): English captions and author notes.
+- [Sequence-relatedness definitions](RELATEDNESS.md)
+- [Prism package](prism/prism_figure_reference.zip): PDFs and LaTeX reference blocks.
+- [Source and caption manifest](manifest.json)
 
-Use the captions above with the matching figure versions. Selected PDF/PNG
-sources remain in their original directories so the manifest and links resolve.
-Dated supporting aggregates retain their own conditions; they are not substitute
-captions for the current figure set. Historical exploratory analyses and redundant
-exports remain local.
+## Figures
 
-The manuscript draft and narrative reports in `20260919/` describe an earlier
-figure layout. Use the current captions linked above for manuscript assembly;
-do not copy those earlier page numbers or draft captions into the current paper.
+| Page | Figure | PDF | Preview |
+|---:|---|---|---|
+| 1 | 외부 모델 비교 | [PDF](figures/01_model_comparison.pdf) | [PNG](figures/01_model_comparison.png) |
+| 2 | Raw/refined·chirality 효과 | [PDF](figures/02_refinement_chirality.pdf) | [PNG](figures/02_refinement_chirality.png) |
+| 3 | 리간드 복잡도별 성능 | [PDF](figures/03_ligand_complexity.pdf) | [PNG](figures/03_ligand_complexity.png) |
+| 4 | 누적 성능: confidence 순위·생성 순서 | [PDF](figures/04_cumulative_success.pdf) | [PNG](figures/04_cumulative_success.png) |
+| 5 | 생성 후보 수별 선택 성능 | [PDF](figures/05_pose_budget.pdf) | [PNG](figures/05_pose_budget.png) |
+| 6 | Guidance·계산 예산별 성능 | [PDF](figures/06_guidance_budget.pdf) | [PNG](figures/06_guidance_budget.png) |
+| 7 | Runtime·memory | [PDF](figures/07_runtime_memory.pdf) | [PNG](figures/07_runtime_memory.png) |
+| 8 | Pocket cutoff·prior 민감도 | [PDF](figures/08_pocket_prior.pdf) | [PNG](figures/08_pocket_prior.png) |
+| 9 | 학습 관련성: 서열·리간드–단백질 중복 | [PDF](figures/09_training_relatedness.pdf) | [PNG](figures/09_training_relatedness.png) |
+| 10 | 리간드 유사도·성능 | [PDF](figures/10_ligand_similarity.pdf) | [PNG](figures/10_ligand_similarity.png) |
+| 11 | 서열 유사도별 성능 | [PDF](figures/11_sequence_similarity.pdf) | [PNG](figures/11_sequence_similarity.png) |
+| 12 | 보충 S1: 개선량과 95% 신뢰구간 | [PDF](figures/S1_paired_uncertainty.pdf) | [PNG](figures/S1_paired_uncertainty.png) |
+| 13 | 보충 S2: Top-k 요약·near-native 밀도 | [PDF](figures/S2_candidate_ranking.pdf) | [PNG](figures/S2_candidate_ranking.png) |
+| 14 | 보충 S3: 복잡도별 실패 분해 | [PDF](figures/S3_complexity_failures.pdf) | [PNG](figures/S3_complexity_failures.png) |
 
-Prism LaTeX blocks are reference material: adapt figure numbering, placement and
-bibliography keys to the manuscript. The package has not been compiled locally
-with XeLaTeX/LuaLaTeX.
+Pages 1–11 are currently main figures; pages 12–14 are supplementary.
+PB-valid success is solid; only RMSD-passing but PB-invalid portions are hatched.
+
+Frozen numerical inputs for retained analysis helpers are in
+[benchmarks/results/paper](../../benchmarks/results/paper). Their conditions
+must be distinguished from the current figure captions. Older drafts, layout
+notes and internal verification logs are retained locally.
+
+Replace the selected figure files with new analysis outputs before running
+`uv run python scripts/package_paper_figures.py` to rebuild the combined PDF,
+manifest and Prism ZIP. Use `--check` to verify the existing package. Packaging
+requires Poppler's `pdfinfo`, `pdftotext` and `pdfunite` on PATH and does not
+rerun scientific analyses. LaTeX blocks need manuscript-specific
+numbering and bibliography keys; local XeLaTeX/LuaLaTeX compilation is unverified.

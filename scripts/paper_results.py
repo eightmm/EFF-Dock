@@ -291,7 +291,7 @@ def write_report(result, out):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "docs/paper/20260919")
+    parser.add_argument("--output", type=Path, default=ROOT / "benchmarks/results/paper")
     parser.add_argument(
         "--from-aggregate",
         action="store_true",

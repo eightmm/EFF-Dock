@@ -28,7 +28,7 @@ esac
 
 SURFDOCK_MODEL_ROOT="${SURFDOCK_MODEL_ROOT:-$SLURM_SUBMIT_DIR/others/surfdock}"
 SURFDOCK_ROOT="$SURFDOCK_MODEL_ROOT/upstream"
-MODEL_RUNNER="$SLURM_SUBMIT_DIR/scripts/others/run_model.sh"
+MODEL_RUNNER="$SLURM_SUBMIT_DIR/benchmarks/external_models/tools/run_model.sh"
 SEED="${SEED:-0}"
 INFERENCE_STEPS="${INFERENCE_STEPS:-20}"
 SAMPLES_PER_COMPLEX="${SAMPLES_PER_COMPLEX:-40}"
@@ -52,7 +52,7 @@ export PYTHONPATH="$SURFDOCK_ROOT"
 export PYTHONHASHSEED="$SEED"
 export precomputed_arrays="$SURFDOCK_MODEL_ROOT/.cache/precomputed_arrays"
 
-"$MODEL_RUNNER" surfdock python scripts/external_models/prepare_surfdock_runtime.py \
+"$MODEL_RUNNER" surfdock python benchmarks/external_models/prepare_surfdock_runtime.py \
   --input-csv "$INPUT_CSV" \
   --surfdock-root "$SURFDOCK_ROOT" \
   --output-dir "$PREPROCESS_DIR" \
@@ -89,7 +89,7 @@ payload = {
 (output_dir / "run_metadata.json").write_text(json.dumps(payload, indent=2) + "\n")
 '
 
-"$MODEL_RUNNER" surfdock python scripts/external_models/run_seeded_upstream.py \
+"$MODEL_RUNNER" surfdock python benchmarks/external_models/run_seeded_upstream.py \
   --upstream-script "$SURFDOCK_ROOT/inference_accelerate.py" \
   --seed "$SEED" \
   --stub-surfdock-force-optimize \
@@ -124,4 +124,4 @@ summary_args=(
 if test "$FAIL_ON_INCOMPLETE" = 1; then
   summary_args+=(--fail-on-incomplete)
 fi
-"$MODEL_RUNNER" surfdock python scripts/external_models/summarize_surfdock.py "${summary_args[@]}"
+"$MODEL_RUNNER" surfdock python benchmarks/external_models/summarize_surfdock.py "${summary_args[@]}"

@@ -36,7 +36,7 @@ bash benchmarks/external_models/tools/run_model.sh interformer python -c \
   'import torch, pyvina_core; print(torch.__version__)'
 ```
 
-Long installations run through `scripts/slurm/others_uv_sync.sbatch` on the
+Long installations run through `benchmarks/external_models/slurm/others_uv_sync.sbatch` on the
 `cpu_only` partition.  GPU inference scripts consume these same model-local
 environments. Interformer's Boost 1.84, Reduce 4.14, and `obrms` runtime are
 also model-local. If no archived copy exists, synchronization downloads the

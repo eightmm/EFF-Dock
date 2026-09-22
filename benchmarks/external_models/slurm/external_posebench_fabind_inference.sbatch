@@ -48,7 +48,7 @@ mkdir -p external_models/logs "$OUTPUT_DIR" "$OUTPUT_DIR/preprocess/mol" "$OUTPU
 export PYTHONHASHSEED="$SEED"
 export INPUT_CSV PROTEIN_DIR OUTPUT_DIR DATASET SEED FAIL_ON_INCOMPLETE
 
-"$FABIND_PYTHON" scripts/external_models/run_posebench_fabind.py \
+"$FABIND_PYTHON" benchmarks/external_models/run_posebench_fabind.py \
   --python "$FABIND_PYTHON" \
   --fabind-dir "$FABIND_EXEC_DIR" \
   --input-csv "$INPUT_CSV" \

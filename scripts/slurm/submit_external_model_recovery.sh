@@ -1,1 +1,0 @@
-../../benchmarks/external_models/slurm/submit_external_model_recovery.sh

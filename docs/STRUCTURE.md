@@ -27,8 +27,9 @@ protein + ligand + explicit pocket
   -> SDF + results.pt + provenance
 ```
 
-Benchmark implementations live under `benchmarks/`; compatibility links under
-`scripts/` and `configs/external_models.json` point to that canonical code.
+Benchmark implementations and external Slurm launchers live under `benchmarks/`.
+The retained `configs/external_models.json` alias points to the model manifest;
+old benchmark aliases under `scripts/` are no longer published.
 Retained analysis and guidance diagnostics are not automatically part of the
 released inference preset. See [evaluation](EVALUATION.md) for metric boundaries
 and [reproducibility](REPRODUCIBILITY.md) for checkpoint identities.

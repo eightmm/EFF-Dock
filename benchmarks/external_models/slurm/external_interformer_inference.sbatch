@@ -30,7 +30,7 @@ INTERFORMER_MODEL_ROOT="${INTERFORMER_MODEL_ROOT:-$SLURM_SUBMIT_DIR/others/inter
 INTERFORMER_ROOT="$INTERFORMER_MODEL_ROOT/upstream"
 INTERFORMER_TORCH_LIB="$INTERFORMER_MODEL_ROOT/.venv/lib/python3.12/site-packages/torch/lib"
 REDUCE_BIN="$INTERFORMER_MODEL_ROOT/bin/reduce"
-MODEL_RUNNER="$SLURM_SUBMIT_DIR/scripts/others/run_model.sh"
+MODEL_RUNNER="$SLURM_SUBMIT_DIR/benchmarks/external_models/tools/run_model.sh"
 SEED="${SEED:-0}"
 SAMPLES_PER_COMPLEX="${SAMPLES_PER_COMPLEX:-20}"
 FAIL_ON_INCOMPLETE="${FAIL_ON_INCOMPLETE:-0}"
@@ -56,7 +56,7 @@ export INPUT_CSV OUTPUT_DIR SEED SAMPLES_PER_COMPLEX FAIL_ON_INCOMPLETE
 export INTERFORMER_MODEL_ROOT INTERFORMER_ROOT WORK_DIR ENERGY_DIR
 export RECEPTOR_COLUMN RECEPTOR_POLICY
 
-"$MODEL_RUNNER" interformer python scripts/external_models/prepare_interformer_runtime.py \
+"$MODEL_RUNNER" interformer python benchmarks/external_models/prepare_interformer_runtime.py \
   --input-csv "$INPUT_CSV" \
   --interformer-root "$INTERFORMER_ROOT" \
   --output-dir "$WORK_DIR" \
@@ -107,7 +107,7 @@ payload = {
     -reload \
     -debug
 
-  "$MODEL_RUNNER" interformer python "$SLURM_SUBMIT_DIR/scripts/external_models/run_seeded_interformer.py" \
+  "$MODEL_RUNNER" interformer python "$SLURM_SUBMIT_DIR/benchmarks/external_models/run_seeded_interformer.py" \
     --upstream-script "$INTERFORMER_ROOT/docking/reconstruct_ligands.py" \
     --seed "$SEED" \
     --normalize-db-markers \
@@ -133,4 +133,4 @@ summary_args=(
 if test "$FAIL_ON_INCOMPLETE" = 1; then
   summary_args+=(--fail-on-incomplete)
 fi
-"$MODEL_RUNNER" interformer python scripts/external_models/summarize_interformer.py "${summary_args[@]}"
+"$MODEL_RUNNER" interformer python benchmarks/external_models/summarize_interformer.py "${summary_args[@]}"

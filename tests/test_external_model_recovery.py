@@ -6,12 +6,12 @@ from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from scripts.external_models import prepare_diffdock_pocket_inputs
-from scripts.external_models.evaluate_native_outputs import load_pose_records, no_align_rmsd
-from scripts.external_models.prepare_vina_recovery_shards import write_recovery_shards
-from scripts.external_models.repair_diffbindfr_output_pdb import repair_pdb
-from scripts.external_models.run_posebench_vina import parse_vina_results
-from scripts.external_models.sigmadock_compat import (
+from benchmarks.external_models import prepare_diffdock_pocket_inputs
+from benchmarks.external_models.evaluate_native_outputs import load_pose_records, no_align_rmsd
+from benchmarks.external_models.prepare_vina_recovery_shards import write_recovery_shards
+from benchmarks.external_models.repair_diffbindfr_output_pdb import repair_pdb
+from benchmarks.external_models.run_posebench_vina import parse_vina_results
+from benchmarks.external_models.sigmadock_compat import (
     assign_missing_stereochemistry_from_3d,
     recover_nonstandard_inter_residue_bonds,
     remove_residues_without_ca,
@@ -221,7 +221,7 @@ def test_predicted_receptor_can_use_native_pre_esm_pocket_crop(
         "astex_diverse",
         1,
     )
-    monkeypatch.syspath_prepend(str(ROOT / "scripts" / "external_models"))
+    monkeypatch.syspath_prepend(str(ROOT / "benchmarks" / "external_models"))
     monkeypatch.setattr(
         sys,
         "argv",
@@ -307,20 +307,20 @@ def test_external_install_recovery_uses_model_local_uv_projects() -> None:
     assert "obrms-lib" in sync_script
 
     for model in expected_python:
-        sbatch = (ROOT / f"scripts/slurm/external_{model}_inference.sbatch")
+        sbatch = (ROOT / f"benchmarks/external_models/slurm/external_{model}_inference.sbatch")
         assert f"others/{model}" in sbatch.read_text()
 
     surfdock_sbatch = (
-        ROOT / "scripts/slurm/external_surfdock_inference.sbatch"
+        ROOT / "benchmarks/external_models/slurm/external_surfdock_inference.sbatch"
     ).read_text()
     interformer_sbatch = (
-        ROOT / "scripts/slurm/external_interformer_inference.sbatch"
+        ROOT / "benchmarks/external_models/slurm/external_interformer_inference.sbatch"
     ).read_text()
     assert ".cache/precomputed_arrays" in surfdock_sbatch
     assert "--normalize-db-markers" in interformer_sbatch
 
     sigmadock_sbatch = (
-        ROOT / "scripts/slurm/external_sigmadock_inference.sbatch"
+        ROOT / "benchmarks/external_models/slurm/external_sigmadock_inference.sbatch"
     ).read_text()
     assert "diffusion.num_steps=$INFERENCE_STEPS" in sigmadock_sbatch
     assert "run_sigmadock_sample.py" in sigmadock_sbatch

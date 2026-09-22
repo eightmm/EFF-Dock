@@ -1,1 +1,0 @@
-../../benchmarks/external_models/slurm/external_model_install.sbatch

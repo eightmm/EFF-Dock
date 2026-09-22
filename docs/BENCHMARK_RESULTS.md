@@ -23,14 +23,14 @@ PLINDER validation bank. OpenBind is an auxiliary single-protease cohort.
 FoldBench-Pocket is a holo-receptor redocking adaptation, not the native
 cofolding benchmark. PhiBench uses the reconstructed 206-complex cohort.
 
-The [manuscript captions](paper/prism/FIGURE_CAPTIONS.md) define the conditions,
+The [manuscript captions](paper/FIGURE_CAPTIONS.md) define the conditions,
 coverage and limitations of each figure. Guided/budget and pocket/prior analyses
 are separate ablations, not interchangeable with the table above. FoldBench
 PoseBusters evaluation includes the disclosed energy-reference InChI
 compatibility repair.
 
 - [Model and environment identities](REPRODUCIBILITY.md)
-- [Manuscript figure PDF](paper/figure_gallery/paper_figures.pdf)
+- [Manuscript figure PDF](paper/paper_figures.pdf)
 - [External model comparison artifacts](../benchmarks/results/external_models/README.md)
 - [Literature comparison conditions](../benchmarks/results/external_models/TEMPORAL_LITERATURE.md)
 
