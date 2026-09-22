@@ -42,7 +42,7 @@ from effdock.workflows.guidance_coverage_audit import AUDIT_SCHEMA_VERSION, ID_H
 PROTOCOL_ID = "EFFDOCK-UNIFIED-GUIDANCE-BUDGET1000-FULL-V2"
 RECEPTOR_POLICY = "geometry_only"
 EXPECTED_DATASET_COUNTS = {"astex": 85, "posebusters": 308}
-BENCHMARK_INPUT_MANIFEST = Path("docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json")
+BENCHMARK_INPUT_MANIFEST = Path("benchmarks/inputs/guidance_budget1000_full_inputs.json")
 EXPECTED_BENCHMARK_INPUT_MANIFEST_SHA256 = (
     "99f15f557644cc51c3dd1f559b0dd97dd4259c1de3e1403fb761b7c7e079f668"
 )

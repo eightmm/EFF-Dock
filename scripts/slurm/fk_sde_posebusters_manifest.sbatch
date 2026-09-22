@@ -38,6 +38,6 @@ fi
 
 .venv/bin/python -m effdock.workflows.fk_sde_posebusters_report manifest \
   --input-root "$input_root" \
-  --cohort-manifest docs/GUIDANCE_BUDGET1000_FULL_COHORT.json \
+  --cohort-manifest benchmarks/inputs/guidance_budget1000_full_cohort.json \
   --mode "$mode" \
   --output "$output"

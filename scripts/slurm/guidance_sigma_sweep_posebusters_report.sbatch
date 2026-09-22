@@ -18,7 +18,7 @@ reference_root=${EFFDOCK_SIGMA_REFERENCE_ROOT:?EFFDOCK_SIGMA_REFERENCE_ROOT is r
   --sweep-root "$sweep_root" \
   --reference-root "$reference_root" \
   --official-root "$sweep_root/sigmadock_posebusters/official" \
-  --input-manifest docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json \
+  --input-manifest benchmarks/inputs/guidance_budget1000_full_inputs.json \
   --full-audit "$sweep_root/audit/full.json" \
   --reference-audit "$sweep_root/audit/reference.json" \
   --output-json "$sweep_root/sigmadock_posebusters/aggregate.json" \

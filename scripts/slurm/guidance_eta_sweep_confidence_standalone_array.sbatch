@@ -49,7 +49,7 @@ verify_manifest inputs "$frozen_inputs_manifest" "$frozen_inputs_manifest_sha256
 checkpoint=weights/effdock_geometry_ft_100k_best.pt
 confidence_checkpoint=weights/effdock_confidence_extmatch_n80_s25_step42500.pt
 config=configs/train.yaml
-benchmark_input_manifest=docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json
+benchmark_input_manifest=benchmarks/inputs/guidance_budget1000_full_inputs.json
 cohort_audit=${EFFDOCK_COHORT_MANIFEST:?EFFDOCK_COHORT_MANIFEST is required}
 output_root=${EFFDOCK_OUTPUT_ROOT:?EFFDOCK_OUTPUT_ROOT is required}
 output_prefix_slash="$output_prefix/"

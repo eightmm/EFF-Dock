@@ -21,6 +21,6 @@ cd "$repo_dir"
 output_root=${EFFDOCK_FK_SDE_OUTPUT_ROOT:?EFFDOCK_FK_SDE_OUTPUT_ROOT is required}
 .venv/bin/python -m effdock.workflows.fk_sde_astex_report report \
   --input-root "$output_root/raw" \
-  --cohort-manifest docs/GUIDANCE_BUDGET1000_FULL_COHORT.json \
+  --cohort-manifest benchmarks/inputs/guidance_budget1000_full_cohort.json \
   --output-json "$output_root/report.json" \
   --output-markdown "$output_root/RESULTS.md"

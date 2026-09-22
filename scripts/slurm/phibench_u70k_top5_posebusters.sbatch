@@ -35,7 +35,7 @@ export PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 export OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2
 
 verify_sha docs/PHIBENCH_U70K_TOP5_PROTOCOL.md "$EFFDOCK_PROTOCOL_SHA"
-verify_sha docs/PHIBENCH_U70K_TOP5_INPUTS.json "$EFFDOCK_INPUTS_SHA"
+verify_sha benchmarks/inputs/phibench_u70k_top5_inputs.json "$EFFDOCK_INPUTS_SHA"
 verify_sha scripts/evaluate_phibench_u70k_top5_posebusters_shard.py "$EFFDOCK_EVALUATOR_SHA"
 verify_sha scripts/evaluate_external_temporal_posebusters_shard.py "$EFFDOCK_HELPER_SHA"
 src_sha=$(find src/effdock -type f -name '*.py' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)

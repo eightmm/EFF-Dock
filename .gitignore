@@ -486,3 +486,8 @@ runs/
 /scripts/slurm/submit_s50_raw_refined_confidence_temporal_external.sh
 /scripts/slurm/submit_s50_symmetry_confidence_refined_external.sh
 /scripts/write_early_time_t0_dose_run_identity.py
+
+# Docs contains human-facing documentation and manuscript assets.
+/docs/*.json
+/docs/assets/intro/
+/docs/maintenance/

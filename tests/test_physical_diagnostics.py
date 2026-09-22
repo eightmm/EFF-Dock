@@ -1595,7 +1595,7 @@ def test_protein_ligand_energy_is_independent_of_shell_and_chunk_layout() -> Non
 
 
 def test_frozen_v3_diagnostic_results_remain_historical() -> None:
-    results_path = Path(__file__).parents[1] / "docs" / "GUIDANCE_DIAGNOSTIC_RESULTS.json"
+    results_path = Path(__file__).parent / "fixtures" / "guidance_diagnostic_results.json"
     results = json.loads(results_path.read_text())
     assert results["schema_version"] == "effdock.guidance_diagnostic_results.v3"
     assert results["protocol_id"] == "EFFDOCK-GUIDANCE-DIAGNOSTIC-V3"

@@ -149,7 +149,7 @@ def test_temporal_comparison_views_are_explicitly_non_rankable() -> None:
 
 
 def test_literature_figure_source_keeps_excluded_methods_out_of_values() -> None:
-    source = json.loads((ROOT / "docs/LITERATURE_RMSD_COMPARISON.json").read_text())
+    source = json.loads((ROOT / "benchmarks/reference/literature_rmsd_comparison.json").read_text())
 
     assert source["comparison_scope"] == "supplied_pocket_only"
     for dataset_key in ("astex", "posebusters"):

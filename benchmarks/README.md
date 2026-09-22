@@ -23,3 +23,11 @@ analysis helpers provide context and regression coverage, not production default
 Compatibility links under `scripts/external_models`, `scripts/figures` and
 `scripts/slurm` resolve to the canonical benchmark code. Slurm launchers have
 site-specific resource defaults and must be adapted to the execution environment.
+
+## Inputs and reference data
+
+`inputs/` contains frozen cohort, eligibility and complex-input manifests used
+by retained benchmark workflows. `reference/` contains literature comparison
+values used by the plotting tools. These files are inputs, not current results.
+Their bytes and checksums are unchanged by the directory reorganization;
+historical provenance strings inside the JSON may retain their original paths.

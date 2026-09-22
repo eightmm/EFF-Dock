@@ -87,7 +87,7 @@ def test_frozen_manifest_is_content_addressed(tmp_path: Path) -> None:
 
 
 def test_repository_full_v2_manifest_freezes_corrected_1meh() -> None:
-    path = Path("docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json")
+    path = Path("benchmarks/inputs/guidance_budget1000_full_inputs.json")
     raw = json.loads(path.read_text())
     assert raw["schema_version"] == BENCHMARK_INPUT_MANIFEST_SCHEMA
     assert raw["datasets"]["astex"]["count"] == 85

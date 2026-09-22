@@ -23,4 +23,5 @@ These are manuscript working materials, not a published paper. See the
 Historical experiment protocols, intermediate results and superseded plots are
 retained locally, outside the current public file listing. References to those
 historical records in retained reports describe local provenance; use the current
-figure captions for manuscript assembly. Required input JSON files remain public.
+figure captions for manuscript assembly. Required benchmark inputs and reference tables are under `benchmarks/inputs`
+and `benchmarks/reference`; test-only results are under `tests/fixtures`.

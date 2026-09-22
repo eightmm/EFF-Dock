@@ -13,7 +13,7 @@ from matplotlib.patches import Patch
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_BENCHMARK = ROOT / "benchmarks/results/external_models/effdock_u70k_benchmark.json"
-DEFAULT_LITERATURE = ROOT / "docs/LITERATURE_RMSD_COMPARISON.json"
+DEFAULT_LITERATURE = ROOT / "benchmarks/reference/literature_rmsd_comparison.json"
 DEFAULT_EXECUTED = (
     ROOT / "benchmarks/results/external_models/pocket_only_executed_reruns.json"
 )

@@ -19,7 +19,7 @@ fi
 cd "$repo_dir"
 mkdir -p outputs/benchmarks/logs
 
-benchmark_input_manifest=docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json
+benchmark_input_manifest=benchmarks/inputs/guidance_budget1000_full_inputs.json
 benchmark_input_manifest_sha256=99f15f557644cc51c3dd1f559b0dd97dd4259c1de3e1403fb761b7c7e079f668
 if [[ ! -f "$benchmark_input_manifest" ]]; then
   echo "missing frozen benchmark-input manifest: $benchmark_input_manifest" >&2
@@ -64,7 +64,7 @@ git status --short
   --receptor-policy geometry_only \
   --seed 42 \
   --pocket-cutoff 10.0 \
-  --legacy-eligibility-manifest docs/GUIDANCE_BUDGET1000_ELIGIBILITY.json \
+  --legacy-eligibility-manifest benchmarks/inputs/guidance_budget1000_eligibility.json \
   --protocol-id EFFDOCK-UNIFIED-GUIDANCE-BUDGET1000-FULL-V2 \
   --require-complete-success \
   --output "$output"

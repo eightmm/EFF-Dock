@@ -85,7 +85,7 @@ def classify(exact, tanimoto):
 
 
 def inputs():
-    frozen = ROOT / "docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json"
+    frozen = ROOT / "benchmarks/inputs/guidance_budget1000_full_inputs.json"
     d = json.loads(frozen.read_text())
     mappings = {
         ds: {k.lower(): v["smiles"] for k, v in d["datasets"][ds]["ligands"].items()}

@@ -101,7 +101,7 @@ _V2_REQUIRED_ROW_FIELDS = {
 _EXPECTED_STATS = set(SUMMARY_STATS)
 _FORBIDDEN_SELECTOR_COLUMN_PREFIXES = ("vina_", "confidence_final_")
 _BENCHMARK_INPUT_MANIFEST = (
-    Path(__file__).resolve().parents[3] / "docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json"
+    Path(__file__).resolve().parents[3] / "benchmarks/inputs/guidance_budget1000_full_inputs.json"
 )
 
 

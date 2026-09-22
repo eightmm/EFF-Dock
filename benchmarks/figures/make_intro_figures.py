@@ -30,7 +30,7 @@ from effdock.preprocess.protein import parse_pocket_atoms
 ROOT = Path(__file__).resolve().parents[2]
 ASTEX_ROOT = ROOT / "data/external_benchmarks/data/astex_diverse_set"
 POCKET_CENTERS = ROOT / "data/external_test/astex_reference_pocket_centers.json"
-DEFAULT_OUTPUT = ROOT / "docs/assets/intro"
+DEFAULT_OUTPUT = ROOT / "outputs/figures/intro"
 
 FRAGMENT_CASE = "1T46_STI"
 POCKET_CASE = "1T46_STI"

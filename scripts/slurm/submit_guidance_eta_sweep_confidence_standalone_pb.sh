@@ -70,7 +70,7 @@ trap cleanup_reservation EXIT
 checkpoint=weights/effdock_geometry_ft_100k_best.pt
 confidence_checkpoint=weights/effdock_confidence_extmatch_n80_s25_step42500.pt
 config=configs/train.yaml
-benchmark_input_manifest=docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json
+benchmark_input_manifest=benchmarks/inputs/guidance_budget1000_full_inputs.json
 astex_centers=data/external_test/astex_reference_pocket_centers.json
 posebusters_centers=data/external_test/posebusters_reference_pocket_centers.json
 cohort_audit=outputs/benchmarks/guidance_eta_sweep_v2_runs/20260801T102903Z/audit/combined.json

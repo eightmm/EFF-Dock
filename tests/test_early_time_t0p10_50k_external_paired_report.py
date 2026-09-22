@@ -64,7 +64,7 @@ def _benchmark_input_identity(dataset: str, ids: list[str]) -> dict[str, object]
         "sha256": _digest(f"{dataset}:identity"),
         "sources": {
             "frozen_manifest": {
-                "path": "docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json",
+                "path": "benchmarks/inputs/guidance_budget1000_full_inputs.json",
                 "sha256": FROZEN_BENCHMARK_INPUT_MANIFEST_SHA256,
             }
         },

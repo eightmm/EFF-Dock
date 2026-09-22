@@ -40,7 +40,7 @@ verify_sha scripts/run_s50_raw_refined_confidence_external_shard.py "$EFFDOCK_RU
 verify_sha scripts/run_s50_symmetry_confidence_refined_external_shard.py "$EFFDOCK_HELPER_RUNNER_SHA"
 verify_sha scripts/score_guidance_sdf_post_refinement_confidence.py "$EFFDOCK_SCORER_SHA"
 verify_sha configs/train.yaml 39aa62e4a48ed6f3aa4ff59345fb43a81220e2baba22edfd5beb0c4981b307ec
-verify_sha docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json 99f15f557644cc51c3dd1f559b0dd97dd4259c1de3e1403fb761b7c7e079f668
+verify_sha benchmarks/inputs/guidance_budget1000_full_inputs.json 99f15f557644cc51c3dd1f559b0dd97dd4259c1de3e1403fb761b7c7e079f668
 src_sha=$(find src/effdock -type f -name '*.py' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
 [[ "$src_sha" == "$EFFDOCK_SRC_SHA" ]] || die "source tree SHA mismatch"
 
@@ -85,7 +85,7 @@ command=(
   --manifest "$manifest"
   --refinement-root "$source_root"
   --output-root "$output_root"
-  --benchmark-input-manifest docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json
+  --benchmark-input-manifest benchmarks/inputs/guidance_budget1000_full_inputs.json
   --external-dir data/external_test
   --config configs/train.yaml
   --docking-checkpoint "$docking"

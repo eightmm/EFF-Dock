@@ -49,7 +49,7 @@ command=(
   --repo-root "$EFFDOCK_CONTROL_CAPSULE"
   --manifest "$EFFDOCK_OUTPUT_ROOT/$EFFDOCK_RUN_MODE/manifest.json"
   --output-root "$EFFDOCK_OUTPUT_ROOT/$EFFDOCK_RUN_MODE"
-  --benchmark-input-manifest docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json
+  --benchmark-input-manifest benchmarks/inputs/guidance_budget1000_full_inputs.json
   --external-dir data/external_test
   --protocol-file docs/FIXED_NFE_STEP_POSE_PROTOCOL.md
   --refinement-capsule "$EFFDOCK_REFINEMENT_CAPSULE"

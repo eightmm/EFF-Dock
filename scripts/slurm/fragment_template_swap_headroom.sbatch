@@ -33,7 +33,7 @@ actual_identity_sha256=$(
       src/effdock/preprocess/fragments.py \
       src/effdock/workflows/benchmark_inputs.py \
       docs/FRAGMENT_TEMPLATE_SWAP_HEADROOM_PROTOCOL.md \
-      docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json \
+      benchmarks/inputs/guidance_budget1000_full_inputs.json \
       "$run_root/audit/full.json"
     sha256sum "$run_root"/raw/*sigma2000*.csv
   } | sha256sum | awk '{print $1}'
@@ -81,7 +81,7 @@ export MKL_NUM_THREADS=1
   --dataset "$dataset" \
   --dataset-root "$dataset_root" \
   --all-poses-dir "$all_poses_dir" \
-  --benchmark-input-manifest docs/GUIDANCE_BUDGET1000_FULL_INPUTS.json \
+  --benchmark-input-manifest benchmarks/inputs/guidance_budget1000_full_inputs.json \
   --expected-poses 100 \
   --expected-sigma 2.0 \
   --max-matches 4096 \
