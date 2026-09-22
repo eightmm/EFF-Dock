@@ -5,6 +5,16 @@ reproducibility records. Start with the short documents below; detailed
 protocols are retained as supporting evidence rather than as the primary user
 interface.
 
+## Current manuscript materials
+
+- [Current figure PDF](paper/figure_gallery/paper_figures.pdf): 11 main figures and 3 supplementary diagnostics.
+- [Page-by-page English captions](paper/prism/FIGURE_CAPTIONS.md): current manuscript captions with author notes.
+- [Prism reference package](paper/prism/prism_figure_reference.zip): individual PDFs and LaTeX figure blocks.
+- [Paper directory guide](paper/README.md): distinguishes current material from historical analysis evidence.
+
+Use these files for manuscript assembly. Dated experiment reports below remain
+supporting evidence and may describe earlier figure layouts or conditions.
+
 ## Start here
 
 - [`MODEL.md`](MODEL.md): architecture, objectives, sampler, and confidence model.
