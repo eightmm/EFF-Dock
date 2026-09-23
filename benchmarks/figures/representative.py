@@ -23,6 +23,7 @@ FLOW_INDICES = (0, 2, 4, 10)
 REFINEMENT_STEPS = (0, 25, 50, 100)
 EXTRA_VIEWS = {
     "supplied_pocket": None,
+    "full_protein": None,
     "refined_endpoint": 100,
     "refined_step_025": 25,
     "refined_step_050": 50,
@@ -40,8 +41,8 @@ OVERVIEW_DIR = DATA / "views/overview"
 OVERVIEW_ZOOM = 0.70
 DARK = "#3E434A"
 MUTED = "#7B838D"
-CONNECTOR = "#9AAEBB"
-FRAME_EDGE = "#D6DBE1"
+CONNECTOR = "#A4A4A4"
+FRAME_EDGE = "#D8D8D8"
 POSE_EDGE = "#8C96A3"
 
 # Landscape overview; preserve vector labels when scaling for the manuscript.
@@ -125,16 +126,52 @@ def reference_data():
     return record
 
 
-def input_scene(row, javascript, camera):
+def pocket_data():
+    record = json.loads((DATA / "input_pocket.json").read_text())
+    trace = json.loads((DATA / "trace.json").read_text())
+    if record["trace_sha256"] != hashlib.sha256((DATA / "trace.json").read_bytes()).hexdigest():
+        raise ValueError("Stale input crop")
+    if (
+        record["center"] != trace["pocket_center"]
+        or record["cutoff_angstrom"] != trace["protocol"]["pocket_cutoff"]
+    ):
+        raise ValueError("Input crop differs from saved protocol")
+    if hashlib.sha256(record["full_pdb"].encode()).hexdigest() != record["source"]["sha256"]:
+        raise ValueError("Full receptor identity differs")
+    for name, digest in record["source_code"].items():
+        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != digest:
+            raise ValueError("Pocket crop implementation changed")
+    return record
+
+
+def input_scene(row, javascript, camera, *, full=False):
     import py3Dmol
 
+    record = pocket_data()
     view = py3Dmol.view(width=900, height=680)
     view.setBackgroundColor("white")
-    view.addModel(row["protein_display"]["pdb"], "pdb", {"keepH": False})
-    view.setStyle({"model": 0}, {"cartoon": {"color": "#ABC4D3", "opacity": 0.55, "arrows": True}})
+    view.addModel(record["full_pdb"], "pdb", {"keepH": False})
+    # Preserve secondary-structure context, then hide all non-pocket residues in the close-up.
+    view.setStyle({"model": 0}, {"cartoon": {"color": "#D6D6D6", "opacity": 0.85}} if full else {})
+    for chain in sorted({r[0] for r in record["residues"]}):
+        resi = [r[1] for r in record["residues"] if r[0] == chain]
+        view.setStyle(
+            {"model": 0, "chain": chain, "resi": resi},
+            {
+                "cartoon": {
+                    "color": "#858585" if full else "#B8B8B8",
+                    "opacity": 0.9 if full else 0.65,
+                    "arrows": True,
+                }
+            },
+        )
     view.setProjection("orthographic")
     view.setView(camera)
-    view.zoom(OVERVIEW_ZOOM)
+    if full:
+        view.zoomTo({"model": 0})
+        view.zoom(1.20)
+    else:
+        view.zoom(0.38)
     view.render()
     return viewer_html(view, javascript)
 
@@ -180,6 +217,9 @@ def verify_extra_views():
             ("trace.json", metadata["trace_sha256"]),
             (f"views/overview/{stem}.png", metadata["sha256"]),
         ]
+        if stem in ("supplied_pocket", "full_protein"):
+            pocket_data()
+            sources.append(("input_pocket.json", metadata["input_pocket_sha256"]))
         if stem in OUTPUT_VIEWS:
             reference_data()
             sources.append(("selected_reference.json", metadata["reference_sha256"]))
@@ -199,14 +239,25 @@ def verify_extra_views():
                 raise ValueError(f"Stale molecular capture: {stem}")
         reference = captures["records"][0]["camera"]
         camera = metadata["camera"]
+        if stem == "full_protein":
+            if (
+                not np.allclose(camera[4:], reference[4:], atol=1e-7)
+                or metadata["zoom_factor"] != 1.20
+            ):
+                raise ValueError("Full receptor camera orientation differs")
+            continue
         if not np.allclose(camera[:3] + camera[4:], reference[:3] + reference[4:], atol=1e-7):
             raise ValueError(f"Overview camera orientation/center changed: {stem}")
-        first = json.loads((OVERVIEW_DIR / "supplied_pocket.json").read_text())
+        if stem == "supplied_pocket":
+            if metadata["zoom_factor"] != 0.38:
+                raise ValueError("Pocket overview zoom differs")
+            continue
+        first = json.loads((OVERVIEW_DIR / "flow_00.json").read_text())
         if (
             not np.allclose(camera, first["camera"], atol=1e-7)
             or metadata.get("zoom_factor") != OVERVIEW_ZOOM
         ):
-            raise ValueError(f"Overview camera differs between panels: {stem}")
+            raise ValueError(f"Overview camera differs between pose panels: {stem}")
 
 
 async def capture_views(javascript, work, *, stems=None):
@@ -257,7 +308,7 @@ async def capture_views(javascript, work, *, stems=None):
                 )
             html = work / f"{stem}.html"
             html.write_text(
-                input_scene(row, javascript, camera)
+                input_scene(row, javascript, camera, full=stem == "full_protein")
                 if pocket
                 else output_scene(row, candidates, javascript, camera)
                 if stem in OUTPUT_VIEWS
@@ -283,7 +334,11 @@ async def capture_views(javascript, work, *, stems=None):
             if (
                 errors
                 or "SwiftShader" not in info["renderer"]
-                or not np.allclose(actual[:3] + actual[4:], camera[:3] + camera[4:], atol=1e-7)
+                or not np.allclose(
+                    actual[4:] if stem == "full_protein" else actual[:3] + actual[4:],
+                    camera[4:] if stem == "full_protein" else camera[:3] + camera[4:],
+                    atol=1e-7,
+                )
             ):
                 raise ValueError(f"Molecular capture failed: {stem}, {errors}, {info}")
             await page.screenshot(path=str(output), animations="disabled")
@@ -291,7 +346,7 @@ async def capture_views(javascript, work, *, stems=None):
                 trace_sha256=hashlib.sha256((DATA / "trace.json").read_bytes()).hexdigest(),
                 sha256=hashlib.sha256(output.read_bytes()).hexdigest(),
                 camera=actual,
-                zoom_factor=OVERVIEW_ZOOM,
+                zoom_factor=1.20 if stem == "full_protein" else 0.38 if pocket else OVERVIEW_ZOOM,
                 scene=info,
                 javascript_url=JS_URL,
                 javascript_sha256=JS_SHA256,
@@ -304,6 +359,15 @@ async def capture_views(javascript, work, *, stems=None):
                     else "Recorded refinement of the stored N1 endpoint; shared overview camera and original fragment colors."
                 ),
             )
+            if pocket:
+                metadata["input_pocket_sha256"] = hashlib.sha256(
+                    (DATA / "input_pocket.json").read_bytes()
+                ).hexdigest()
+                metadata["description"] = (
+                    "Full supplied receptor with retained residues highlighted"
+                    if stem == "full_protein"
+                    else "Recorded supplied-center residue-aware pocket crop; non-pocket residues hidden"
+                )
             if stem in OUTPUT_VIEWS:
                 metadata["description"] = (
                     "Selected pose and evaluated crystal reference; receptor frame; no alignment"
@@ -504,12 +568,18 @@ def compose(row):
         for stem in ("refined_step_025", "refined_step_050", "refined_endpoint")
     ]
     pocket = plt.imread(OVERVIEW_DIR / "supplied_pocket.png")
+    protein = plt.imread(OVERVIEW_DIR / "full_protein.png")
     candidates = [plt.imread(OVERVIEW_DIR / f"{stem}.png") for stem in CANDIDATE_VIEWS]
     overlay = plt.imread(OVERVIEW_DIR / "selected_overlay.png")
     selection = selection_data()
     annotations = annotation_data()
     reference = reference_data()
     crop = common_crop([*flow, *refinement, *candidates, overlay])
+    y0, y1, x0, x1 = crop
+    visible = np.min(protein[..., :3], axis=-1) < 0.90
+    ys, xs = np.nonzero(visible)
+    if ys.min() < y0 or ys.max() >= y1 or xs.min() < x0 or xs.max() >= x1:
+        raise ValueError("Full receptor extends outside the display crop")
     height, fw, box_width = 5.25, 1.30, 1.75
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
     positions = (3.80, 2.73, 1.66, 0.59)
@@ -577,14 +647,8 @@ def compose(row):
             zorder=8,
         )
 
-    palettes = (
-        ("#F3F7FA", "#BDCDD8"),
-        ("#F5F3FA", "#C9C0D9"),
-        ("#FBF5F0", "#DCCBBE"),
-        ("#F1F8F5", "#BBD3C9"),
-    )
-    for x, (fill, edge) in zip(columns[:4], palettes, strict=True):
-        card(x, 0.30, box_width, 4.80, edge=edge, fill=fill, lw=0.85)
+    for x in columns[:4]:
+        card(x, 0.30, box_width, 4.80, edge="#C6C6C6", fill="white", lw=0.85)
     for left, right in zip(columns[:-1], columns[1:], strict=True):
         connector(fig, left + box_width + 0.065, right - 0.065, middle, WIDTH, height)
 
@@ -592,13 +656,16 @@ def compose(row):
     px = center - fw / 2
     label(center, 4.95, "Input preparation", size=9)
     for y, title, fragmented in ((3.80, "Ligand", False), (2.73, "Rigid fragments", True)):
-        card(px, y, fw, fh, fill="#FCFDFE")
+        card(px, y, fw, fh, fill="white")
         ligand_diagram(fig.add_axes(rect(px, y, fw, fh)), row, fragmented=fragmented)
         corner(px, y, title)
     down(center, 3.80 - 0.07, 2.73 + fh + 0.07)
     label(center, (2.73 + 1.66 + fh) / 2, "+", size=14, weight="normal", color=MUTED)
-    arts.append(frame(fig, rect(px, 1.66, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
-    corner(px, 1.66, "Given pocket")
+    arts.append(frame(fig, rect(px, 1.66, fw, fh), protein, crop, FRAME_EDGE, 0.6))
+    corner(px, 1.66, "Protein")
+    down(center, 1.66 - 0.07, 0.59 + fh + 0.07)
+    arts.append(frame(fig, rect(px, 0.59, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
+    corner(px, 0.59, "Given pocket")
 
     def trajectory(box_x, title, method, images, labels):
         center = box_x + box_width / 2
@@ -607,7 +674,7 @@ def compose(row):
         label(center, 4.73, method, size=8, weight="normal")
         # Empty backplates denote parallel candidates, not additional saved traces.
         for dx, dy in ((0.07, 0.04), (0.025, 0.02), (-0.04, 0.0)):
-            card(px + dx, 0.53 + dy, fw + 0.08, 4.01, edge="#D4D6DE", fill="#FDFDFE", lw=0.55)
+            card(px + dx, 0.53 + dy, fw + 0.08, 4.01, edge="#D7D7D7", fill="white", lw=0.55)
         label(center, 0.415, r"$\times\,N$", size=8.5, weight="normal", color=MUTED)
         for i, (py, pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
             arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.55))
@@ -634,18 +701,23 @@ def compose(row):
     px = center - fw / 2
     label(center, 4.95, "Confidence selection", size=9)
     label(center, 4.70, "Predicted RMSD\nranking", size=8, weight="normal")
-    for upper in positions[:-1]:
-        label(center, upper - 0.26, "…", size=10, weight="normal", color=MUTED)
-    label(center, 0.375, r"$N\,\to\,1$", size=8.5, weight="normal", color=MUTED)
+    for upper, lower in zip(positions[:-1], positions[1:], strict=True):
+        label(center, (upper + lower + fh) / 2, "…", size=10, weight="normal", color=MUTED)
+    label(center, 0.415, r"$N\,\to\,1$", size=8.5, weight="normal", color=MUTED)
     for pixels, candidate, annotation, y in zip(
         candidates, selection["candidates"], annotations, positions, strict=True
     ):
-        label(
-            center,
-            y - 0.09,
-            f"pRMSD {annotation['predicted_rmsd']:.2f} Å  /  RMSD {annotation['symmetry_rmsd']:.2f} Å",
-            size=6.5,
-            weight="normal",
+        fig.text(
+            (px + 0.245) / WIDTH,
+            (y + fh - 0.05) / height,
+            f"pRMSD {annotation['predicted_rmsd']:.2f} Å\nRMSD {annotation['symmetry_rmsd']:.2f} Å",
+            fontsize=5.8,
+            color=DARK,
+            ha="left",
+            va="top",
+            linespacing=1.15,
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.92, "pad": 1.2},
+            zorder=8,
         )
         selected = candidate["selected"]
         edge = "#82B7A4" if selected else FRAME_EDGE
@@ -683,7 +755,7 @@ def compose(row):
 
     center = columns[4] + box_width / 2
     px = center - fw / 2
-    card(columns[4], 1.57, box_width, 1.90, edge="#BBD3C9", fill="#F7FBF9", lw=0.85)
+    card(columns[4], 1.57, box_width, 1.90, edge="#C6C6C6", fill="white", lw=0.85)
     label(center, 3.25, "Selected pose")
     arts.append(frame(fig, rect(px, 2.21, fw, fh), overlay, crop, "#82B7A4", 0.9))
     corner(px, 2.21, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")

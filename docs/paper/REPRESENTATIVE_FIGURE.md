@@ -4,23 +4,24 @@ A standalone left-to-right overview for known-pocket redocking: ligand
 fragmentation + given pocket → candidate generation → post-generation refinement
 → confidence selection → one output pose. Refinement is downstream of the
 completed generative flow. No η-based guidance is depicted.
-The ligand, fragments and given pocket occupy equally sized panels in a vertical
+The ligand, fragments, full supplied receptor and given pocket occupy equally sized panels in a vertical
 input column enclosed in an Input preparation box with the same height as
 the generation, refinement and confidence stages. Names sit inside
-the upper-left corners; a short arrow connects ligand to fragments, and a plus
-sign combines the fragments with the independently supplied pocket. Generation and refinement are enclosed in separate large boxes;
+the upper-left corners. Separate arrows show ligand → fragments and full
+receptor → given-pocket crop; the pocket center is supplied, not predicted. Generation and refinement are enclosed in separate large boxes;
 each contains four states ordered from top to bottom with downward arrows.
 The stages progress from left to right. Method subtitles sit inside each box
 under its heading. Confidence displays four distinct recorded poses in a matching large box, with
 selected/not-selected marks overlaid in the upper-left image corners.
 Time and step labels use that same corner. Stage boxes have equal widths and
-uniform gaps, with aligned connectors and restrained pastel fills.
+uniform gaps, with aligned connectors and white backgrounds with neutral gray borders.
 Typography uses Matplotlib-bundled DejaVu Sans fonts for both text and mathematical
 labels. The final panel omits the PDB identifier; source identity remains here.
 Empty stacked backplates and × N denote candidate multiplicity in the generation
 and refinement stages; confidence ellipses omit intervening candidates, and
 N → 1 denotes selection. Here N = 100 in the primary candidate-bank protocol.
-Each confidence image has a paired pRMSD/RMSD annotation directly below it,
+Each confidence image has a small two-line pRMSD/RMSD annotation inside its
+upper-left corner, beside the selection glyph,
 with both values in ångströms. All pose panels
 have equal dimensions.
 This draft does not change the existing 21-page reference package.
@@ -56,6 +57,7 @@ is reproducible with:
 python -m benchmarks.analysis.representative_refinement --source-root /path/to/source-checkout
 python -m benchmarks.analysis.representative_ligand --source-root /path/to/source-checkout
 python -m benchmarks.analysis.representative_selection --source-root /path/to/source-checkout
+python -m benchmarks.analysis.representative_pocket --source-root /path/to/source-checkout
 ```
 
 The first command invokes the existing rigid-fragment optimizer, not the docking
@@ -63,6 +65,8 @@ model. The second exports a 2D depiction of the original ligand graph with the
 saved fragment boundaries; it does not generate a new 3D conformer. The third
 exports existing N100 candidate coordinates and confidence ranks, with source
 checksums, graph isomorphism and fragment-assignment checks.
+The fourth command exports the original full receptor and verifies the actual
+residue-aware crop used by the saved N1 illustration.
 The numerical record is
 `benchmarks/results/paper/trajectory/representative_refinement.json`; separate
 capture metadata record its hash and the unchanged camera. Source-file hashes,
@@ -74,7 +78,8 @@ energy parameter identities and implementation checksums are retained.
 |---|---|
 | Ligand | Original prepared STI graph; five fragment boundaries marked |
 | Rigid fragments | Same 2D coordinates with those five bonds omitted; six saved fragment identities |
-| Given pocket | Stored 1T46 receptor, ligand hidden, pale blue-gray cartoon, matching close-up crop |
+| Protein | Full supplied 1T46 receptor structure, retained pocket residues highlighted in darker gray |
+| Given pocket | Only retained residues from the saved center and 10 Å cutoff; unchanged coordinates; wider camera than the pose panels to show the cropped region |
 | Pose generation | Saved frames 0, 2, 4 and 10: t = 0, 0.488, 0.784 and 1 |
 | Post-refinement | Steps 0, 25, 50 and 100 from the recorded CPU refinement of that exact endpoint |
 | Confidence candidates | Astex repeat 0, same 1T46 complex, existing N100 refined bank; eligible ranks 1, 25, 50 and 100 |
@@ -101,13 +106,17 @@ the four displayed coordinates and their source provenance. The primary selector
 ranks eligible
 refined poses by predicted RMSD; raw and refined banks are scored independently.
 
-All molecular views use the same camera, crop and display scale. The overview
-gallery (`views/overview`) retains the original camera center and orientation
+All pose views use the same camera, crop and display scale.
+The full-receptor overview deliberately uses a wider camera scale while keeping
+the same orientation, so the complete supplied structure fits inside its panel. Pose captures in the overview
+gallery (`views/overview`) retain the original camera center and orientation
 with a common 0.70 zoom factor so that all four confidence candidates are fully
 visible. Original captures for the other manuscript figures remain unchanged.
-The supplied-pocket cartoon uses a lighter blue-gray color and 0.55 opacity;
-its receptor coordinates, camera and crop remain unchanged.
-The three input panels have identical width and height; the ligand diagrams preserve their 2D
+The supplied-pocket cartoon now hides non-pocket residues using the verified
+model crop, and uses neutral gray at 0.65 opacity. Its retained atom coordinates
+remain unchanged; its input camera is widened to display more of the crop. The full receptor is light gray with the
+same retained residues highlighted in darker gray.
+The four input panels have identical width and height; the ligand diagrams preserve their 2D
 aspect ratio inside these bounds. They are not docking conformers. Refinement
 step 0 reuses the generated t = 1 capture, preserving the exact transition between
 stages. The overview gallery uses stored coordinates; no optimization was rerun.
@@ -135,6 +144,19 @@ or validity claim is made. The optimizer's diagnostic reference argument was
 the raw endpoint; its displacement-to-reference metrics are deliberately not
 published as crystal RMSD. No new docking inference or confidence selection
 was performed.
+
+## Supplied-pocket crop
+
+`input_pocket.json` stores the original receptor PDB, the retained atom records,
+residue identities, supplied center, 10 Å cutoff and source hashes. The production
+`crop_to_pocket` function keeps an entire residue when at least one of its heavy
+atoms lies within 10 Å of the recorded center. Export checks that the atom records
+shown in the crop exactly match the production crop coordinates. Full protein
+means the complete supplied receptor structure, including its experimental gaps,
+not a reconstruction of the full-length biological sequence. This input export performs
+no ligand or pocket prediction. The overview and cropped panel share orientation but
+use different camera scales. The input pocket uses a wider view than the trajectory panels; hiding
+non-pocket residues is an input illustration and does not change other panels.
 
 ## Confidence candidate annotations
 
@@ -177,8 +199,9 @@ panels show recorded states at t = 0, 0.488, 0.784 and 1. Physics- and
 interaction-based post-generation refinement is illustrated at iterations 0,
 25, 50 and 100. Each boxed sequence proceeds from top to bottom, while the complete
 workflow progresses from left to right. Input preparation groups the ligand,
-fragmentation and independently supplied pocket, with inset labels and a plus
-sign indicating the combined inputs. Time and iteration labels are overlaid inside
+fragmentation and full supplied receptor → pocket crop, with inset labels.
+The crop retains complete residues within 10 Å of the supplied center and is
+not a pocket prediction. The full receptor highlights those residues in gray. Time and iteration labels are overlaid inside
 the corresponding images. Refinement step 0 equals the generated t = 1 pose.
 Method subtitles appear beneath the stage headings; η-based guidance is omitted.
 Empty backplates and × N schematically indicate parallel candidate processing
@@ -191,10 +214,11 @@ and 100. The best-ranked candidate carries an overlaid ✓ and is shown as the
 selected output, overlaid with the crystal ligand in the unchanged receptor
 coordinate frame (symmetry-aware heavy-atom RMSD 0.96 Å);
 × marks the three unselected candidates, not physical invalidity. Each candidate
-is annotated with pRMSD (the ranking prediction) and RMSD (the retrospective
+is annotated inside the image with pRMSD (the ranking prediction) and RMSD (the retrospective
 crystal-reference symmetry-aware heavy-atom error), both in Å. Reference RMSD
-is displayed for comparison and is not used to select the pose. All molecular
-panels share camera, crop and scale. Carbon colors identify fragments in the trajectory and candidate panels;
+is displayed for comparison and is not used to select the pose. All
+pose panels share camera, crop and scale; the full-receptor and pocket-input
+views use wider scales to show their respective structures. Carbon colors identify fragments in the trajectory and candidate panels;
 the final overlay instead uses blue for selected-pose carbons and peach for
 crystal carbons. Heteroatoms retain element colors. The generation/refinement trajectory is the
 saved N1/S10 illustration; the confidence examples are from the separate primary
