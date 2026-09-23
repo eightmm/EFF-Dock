@@ -69,8 +69,14 @@ curl -fL https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js -o /tmp/eff
 uv run --with py3Dmol==2.5.5 --with playwright==1.62.0 python -m benchmarks.figures.structure_views --javascript /tmp/effdock-3Dmol-min.js
 ```
 
-Camera and style settings are in `benchmarks/figures/structure_views.py`. The
-manifest records browser/library versions and per-view checksums. Rebuilding on
+Case-specific camera quaternions are in `structure_views/settings.json`; styles
+are in `benchmarks/figures/structure_views.py`. Each view rotates the entire
+receptor/pose scene together. Orientations were selected for readability from
+six previews (the prior view and five principal-axis-derived views), without
+changing coordinates, cases or RMSDs. The pale cartoon (opacity 0.25) and thinner
+ligands (stick radius 0.16 Å, sphere scale 0.16) reduce occlusion. The manifest
+records the actual cameras, settings hash, browser/library versions and per-view
+checksums. Rebuilding on
 a different software-rendering stack may change pixels, even with identical
 coordinates; update capture and paper-manifest hashes deliberately after review.
 Only pocket close-ups are shown: five dataset rows by three mechanism columns.

@@ -39,9 +39,10 @@ def atoms(mol):
     return result
 
 
-def make_html(row, javascript):
+def make_html(row, javascript, settings=None):
     import py3Dmol
 
+    settings = settings or {}
     view = py3Dmol.view(width=900, height=680)
     view.addModel(row["protein_display"]["pdb"], "pdb", {"keepH": False})
     view.setStyle(
@@ -49,7 +50,7 @@ def make_html(row, javascript):
         {
             "cartoon": {
                 "color": "#B7C7D8",
-                "opacity": 0.45,
+                "opacity": 0.25,
                 "arrows": True,
                 "thickness": 0.35,
             }
@@ -68,25 +69,35 @@ def make_html(row, javascript):
             {
                 "stick": {
                     "colorscheme": scheme,
-                    "radius": 0.19,
+                    "radius": 0.16,
                     "singleBonds": True,
                 },
-                "sphere": {"colorscheme": scheme, "scale": 0.20},
+                "sphere": {"colorscheme": scheme, "scale": 0.16},
             },
         )
         models.append(model)
     view.setProjection("orthographic")
     view.setBackgroundColor("white")
-    # One common camera rotation for every molecule; no coordinate alignment.
+    # The camera rotates the entire scene; molecular coordinates are untouched.
     view.rotate(30, "y")
     view.rotate(-15, "x")
     view.zoomTo({"model": models})
     view.zoom(1.1)
     view.render()
-    return viewer_html(view, javascript)
+    return viewer_html(view, javascript, settings.get("quaternion"))
 
 
-def viewer_html(view, javascript):
+def viewer_html(view, javascript, quaternion=None):
+    camera_script = ""
+    if quaternion is not None:
+        q = np.asarray(quaternion, dtype=float)
+        if q.shape != (4,) or not np.isfinite(q).all() or not np.isclose(np.linalg.norm(q), 1):
+            raise ValueError("Invalid camera quaternion")
+        camera_script = (
+            "const camera=viewer.getView();camera.splice(4,4,..."
+            + json.dumps(q.tolist())
+            + ");viewer.setView(camera);"
+        )
     content = view._make_html()
     variable = re.search(r"var (viewer_[A-Za-z0-9_]+) = null;", content).group(1)
     return (
@@ -97,13 +108,14 @@ def viewer_html(view, javascript):
         + """<script>
 $3Dmolpromise.then(function(){
 const viewer=VIEWER;
+CAMERA_SCRIPT
 window.sceneCamera=viewer.getView();
 const gl=viewer.getRenderer().getContext();
 const info=gl.getExtension('WEBGL_debug_renderer_info');
 window.sceneInfo={renderer:info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : 'unavailable', atoms:viewer.getModel(0).selectedAtoms({}).length, secondary:viewer.getModel(0).selectedAtoms({atom:'CA'}).reduce((acc,a)=>{acc[a.ss]=(acc[a.ss]||0)+1;return acc;},{})};
 viewer.render();
 requestAnimationFrame(()=>requestAnimationFrame(()=>{window.sceneReady=true;}));
-});</script></body></html>""".replace("VIEWER", variable)
+});</script></body></html>""".replace("VIEWER", variable).replace("CAMERA_SCRIPT", camera_script)
     )
 
 
@@ -112,6 +124,10 @@ async def capture(javascript, work, out):
 
     source = DATA / "structures.json"
     rows = json.loads(source.read_text())
+    settings_path = DATA / "structure_views/settings.json"
+    settings = json.loads(settings_path.read_text())
+    if set(settings["views"]) != {row["view_key"] for row in rows}:
+        raise ValueError("Camera settings do not match the 15 cases")
     work.mkdir(parents=True, exist_ok=True)
     out.mkdir(parents=True, exist_ok=True)
     records = []
@@ -129,7 +145,7 @@ async def capture(javascript, work, out):
             mode = "pocket"
             stem = f"{row['view_key']}_{mode}"
             html = work / f"{stem}.html"
-            html.write_text(make_html(row, javascript))
+            html.write_text(make_html(row, javascript, settings["views"][row["view_key"]]))
             page = await browser.new_page(
                 viewport={"width": 900, "height": 680}, device_scale_factor=2
             )
@@ -138,6 +154,7 @@ async def capture(javascript, work, out):
             await page.goto(html.resolve().as_uri(), wait_until="load")
             await page.wait_for_function("window.sceneReady === true", timeout=60000)
             scene = await page.evaluate("window.sceneInfo")
+            camera = await page.evaluate("window.sceneCamera")
             if errors or "SwiftShader" not in scene["renderer"]:
                 raise ValueError(
                     f"Scene failed or did not use software rendering: {errors}, {scene}"
@@ -161,6 +178,7 @@ async def capture(javascript, work, out):
                     file=output.name,
                     sha256=hashlib.sha256(output.read_bytes()).hexdigest(),
                     scene=scene,
+                    camera_view=camera,
                     nonwhite_fraction=float(nonwhite),
                 )
             )
@@ -168,6 +186,7 @@ async def capture(javascript, work, out):
             await page.close()
         await browser.close()
     manifest = dict(
+        settings_sha256=hashlib.sha256(settings_path.read_bytes()).hexdigest(),
         structures_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
         javascript_url=JS_URL,
         javascript_sha256=JS_SHA256,

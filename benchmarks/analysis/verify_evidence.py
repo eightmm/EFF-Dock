@@ -254,6 +254,16 @@ def verify():
         require(data["sources"][r["path"]] == r["sha256"], "Rescue ledger identity")
     views = directory / "structure_views"
     scene_manifest = json.loads((views / "manifest.json").read_text())
+    settings = json.loads((views / "settings.json").read_text())
+    require(
+        hashlib.sha256((views / "settings.json").read_bytes()).hexdigest()
+        == scene_manifest["settings_sha256"],
+        "Stale structure camera settings",
+    )
+    require(
+        set(settings["views"]) == {r["view_key"] for r in examples},
+        "Camera settings do not match structure cases",
+    )
     require(
         hashlib.sha256((directory / "structures.json").read_bytes()).hexdigest()
         == scene_manifest["structures_sha256"],
@@ -269,6 +279,14 @@ def verify():
         "Missing structure view",
     )
     for record in scene_manifest["records"]:
+        quaternion = np.asarray(settings["views"][record["view_key"]]["quaternion"])
+        require(
+            quaternion.shape == (4,)
+            and np.isfinite(quaternion).all()
+            and np.isclose(np.linalg.norm(quaternion), 1)
+            and np.allclose(record["camera_view"][4:8], quaternion),
+            "Structure camera rotation mismatch",
+        )
         require(
             hashlib.sha256((views / record["file"]).read_bytes()).hexdigest() == record["sha256"],
             "Structure view hash mismatch",

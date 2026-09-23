@@ -100,6 +100,12 @@ failures remain; it is not a universal stereochemical repair claim.
 
 ## Structure examples — Figure S8
 
+The 15 cases use individually selected viewing angles to reduce projection
+overlap. Each rotation applies equally to the receptor and all ligand poses;
+coordinates, RMSDs, labels and case-selection rules are unchanged. Camera
+quaternions are stored in `structure_views/settings.json`. Protein cartoons
+are paler and ligand sticks thinner for clarity. True pose overlap remains.
+
 All five external cohorts now have three different complex IDs, selected from
 all three saved repeats. This replaces the earlier mixed-dataset triplet.
 Rescue is chosen first by maximum same-candidate RMSD improvement, requiring raw

@@ -1,0 +1,125 @@
+{
+  "purpose": "Case-specific whole-scene viewing rotations chosen for readability from six preview orientations. All receptor and ligand coordinates are unchanged; projected separation is not a quantitative metric.",
+  "views": {
+    "astex_2_1n1m_successful_pose": {
+      "quaternion": [
+        0.6498031709435274,
+        0.13803353934290016,
+        -0.17805402796872538,
+        0.7259472048105987
+      ]
+    },
+    "astex_0_1hvy_refinement_rescue": {
+      "quaternion": [
+        -0.32489269551899425,
+        0.013426489578078293,
+        -0.41077827938104905,
+        0.8517779469819331
+      ]
+    },
+    "astex_0_1tz8_selection_failure": {
+      "quaternion": [
+        -0.7487302469220858,
+        0.16110758454431806,
+        -0.18921720581824658,
+        0.6145276336899937
+      ]
+    },
+    "posebusters_2_7dua_hj0_successful_pose": {
+      "quaternion": [
+        0.31672432825016,
+        0.0514939877358831,
+        0.27118078605104645,
+        0.9074662805847269
+      ]
+    },
+    "posebusters_0_7fb7_8nf_refinement_rescue": {
+      "quaternion": [
+        0.5252556423629573,
+        0.14528509950476234,
+        0.08947547941382386,
+        0.8336623348883136
+      ]
+    },
+    "posebusters_1_8ay3_oe3_selection_failure": {
+      "quaternion": [
+        0.3073911338048487,
+        -0.8422621773430664,
+        0.263148797781227,
+        -0.3561710624149322
+      ]
+    },
+    "phibench_2_9dhh_a1a4o_a_1_successful_pose": {
+      "quaternion": [
+        -0.5435247129944494,
+        -0.06776176230654644,
+        0.07739302217993317,
+        -0.8330663539306272
+      ]
+    },
+    "phibench_0_9fyb_nmn_a_1_b_refinement_rescue": {
+      "quaternion": [
+        0.21746450129841566,
+        0.5842657120478459,
+        0.649582202407507,
+        0.435184708733737
+      ]
+    },
+    "phibench_0_7hhm_uwd_c_1_selection_failure": {
+      "quaternion": [
+        0.8033868525872622,
+        0.5111214651654352,
+        0.12705247174557993,
+        -0.27781663441991783
+      ]
+    },
+    "foldbench_2_9bbh-assembly1__protein-a__ligand-e__ccd-vvp_successful_pose": {
+      "quaternion": [
+        -0.40577525159083067,
+        0.6577913765761292,
+        0.09928519106660975,
+        0.6267371067148855
+      ]
+    },
+    "foldbench_2_8ug3-assembly1__protein-a__ligand-c__ccd-wre_refinement_rescue": {
+      "quaternion": [
+        0.7017101186375274,
+        0.23065497135178928,
+        0.25556202743532025,
+        -0.62377018502455
+      ]
+    },
+    "foldbench_0_8g7f-assembly1__protein-b__ligand-h__ccd-1jj_selection_failure": {
+      "quaternion": [
+        -0.4529156042208435,
+        -0.17825992380875233,
+        0.06679983672856009,
+        -0.8709929028585732
+      ]
+    },
+    "openbind_1_a71ev2a-x3177a_successful_pose": {
+      "quaternion": [
+        -0.12356521341869464,
+        -0.33022067335147637,
+        -0.3742187248419644,
+        0.857698251660655
+      ]
+    },
+    "openbind_1_a71ev2a-x7379a_refinement_rescue": {
+      "quaternion": [
+        0.056295401143130766,
+        -0.26913242686638733,
+        -0.340414401612408,
+        0.899175511117829
+      ]
+    },
+    "openbind_2_a71ev2a-x3858b_selection_failure": {
+      "quaternion": [
+        0.48304430020562406,
+        -0.24208079872041097,
+        0.8065580484840715,
+        0.23985246581036676
+      ]
+    }
+  }
+}
