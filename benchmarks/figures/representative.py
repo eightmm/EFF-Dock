@@ -38,7 +38,7 @@ FRAME_EDGE = "#D6DBE1"
 POSE_EDGE = "#8C96A3"
 
 # Landscape overview; preserve vector labels when scaling for the manuscript.
-WIDTH = 10.1
+WIDTH = 9.4
 
 
 def selection_data():
@@ -387,10 +387,10 @@ def compose(row):
     candidates = [plt.imread(OVERVIEW_DIR / f"{stem}.png") for stem in CANDIDATE_VIEWS]
     selection = selection_data()
     crop = common_crop([*flow, *refinement, *candidates])
-    height = 3.2
-    fw = 1.15
+    height = 5.25
+    fw = 1.30
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
-    middle = 1.60
+    middle = 2.21 + fh / 2
     fig = plt.figure(figsize=(WIDTH, height))
     arts = []
 
@@ -409,107 +409,98 @@ def compose(row):
             va="center",
         )
 
-    def card(x, y, w, h, edge=FRAME_EDGE, fill="white"):
+    def card(x, y, w, h, edge=FRAME_EDGE, fill="white", lw=0.6):
         fig.add_artist(
             FancyBboxPatch(
                 (x / WIDTH, y / height),
                 w / WIDTH,
                 h / height,
-                boxstyle="round,pad=0,rounding_size=0.005",
+                boxstyle="round,pad=0,rounding_size=0.008",
                 transform=fig.transFigure,
                 facecolor=fill,
                 edgecolor=edge,
-                linewidth=0.6,
+                linewidth=lw,
                 mutation_aspect=WIDTH / height,
                 zorder=-1,
             )
         )
 
-    # All three input panels have identical bounds; molecular geometry is never stretched.
-    for y, title, fragmented in ((2.30, "Ligand", False), (1.26, "Rigid fragments", True)):
-        card(0.06, y, fw, fh, fill="#FAFBFC")
-        ligand_diagram(fig.add_axes(rect(0.06, y, fw, fh)), row, fragmented=fragmented)
-        label(0.635, y + fh + 0.13, title, size=9)
-    fig.add_artist(
-        FancyArrowPatch(
-            (0.635 / WIDTH, 2.23 / height),
-            (0.635 / WIDTH, (1.26 + fh + 0.28) / height),
-            transform=fig.transFigure,
-            arrowstyle="-|>",
-            mutation_scale=8,
-            color=CONNECTOR,
-            linewidth=0.9,
-        )
-    )
-    arts.append(frame(fig, rect(0.06, 0.22, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
-    label(0.635, 0.22 + fh + 0.13, "Given pocket", size=9)
-    fig.add_artist(
-        plt.Line2D(
-            [1.24 / WIDTH, 1.43 / WIDTH, 1.43 / WIDTH, 1.24 / WIDTH],
-            [(0.22 + fh / 2) / height, (0.22 + fh / 2) / height, middle / height, middle / height],
-            color=CONNECTOR,
-            linewidth=0.8,
-        )
-    )
-    connector(fig, 1.43, 1.65, middle, WIDTH, height)
-
-    def trajectory(x, images, labels):
-        positions = ((x, 2.06), (x + 1.32, 2.06), (x, 0.98), (x + 1.32, 0.98))
-        for i, ((px, py), pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
-            if i == 3:
-                # Backing cards indicate a candidate bank, not additional measured trajectories.
-                for offset in (0.07, 0.035):
-                    card(px + offset, py + offset, fw, fh, fill="#F4F7F9")
-            arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.6))
-            label(px + fw / 2, py - 0.14, text, size=8, weight="normal")
-        # The bent arrow joins the second state to the third without crossing a panel.
-        bridge_y = 1.76
-        fig.add_artist(
-            plt.Line2D(
-                [(x + 1.32 + fw / 2) / WIDTH, (x + 1.32 + fw / 2) / WIDTH, (x + fw / 2) / WIDTH],
-                [1.84 / height, bridge_y / height, bridge_y / height],
-                color=CONNECTOR,
-                linewidth=0.8,
-            )
-        )
+    def down(x, top, bottom):
         fig.add_artist(
             FancyArrowPatch(
-                ((x + fw / 2) / WIDTH, bridge_y / height),
-                ((x + fw / 2) / WIDTH, (0.98 + fh + 0.04) / height),
+                (x / WIDTH, top / height),
+                (x / WIDTH, bottom / height),
                 transform=fig.transFigure,
                 arrowstyle="-|>",
                 mutation_scale=7,
                 color=CONNECTOR,
-                linewidth=0.8,
+                linewidth=0.9,
             )
         )
-        for py in (2.06, 0.98):
-            connector(fig, x + fw + 0.025, x + 1.295, py + fh / 2, WIDTH, height)
 
-    trajectory(1.70, flow, [f"$t$ = {row['times'][i]:.2f}" for i in FLOW_INDICES])
-    label(2.935, 2.99, "Pose generation")
-    label(2.935, 2.77, "Fragment SE(3) flow matching", size=8, weight="normal")
-    connector(fig, 4.27, 4.55, middle, WIDTH, height)
+    for y, title, fragmented in ((3.80, "Ligand", False), (2.21, "Rigid fragments", True)):
+        card(0.10, y, fw, fh, fill="#FAFBFC")
+        ligand_diagram(fig.add_axes(rect(0.10, y, fw, fh)), row, fragmented=fragmented)
+        label(0.75, 4.95 if not fragmented else y + fh + 0.16, title)
+    down(0.75, 3.64, 2.21 + fh + 0.35)
+    arts.append(frame(fig, rect(0.10, 0.62, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
+    label(0.75, 0.62 + fh + 0.16, "Given pocket")
+    fig.add_artist(
+        plt.Line2D(
+            [1.44 / WIDTH, 1.66 / WIDTH, 1.66 / WIDTH, 1.44 / WIDTH],
+            [(0.62 + fh / 2) / height, (0.62 + fh / 2) / height, middle / height, middle / height],
+            color=CONNECTOR,
+            linewidth=0.8,
+        )
+    )
+    connector(fig, 1.66, 1.90, middle, WIDTH, height)
 
-    trajectory(4.60, refinement, [f"Step {step}" for step in REFINEMENT_STEPS])
-    label(5.835, 2.99, "Post-refinement")
-    label(5.835, 2.77, "Physics- and interaction-based", size=8, weight="normal")
-    connector(fig, 7.17, 7.37, middle, WIDTH, height)
+    def trajectory(box_x, title, method, images, labels):
+        box_width = 1.65
+        center = box_x + box_width / 2
+        px = center - fw / 2
+        card(box_x, 0.30, box_width, 4.80, edge="#BAC7D2", fill="#F8FAFC", lw=0.85)
+        label(center, 4.95, title)
+        label(center, 4.70, method, size=8, weight="normal")
+        positions = (3.80, 2.73, 1.66, 0.59)
+        for i, (py, pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
+            arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.55))
+            label(center, py - 0.12, text, size=8, weight="normal")
+            if i < 3:
+                down(center, py - 0.22, positions[i + 1] + fh + 0.03)
 
-    label(8.025, 2.99, "Confidence selection", size=9)
-    label(8.025, 2.77, "Predicted RMSD ranking", size=8, weight="normal")
+    trajectory(
+        1.95,
+        "Pose generation",
+        "Fragment SE(3)\nflow matching",
+        flow,
+        [f"$t$ = {row['times'][i]:.2f}" for i in FLOW_INDICES],
+    )
+    connector(fig, 3.65, 3.95, middle, WIDTH, height)
+    trajectory(
+        4.00,
+        "Post-refinement",
+        "Physics- and\ninteraction-based",
+        refinement,
+        [f"Step {step}" for step in REFINEMENT_STEPS],
+    )
+    connector(fig, 5.70, 6.05, middle, WIDTH, height)
+
+    label(6.75, 4.95, "Confidence selection", size=9)
+    label(6.75, 4.70, "Predicted RMSD\nranking", size=8, weight="normal")
     for pixels, candidate, y in zip(
-        candidates, selection["candidates"], (2.06, 1.10, 0.14), strict=True
+        candidates, selection["candidates"], (3.80, 2.21, 0.62), strict=True
     ):
         selected = candidate["selected"]
         edge = "#78A797" if selected else FRAME_EDGE
-        arts.append(frame(fig, rect(7.45, y, fw, fh), pixels, crop, edge, 0.9 if selected else 0.6))
-        cx, cy = 8.71, y + fh / 2
+        arts.append(frame(fig, rect(6.10, y, fw, fh), pixels, crop, edge, 0.9 if selected else 0.6))
+        # Overlay in the padded corner, leaving the molecular sticks visible.
+        cx, cy = 6.10 + fw - 0.11, y + fh - 0.10
         fig.add_artist(
             Ellipse(
                 (cx / WIDTH, cy / height),
-                0.17 / WIDTH,
-                0.17 / height,
+                0.18 / WIDTH,
+                0.18 / height,
                 transform=fig.transFigure,
                 facecolor="white",
                 edgecolor="none",
@@ -534,9 +525,9 @@ def compose(row):
                     zorder=9,
                 )
             )
-    connector(fig, 8.81, 8.88, 2.06 + fh / 2, WIDTH, height)
-    arts.append(frame(fig, rect(8.91, 2.06, fw, fh), candidates[0], crop, "#78A797", 1.0))
-    label(9.485, 2.99, "Selected pose")
+    connector(fig, 7.45, 7.95, 3.80 + fh / 2, WIDTH, height)
+    arts.append(frame(fig, rect(8.00, 3.80, fw, fh), candidates[0], crop, "#78A797", 1.0))
+    label(8.65, 4.95, "Selected pose")
     return fig, arts
 
 
@@ -563,7 +554,9 @@ def render(out):
             art.set_interpolation("antialiased")
         fig.savefig(out / f"{NAME}.png", dpi=400, metadata={"Software": None})
         plt.close(fig)
-    print(f"Rendered {NAME} PDF/SVG/PNG in {out}; four-state trajectories and recorded confidence selection")
+    print(
+        f"Rendered {NAME} PDF/SVG/PNG in {out}; four-state trajectories and recorded confidence selection"
+    )
 
 
 def main():
