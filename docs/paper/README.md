@@ -3,7 +3,7 @@
 Working figures and captions for writing the EFF-Dock manuscript. Figure
 numbering and placement may change during writing.
 
-- [Combined PDF](paper_figures.pdf): 20 pages.
+- [Combined PDF](paper_figures.pdf): 21 pages.
 - [New empirical evidence and interpretation](EVIDENCE.md)
 - [Figure captions](FIGURE_CAPTIONS.md): English captions and author notes.
 - [Sequence-relatedness definitions](RELATEDNESS.md)
@@ -36,11 +36,12 @@ numbering and placement may change during writing.
 | 18 | 보충 S7: Refinement PB 실패·전이 | [PDF](figures/S7_physical_validity.pdf) | [PNG](figures/S7_physical_validity.png) |
 | 19 | 보충 S8: 성공·refinement rescue·선택 실패 구조 | [PDF](figures/S8_structure_examples.pdf) | [PNG](figures/S8_structure_examples.png) |
 | 20 | 보충 S9: 로컬 baseline과 paired 신뢰구간 | [PDF](figures/S9_baseline_uncertainty.pdf) | [PNG](figures/S9_baseline_uncertainty.png) |
+| 21 | 보충 S10: Fragment 생성 경로 | [PDF](figures/S10_fragment_trajectory.pdf) | [PNG](figures/S10_fragment_trajectory.png) |
 
-Pages 1–11 are currently main figures; pages 12–20 are supplementary.
+Pages 1–11 are currently main figures; pages 12–21 are supplementary.
 PB-valid success is solid; only RMSD-passing but PB-invalid portions are hatched.
 
-All 20 selected figures can be rendered using the versioned numerical inputs:
+All 21 selected figures can be rendered using the versioned numerical inputs:
 
 ```bash
 uv run python -m benchmarks.figures.paper --check
@@ -51,7 +52,7 @@ The renderer produces PDF/PNG pairs and a long-form source-data CSV. It verifies
 hashes, counts, repeat statistics, outcome joins and training-witness membership.
 This rebuild starts from frozen numerical records; it does not rerun docking,
 PB evaluation, sequence alignment or bootstrap sampling. The six empirical-evidence figures additionally use the
-[evidence tables](../../benchmarks/results/paper/evidence/README.md). Historical collection
+[evidence tables](../../benchmarks/results/paper/evidence/README.md). The saved ODE illustration uses [trajectory source data](../../benchmarks/results/paper/trajectory/README.md). Historical collection
 helpers still require separately supplied pose banks. Older drafts and internal
 verification logs remain local.
 

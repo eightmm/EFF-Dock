@@ -1,6 +1,6 @@
 # Prism manuscript reference package
 
-[Download the ZIP](prism_figure_reference.zip) for the combined 20-page figure
+[Download the ZIP](prism_figure_reference.zip) for the combined 21-page figure
 PDF, individual PDFs, English captions, source mapping and editable LaTeX.
 `methods.tex` contains the current model, loss, refinement, selection and
 relatedness equations. `main.tex` includes the methods followed by

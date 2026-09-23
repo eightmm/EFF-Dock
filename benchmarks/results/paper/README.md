@@ -1,6 +1,6 @@
 # Numerical source data for the manuscript figures
 
-These files reproduce the current 20 figures in
+These files reproduce the current 21 figures in
 [docs/paper](../../../docs/paper/README.md) using a public checkout, without
 raw structures, checkpoints, private pose banks or cluster directories.
 
@@ -13,7 +13,7 @@ For a figure-only CPU environment, use
 `uv run --locked --only-group dev python -m benchmarks.figures.paper`.
 The development group pins Matplotlib; this form omits the model's CUDA stack.
 
-The renderer produces 20 PDF/PNG pairs with the published names and a
+The renderer produces 21 PDF/PNG pairs with the published names and a
 `source_data.csv` containing the input values in long form. Its columns are
 `json_pointer` and `value_json`: pointers index the named input tables/arrays,
 and JSON scalars retain numbers, strings, booleans and explicit nulls. The
@@ -32,6 +32,7 @@ hierarchical JSON inputs remain the canonical numerical source.
 | S2 | `candidate_metrics.json` |
 | S3 | `figure_data.json` → `complexity_failures` |
 | S4–S9 | `evidence/` JSON and case-level CSV files |
+| S10 | `trajectory/trace.json` and checked molecular captures |
 
 `selected_outcomes.csv` contains 24,984 rows: 2,082 external complexes × three
 seeds × raw/refined × ordinary/chirality-filtered selection. Boolean RMSD/PB

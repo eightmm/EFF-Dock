@@ -1,0 +1,143 @@
+{
+  "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
+  "javascript_url": "https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js",
+  "javascript_sha256": "f7cc78921ae72e7623e89cdd111434f58c2efddd2ffda1cd212644b406fb8016",
+  "chromium_version": "151.0.7922.34",
+  "py3dmol_version": "2.5.5",
+  "playwright_version": "1.62.0",
+  "fragment_carbon_colors": [
+    "#77AFD1",
+    "#E6AC83",
+    "#85BDA3",
+    "#AF98C5",
+    "#C8BC78",
+    "#D38EAE"
+  ],
+  "records": [
+    {
+      "index": 0,
+      "time": 0.0,
+      "file": "frame_00.png",
+      "sha256": "7198139f65a5b84dfa4d6579af48ca453e92472756e1ff40804dee0dd608406c",
+      "camera": [
+        -27.49601372383736,
+        -25.89508024679648,
+        -41.17907703502758,
+        119.49219642875086,
+        -0.12607862007251908,
+        0.25660481229257065,
+        0.03378266443126182,
+        0.9576621969425486
+      ],
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2359,
+        "secondary": {
+          "c": 127,
+          "s": 55,
+          "h": 115
+        }
+      }
+    },
+    {
+      "index": 1,
+      "time": 0.27100008726119995,
+      "file": "frame_01.png",
+      "sha256": "4962b5d98eb11c9205293cca54da7b4de00ee81747a9c5fb43d9df4f61496cce",
+      "camera": [
+        -27.49601372383736,
+        -25.89508024679648,
+        -41.17907703502758,
+        119.49219642875086,
+        -0.12607862007251908,
+        0.25660481229257065,
+        0.03378266443126182,
+        0.9576621969425486
+      ],
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2359,
+        "secondary": {
+          "c": 127,
+          "s": 55,
+          "h": 115
+        }
+      }
+    },
+    {
+      "index": 2,
+      "time": 0.48799997568130493,
+      "file": "frame_02.png",
+      "sha256": "7452777f7396192e0d5aa2766821e36b00fe97f16c5bb4883825c2a3eb965bca",
+      "camera": [
+        -27.49601372383736,
+        -25.89508024679648,
+        -41.17907703502758,
+        119.49219642875086,
+        -0.12607862007251908,
+        0.25660481229257065,
+        0.03378266443126182,
+        0.9576621969425486
+      ],
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2359,
+        "secondary": {
+          "c": 127,
+          "s": 55,
+          "h": 115
+        }
+      }
+    },
+    {
+      "index": 4,
+      "time": 0.7839999794960022,
+      "file": "frame_04.png",
+      "sha256": "4c658c8c935a2e6fc1a717339fa0bdb2c3225afb0b4211f853ed7e8d56767b09",
+      "camera": [
+        -27.49601372383736,
+        -25.89508024679648,
+        -41.17907703502758,
+        119.49219642875086,
+        -0.12607862007251908,
+        0.25660481229257065,
+        0.03378266443126182,
+        0.9576621969425486
+      ],
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2359,
+        "secondary": {
+          "c": 127,
+          "s": 55,
+          "h": 115
+        }
+      }
+    },
+    {
+      "index": 10,
+      "time": 1.0,
+      "file": "frame_10.png",
+      "sha256": "31c8f3b45c7487777077d07a6b9354a1b3fea5bb3ba51f15ca0bf8f259e82efa",
+      "camera": [
+        -27.49601372383736,
+        -25.89508024679648,
+        -41.17907703502758,
+        119.49219642875086,
+        -0.12607862007251908,
+        0.25660481229257065,
+        0.03378266443126182,
+        0.9576621969425486
+      ],
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2359,
+        "secondary": {
+          "c": 127,
+          "s": 55,
+          "h": 115
+        }
+      }
+    }
+  ]
+}

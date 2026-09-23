@@ -1210,6 +1210,9 @@ def main():
     from benchmarks.analysis.verify_evidence import verify
 
     verify()
+    from benchmarks.figures.trajectory import verify as verify_trajectory
+
+    verify_trajectory()
     if args.check:
         print(
             "Verified figure inputs, repeat statistics, 24,984 outcomes, 3,158 relatedness records and training memberships"
@@ -1243,8 +1246,11 @@ def main():
     from benchmarks.figures.evidence import render as render_evidence
 
     render_evidence(args.output)
+    from benchmarks.figures.trajectory import render as render_trajectory
+
+    render_trajectory(args.output)
     export_csv(dict(bundle, **data), args.output / "source_data.csv")
-    print(f"Rendered 20 figures (PDF/PNG) and source_data.csv in {args.output}")
+    print(f"Rendered 21 figures (PDF/PNG) and source_data.csv in {args.output}")
 
 
 if __name__ == "__main__":

@@ -83,6 +83,10 @@ def make_html(row, javascript):
     view.zoomTo({"model": models})
     view.zoom(1.1)
     view.render()
+    return viewer_html(view, javascript)
+
+
+def viewer_html(view, javascript):
     content = view._make_html()
     variable = re.search(r"var (viewer_[A-Za-z0-9_]+) = null;", content).group(1)
     return (
@@ -93,6 +97,7 @@ def make_html(row, javascript):
         + """<script>
 $3Dmolpromise.then(function(){
 const viewer=VIEWER;
+window.sceneCamera=viewer.getView();
 const gl=viewer.getRenderer().getContext();
 const info=gl.getExtension('WEBGL_debug_renderer_info');
 window.sceneInfo={renderer:info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : 'unavailable', atoms:viewer.getModel(0).selectedAtoms({}).length, secondary:viewer.getModel(0).selectedAtoms({atom:'CA'}).reduce((acc,a)=>{acc[a.ss]=(acc[a.ss]||0)+1;return acc;},{})};

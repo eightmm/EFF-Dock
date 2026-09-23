@@ -201,3 +201,16 @@ All 20 figures regenerated pixel-for-pixel from public tables in the figure-only
 CPU environment. The PDF/manifest/caption/ZIP checks passed. Prism's reference
 LaTeX was compiled with Tectonic; the Å unit markup was corrected for math mode
 without changing any equations or scientific content.
+
+## Saved fragment trajectory — Figure S10
+
+Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and camera. The five panels show actual saved states at t=0.000, 0.271, 0.488, 0.784 and 1.000; no coordinates are interpolated. These are the available states nearest to five equally spaced target times. Carbon colors track the same six rigid fragments throughout; nitrogen is blue and oxygen red. The pale protein cartoon provides binding-site context. Interfragment bonds are omitted in the first four panels for visibility and shown in grey at the last panel using the known ligand connectivity. This display convention does not represent chemical bond formation. Time t is the dimensionless generative-flow coordinate, not physical time or energy-refinement progress. The stored illustrative run used one sample, ten ODE steps, a late schedule with power 3, positional prior sigma 2 Å, pocket cutoff 10 Å, seed 42 and no guidance or confidence selection. The recorded checkpoint is effdock_docking_early_time_t0p10_50k.pt. This is a separate N1 illustration, not the 7FB7 refinement rescue of Figure S8 or an N100 benchmark-selected pose; no success, PB-validity or representative-trajectory claim is made. All 11 saved frames and the original fragment assignments are retained in the source data.
+
+This additional illustration reuses an existing trace and requires no new model
+inference. See `benchmarks/results/paper/trajectory/README.md` for the frame,
+fragment, camera and source-integrity checks. Existing benchmark outcomes and
+the three S8 examples are unchanged.
+
+The trajectory artwork is intended as manuscript Figure 1; it has time labels
+without panel letters. Page 21 / S10 remains its working-bundle identifier until
+the manuscript figure order is finalized.

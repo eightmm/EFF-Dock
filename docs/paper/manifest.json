@@ -1,6 +1,6 @@
 {
   "pdf": "docs/paper/paper_figures.pdf",
-  "pdf_sha256": "17f01a59fdb7b38a109a979e9bf82d17ac9a6680916e095a72c133fb9b6fd001",
+  "pdf_sha256": "6490d04e699a84d969c9b660338418c61b8a94528963b1ddfafece5285d5b83b",
   "figures": [
     {
       "page": 1,
@@ -281,6 +281,20 @@
       "latex_label": "fig:paper-s9",
       "bundle_file": "figures/page_20.pdf",
       "data_key": "evidence"
+    },
+    {
+      "page": 21,
+      "title": "보충 S10: Fragment 생성 경로",
+      "section": "supplement",
+      "source": "docs/paper/figures/S10_fragment_trajectory.pdf",
+      "sha256": "245d903f8e52491a3f127e45c84037ba565cbcb9c1424c813aa99c61b1e8aa56",
+      "figure_id": "S10",
+      "caption_title": "Fragment motion along a saved ODE generation trajectory.",
+      "caption": "Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and camera. The five panels show actual saved states at t=0.000, 0.271, 0.488, 0.784 and 1.000; no coordinates are interpolated. These are the available states nearest to five equally spaced target times. Carbon colors track the same six rigid fragments throughout; nitrogen is blue and oxygen red. The pale protein cartoon provides binding-site context. Interfragment bonds are omitted in the first four panels for visibility and shown in grey at the last panel using the known ligand connectivity. This display convention does not represent chemical bond formation. Time t is the dimensionless generative-flow coordinate, not physical time or energy-refinement progress. The stored illustrative run used one sample, ten ODE steps, a late schedule with power 3, positional prior sigma 2 Å, pocket cutoff 10 Å, seed 42 and no guidance or confidence selection. The recorded checkpoint is effdock_docking_early_time_t0p10_50k.pt. This is a separate N1 illustration, not the 7FB7 refinement rescue of Figure S8 or an N100 benchmark-selected pose; no success, PB-validity or representative-trajectory claim is made. All 11 saved frames and the original fragment assignments are retained in the source data.",
+      "author_note_ko": "원고 Figure 1 대표이미지용. A–E 표시는 제거하고 시간만 표시한다. 현재 작업용 묶음에서는 page 21 / S10 식별자를 유지한다. 실제 저장된 1T46 생성 경로다. 7FB7 refinement와 다른 실행이며 t는 ODE 시간이다. 초기·중간 패널에서 fragment 사이 결합을 숨기는 것은 표시 방식이며 화학 반응을 의미하지 않는다.",
+      "latex_label": "fig:paper-s10",
+      "bundle_file": "figures/page_21.pdf",
+      "data_key": "trajectory"
     }
   ],
   "numerical_inputs": [
@@ -359,6 +373,14 @@
     {
       "path": "benchmarks/results/paper/evidence/rescue_search_sources.json",
       "sha256": "f78368536078df9a23ea450b7088652f8a0cdffc8071788f7f6e2b13ca9e1f8a"
+    },
+    {
+      "path": "benchmarks/results/paper/trajectory/trace.json",
+      "sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e"
+    },
+    {
+      "path": "benchmarks/results/paper/trajectory/views/manifest.json",
+      "sha256": "05f6d474e9760d9b32e999f11284a48dbbb3ed6a3814b29a166d29a7fe348b96"
     }
   ],
   "render_command": "uv run python -m benchmarks.figures.paper --output outputs/paper_figures"

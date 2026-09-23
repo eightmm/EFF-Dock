@@ -1,8 +1,8 @@
 # Current manuscript figure captions — Prism reference
 
-현재 **20페이지 PDF** 기준: 본문용 Figure 1–11, 보충 Figure S1–S9. 최종 논문 번호는 편집 시 변경 가능하다. 각 영문 캡션은 복사해서 사용할 수 있으며, 한국어 메모는 저자 참고용이다.
+현재 **21페이지 PDF** 기준: 본문용 Figure 1–11, 보충 Figure S1–S10. 최종 논문 번호는 편집 시 변경 가능하다. 각 영문 캡션은 복사해서 사용할 수 있으며, 한국어 메모는 저자 참고용이다.
 
-PDF SHA-256: `17f01a59fdb7b38a109a979e9bf82d17ac9a6680916e095a72c133fb9b6fd001`
+PDF SHA-256: `6490d04e699a84d969c9b660338418c61b8a94528963b1ddfafece5285d5b83b`
 
 ## 공통 Methods 메모
 
@@ -213,3 +213,13 @@ Binding-site close-ups in the original receptor frame, without independent ligan
 - 원본: [S9_baseline_uncertainty.pdf](figures/S9_baseline_uncertainty.pdf)
 - LaTeX label: `fig:paper-s9`
 - 저자 메모: 음수·0을 포함하는 CI도 모두 유지. Exact PDB가 모두 달라서 여기서는 complex/PDB bootstrap이 같다.
+
+## PDF page 21 · Figure S10
+
+**Fragment motion along a saved ODE generation trajectory.**
+
+Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and camera. The five panels show actual saved states at t=0.000, 0.271, 0.488, 0.784 and 1.000; no coordinates are interpolated. These are the available states nearest to five equally spaced target times. Carbon colors track the same six rigid fragments throughout; nitrogen is blue and oxygen red. The pale protein cartoon provides binding-site context. Interfragment bonds are omitted in the first four panels for visibility and shown in grey at the last panel using the known ligand connectivity. This display convention does not represent chemical bond formation. Time t is the dimensionless generative-flow coordinate, not physical time or energy-refinement progress. The stored illustrative run used one sample, ten ODE steps, a late schedule with power 3, positional prior sigma 2 Å, pocket cutoff 10 Å, seed 42 and no guidance or confidence selection. The recorded checkpoint is effdock_docking_early_time_t0p10_50k.pt. This is a separate N1 illustration, not the 7FB7 refinement rescue of Figure S8 or an N100 benchmark-selected pose; no success, PB-validity or representative-trajectory claim is made. All 11 saved frames and the original fragment assignments are retained in the source data.
+
+- 원본: [S10_fragment_trajectory.pdf](figures/S10_fragment_trajectory.pdf)
+- LaTeX label: `fig:paper-s10`
+- 저자 메모: 원고 Figure 1 대표이미지용. A–E 없이 시간만 표시한다. 작업용 묶음에서는 page 21 / S10 식별자를 유지한다. 실제 저장된 1T46 생성 경로다. 7FB7 refinement와 다른 실행이며 t는 ODE 시간이다. 초기·중간 패널에서 fragment 사이 결합을 숨기는 것은 표시 방식이며 화학 반응을 의미하지 않는다.
