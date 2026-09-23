@@ -7,7 +7,9 @@ completed generative flow. No η-based guidance is depicted.
 The full supplied receptor, given pocket, fragments and ligand occupy equally sized panels in a vertical
 input column enclosed in an Input preparation box with the same height as
 the generation, refinement and confidence stages. Names sit inside
-the upper-left corners. The protein branch runs downward (full receptor → supplied pocket), and the
+the upper-left corners. The full-receptor panel is labeled "Pocket extraction"
+and the isolated input surface "Cropped pocket": these describe extraction
+around a supplied center, not pocket discovery. The protein branch runs downward (full receptor → supplied pocket), and the
 ligand branch runs upward (ligand → rigid fragments). Their connectors merge
 at the center and enter generation from the left; the pocket center is supplied,
 not predicted. The complete cropped-pocket surface is shown in teal inside the translucent
@@ -19,7 +21,7 @@ Generation and refinement are enclosed in separate large boxes;
 each contains four states ordered from top to bottom with downward arrows.
 The stages progress from left to right. Every box uses a 9 pt bold title and a single-line 7.1 pt muted subtitle,
 with common title/subtitle offsets (0.16/0.38 inches below the box top).
-The stage labels are Input preparation / Pocket crop + fragmentation;
+The stage labels are Input preparation / Protein + ligand;
 Pose generation / Fragment SE(3) flow; Pose refinement / Physics + interaction
 energy; Confidence selection / Predicted RMSD ranking; and Selected pose /
 Crystal comparison. The final subtitle identifies the retrospective reference
@@ -95,8 +97,8 @@ energy parameter identities and implementation checksums are retained.
 |---|---|
 | Ligand | Original prepared STI graph; five fragment boundaries marked |
 | Rigid fragments | Same 2D coordinates with those five bonds omitted; six saved fragment identities |
-| Protein | Full supplied 1T46 receptor molecular surface, translucent gray receptor with complete teal crop surface overlaid at original coordinates; supplied center marked by a terracotta dot |
-| Given pocket | Molecular surface of retained residues from the saved center and 10 Å cutoff; unchanged coordinates; wider camera than pose panels |
+| Pocket extraction | Full supplied 1T46 receptor molecular surface, translucent gray receptor with complete teal crop surface overlaid at original coordinates; supplied center marked by a terracotta dot |
+| Cropped pocket | Molecular surface of retained residues from the saved center and 10 Å cutoff; unchanged coordinates; wider camera than pose panels |
 | Pose generation | Saved frames 0, 2, 4 and 10: t = 0, 0.488, 0.784 and 1 |
 | Pose refinement | Steps 0, 25, 50 and 100 from the recorded CPU refinement of that exact endpoint |
 | Confidence candidates | Astex repeat 0, same 1T46 complex, existing N100 refined bank; eligible ranks 1, 25, 50 and 100 |

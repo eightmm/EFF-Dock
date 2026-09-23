@@ -728,10 +728,10 @@ def compose(row):
 
     center = columns[0] + box_width / 2
     px = center - fw / 2
-    header(center, 5.10, "Input preparation", "Pocket crop + fragmentation")
+    header(center, 5.10, "Input preparation", "Protein + ligand")
     for y, title, pixels in (
-        (positions[0], "Protein", protein),
-        (positions[1], "Given pocket", pocket),
+        (positions[0], "Pocket extraction", protein),
+        (positions[1], "Cropped pocket", pocket),
     ):
         input_crop = surface_crop(pixels, input_aspect)
         arts.append(frame(fig, rect(px, y, fw, fh), pixels, input_crop, FRAME_EDGE, 0.6))
