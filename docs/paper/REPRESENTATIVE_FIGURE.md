@@ -5,7 +5,8 @@ fragmentation + given pocket → candidate generation → post-generation refine
 → confidence selection → one output pose. Refinement is downstream of the
 completed generative flow. No η-based guidance is depicted.
 The ligand, fragments and given pocket occupy equally sized panels in a vertical
-input column enclosed in a compact Input preparation box. Names sit inside
+input column enclosed in an Input preparation box with the same height as
+the generation, refinement and confidence stages. Names sit inside
 the upper-left corners; a short arrow connects ligand to fragments, and a plus
 sign combines the fragments with the independently supplied pocket. Generation and refinement are enclosed in separate large boxes;
 each contains four states ordered from top to bottom with downward arrows.
@@ -18,7 +19,9 @@ Typography uses Matplotlib-bundled STIX fonts for both text and mathematical
 labels. The final panel omits the PDB identifier; source identity remains here.
 Empty stacked backplates and × N denote candidate multiplicity in the generation
 and refinement stages; confidence ellipses omit intervening candidates, and
-N → 1 denotes selection. Here N = 100 in the primary candidate-bank protocol. All pose panels
+N → 1 denotes selection. Here N = 100 in the primary candidate-bank protocol.
+Each confidence image has a paired pRMSD/RMSD annotation directly below it,
+with both values in ångströms. All pose panels
 have equal dimensions.
 This draft does not change the existing 21-page reference package.
 
@@ -133,6 +136,23 @@ the raw endpoint; its displacement-to-reference metrics are deliberately not
 published as crystal RMSD. No new docking inference or confidence selection
 was performed.
 
+## Confidence candidate annotations
+
+`pRMSD` is the frozen confidence model prediction used to rank eligible candidates.
+`RMSD` is the retrospective symmetry-aware heavy-atom error against the crystal
+ligand, in the receptor frame without alignment; it is not used for selection.
+The displayed candidates and their order remain unchanged. Stored reference
+RMSDs for all four were independently reproduced with `CalcRMS` to within
+1e-6 Å. The paired values and source-record hashes are stored separately in
+`candidate_annotations.json`; original geometry and capture records are unchanged.
+
+| Eligible rank | Bank index (zero-based) | pRMSD (Å) | RMSD (Å) |
+|---|---|---|---|
+| 1 | 41 | 1.59 | 0.96 |
+| 25 | 98 | 2.33 | 1.84 |
+| 50 | 3 | 2.82 | 1.81 |
+| 100 | 84 | 4.44 | 4.31 |
+
 ## Selected-pose reference overlay
 
 The output panel compares the frozen selected candidate (index 41) with the exact
@@ -170,7 +190,10 @@ N100 bank for the same 1T46–STI complex, at eligible predicted-RMSD ranks 1, 2
 and 100. The best-ranked candidate carries an overlaid ✓ and is shown as the
 selected output, overlaid with the crystal ligand in the unchanged receptor
 coordinate frame (symmetry-aware heavy-atom RMSD 0.96 Å);
-× marks the three unselected candidates, not physical invalidity. All molecular
+× marks the three unselected candidates, not physical invalidity. Each candidate
+is annotated with pRMSD (the ranking prediction) and RMSD (the retrospective
+crystal-reference symmetry-aware heavy-atom error), both in Å. Reference RMSD
+is displayed for comparison and is not used to select the pose. All molecular
 panels share camera, crop and scale. Carbon colors identify fragments in the trajectory and candidate panels;
 the final overlay instead uses blue for selected-pose carbons and peach for
 crystal carbons. Heteroatoms retain element colors. The generation/refinement trajectory is the

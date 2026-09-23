@@ -1,0 +1,36 @@
+{
+  "selection_sha256": "1d65ed7a6bfd8daecf1f1981627e10e4332697cb3547b304d510d64f22e1bc19",
+  "reference_sha256": "25011dfdb41bef8fd6a20fcb7eeefa5c3d28dd6b79924aa209c9bf8f2dabd231",
+  "unit": "angstrom",
+  "candidates": [
+    {
+      "index": 41,
+      "rank": 1,
+      "predicted_rmsd": 1.5893504619598389,
+      "symmetry_rmsd": 0.9585406947604571,
+      "verified_rmsd": 0.9585407383530757
+    },
+    {
+      "index": 98,
+      "rank": 25,
+      "predicted_rmsd": 2.3284177780151367,
+      "symmetry_rmsd": 1.8446002676909807,
+      "verified_rmsd": 1.8446001800064458
+    },
+    {
+      "index": 3,
+      "rank": 50,
+      "predicted_rmsd": 2.8240041732788086,
+      "symmetry_rmsd": 1.8122084788866115,
+      "verified_rmsd": 1.8122083721099307
+    },
+    {
+      "index": 84,
+      "rank": 100,
+      "predicted_rmsd": 4.439072608947754,
+      "symmetry_rmsd": 4.308258556198316,
+      "verified_rmsd": 4.308258561774364
+    }
+  ],
+  "note": "pRMSD is the frozen confidence prediction; RMSD is retrospective symmetry-aware heavy-atom error without alignment, not a selector input"
+}

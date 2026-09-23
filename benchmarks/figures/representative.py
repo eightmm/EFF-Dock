@@ -76,6 +76,31 @@ def selection_data():
     return record
 
 
+def annotation_data():
+    record = json.loads((DATA / "candidate_annotations.json").read_text())
+    for filename, key in (
+        ("selection_example.json", "selection_sha256"),
+        ("selected_reference.json", "reference_sha256"),
+    ):
+        if hashlib.sha256((DATA / filename).read_bytes()).hexdigest() != record[key]:
+            raise ValueError("Stale candidate RMSD annotations")
+    if record["unit"] != "angstrom":
+        raise ValueError("Unexpected candidate RMSD units")
+    for annotation, candidate in zip(
+        record["candidates"], selection_data()["candidates"], strict=True
+    ):
+        if any(annotation[key] != candidate[key] for key in ("index", "rank", "predicted_rmsd")):
+            raise ValueError("Candidate annotation identity differs")
+        values = [annotation[key] for key in ("predicted_rmsd", "symmetry_rmsd", "verified_rmsd")]
+        if (
+            not np.isfinite(values).all()
+            or min(values) < 0
+            or not np.isclose(values[1], values[2], atol=1e-6, rtol=0)
+        ):
+            raise ValueError("Invalid candidate RMSD annotation")
+    return record["candidates"]
+
+
 def reference_data():
     record = json.loads((DATA / "selected_reference.json").read_text())
     selection = selection_data()
@@ -482,6 +507,7 @@ def compose(row):
     candidates = [plt.imread(OVERVIEW_DIR / f"{stem}.png") for stem in CANDIDATE_VIEWS]
     overlay = plt.imread(OVERVIEW_DIR / "selected_overlay.png")
     selection = selection_data()
+    annotations = annotation_data()
     reference = reference_data()
     crop = common_crop([*flow, *refinement, *candidates, overlay])
     height, fw, box_width = 5.25, 1.30, 1.75
@@ -557,9 +583,8 @@ def compose(row):
         ("#FBF5F0", "#DCCBBE"),
         ("#F1F8F5", "#BBD3C9"),
     )
-    for i, (x, (fill, edge)) in enumerate(zip(columns[:4], palettes, strict=True)):
-        bottom = 1.39 if i == 0 else 0.30
-        card(x, bottom, box_width, 5.10 - bottom, edge=edge, fill=fill, lw=0.85)
+    for x, (fill, edge) in zip(columns[:4], palettes, strict=True):
+        card(x, 0.30, box_width, 4.80, edge=edge, fill=fill, lw=0.85)
     for left, right in zip(columns[:-1], columns[1:], strict=True):
         connector(fig, left + box_width + 0.065, right - 0.065, middle, WIDTH, height)
 
@@ -609,10 +634,19 @@ def compose(row):
     px = center - fw / 2
     label(center, 4.95, "Confidence selection", size=9)
     label(center, 4.70, "Predicted RMSD\nranking", size=8, weight="normal")
-    for upper, lower in zip(positions[:-1], positions[1:], strict=True):
-        label(center, (upper + lower + fh) / 2, "…", size=12, weight="normal", color=MUTED)
-    label(center, 0.415, r"$N\,\to\,1$", size=8.5, weight="normal", color=MUTED)
-    for pixels, candidate, y in zip(candidates, selection["candidates"], positions, strict=True):
+    for upper in positions[:-1]:
+        label(center, upper - 0.26, "…", size=10, weight="normal", color=MUTED)
+    label(center, 0.375, r"$N\,\to\,1$", size=8.5, weight="normal", color=MUTED)
+    for pixels, candidate, annotation, y in zip(
+        candidates, selection["candidates"], annotations, positions, strict=True
+    ):
+        label(
+            center,
+            y - 0.09,
+            f"pRMSD {annotation['predicted_rmsd']:.2f} Å  /  RMSD {annotation['symmetry_rmsd']:.2f} Å",
+            size=6.5,
+            weight="normal",
+        )
         selected = candidate["selected"]
         edge = "#82B7A4" if selected else FRAME_EDGE
         arts.append(frame(fig, rect(px, y, fw, fh), pixels, crop, edge, 0.9 if selected else 0.6))

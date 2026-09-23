@@ -156,6 +156,38 @@ def export(source_root):
         json.dumps(overlay, indent=2, allow_nan=False) + "\n"
     )
     print(f"Verified selected-pose crystal RMSD: {measured:.8f} A")
+    annotations = []
+    for candidate in candidates:
+        index = candidate["index"]
+        before = bank[index].GetConformer().GetPositions().copy()
+        measured = float(rdMolAlign.CalcRMS(bank[index], reference))
+        if not np.array_equal(before, bank[index].GetConformer().GetPositions()):
+            raise ValueError("Candidate RMSD verification modified coordinates")
+        saved = record["symmetry_rmsd"][index]
+        if not np.isclose(measured, saved, atol=1e-6, rtol=0):
+            raise ValueError("Candidate annotation differs from frozen RMSD")
+        annotations.append(
+            dict(
+                index=index,
+                rank=candidate["rank"],
+                predicted_rmsd=candidate["predicted_rmsd"],
+                symmetry_rmsd=saved,
+                verified_rmsd=measured,
+            )
+        )
+    annotation_record = dict(
+        selection_sha256=hashlib.sha256((DATA / "selection_example.json").read_bytes()).hexdigest(),
+        reference_sha256=hashlib.sha256(
+            (DATA / "selected_reference.json").read_bytes()
+        ).hexdigest(),
+        unit="angstrom",
+        candidates=annotations,
+        note="pRMSD is the frozen confidence prediction; RMSD is retrospective symmetry-aware heavy-atom error without alignment, not a selector input",
+    )
+    (DATA / "candidate_annotations.json").write_text(
+        json.dumps(annotation_record, indent=2, allow_nan=False) + "\n"
+    )
+    print("Verified all four candidate pRMSD/RMSD annotations")
 
 
 def main():

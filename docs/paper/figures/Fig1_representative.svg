@@ -28,15 +28,15 @@ z
 " style="fill: #ffffff"/>
   </g>
   <g id="patch_2">
-   <path d="M 13.1616 277.92
-L 127.2384 277.92
-Q 133.2 277.92 133.2 271.9584
+   <path d="M 13.1616 356.4
+L 127.2384 356.4
+Q 133.2 356.4 133.2 350.4384
 L 133.2 16.7616
 Q 133.2 10.8 127.2384 10.8
 L 13.1616 10.8
 Q 7.2 10.8 7.2 16.7616
-L 7.2 271.9584
-Q 7.2 277.92 13.1616 277.92
+L 7.2 350.4384
+Q 7.2 356.4 13.1616 356.4
 z
 " style="fill: #f3f7fa; stroke: #bdcdd8; stroke-width: 0.85; stroke-linejoin: miter"/>
   </g>
@@ -2193,17 +2193,17 @@ L 657.72 251.28
    <text style="font-size: 8px; font-family: 'STIXGeneral'; fill: #3e434a" transform="translate(511.58 45.606375)">ranking</text>
   </g>
   <g id="text_11">
-   <text style="font-size: 12px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="119.859455" transform="rotate(-0 523.8 119.859455)">…</text>
+   <text style="font-size: 10px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="125.449688" transform="rotate(-0 523.8 125.449688)">…</text>
   </g>
   <g id="text_12">
-   <text style="font-size: 12px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="196.899455" transform="rotate(-0 523.8 196.899455)">…</text>
+   <text style="font-size: 10px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="202.489688" transform="rotate(-0 523.8 202.489688)">…</text>
   </g>
   <g id="text_13">
-   <text style="font-size: 12px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="273.939455" transform="rotate(-0 523.8 273.939455)">…</text>
+   <text style="font-size: 10px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="279.529688" transform="rotate(-0 523.8 279.529688)">…</text>
   </g>
   <g id="text_14">
    <!-- $N\,\to\,1$ -->
-   <g style="fill: #7b838d" transform="translate(512.6225 350.100234)">
+   <g style="fill: #7b838d" transform="translate(512.6225 352.980234)">
     <text>
      <tspan x="0" y="-0.921875" style="font-style: italic; font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">N</tspan>
      <tspan x="7.919746" y="-0.921875" style="font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">→</tspan>
@@ -2212,12 +2212,24 @@ L 657.72 251.28
    </g>
   </g>
   <g id="text_15">
-   <text style="font-weight: 700; font-size: 9.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="675" y="146.313398" transform="rotate(-0 675 146.313398)">Selected pose</text>
+   <text style="font-size: 6.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="113.297695" transform="rotate(-0 523.8 113.297695)">pRMSD 1.59 Å  /  RMSD 0.96 Å</text>
   </g>
   <g id="text_16">
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="664.2" y="237.30375" transform="rotate(-0 664.2 237.30375)">Selected</text>
+   <text style="font-size: 6.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="190.337695" transform="rotate(-0 523.8 190.337695)">pRMSD 2.33 Å  /  RMSD 1.84 Å</text>
   </g>
   <g id="text_17">
+   <text style="font-size: 6.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="267.377695" transform="rotate(-0 523.8 267.377695)">pRMSD 2.82 Å  /  RMSD 1.81 Å</text>
+  </g>
+  <g id="text_18">
+   <text style="font-size: 6.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="344.417695" transform="rotate(-0 523.8 344.417695)">pRMSD 4.44 Å  /  RMSD 4.31 Å</text>
+  </g>
+  <g id="text_19">
+   <text style="font-weight: 700; font-size: 9.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="675" y="146.313398" transform="rotate(-0 675 146.313398)">Selected pose</text>
+  </g>
+  <g id="text_20">
+   <text style="font-size: 8px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="664.2" y="237.30375" transform="rotate(-0 664.2 237.30375)">Selected</text>
+  </g>
+  <g id="text_21">
    <text style="font-size: 8px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="664.2" y="253.14" transform="rotate(-0 664.2 253.14)">Crystal</text>
   </g>
   <g id="patch_40">
@@ -2272,7 +2284,7 @@ C 481.553122 296.804886 483.201484 297.48766 484.92 297.48766
 z
 " style="fill: #ffffff"/>
   </g>
-  <g id="text_18">
+  <g id="text_22">
    <g id="patch_44">
     <path d="M 26.97 64.150941
 L 49.740781 64.150941
@@ -2283,7 +2295,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="28.44" y="61.15516" transform="rotate(-0 28.44 61.15516)">Ligand</text>
   </g>
-  <g id="text_19">
+  <g id="text_23">
    <g id="patch_45">
     <path d="M 26.97 141.190941
 L 75.214219 141.190941
@@ -2294,7 +2306,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="28.44" y="138.19516" transform="rotate(-0 28.44 138.19516)">Rigid fragments</text>
   </g>
-  <g id="text_20">
+  <g id="text_24">
    <g id="patch_46">
     <path d="M 26.97 218.22766
 L 67.431094 218.22766
@@ -2305,7 +2317,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="28.44" y="215.238441" transform="rotate(-0 28.44 215.238441)">Given pocket</text>
   </g>
-  <g id="text_21">
+  <g id="text_25">
    <g id="patch_47">
     <path d="M 178.17 64.14766
 L 203.65 64.14766
@@ -2328,7 +2340,7 @@ z
     </text>
    </g>
   </g>
-  <g id="text_22">
+  <g id="text_26">
    <g id="patch_48">
     <path d="M 178.17 141.18766
 L 203.65 141.18766
@@ -2351,7 +2363,7 @@ z
     </text>
    </g>
   </g>
-  <g id="text_23">
+  <g id="text_27">
    <g id="patch_49">
     <path d="M 178.17 218.22766
 L 203.65 218.22766
@@ -2374,7 +2386,7 @@ z
     </text>
    </g>
   </g>
-  <g id="text_24">
+  <g id="text_28">
    <g id="patch_50">
     <path d="M 178.17 295.26766
 L 203.65 295.26766
@@ -2397,7 +2409,7 @@ z
     </text>
    </g>
   </g>
-  <g id="text_25">
+  <g id="text_29">
    <g id="patch_51">
     <path d="M 329.37 64.14766
 L 350.005781 64.14766
@@ -2408,7 +2420,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="330.84" y="61.158441" transform="rotate(-0 330.84 61.158441)">Step 0</text>
   </g>
-  <g id="text_26">
+  <g id="text_30">
    <g id="patch_52">
     <path d="M 329.37 141.20516
 L 353.505781 141.20516
@@ -2419,7 +2431,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="330.84" y="138.215941" transform="rotate(-0 330.84 138.215941)">Step 25</text>
   </g>
-  <g id="text_27">
+  <g id="text_31">
    <g id="patch_53">
     <path d="M 329.37 218.24516
 L 353.505781 218.24516
@@ -2430,7 +2442,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="330.84" y="215.255941" transform="rotate(-0 330.84 215.255941)">Step 50</text>
   </g>
-  <g id="text_28">
+  <g id="text_32">
    <g id="patch_54">
     <path d="M 329.37 295.26766
 L 357.005781 295.26766
@@ -2441,7 +2453,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="330.84" y="292.278441" transform="rotate(-0 330.84 292.278441)">Step 100</text>
   </g>
-  <g id="text_29">
+  <g id="text_33">
    <g id="patch_55">
     <path d="M 631.77 178.91805
 L 675.352656 178.91805
