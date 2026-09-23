@@ -12,14 +12,12 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 from benchmarks.figures.structure_views import ELEMENT_COLORS, JS_SHA256, JS_URL
 from benchmarks.figures.trajectory import COLORS, DATA, ROOT, scene, verify
 
 NAME = "Fig1_representative"
-# Saved frames nearest to t = 0 and 0.5, plus the t = 1 endpoint (views/manifest.json).
-FLOW_INDICES = (0, 2)
 POSE_INDEX = 10
 DARK = "#3E434A"
 MUTED = "#7B838D"
@@ -27,8 +25,8 @@ CONNECTOR = "#B4BBC4"
 FRAME_EDGE = "#D6DBE1"
 POSE_EDGE = "#8C96A3"
 
-# Figure geometry in inches; two-column width.
-WIDTH = 7.2
+# Landscape overview; preserve vector labels when scaling for the manuscript.
+WIDTH = 9.4
 
 
 def verify_extra_views():
@@ -159,7 +157,7 @@ def load():
         d = np.linalg.norm(xyz[:, ids, None] - xyz[:, None, ids], axis=-1)
         if len(ids) < 2 or np.abs(d - d[0]).max() > 1e-3:
             raise ValueError(f"Fragment {f} is not rigid across saved frames")
-    if set(FLOW_INDICES + (POSE_INDEX,)) - set(row["shown_indices"]):
+    if POSE_INDEX not in row["shown_indices"]:
         raise ValueError("Displayed frame lacks a verified capture")
     if POSE_INDEX != len(row["times"]) - 1:
         raise ValueError("Generated pose must be the t = 1 state")
@@ -279,19 +277,22 @@ def connector(fig, x0, x1, y, width, height):
 
 
 def compose(row):
-    images = {i: plt.imread(DATA / f"views/frame_{i:02d}.png") for i in row["shown_indices"]}
+    raw = plt.imread(DATA / f"views/frame_{POSE_INDEX:02d}.png")
     refined = plt.imread(DATA / "views/refined_endpoint.png")
-    crop = common_crop([*images.values(), refined])
-    height = 3.12
-    fw = 1.65
+    pocket = plt.imread(DATA / "views/supplied_pocket.png")
+    crop = common_crop([raw, refined])
+    height = 2.2
+    fw = 1.43
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
-    bottom = 0.30
+    middle = 1.23
+    bottom = middle - fh / 2
     fig = plt.figure(figsize=(WIDTH, height))
+    arts = []
 
     def rect(x, y, w, h):
         return [x / WIDTH, y / height, w / WIDTH, h / height]
 
-    def label(x, y, text, size=9, weight="semibold", color=DARK):
+    def label(x, y, text, size=9.5, weight="semibold", color=DARK):
         fig.text(
             x / WIDTH,
             y / height,
@@ -303,74 +304,72 @@ def compose(row):
             va="center",
         )
 
-    ligand_diagram(fig.add_axes(rect(0.07, 1.90, 2.02, 0.82)), row)
-    ligand_diagram(fig.add_axes(rect(2.92, 1.90, 2.02, 0.82)), row, fragmented=True)
-    label(1.08, 2.94, "Ligand")
-    label(3.93, 2.94, "Rigid fragments")
-    label(2.50, 2.62, "Fragmentation", size=8, weight="normal")
-    connector(fig, 2.20, 2.79, 2.31, WIDTH, height)
-
-    pocket = plt.imread(DATA / "views/supplied_pocket.png")
-    ax = fig.add_axes(rect(5.49, 1.83, 1.60, 0.98))
-    arts = [ax.imshow(pocket, interpolation="none")]
-    y0, y1, x0, x1 = crop
-    ax.add_patch(
-        Rectangle(
-            (x0, y0),
-            x1 - x0,
-            y1 - y0,
-            fill=False,
-            edgecolor="#61788F",
-            linewidth=0.7,
-            linestyle=(0, (3, 2)),
-        )
-    )
-    ax.set_axis_off()
-    label(6.29, 2.94, "Supplied pocket")
-
-    # Both supplied inputs condition the flow; the bracket is not a learned module.
-    for x in (3.93, 6.29):
-        fig.add_artist(
-            plt.Line2D(
-                [x / WIDTH, x / WIDTH, 2.70 / WIDTH],
-                [1.81 / height, 1.66 / height, 1.66 / height],
-                color=CONNECTOR,
-                linewidth=0.8,
-            )
-        )
-    fig.add_artist(
-        FancyArrowPatch(
-            (2.70 / WIDTH, 1.66 / height),
-            (2.70 / WIDTH, 1.53 / height),
+    def card(x, y, w, h, edge=FRAME_EDGE, fill="white", lw=0.7):
+        patch = FancyBboxPatch(
+            (x / WIDTH, y / height),
+            w / WIDTH,
+            h / height,
+            boxstyle="round,pad=0,rounding_size=0.006",
             transform=fig.transFigure,
-            arrowstyle="-|>",
-            mutation_scale=7,
+            facecolor=fill,
+            edgecolor=edge,
+            linewidth=lw,
+            mutation_aspect=WIDTH / height,
+            zorder=-1,
+        )
+        fig.add_artist(patch)
+
+    def candidates(x, pixels):
+        # Empty backing cards denote multiplicity, not fabricated molecular poses.
+        for offset, fill in ((0.14, "#F3F6F8"), (0.07, "#FAFBFC")):
+            card(x + offset, bottom + offset, fw, fh, fill=fill)
+        arts.append(frame(fig, rect(x, bottom, fw, fh), pixels, crop, FRAME_EDGE, 0.7))
+
+    label(0.60, 1.96, "Ligand")
+    label(2.04, 1.96, "Rigid fragments")
+    ligand_diagram(fig.add_axes(rect(0.03, middle - 0.32, 1.13, 0.64)), row)
+    ligand_diagram(fig.add_axes(rect(1.47, middle - 0.32, 1.13, 0.64)), row, fragmented=True)
+    connector(fig, 1.20, 1.42, middle, WIDTH, height)
+
+    pw = 1.05
+    ph = pw * (crop[1] - crop[0]) / (crop[3] - crop[2])
+    arts.append(frame(fig, rect(1.515, 0.10, pw, ph), pocket, crop, FRAME_EDGE, 0.6))
+    label(2.04, 0.10 + ph + 0.13, "Given pocket", size=8, weight="normal")
+    # A short local join combines the two supplied inputs before generation.
+    fig.add_artist(
+        plt.Line2D(
+            [2.62 / WIDTH, 2.81 / WIDTH, 2.81 / WIDTH],
+            [(0.10 + ph / 2) / height, (0.10 + ph / 2) / height, middle / height],
             color=CONNECTOR,
-            linewidth=0.8,
+            linewidth=0.9,
         )
     )
-    label(2.70, 1.43, "SE(3) flow")
-    label(6.305, 1.52, "Energy refinement")
-    label(6.305, 1.32, r"$E_{\mathrm{physical}}+E_{\mathrm{interaction}}$", size=8, weight="normal")
+    connector(fig, 2.65, 2.97, middle, WIDTH, height)
 
-    positions = (0.05, 1.86, 3.67, 5.48)
-    for x, index in zip(positions[:3], FLOW_INDICES + (POSE_INDEX,), strict=True):
-        arts.append(frame(fig, rect(x, bottom, fw, fh), images[index], crop, FRAME_EDGE, 0.5))
-        time = row["times"][index]
-        text = f"$t$ = {time:.3f}" if index == 2 else f"$t$ = {int(time)}"
-        if index == POSE_INDEX:
-            text += " · Generated pose"
-        label(x + fw / 2, bottom - 0.16, text, size=7.5, weight="normal")
-    arts.append(frame(fig, rect(positions[-1], bottom, fw, fh), refined, crop, POSE_EDGE, 0.65))
-    record = verify_refinement(row)
-    label(
-        6.305,
-        bottom - 0.16,
-        f"Refined pose · {record['saved_steps'][-1]} steps",
-        size=7.5,
-        weight="normal",
-    )
-    connector(fig, 5.34, 5.46, bottom + fh / 2, WIDTH, height)
+    candidates(3.02, raw)
+    label(3.79, 1.96, "Pose generation")
+    label(3.79, 0.56, r"SE(3) flow · $t$: 0 → 1", size=8, weight="normal")
+    connector(fig, 4.63, 4.89, middle, WIDTH, height)
+
+    candidates(4.94, refined)
+    label(5.71, 1.96, "Post-refinement")
+    label(5.71, 0.56, "Physical + interaction energy", size=8, weight="normal")
+    connector(fig, 6.55, 6.79, middle, WIDTH, height)
+
+    label(7.14, 1.96, "Confidence\nselection", size=9)
+    # Rank glyphs are conceptual. No confidence scores were computed for this N1 example.
+    for y, text, edge, fill in (
+        (middle - 0.10, "1", "#78A797", "#E6F1EA"),
+        (middle - 0.37, "2", FRAME_EDGE, "#F4F6F8"),
+        (middle - 0.64, "⋯", FRAME_EDGE, "#F4F6F8"),
+    ):
+        card(6.87, y, 0.54, 0.20, edge=edge, fill=fill)
+        label(7.14, y + 0.10, text, size=8, weight="normal")
+    label(7.14, 0.30, "Lowest predicted\nRMSD", size=8, weight="normal")
+    connector(fig, 7.47, 7.84, middle, WIDTH, height)
+
+    arts.append(frame(fig, rect(7.90, bottom, fw, fh), refined, crop, "#78A797", 1.0))
+    label(8.615, 1.96, "Selected pose")
     return fig, arts
 
 
@@ -397,8 +396,7 @@ def render(out):
             art.set_interpolation("antialiased")
         fig.savefig(out / f"{NAME}.png", dpi=400, metadata={"Software": None})
         plt.close(fig)
-    shown = ", ".join(f"{i} (t={row['times'][i]:.3f})" for i in FLOW_INDICES + (POSE_INDEX,))
-    print(f"Rendered {NAME} PDF/SVG/PNG in {out}; frames {shown}")
+    print(f"Rendered {NAME} PDF/SVG/PNG in {out}; saved endpoint and conceptual selection")
 
 
 def main():

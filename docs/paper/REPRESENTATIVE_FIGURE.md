@@ -1,9 +1,9 @@
 # Figure 1 representative image
 
-A standalone concept figure for known-pocket redocking: intact ligand → rigid
-fragments, combined with a supplied pocket → unguided SE(3) generation →
-post-generation energy refinement.
-The layout was reviewed with Claude Opus 5.5 and implemented/verified locally.
+A standalone left-to-right overview for known-pocket redocking: ligand
+fragmentation + given pocket → candidate generation → post-generation refinement
+→ confidence selection → one output pose. Refinement is downstream of the
+completed generative flow. No η-based guidance is depicted.
 This draft does not change the existing 21-page reference package.
 
 - [PDF](figures/Fig1_representative.pdf)
@@ -47,22 +47,28 @@ energy parameter identities and implementation checksums are retained.
 
 ## Displayed states and interpretation
 
-| State | Source | Time / iteration |
-|---|---|---|
-| Ligand | Original prepared STI molecular graph; five fragment boundaries marked | 2D input diagram |
-| Rigid fragments | Same 2D coordinates, with those five bonds omitted; six saved fragment identities | Schematic decomposition |
-| Supplied pocket | Stored 1T46 receptor; ligand models hidden | Input |
-| Initial state | Saved ODE frame 0 | t = 0 |
-| Intermediate state | Saved ODE frame 2 | t = 0.488 |
-| Generated pose | Saved ODE frame 10 | t = 1 |
-| Refined pose | CPU refinement of that exact endpoint | Step 100 |
+| Display | Source / meaning |
+|---|---|
+| Ligand | Original prepared STI graph; five fragment boundaries marked |
+| Rigid fragments | Same 2D coordinates with those five bonds omitted; six saved fragment identities |
+| Given pocket | Stored 1T46 receptor, ligand hidden, matching close-up crop |
+| Pose generation | Actual saved t = 1 endpoint of the unguided N1/S10 trajectory |
+| Post-refinement | Recorded 100-step CPU refinement of that exact endpoint |
+| Stacked cards | Conceptual candidate bank; backing cards contain no invented poses |
+| Confidence ranks and selected pose | Conceptual selection; the same refined view is reused to illustrate the output |
 
-The receptor-only thumbnail uses the same orientation and camera. Its dashed
-rectangle marks the image region displayed in the molecular panels, not a
-predicted pocket, selected residue set or a radial cutoff. The thumbnail is
-shown at a smaller display scale; all four trajectory/refinement panels share
-one camera, crop and display scale. Darker receptor coloring is used only for
-the supplied-pocket thumbnail.
+**Selection is schematic.** The displayed trajectory contains one candidate.
+No additional candidate coordinates, confidence scores or measured ranking are
+introduced by this figure. The small rank glyphs describe the selection operation,
+not observed ranks of this molecule. The output view is not claimed to be a
+measured best-of-N result. In the full workflow, confidence ranks eligible refined
+candidates by predicted RMSD; the primary benchmark also applies its documented
+chirality eligibility filter. Raw and refined banks are scored independently.
+
+All molecular views use the same camera and crop. The pocket thumbnail is
+smaller; the generation, refinement and selected-pose views share display scale.
+The intact and fragmented ligand diagrams share a 2D depiction, not a docking
+conformer. The full time-series remains in the separate trajectory figure.
 
 Refinement used the original prepared ligand for parameterization, stored
 fragment assignments, a fixed receptor, an 18 Å receptor shell, and 100 maximum
@@ -84,28 +90,21 @@ was performed.
 
 ## Caption
 
-**Pocket-conditioned fragment generation followed by energy refinement.**
-A ligand is decomposed into rigid fragments and combined with a supplied receptor
-pocket to condition unguided SE(3) pose generation. Top: a 2D depiction of STI
-marks the five bonds crossing the saved fragment boundaries; omitting these
-bonds reveals the six color-coded fragments. The two depictions share the same
-2D coordinates and are neither docking poses nor newly generated conformers.
-The supplied-pocket thumbnail shows the stored 1T46 receptor without ligand;
-its dashed rectangle marks the close-up region, not a predicted pocket or
-distance-cutoff boundary. Bottom: actual saved ODE states at t = 0, 0.488
-and 1 (frames 0, 2 and 10 of 11). The generated t = 1 pose then undergoes
-100 CPU optimization steps using physical and protein–ligand interaction
-energies, with fixed receptor coordinates and rigid fragment internal geometry.
-The refined panel shows the resulting coordinates of this same pose. Physical
-terms describe covalent geometry and nonbonded/steric contributions; interaction
-terms describe typed protein–ligand contacts. These postprocessing energies are
-distinct from the learned vector field and are not binding affinities. All
-molecular trajectory/refinement panels share a camera, crop and scale. Carbon colors track fragments;
-heteroatoms retain element colors. Interfragment bonds are hidden in the early
-ODE panels and drawn at the endpoint and after refinement solely for display;
-no chemical bond formation is simulated. Flow time is dimensionless and is not
-physical time or optimization iteration. This separate N1/S10 illustration uses
-prior sigma 2 Å and seed 42. The refinement reaches the step budget and uses a
-finite 18 Å receptor shell whose full-neighborhood envelope is not satisfied;
-it does not establish convergence, docking accuracy, PB validity or representative
-improvement. Confidence/chirality selection is downstream and is not shown.
+**Fragment-based docking with post-generation refinement and confidence selection.**
+Left to right: the input ligand is decomposed into rigid fragments and combined
+with a given receptor pocket to generate a bank of candidate poses through
+unguided SE(3) flow from t = 0 to t = 1. After generation, candidates undergo
+refinement using physical and protein–ligand interaction energies. A confidence
+model ranks eligible refined candidates by predicted RMSD and selects one pose;
+the primary benchmark's chirality eligibility filter is omitted from the drawing
+for clarity. Refinement is a post-generation operation, distinct from the learned
+flow; η-based guidance is not shown. Carbon colors identify fragments, while
+heteroatoms retain element colors. The molecular views reuse the saved 1T46–STI
+N1/S10 endpoint and its actual 100-step refinement, with matched cameras and scale.
+Stacked cards and rank glyphs schematically illustrate candidate multiplicity and
+selection; the final view reuses the refined pose and does not represent a measured
+best-of-N outcome. The 2D ligand diagrams show the actual five fragment boundaries
+and six fragment assignments. Bonds are omitted only to depict decomposition;
+no chemical bond-breaking or formation reaction is simulated. The numerical
+example illustrates the workflow rather than convergence or an accuracy gain;
+its finite-shell refinement limitations are documented above.
