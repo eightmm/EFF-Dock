@@ -57,7 +57,7 @@ elements retain the palette in `structure_views/manifest.json`. Display chains
 are selected by any protein heavy atom within 5 Å of the crystal ligand, then
 retained in full. This is a visualization selection, not a new pocket or metric.
 
-The ordinary 20-figure renderer uses the six checked PNG captures, so it needs
+The ordinary 20-figure renderer uses the three checked pocket PNG captures, so it needs
 no browser or additional molecular-view dependencies. To regenerate the captures,
 use the optional `py3Dmol==2.5.5` and `playwright==1.62.0` packages with Playwright
 Chromium and its OS libraries. Download the pinned JavaScript file named below;
@@ -73,4 +73,10 @@ Camera and style settings are in `benchmarks/figures/structure_views.py`. The
 manifest records browser/library versions and per-view checksums. Rebuilding on
 a different software-rendering stack may change pixels, even with identical
 coordinates; update capture and paper-manifest hashes deliberately after review.
-The ligand-coordinate and selected-case fields are unchanged by this revision.
+Only pocket close-ups are shown. A and C retain their original Astex repeat-0
+median selections. B is the largest eligible same-candidate RMSD improvement
+across five cohorts and three repeats, an explicitly post-hoc extreme example
+(see the protocol amendment). `rescue_candidates.json` records all 138 eligible
+complex-repeat selections; `rescue_search_sources.json` records the 15 input
+ledger checksums. Re-running `benchmarks.analysis.evidence` exports these audits
+along with the structures. No new docking inference or PB evaluation is needed.

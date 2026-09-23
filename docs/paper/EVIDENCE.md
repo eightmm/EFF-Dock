@@ -100,21 +100,31 @@ failures remain; it is not a universal stereochemical repair claim.
 
 ## Structure examples — Figure S8
 
-Astex repeat 0, chosen by fixed median rules before viewing structures:
+A and C retain their original lower-median selections in Astex repeat 0.
+At the user's request, B uses an expanded, explicitly post-hoc extreme-example
+rule: maximize same-candidate RMSD improvement among primary refined selections
+in five cohorts and three repeats, requiring raw RMSD ≥2 Å, refined RMSD <2 Å
+and refined PB validity. Dataset, repeat and ID break ties. The rule was fixed
+before the expanded search; this is not a typical effect or prevalence estimate.
 
-| Mechanism | Complex | Selected refined RMSD | Comparator | Eligible examples |
-|---|---|---:|---|---:|
-| Successful pose | 1OWE | 0.80 Å | — | 66 |
-| Refinement rescue | 1HVY | 1.98 Å | 2.32 Å (raw, same index) | 1 |
-| Selection failure | 1TZ8 | 2.27 Å | 0.65 Å (refined oracle) | 14 |
+| Mechanism | Dataset / repeat | Complex | Selected refined RMSD | Comparator | Eligible examples |
+|---|---|---|---:|---|---:|
+| Successful pose | Astex / 0 | 1OWE | 0.80 Å | — | 66 |
+| Refinement rescue | PoseBusters v2 / 0 | 7FB7–8NF | 0.30 Å | 2.08 Å (raw, same index 76) | 138 |
+| Selection failure | Astex / 0 | 1TZ8 | 2.27 Å | 0.65 Å (refined oracle) | 14 |
 
-The rescue crosses the 2 Å threshold only narrowly, and is the sole eligible
-example under this rule. The drawings preserve the receptor frame and show actual protein cartoons, with
-complete ligand-contacting chains above and a binding-site enlargement below.
-Carbon colors identify poses; heteroatom colors identify elements. Stored
-coordinates, displayed receptor chains, connectivity and software-rendered
-captures are distributed for re-rendering. No independent ligand superposition
-or contact/interaction assignment is used.
+The rescue improves by 1.7784 Å; all 27 saved non-RMSD PB checks pass after
+refinement. The 138 eligible records are complex-repeat selections, not 138
+independent complexes. The audit lists all eligible candidates in
+`benchmarks/results/paper/evidence/rescue_candidates.json` and the 15 ledger
+checksums in `rescue_search_sources.json`. No new pose generation or PB
+measurement was run. Numerical aggregate results elsewhere are unchanged.
+
+Only binding-site close-ups are shown; the full-protein overview row was
+removed. Carbon colors identify poses; heteroatom colors identify elements.
+Stored coordinates, displayed receptor chains, connectivity and three software
+rendered captures are distributed for re-rendering. No independent ligand
+superposition or contact/interaction assignment is used.
 
 ## Local-baseline paired uncertainty — Figure S9
 

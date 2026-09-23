@@ -159,7 +159,7 @@ def verify():
             r
             for r in cases
             if (r["dataset"], r["id"], r["repeat"], r["stage"])
-            == ("astex", row["id"], 0, "refined")
+            == (row["dataset"], row["id"], row["repeat"], "refined")
         )
         close(row["selected_rmsd"], match["selected_rmsd"])
         require(row["selected_index"] == match["selected_index"], "Structure index mismatch")
@@ -171,6 +171,48 @@ def verify():
                     xyz.shape == (len(mol["elements"]), 3) and np.isfinite(xyz).all(),
                     "Structure coordinates",
                 )
+    rescues = json.loads((directory / "rescue_candidates.json").read_text())
+    require(bool(rescues), "No rescue audit records")
+    require(
+        rescues
+        == sorted(rescues, key=lambda r: (-r["improvement"], r["dataset"], r["repeat"], r["id"])),
+        "Rescue ordering",
+    )
+    case_lookup = {(r["dataset"], r["repeat"], r["id"], r["stage"]): r for r in cases}
+    for r in rescues:
+        key = (r["dataset"], r["repeat"], r["id"], "refined")
+        selected = case_lookup[key]
+        evaluated = pb[key + ("filtered",)]
+        require(
+            r["raw_rmsd"] >= 2 and r["refined_rmsd"] < 2 and r["pb_valid"], "Rescue eligibility"
+        )
+        require(
+            selected["filtered_joint"] and all(evaluated["checks"].values()), "Rescue PB mismatch"
+        )
+        require(
+            r["selected_index"] == selected["selected_index"] == evaluated["pose_index"],
+            "Rescue candidate mismatch",
+        )
+        close(r["refined_rmsd"], selected["selected_rmsd"])
+        close(r["improvement"], r["raw_rmsd"] - r["refined_rmsd"])
+    example = json.loads((directory / "structures.json").read_text())[1]
+    best = rescues[0]
+    require(
+        all(example[k] == best[k] for k in ("dataset", "repeat", "id", "selected_index")),
+        "Not the maximum rescue",
+    )
+    require(
+        example["eligible_cases"] == len(rescues) and example["median_order"] is None,
+        "Extreme selection metadata",
+    )
+    close(example["comparator_rmsd"], best["raw_rmsd"])
+    sources = json.loads((directory / "rescue_search_sources.json").read_text())
+    require(
+        sources["complex_repeats"] == 6246 and len(sources["sources"]) == 15,
+        "Rescue search coverage",
+    )
+    for r in sources["sources"]:
+        require(data["sources"][r["path"]] == r["sha256"], "Rescue ledger identity")
     views = directory / "structure_views"
     scene_manifest = json.loads((views / "manifest.json").read_text())
     require(
@@ -183,7 +225,7 @@ def verify():
         == {
             (r["id"], mode)
             for r in json.loads((directory / "structures.json").read_text())
-            for mode in ("overview", "pocket")
+            for mode in ("pocket",)
         },
         "Missing structure view",
     )

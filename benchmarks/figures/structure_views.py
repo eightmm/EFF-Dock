@@ -39,7 +39,7 @@ def atoms(mol):
     return result
 
 
-def make_html(row, mode, javascript):
+def make_html(row, javascript):
     import py3Dmol
 
     view = py3Dmol.view(width=900, height=680)
@@ -49,7 +49,7 @@ def make_html(row, mode, javascript):
         {
             "cartoon": {
                 "color": "#B7C7D8",
-                "opacity": 1.0 if mode == "overview" else 0.45,
+                "opacity": 0.45,
                 "arrows": True,
                 "thickness": 0.35,
             }
@@ -68,10 +68,10 @@ def make_html(row, mode, javascript):
             {
                 "stick": {
                     "colorscheme": scheme,
-                    "radius": 0.19 if mode == "pocket" else 0.24,
+                    "radius": 0.19,
                     "singleBonds": True,
                 },
-                "sphere": {"colorscheme": scheme, "scale": 0.20 if mode == "pocket" else 0.27},
+                "sphere": {"colorscheme": scheme, "scale": 0.20},
             },
         )
         models.append(model)
@@ -80,8 +80,8 @@ def make_html(row, mode, javascript):
     # One common camera rotation for every molecule; no coordinate alignment.
     view.rotate(30, "y")
     view.rotate(-15, "x")
-    view.zoomTo({"model": 0} if mode == "overview" else {"model": models})
-    view.zoom(1.30 if mode == "overview" else 1.1)
+    view.zoomTo({"model": models})
+    view.zoom(1.1)
     view.render()
     content = view._make_html()
     variable = re.search(r"var (viewer_[A-Za-z0-9_]+) = null;", content).group(1)
@@ -121,45 +121,45 @@ async def capture(javascript, work, out):
         )
         version = browser.version
         for row in rows:
-            for mode in ("overview", "pocket"):
-                stem = f"{row['id']}_{mode}"
-                html = work / f"{stem}.html"
-                html.write_text(make_html(row, mode, javascript))
-                page = await browser.new_page(
-                    viewport={"width": 900, "height": 680}, device_scale_factor=2
+            mode = "pocket"
+            stem = f"{row['id']}_{mode}"
+            html = work / f"{stem}.html"
+            html.write_text(make_html(row, javascript))
+            page = await browser.new_page(
+                viewport={"width": 900, "height": 680}, device_scale_factor=2
+            )
+            errors = []
+            page.on("pageerror", lambda error: errors.append(str(error)))
+            await page.goto(html.resolve().as_uri(), wait_until="load")
+            await page.wait_for_function("window.sceneReady === true", timeout=60000)
+            scene = await page.evaluate("window.sceneInfo")
+            if errors or "SwiftShader" not in scene["renderer"]:
+                raise ValueError(
+                    f"Scene failed or did not use software rendering: {errors}, {scene}"
                 )
-                errors = []
-                page.on("pageerror", lambda error: errors.append(str(error)))
-                await page.goto(html.resolve().as_uri(), wait_until="load")
-                await page.wait_for_function("window.sceneReady === true", timeout=60000)
-                scene = await page.evaluate("window.sceneInfo")
-                if errors or "SwiftShader" not in scene["renderer"]:
-                    raise ValueError(
-                        f"Scene failed or did not use software rendering: {errors}, {scene}"
-                    )
-                if not scene["secondary"].get("h", 0) + scene["secondary"].get("s", 0):
-                    raise ValueError("No helix/sheet assignment in receptor cartoon")
-                output = out / f"{stem}.png"
-                await page.screenshot(path=str(output), animations="disabled")
-                # Reject blank captures, not small camera/color differences across GPUs.
-                from PIL import Image
+            if not scene["secondary"].get("h", 0) + scene["secondary"].get("s", 0):
+                raise ValueError("No helix/sheet assignment in receptor cartoon")
+            output = out / f"{stem}.png"
+            await page.screenshot(path=str(output), animations="disabled")
+            # Reject blank captures, not small camera/color differences across GPUs.
+            from PIL import Image
 
-                pixels = np.asarray(Image.open(output).convert("RGB"))
-                nonwhite = np.mean(np.min(pixels, axis=-1) < 230)
-                if nonwhite < 0.015:
-                    raise ValueError(f"Empty molecular scene: {stem}")
-                records.append(
-                    dict(
-                        id=row["id"],
-                        mode=mode,
-                        file=output.name,
-                        sha256=hashlib.sha256(output.read_bytes()).hexdigest(),
-                        scene=scene,
-                        nonwhite_fraction=float(nonwhite),
-                    )
+            pixels = np.asarray(Image.open(output).convert("RGB"))
+            nonwhite = np.mean(np.min(pixels, axis=-1) < 230)
+            if nonwhite < 0.015:
+                raise ValueError(f"Empty molecular scene: {stem}")
+            records.append(
+                dict(
+                    id=row["id"],
+                    mode=mode,
+                    file=output.name,
+                    sha256=hashlib.sha256(output.read_bytes()).hexdigest(),
+                    scene=scene,
+                    nonwhite_fraction=float(nonwhite),
                 )
-                print(stem, scene, f"visible fraction={nonwhite:.3f}", flush=True)
-                await page.close()
+            )
+            print(stem, scene, f"visible fraction={nonwhite:.3f}", flush=True)
+            await page.close()
         await browser.close()
     manifest = dict(
         structures_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),

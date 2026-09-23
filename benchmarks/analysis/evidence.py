@@ -506,11 +506,42 @@ def sample_cases(root, out, cases, private, pb, result):
         if r["oracle_success"] and not r["filtered_success"]
     ]
     rescue = []
-    for r in refined:
-        raw = private["astex", 0, r["id"], "raw"]
+    for r in cases:
+        if r["stage"] != "refined":
+            continue
+        raw = private[r["dataset"], r["repeat"], r["id"], "raw"]
         before = raw["symmetry_rmsd"][r["selected_index"]]
         if before >= 2 and r["filtered_joint"]:
             rescue.append((before - r["selected_rmsd"], r))
+    audit = [
+        dict(
+            dataset=r["dataset"],
+            repeat=r["repeat"],
+            id=r["id"],
+            selected_index=r["selected_index"],
+            raw_rmsd=private[r["dataset"], r["repeat"], r["id"], "raw"]["symmetry_rmsd"][
+                r["selected_index"]
+            ],
+            refined_rmsd=r["selected_rmsd"],
+            improvement=effect,
+            pb_valid=True,
+        )
+        for effect, r in sorted(
+            rescue, key=lambda x: (-x[0], x[1]["dataset"], x[1]["repeat"], x[1]["id"])
+        )
+    ]
+    (out / "rescue_candidates.json").write_text(json.dumps(audit, indent=2) + "\n")
+    search_sources = dict(
+        sources=[
+            dict(path=path, sha256=result["sources"][path])
+            for ds in COUNTS
+            for rep in range(3)
+            for path in [f"outputs/benchmarks/{BANKS[ds]}/{ds}_repeat_{rep}/records.json"]
+        ],
+        complex_repeats=sum(COUNTS.values()) * 3,
+        rule="Maximum same-candidate RMSD improvement; raw >=2 A, refined <2 A, primary refined selection PB-valid; ties by dataset, repeat, ID",
+    )
+    (out / "rescue_search_sources.json").write_text(json.dumps(search_sources, indent=2) + "\n")
     geometries = []
 
     def molecule(path, index=0, expected=None):
@@ -540,10 +571,15 @@ def sample_cases(root, out, cases, private, pb, result):
         ("Selection failure", failure),
     ):
         require(bool(candidates), f"No eligible example for {title}")
-        ordered = sorted(candidates, key=lambda x: (x[0], x[1]["id"]))
-        effect, row = ordered[(len(ordered) - 1) // 2]
-        rec = private["astex", 0, row["id"], "refined"]
-        raw = private["astex", 0, row["id"], "raw"]
+        extreme = title == "Refinement rescue"
+        ordered = sorted(
+            candidates,
+            key=lambda x: (-x[0] if extreme else x[0], x[1]["dataset"], x[1]["repeat"], x[1]["id"]),
+        )
+        order = 0 if extreme else (len(ordered) - 1) // 2
+        effect, row = ordered[order]
+        rec = private[row["dataset"], row["repeat"], row["id"], "refined"]
+        raw = private[row["dataset"], row["repeat"], row["id"], "raw"]
         conf = json.loads(Path(rec["confidence_summary"]).read_text())
         ref = json.loads(Path(conf["inputs"]["refinement_summary"]).read_text())
         inputs = ref["inputs"]
@@ -565,11 +601,14 @@ def sample_cases(root, out, cases, private, pb, result):
         geometries.append(
             dict(
                 title=title,
-                dataset="astex",
+                dataset=row["dataset"],
                 id=row["id"],
-                repeat=0,
+                repeat=row["repeat"],
                 eligible_cases=len(ordered),
-                median_order=(len(ordered) - 1) // 2,
+                median_order=None if extreme else order,
+                selection_rule="maximum improvement across five cohorts and three repeats"
+                if extreme
+                else "lower median in Astex repeat 0",
                 effect=effect,
                 selected_rmsd=row["selected_rmsd"],
                 comparator_rmsd=comparator_rmsd,
@@ -592,7 +631,19 @@ def sample_cases(root, out, cases, private, pb, result):
         )
     (out / "structures.json").write_text(json.dumps(geometries, indent=2, allow_nan=False) + "\n")
     result["case_ids"] = [
-        {k: r[k] for k in ("title", "id", "selected_rmsd", "comparator_rmsd", "eligible_cases")}
+        {
+            k: r[k]
+            for k in (
+                "title",
+                "dataset",
+                "repeat",
+                "id",
+                "selected_rmsd",
+                "comparator_rmsd",
+                "eligible_cases",
+                "selection_rule",
+            )
+        }
         for r in geometries
     ]
     (out / "results.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")

@@ -259,13 +259,12 @@ def structures(rows, out):
     from benchmarks.figures.structure_views import ELEMENT_COLORS, POSE_COLORS
 
     views = DATA / "structure_views"
-    fig, axes = plt.subplots(2, 3, figsize=(14.2, 8.8), gridspec_kw={"height_ratios": [1, 1.15]})
+    fig, axes = plt.subplots(1, 3, figsize=(14.2, 5.3))
     for i, row in enumerate(rows):
-        for j, mode in enumerate(("overview", "pocket")):
-            ax = axes[j, i]
-            ax.imshow(plt.imread(views / f"{row['id']}_{mode}.png"))
-            ax.set_axis_off()
-        axes[0, i].set_title(
+        ax = axes[i]
+        ax.imshow(plt.imread(views / f"{row['id']}_pocket.png"))
+        ax.set_axis_off()
+        ax.set_title(
             f"{chr(65 + i)}  {row['title']}\n{row['id'].upper()}",
             loc="left",
             fontweight="bold",
@@ -275,11 +274,7 @@ def structures(rows, out):
         if row["comparator_rmsd"] is not None:
             label = "Raw, same pose" if i == 1 else "Oracle"
             detail += f"   ·   {label}: {row['comparator_rmsd']:.2f} Å"
-        axes[1, i].text(
-            0.5, -0.065, detail, transform=axes[1, i].transAxes, ha="center", fontsize=10
-        )
-    fig.text(0.012, 0.72, "Protein", rotation=90, va="center", fontsize=11, color=DARK)
-    fig.text(0.012, 0.32, "Binding site", rotation=90, va="center", fontsize=11, color=DARK)
+        axes[i].text(0.5, -0.065, detail, transform=axes[i].transAxes, ha="center", fontsize=10)
     handles = [Line2D([], [], color=c, lw=4) for c in POSE_COLORS.values()]
     labels = ["Crystal carbon", "Selected carbon", "Raw / oracle carbon"]
     present = set(
@@ -290,7 +285,7 @@ def structures(rows, out):
             handles.append(Line2D([], [], marker="o", color=color, linestyle="none", ms=6))
             labels.append(element)
     fig.legend(handles, labels, ncol=len(labels), frameon=False, loc="lower center", fontsize=10)
-    fig.subplots_adjust(left=0.035, right=0.985, top=0.89, bottom=0.10, hspace=0.10, wspace=0.045)
+    fig.subplots_adjust(left=0.02, right=0.985, top=0.84, bottom=0.18, wspace=0.06)
     save(fig, out, "S8_structure_examples", dpi=400)
 
 

@@ -66,3 +66,16 @@ or protein-family-level resampling. Preserve negative and inconclusive effects.
 Count parameter objects in the released models instantiated on CPU, excluding
 non-parameter buffers. Derive amortized pose throughput from existing mean
 pipeline timing only. Do not infer training wall time from checkpoint steps.
+
+### Pocket-only example and rescue selection amendment (2026-09-23)
+
+At the user's request, remove the full-protein overview row from page19/S8.
+Keep the original successful and selection-failure examples. Replace the rescue
+with the largest absolute same-candidate raw-to-refined RMSD decrease among
+primary refined selections across all five external datasets and three repeats,
+requiring raw RMSD >=2 A, refined RMSD <2 A and refined PB validity. Break ties
+by dataset, repeat and complex ID. This post-hoc extreme illustration is not a
+representative effect or a prevalence estimate. Freeze this rule before the
+expanded search; export eligible candidates and source-ledger hashes for audit.
+No new inference or PB evaluation; reuse saved coordinates and labels. Use
+pocket-only cartoons, element-colored ligands and existing CPU render budget.

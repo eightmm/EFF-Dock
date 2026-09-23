@@ -2,7 +2,7 @@
 
 현재 **20페이지 PDF** 기준: 본문용 Figure 1–11, 보충 Figure S1–S9. 최종 논문 번호는 편집 시 변경 가능하다. 각 영문 캡션은 복사해서 사용할 수 있으며, 한국어 메모는 저자 참고용이다.
 
-PDF SHA-256: `fd6c2b8d7839c9ce39e6be113fc76ad0d2fd11fab17495a44089e8cc409b05fc`
+PDF SHA-256: `17f01a59fdb7b38a109a979e9bf82d17ac9a6680916e095a72c133fb9b6fd001`
 
 ## 공통 Methods 메모
 
@@ -198,11 +198,11 @@ Each benchmark compares its full cohort with a fixed stringent subset: maximum o
 
 **Receptor-frame examples of success, refinement rescue and selection failure.**
 
-Illustrative Astex Diverse Set cases from repeat 0. Upper views show complete ligand-contacting protein chains as cartoons; lower views enlarge the binding site. Displayed chains have at least one heavy atom within 5 Å of a crystal-ligand heavy atom; this display rule does not change evaluation inputs. Ligands are ball-and-stick, with green crystal, blue selected and orange comparator carbon atoms; heteroatoms use element colors (nitrogen blue, oxygen red, sulfur yellow). Sticks show connectivity. The cartoons are rendered from stored receptor coordinates using 3Dmol.js secondary-structure assignment. All poses retain the original receptor frame, with no independent ligand alignment. (A) 1OWE, the lower-median selected RMSD among 66 PB-valid successes (0.80 Å). (B) 1HVY, the sole eligible same-candidate RMSD rescue among this repeat's refined primary selections: 2.32 Å before refinement and 1.98 Å after refinement, with the final selected pose PB-valid. This small threshold crossing is illustrative. (C) 1TZ8, the lower-median regret among 14 selection failures with a near-native candidate available: selected RMSD 2.27 Å versus oracle RMSD 0.65 Å. Median rules and ID tie breaking were specified before inspecting the structures. The views do not assign contacts or interaction types.
+Binding-site close-ups in the original receptor frame, without independent ligand alignment. Protein cartoons use stored coordinates and 3Dmol.js secondary-structure assignment; display chains contact the crystal ligand within 5 Å, a visualization rule that does not change evaluation inputs. Ligand carbon atoms are green (crystal), blue (selected) or orange (raw/oracle); nitrogen is blue and oxygen red. Sticks show connectivity, not assigned interactions. (A) Astex Diverse Set 1OWE, repeat 0: selected RMSD 0.80 Å, the lower median among 66 PB-valid successes. (B) PoseBusters v2 7FB7–8NF, repeat 0: the same candidate (zero-based index 76) improves from 2.08 Å raw to 0.30 Å refined and is PB-valid after refinement. This is the largest RMSD improvement among 138 eligible complex-repeat selections across five external cohorts and three repeats, requiring raw RMSD ≥2 Å and refined RMSD <2 Å with PB validity. The post-hoc extreme-example rule was fixed before the expanded search; this panel illustrates a strong rescue, not a typical effect. (C) Astex Diverse Set 1TZ8, repeat 0: selected RMSD 2.27 Å versus refined oracle 0.65 Å, the lower-median regret among 14 selection failures with a near-native candidate. The original median selections in A and C are unchanged.
 
 - 원본: [S8_structure_examples.pdf](figures/S8_structure_examples.pdf)
 - LaTeX label: `fig:paper-s8`
-- 저자 메모: 시각적으로 가장 좋은 사례를 고르지 않았다. Rescue는 해당 정의에서 1건뿐이며 2 Å 경계 부근의 작은 변화이다.
+- 저자 메모: B는 5개 외부 셋·3회 반복의 적격 138건 중 동일 후보 RMSD 개선 최대 사례다. 사후 극단 사례 선택이며 평균적 효과나 빈도 추정으로 해석하지 않는다. 전체 단백질 뷰는 제거했다.
 
 ## PDF page 20 · Figure S9
 

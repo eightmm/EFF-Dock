@@ -39764,24 +39764,33 @@
   "case_ids": [
     {
       "title": "Successful pose",
+      "dataset": "astex",
+      "repeat": 0,
       "id": "1owe",
       "selected_rmsd": 0.7970416075945543,
       "comparator_rmsd": null,
-      "eligible_cases": 66
+      "eligible_cases": 66,
+      "selection_rule": "lower median in Astex repeat 0"
     },
     {
       "title": "Refinement rescue",
-      "id": "1hvy",
-      "selected_rmsd": 1.9802526302273775,
-      "comparator_rmsd": 2.3167792123460695,
-      "eligible_cases": 1
+      "dataset": "posebusters",
+      "repeat": 0,
+      "id": "7fb7_8nf",
+      "selected_rmsd": 0.30229048437531425,
+      "comparator_rmsd": 2.080733873936372,
+      "eligible_cases": 138,
+      "selection_rule": "maximum improvement across five cohorts and three repeats"
     },
     {
       "title": "Selection failure",
+      "dataset": "astex",
+      "repeat": 0,
       "id": "1tz8",
       "selected_rmsd": 2.2721521695480176,
       "comparator_rmsd": 0.6478160251503586,
-      "eligible_cases": 14
+      "eligible_cases": 14,
+      "selection_rule": "lower median in Astex repeat 0"
     }
   ]
 }

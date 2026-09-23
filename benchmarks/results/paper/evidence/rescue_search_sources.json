@@ -1,0 +1,66 @@
+{
+  "sources": [
+    {
+      "path": "outputs/benchmarks/astex_pb_unguided_r3_hostmatched_v2/n100_s10/selection/full/astex_repeat_0/records.json",
+      "sha256": "1485563e569901a6a1d78e0d7c213973cb0a6bc800dd409ef0a22ff1c0568b03"
+    },
+    {
+      "path": "outputs/benchmarks/astex_pb_unguided_r3_hostmatched_v2/n100_s10/selection/full/astex_repeat_1/records.json",
+      "sha256": "fbf17a15284b1a19789d0f264a1a32086ba23eaee52e8194bb422a8166d198e9"
+    },
+    {
+      "path": "outputs/benchmarks/astex_pb_unguided_r3_hostmatched_v2/n100_s10/selection/full/astex_repeat_2/records.json",
+      "sha256": "4e56b0f4bc986725c143d24967740005993348b5b989d8c1ae8aef57809c0d65"
+    },
+    {
+      "path": "outputs/benchmarks/astex_pb_unguided_r3_hostmatched_v2/n100_s10/selection/full/posebusters_repeat_0/records.json",
+      "sha256": "55080bf340b57119672bbb59b0893f31df3b38f10542446a55237e44b0eb461c"
+    },
+    {
+      "path": "outputs/benchmarks/astex_pb_unguided_r3_hostmatched_v2/n100_s10/selection/full/posebusters_repeat_1/records.json",
+      "sha256": "cc0b53bd61e74d66431ab4fabe9ea2efea4edb2af569833ec7de42ce34f75ad1"
+    },
+    {
+      "path": "outputs/benchmarks/astex_pb_unguided_r3_hostmatched_v2/n100_s10/selection/full/posebusters_repeat_2/records.json",
+      "sha256": "a71ccb695fe0bbfde409230447a2e355f777c954d6b03e5e9468fd96a730125a"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/phibench_repeat_0/records.json",
+      "sha256": "4c524292b83dd74930ca3807894eb65f5b8e589c33a8e2eb05a747cd67ccb4c5"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/phibench_repeat_1/records.json",
+      "sha256": "6f72501789747b37487f7501aefb9674abf137b72177e180416438ed803adf65"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/phibench_repeat_2/records.json",
+      "sha256": "7ea881964b7afa9adf20c1cb86332ff631896a7e185f8dedd07b6269b8533009"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/foldbench_repeat_0/records.json",
+      "sha256": "66157c77f363b199d093e9f8b88db576dd0e88079bf951d231126f5b31bf96c9"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/foldbench_repeat_1/records.json",
+      "sha256": "e7ee3f851e27293b9d324b3e7bdaea877f087b68bf928f01ab4c5aef78bbbb37"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/foldbench_repeat_2/records.json",
+      "sha256": "d679edb490a51bf0fb94ed8e1750f6f7f528ceb18a599cd2450e422d1938b023"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/openbind_repeat_0/records.json",
+      "sha256": "cefbb5861659e812d2d721659ad31c63c66e5a9dba4537d0cad33482b336e015"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/openbind_repeat_1/records.json",
+      "sha256": "0eb95331b9b919f179f950cfff906c98021513056627446a60ba82f4d0dffe0c"
+    },
+    {
+      "path": "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/full/openbind_repeat_2/records.json",
+      "sha256": "61dd60d33792e53d04942e7da2530933c44b0661b85d79ca1e0119db4f2ac1a7"
+    }
+  ],
+  "complex_repeats": 6246,
+  "rule": "Maximum same-candidate RMSD improvement; raw >=2 A, refined <2 A, primary refined selection PB-valid; ties by dataset, repeat, ID"
+}

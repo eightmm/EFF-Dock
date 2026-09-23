@@ -1,0 +1,1382 @@
+[
+  {
+    "dataset": "posebusters",
+    "repeat": 0,
+    "id": "7fb7_8nf",
+    "selected_index": 76,
+    "raw_rmsd": 2.080733873936372,
+    "refined_rmsd": 0.30229048437531425,
+    "improvement": 1.7784433895610579,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8ug3-assembly1__protein-a__ligand-c__ccd-wre",
+    "selected_index": 14,
+    "raw_rmsd": 2.524276724792168,
+    "refined_rmsd": 1.2248922551961454,
+    "improvement": 1.2993844695960226,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7379a",
+    "selected_index": 19,
+    "raw_rmsd": 2.8813977560292674,
+    "refined_rmsd": 1.5996253556904754,
+    "improvement": 1.281772400338792,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 1,
+    "id": "7uaw_mf6",
+    "selected_index": 5,
+    "raw_rmsd": 2.067766147188304,
+    "refined_rmsd": 0.9782113174184259,
+    "improvement": 1.089554829769878,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "8gkf-assembly1__protein-a__ligand-j__ccd-d16",
+    "selected_index": 78,
+    "raw_rmsd": 2.4394108450538337,
+    "refined_rmsd": 1.3779344120285197,
+    "improvement": 1.061476433025314,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8ehp-assembly1__protein-a__ligand-c__ccd-wjo",
+    "selected_index": 21,
+    "raw_rmsd": 2.5367963489563357,
+    "refined_rmsd": 1.4948392902672336,
+    "improvement": 1.041957058689102,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x4309b",
+    "selected_index": 27,
+    "raw_rmsd": 2.0845966202469186,
+    "refined_rmsd": 1.1776322010541724,
+    "improvement": 0.9069644191927462,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x4202b",
+    "selected_index": 87,
+    "raw_rmsd": 2.333821285162252,
+    "refined_rmsd": 1.457976429763322,
+    "improvement": 0.87584485539893,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x4028a",
+    "selected_index": 72,
+    "raw_rmsd": 2.5115647398598204,
+    "refined_rmsd": 1.6714715566738254,
+    "improvement": 0.840093183185995,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x4429a",
+    "selected_index": 44,
+    "raw_rmsd": 2.528508975034277,
+    "refined_rmsd": 1.7067495571604288,
+    "improvement": 0.8217594178738481,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 1,
+    "id": "7rzl_npo",
+    "selected_index": 54,
+    "raw_rmsd": 2.307696647678935,
+    "refined_rmsd": 1.5628641427404038,
+    "improvement": 0.7448325049385311,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "7uyc-assembly1__protein-a__ligand-e__ccd-ojr",
+    "selected_index": 31,
+    "raw_rmsd": 2.1759041130974355,
+    "refined_rmsd": 1.4432961040762877,
+    "improvement": 0.7326080090211478,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 0,
+    "id": "9fyb_nmn_a_1_b",
+    "selected_index": 22,
+    "raw_rmsd": 2.2274937238695776,
+    "refined_rmsd": 1.5093836729254317,
+    "improvement": 0.7181100509441458,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 1,
+    "id": "7f51_ba7",
+    "selected_index": 85,
+    "raw_rmsd": 2.0449636036742356,
+    "refined_rmsd": 1.3526484833275352,
+    "improvement": 0.6923151203467004,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x3706b",
+    "selected_index": 5,
+    "raw_rmsd": 2.0712984884908834,
+    "refined_rmsd": 1.4011824812626896,
+    "improvement": 0.6701160072281938,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x5525a",
+    "selected_index": 52,
+    "raw_rmsd": 2.5138879517507178,
+    "refined_rmsd": 1.8442827808577296,
+    "improvement": 0.6696051708929882,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x5550a",
+    "selected_index": 91,
+    "raw_rmsd": 2.267200259672553,
+    "refined_rmsd": 1.624013856108444,
+    "improvement": 0.643186403564109,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x7501b",
+    "selected_index": 26,
+    "raw_rmsd": 2.1945382473330928,
+    "refined_rmsd": 1.5689487537096494,
+    "improvement": 0.6255894936234434,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x5509a",
+    "selected_index": 23,
+    "raw_rmsd": 2.0437765246887913,
+    "refined_rmsd": 1.4419582065270993,
+    "improvement": 0.6018183181616921,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x6746a",
+    "selected_index": 84,
+    "raw_rmsd": 2.0149930289227593,
+    "refined_rmsd": 1.4142444997933543,
+    "improvement": 0.600748529129405,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7446a",
+    "selected_index": 46,
+    "raw_rmsd": 2.5266518321712255,
+    "refined_rmsd": 1.9340965378938153,
+    "improvement": 0.5925552942774102,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x6955b",
+    "selected_index": 89,
+    "raw_rmsd": 2.35147211103027,
+    "refined_rmsd": 1.7612337936348075,
+    "improvement": 0.5902383173954626,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x6739a",
+    "selected_index": 79,
+    "raw_rmsd": 2.535698698376557,
+    "refined_rmsd": 1.9658637141471729,
+    "improvement": 0.5698349842293842,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7284a",
+    "selected_index": 88,
+    "raw_rmsd": 2.3247310156745864,
+    "refined_rmsd": 1.7587887271160598,
+    "improvement": 0.5659422885585266,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x7424a",
+    "selected_index": 25,
+    "raw_rmsd": 2.016117241674844,
+    "refined_rmsd": 1.455968108035962,
+    "improvement": 0.560149133638882,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 2,
+    "id": "9d6d_qng_g_h_1",
+    "selected_index": 24,
+    "raw_rmsd": 2.226865179542975,
+    "refined_rmsd": 1.6693773354396055,
+    "improvement": 0.5574878441033693,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 0,
+    "id": "9ciw_a1awu_d_1",
+    "selected_index": 11,
+    "raw_rmsd": 2.0792623687499696,
+    "refined_rmsd": 1.5235988235597315,
+    "improvement": 0.5556635451902381,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x7339a",
+    "selected_index": 86,
+    "raw_rmsd": 2.1281755395150297,
+    "refined_rmsd": 1.5725480802466054,
+    "improvement": 0.5556274592684243,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x1148a",
+    "selected_index": 57,
+    "raw_rmsd": 2.117736784176925,
+    "refined_rmsd": 1.5657183096962548,
+    "improvement": 0.5520184744806702,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "8qrt-assembly1__protein-a__ligand-e__ccd-wp2",
+    "selected_index": 23,
+    "raw_rmsd": 2.186353702674659,
+    "refined_rmsd": 1.6404467834340528,
+    "improvement": 0.5459069192406061,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x7147a",
+    "selected_index": 1,
+    "raw_rmsd": 2.0280820165486513,
+    "refined_rmsd": 1.5000045823238257,
+    "improvement": 0.5280774342248256,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7533a",
+    "selected_index": 18,
+    "raw_rmsd": 2.1375216766326477,
+    "refined_rmsd": 1.6119392326244966,
+    "improvement": 0.5255824440081511,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x6838a",
+    "selected_index": 61,
+    "raw_rmsd": 2.315676235751892,
+    "refined_rmsd": 1.824204977683218,
+    "improvement": 0.491471258068674,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x4669b",
+    "selected_index": 47,
+    "raw_rmsd": 2.1265634318757805,
+    "refined_rmsd": 1.6473023372561333,
+    "improvement": 0.47926109461964717,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7170a",
+    "selected_index": 82,
+    "raw_rmsd": 2.104866585452277,
+    "refined_rmsd": 1.6290895312401152,
+    "improvement": 0.47577705421216154,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x4644a",
+    "selected_index": 10,
+    "raw_rmsd": 2.335742019936328,
+    "refined_rmsd": 1.8690892515393007,
+    "improvement": 0.4666527683970272,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x7011a",
+    "selected_index": 81,
+    "raw_rmsd": 2.422517587246406,
+    "refined_rmsd": 1.9689517266073817,
+    "improvement": 0.4535658606390245,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "7qrb-assembly1__protein-a__ligand-g__ccd-ex9",
+    "selected_index": 96,
+    "raw_rmsd": 2.3179159192314116,
+    "refined_rmsd": 1.8694476151528407,
+    "improvement": 0.44846830407857086,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7256a",
+    "selected_index": 96,
+    "raw_rmsd": 2.106391758505594,
+    "refined_rmsd": 1.6607748295977283,
+    "improvement": 0.44561692890786553,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 1,
+    "id": "7rou_66i",
+    "selected_index": 49,
+    "raw_rmsd": 2.329546005006027,
+    "refined_rmsd": 1.8852648918936243,
+    "improvement": 0.4442811131124025,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "8rhe-assembly1__protein-a__ligand-c__ccd-blg",
+    "selected_index": 90,
+    "raw_rmsd": 2.0616135756236487,
+    "refined_rmsd": 1.6338761612831272,
+    "improvement": 0.4277374143405215,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x5226a",
+    "selected_index": 49,
+    "raw_rmsd": 2.2783734875950716,
+    "refined_rmsd": 1.855559596560635,
+    "improvement": 0.42281389103443656,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x4986a",
+    "selected_index": 73,
+    "raw_rmsd": 2.0517843290804314,
+    "refined_rmsd": 1.6307114331263954,
+    "improvement": 0.42107289595403596,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8jwz-assembly1__protein-a__ligand-u__ccd-u30",
+    "selected_index": 44,
+    "raw_rmsd": 2.38781859631472,
+    "refined_rmsd": 1.9699506511986073,
+    "improvement": 0.4178679451161127,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "8bje-assembly1__protein-a__ligand-d__ccd-wrl",
+    "selected_index": 7,
+    "raw_rmsd": 2.1892834773071823,
+    "refined_rmsd": 1.7773278460196051,
+    "improvement": 0.4119556312875772,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x3606a",
+    "selected_index": 23,
+    "raw_rmsd": 2.282266645881157,
+    "refined_rmsd": 1.8747903599995142,
+    "improvement": 0.40747628588164275,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "8g9v-assembly1__protein-b__ligand-o__ccd-yyc",
+    "selected_index": 19,
+    "raw_rmsd": 2.073123090434281,
+    "refined_rmsd": 1.6676096032820789,
+    "improvement": 0.4055134871522019,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7436b",
+    "selected_index": 33,
+    "raw_rmsd": 2.2137854655170828,
+    "refined_rmsd": 1.808832996667388,
+    "improvement": 0.4049524688496948,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x7238a",
+    "selected_index": 2,
+    "raw_rmsd": 2.225800048075934,
+    "refined_rmsd": 1.8297323449068377,
+    "improvement": 0.39606770316909623,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x7154a",
+    "selected_index": 7,
+    "raw_rmsd": 2.0851293599931813,
+    "refined_rmsd": 1.6956720306561388,
+    "improvement": 0.38945732933704247,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7491b",
+    "selected_index": 36,
+    "raw_rmsd": 2.002274448295211,
+    "refined_rmsd": 1.613667818996272,
+    "improvement": 0.38860662929893897,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x4986b",
+    "selected_index": 28,
+    "raw_rmsd": 2.192122783968724,
+    "refined_rmsd": 1.8097223975186718,
+    "improvement": 0.38240038645005225,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7339a",
+    "selected_index": 51,
+    "raw_rmsd": 2.3085822468592054,
+    "refined_rmsd": 1.9360530311108002,
+    "improvement": 0.37252921574840525,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7353b",
+    "selected_index": 74,
+    "raw_rmsd": 2.2355464976917787,
+    "refined_rmsd": 1.866187543836665,
+    "improvement": 0.36935895385511364,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7501a",
+    "selected_index": 87,
+    "raw_rmsd": 2.018446631853206,
+    "refined_rmsd": 1.6511297571595822,
+    "improvement": 0.36731687469362395,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x5512b",
+    "selected_index": 99,
+    "raw_rmsd": 2.034116375411077,
+    "refined_rmsd": 1.6681517671170007,
+    "improvement": 0.3659646082940762,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x6794a",
+    "selected_index": 86,
+    "raw_rmsd": 2.1964539535723078,
+    "refined_rmsd": 1.8352592611329501,
+    "improvement": 0.36119469243935765,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 2,
+    "id": "9du6_atp_a_b_1",
+    "selected_index": 24,
+    "raw_rmsd": 2.285281355627033,
+    "refined_rmsd": 1.9462570727126227,
+    "improvement": 0.33902428291441034,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 0,
+    "id": "7hg7_ejq_b_1",
+    "selected_index": 10,
+    "raw_rmsd": 2.122514947170962,
+    "refined_rmsd": 1.7849922831059397,
+    "improvement": 0.3375226640650222,
+    "pb_valid": true
+  },
+  {
+    "dataset": "astex",
+    "repeat": 0,
+    "id": "1hvy",
+    "selected_index": 64,
+    "raw_rmsd": 2.3167792123460695,
+    "refined_rmsd": 1.9802526302273775,
+    "improvement": 0.336526582118692,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x7446a",
+    "selected_index": 68,
+    "raw_rmsd": 2.270541618474903,
+    "refined_rmsd": 1.9356539592165258,
+    "improvement": 0.33488765925837716,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7424a",
+    "selected_index": 65,
+    "raw_rmsd": 2.2245076244493642,
+    "refined_rmsd": 1.8921842009535579,
+    "improvement": 0.33232342349580635,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x5581a",
+    "selected_index": 78,
+    "raw_rmsd": 2.1693126588612923,
+    "refined_rmsd": 1.8433704491283416,
+    "improvement": 0.32594220973295074,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x4959a",
+    "selected_index": 79,
+    "raw_rmsd": 2.1741580491860546,
+    "refined_rmsd": 1.8795732775343301,
+    "improvement": 0.2945847716517245,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 0,
+    "id": "7r7r_awj",
+    "selected_index": 41,
+    "raw_rmsd": 2.1224333358716323,
+    "refined_rmsd": 1.831957722850818,
+    "improvement": 0.29047561302081437,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7026a",
+    "selected_index": 99,
+    "raw_rmsd": 2.1549892334267096,
+    "refined_rmsd": 1.8695828690902305,
+    "improvement": 0.28540636433647903,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "8chi-assembly1__protein-a__ligand-c__ccd-umr",
+    "selected_index": 82,
+    "raw_rmsd": 2.168076535842905,
+    "refined_rmsd": 1.8857776102407764,
+    "improvement": 0.28229892560212844,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7369b",
+    "selected_index": 96,
+    "raw_rmsd": 2.0422115921176935,
+    "refined_rmsd": 1.7622888603377964,
+    "improvement": 0.2799227317798971,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x5676a",
+    "selected_index": 1,
+    "raw_rmsd": 2.0567629042965185,
+    "refined_rmsd": 1.7899512806306161,
+    "improvement": 0.2668116236659024,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8cbu-assembly1__protein-d__ligand-m__ccd-u60",
+    "selected_index": 72,
+    "raw_rmsd": 2.180761230334458,
+    "refined_rmsd": 1.916846770448507,
+    "improvement": 0.2639144598859511,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 2,
+    "id": "9d6c_qng_a_1_b",
+    "selected_index": 62,
+    "raw_rmsd": 2.0152268449181903,
+    "refined_rmsd": 1.7528062383565348,
+    "improvement": 0.26242060656165545,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x4986a",
+    "selected_index": 14,
+    "raw_rmsd": 2.1279617259573,
+    "refined_rmsd": 1.87748247107528,
+    "improvement": 0.25047925488202005,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "8fgq-assembly1__protein-b__ligand-p__ccd-v80",
+    "selected_index": 46,
+    "raw_rmsd": 2.2449586739029685,
+    "refined_rmsd": 1.995592043724236,
+    "improvement": 0.2493666301787325,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x5705a",
+    "selected_index": 86,
+    "raw_rmsd": 2.0435217500334537,
+    "refined_rmsd": 1.79985399032847,
+    "improvement": 0.24366775970498367,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x5705b",
+    "selected_index": 53,
+    "raw_rmsd": 2.1856089793767732,
+    "refined_rmsd": 1.9460931325068658,
+    "improvement": 0.23951584686990746,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "8ehp-assembly1__protein-a__ligand-c__ccd-wjo",
+    "selected_index": 7,
+    "raw_rmsd": 2.2243467581299905,
+    "refined_rmsd": 1.9932714587899172,
+    "improvement": 0.23107529934007331,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x7334b",
+    "selected_index": 67,
+    "raw_rmsd": 2.1385128644467577,
+    "refined_rmsd": 1.9079430355834532,
+    "improvement": 0.23056982886330446,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 1,
+    "id": "7n6f_0i1",
+    "selected_index": 35,
+    "raw_rmsd": 2.1590333181207826,
+    "refined_rmsd": 1.9338701747216875,
+    "improvement": 0.22516314339909504,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x7424a",
+    "selected_index": 64,
+    "raw_rmsd": 2.1378214220888236,
+    "refined_rmsd": 1.9223972190052465,
+    "improvement": 0.21542420308357713,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8qe2-assembly1__protein-a__ligand-b__ccd-u7x",
+    "selected_index": 0,
+    "raw_rmsd": 2.1093194932450485,
+    "refined_rmsd": 1.896691434255463,
+    "improvement": 0.21262805898958548,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "8j3t-assembly1__protein-a__ligand-c__ccd-t1f",
+    "selected_index": 88,
+    "raw_rmsd": 2.1475329324285544,
+    "refined_rmsd": 1.9391156801928864,
+    "improvement": 0.20841725223566798,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x6738a",
+    "selected_index": 12,
+    "raw_rmsd": 2.076578254401402,
+    "refined_rmsd": 1.8690357670255662,
+    "improvement": 0.20754248737583603,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "8ja9-assembly1__protein-a__ligand-h__ccd-ty6",
+    "selected_index": 38,
+    "raw_rmsd": 2.0208699150592286,
+    "refined_rmsd": 1.8158205025608538,
+    "improvement": 0.20504941249837483,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "7zib-assembly1__protein-a-2__ligand-c-2__ccd-j7i",
+    "selected_index": 95,
+    "raw_rmsd": 2.181211740731416,
+    "refined_rmsd": 1.9835854897064629,
+    "improvement": 0.19762625102495313,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7350b",
+    "selected_index": 16,
+    "raw_rmsd": 2.0895634663130465,
+    "refined_rmsd": 1.8948596076544222,
+    "improvement": 0.19470385865862427,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7510a",
+    "selected_index": 61,
+    "raw_rmsd": 2.097635526714671,
+    "refined_rmsd": 1.9031141806883423,
+    "improvement": 0.19452134602632865,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 1,
+    "id": "9j56_a1l3v_a_1",
+    "selected_index": 10,
+    "raw_rmsd": 2.0460877264381,
+    "refined_rmsd": 1.852657770203751,
+    "improvement": 0.1934299562343489,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x5289a",
+    "selected_index": 24,
+    "raw_rmsd": 2.0837642343699474,
+    "refined_rmsd": 1.8918634434230495,
+    "improvement": 0.19190079094689794,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x0228a",
+    "selected_index": 8,
+    "raw_rmsd": 2.044186908013177,
+    "refined_rmsd": 1.8533710033492188,
+    "improvement": 0.19081590466395815,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "8rhe-assembly1__protein-a__ligand-c__ccd-blg",
+    "selected_index": 67,
+    "raw_rmsd": 2.0663968831669464,
+    "refined_rmsd": 1.8820808699708194,
+    "improvement": 0.184316013196127,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 2,
+    "id": "9j6o_a1l3s_a_1",
+    "selected_index": 65,
+    "raw_rmsd": 2.171297484628801,
+    "refined_rmsd": 1.9872927874044677,
+    "improvement": 0.18400469722433344,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8hut-assembly1__protein-a__ligand-c__ccd-7yy",
+    "selected_index": 39,
+    "raw_rmsd": 2.0399425910024034,
+    "refined_rmsd": 1.8597352464473678,
+    "improvement": 0.18020734455503562,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 2,
+    "id": "9d8z_a1a3d_a_1",
+    "selected_index": 97,
+    "raw_rmsd": 2.0707357797238224,
+    "refined_rmsd": 1.8937846797301092,
+    "improvement": 0.17695109999371317,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8wbt-assembly1__protein-b__ligand-j__ccd-tla",
+    "selected_index": 76,
+    "raw_rmsd": 2.0902534436571267,
+    "refined_rmsd": 1.9138752640857373,
+    "improvement": 0.17637817957138946,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x6914a",
+    "selected_index": 99,
+    "raw_rmsd": 2.1469520646081373,
+    "refined_rmsd": 1.973184469826158,
+    "improvement": 0.17376759478197923,
+    "pb_valid": true
+  },
+  {
+    "dataset": "astex",
+    "repeat": 2,
+    "id": "1xoz",
+    "selected_index": 59,
+    "raw_rmsd": 2.032647933755396,
+    "refined_rmsd": 1.8592432930648668,
+    "improvement": 0.1734046406905292,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8bc8-assembly1__protein-a__ligand-c__ccd-qb6",
+    "selected_index": 30,
+    "raw_rmsd": 2.1386487251864006,
+    "refined_rmsd": 1.9664547554092724,
+    "improvement": 0.1721939697771282,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8qk2-assembly1__protein-a-2__ligand-d-2__ccd-vtf",
+    "selected_index": 32,
+    "raw_rmsd": 2.1106304454822995,
+    "refined_rmsd": 1.9403520535064036,
+    "improvement": 0.1702783919758959,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x0926a",
+    "selected_index": 16,
+    "raw_rmsd": 2.05507755754305,
+    "refined_rmsd": 1.8891253394097294,
+    "improvement": 0.16595221813332084,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x4372a",
+    "selected_index": 26,
+    "raw_rmsd": 2.074276551323669,
+    "refined_rmsd": 1.9088388971443813,
+    "improvement": 0.1654376541792879,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x6827a",
+    "selected_index": 11,
+    "raw_rmsd": 2.1355367601680446,
+    "refined_rmsd": 1.9707612396264882,
+    "improvement": 0.16477552054155642,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "7v2t-assembly1__protein-a__ligand-g__ccd-5uq",
+    "selected_index": 69,
+    "raw_rmsd": 2.0627541973564796,
+    "refined_rmsd": 1.901484659020484,
+    "improvement": 0.16126953833599567,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x4380a",
+    "selected_index": 24,
+    "raw_rmsd": 2.019552752877382,
+    "refined_rmsd": 1.8592706079218506,
+    "improvement": 0.16028214495553117,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x4596a",
+    "selected_index": 37,
+    "raw_rmsd": 2.102929720243172,
+    "refined_rmsd": 1.947210517423372,
+    "improvement": 0.15571920281979978,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x5475a",
+    "selected_index": 42,
+    "raw_rmsd": 2.1228914774753114,
+    "refined_rmsd": 1.9701692943414022,
+    "improvement": 0.15272218313390917,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7608a",
+    "selected_index": 92,
+    "raw_rmsd": 2.022049857970315,
+    "refined_rmsd": 1.8755288890308444,
+    "improvement": 0.14652096893947042,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8r6j-assembly1__protein-a__ligand-c__ccd-y7f",
+    "selected_index": 90,
+    "raw_rmsd": 2.0036654655391914,
+    "refined_rmsd": 1.8587807573948305,
+    "improvement": 0.14488470814436094,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 0,
+    "id": "7pk0_byc",
+    "selected_index": 37,
+    "raw_rmsd": 2.0063352523419327,
+    "refined_rmsd": 1.8643097392704862,
+    "improvement": 0.1420255130714465,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x2458a",
+    "selected_index": 97,
+    "raw_rmsd": 2.1127996786404997,
+    "refined_rmsd": 1.973766209788385,
+    "improvement": 0.13903346885211465,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x4675a",
+    "selected_index": 24,
+    "raw_rmsd": 2.0740773866820352,
+    "refined_rmsd": 1.9409316446695828,
+    "improvement": 0.13314574201245244,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7260a",
+    "selected_index": 34,
+    "raw_rmsd": 2.0612395280362574,
+    "refined_rmsd": 1.9294723910003297,
+    "improvement": 0.13176713703592768,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x4873a",
+    "selected_index": 94,
+    "raw_rmsd": 2.01954432291207,
+    "refined_rmsd": 1.8968193004693124,
+    "improvement": 0.12272502244275785,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x3175a",
+    "selected_index": 55,
+    "raw_rmsd": 2.091789363898018,
+    "refined_rmsd": 1.976866615201327,
+    "improvement": 0.11492274869669084,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 0,
+    "id": "7omx_cna",
+    "selected_index": 23,
+    "raw_rmsd": 2.10185998731626,
+    "refined_rmsd": 1.9910760459117174,
+    "improvement": 0.11078394140454262,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x5219b",
+    "selected_index": 86,
+    "raw_rmsd": 2.09582372522545,
+    "refined_rmsd": 1.9908410444649585,
+    "improvement": 0.10498268076049166,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x7297a",
+    "selected_index": 22,
+    "raw_rmsd": 2.0595795502241816,
+    "refined_rmsd": 1.9680327673161995,
+    "improvement": 0.09154678290798213,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "8cm2-assembly1__protein-a__ligand-b__ccd-v1x",
+    "selected_index": 96,
+    "raw_rmsd": 2.0492237933875397,
+    "refined_rmsd": 1.962267111714107,
+    "improvement": 0.08695668167343262,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x6808a",
+    "selected_index": 27,
+    "raw_rmsd": 2.084551362594588,
+    "refined_rmsd": 1.9982999950728901,
+    "improvement": 0.08625136752169782,
+    "pb_valid": true
+  },
+  {
+    "dataset": "astex",
+    "repeat": 2,
+    "id": "1meh",
+    "selected_index": 77,
+    "raw_rmsd": 2.0683740083769684,
+    "refined_rmsd": 1.9864313321613956,
+    "improvement": 0.08194267621557283,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "8b96-assembly1__protein-a__ligand-b__ccd-q2f",
+    "selected_index": 2,
+    "raw_rmsd": 2.028158858027271,
+    "refined_rmsd": 1.9481531135867802,
+    "improvement": 0.08000574444049069,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "8bpv-assembly1__protein-a__ligand-b__ccd-6t3",
+    "selected_index": 89,
+    "raw_rmsd": 2.044189678245319,
+    "refined_rmsd": 1.9669772919001538,
+    "improvement": 0.07721238634516503,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "7ful-assembly1__protein-a__ligand-c__ccd-yuo",
+    "selected_index": 47,
+    "raw_rmsd": 2.0659175241294867,
+    "refined_rmsd": 1.9911780919526807,
+    "improvement": 0.07473943217680601,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "8p9k-assembly1__protein-a__ligand-c__ccd-x9u",
+    "selected_index": 1,
+    "raw_rmsd": 2.0389266436884834,
+    "refined_rmsd": 1.965517968204301,
+    "improvement": 0.0734086754841825,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 2,
+    "id": "a71ev2a-x3936a",
+    "selected_index": 35,
+    "raw_rmsd": 2.0077398764524754,
+    "refined_rmsd": 1.934932299040469,
+    "improvement": 0.0728075774120065,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 2,
+    "id": "7th4-assembly1__protein-b__ligand-h__ccd-ffo",
+    "selected_index": 57,
+    "raw_rmsd": 2.030210795801009,
+    "refined_rmsd": 1.9588190702769972,
+    "improvement": 0.07139172552401174,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 1,
+    "id": "7zi3-assembly1__protein-a-2__ligand-b-2__ccd-j98",
+    "selected_index": 35,
+    "raw_rmsd": 2.0190427843823113,
+    "refined_rmsd": 1.9586573944599066,
+    "improvement": 0.06038538992240472,
+    "pb_valid": true
+  },
+  {
+    "dataset": "astex",
+    "repeat": 2,
+    "id": "1t9b",
+    "selected_index": 8,
+    "raw_rmsd": 2.050496870261106,
+    "refined_rmsd": 1.991400621756795,
+    "improvement": 0.059096248504311166,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x4873a",
+    "selected_index": 94,
+    "raw_rmsd": 2.012720849178944,
+    "refined_rmsd": 1.95749104046656,
+    "improvement": 0.05522980871238392,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x3963b",
+    "selected_index": 97,
+    "raw_rmsd": 2.04287766199964,
+    "refined_rmsd": 1.993661356602352,
+    "improvement": 0.04921630539728783,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 1,
+    "id": "9fyf_a1ig6_b_1",
+    "selected_index": 77,
+    "raw_rmsd": 2.027409595880216,
+    "refined_rmsd": 1.9808500115514984,
+    "improvement": 0.04655958432871743,
+    "pb_valid": true
+  },
+  {
+    "dataset": "phibench",
+    "repeat": 0,
+    "id": "9gis_a1ilu_a_1_b",
+    "selected_index": 78,
+    "raw_rmsd": 2.030000949534091,
+    "refined_rmsd": 1.9848709245979987,
+    "improvement": 0.04513002493609242,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 1,
+    "id": "a71ev2a-x4611b",
+    "selected_index": 81,
+    "raw_rmsd": 2.021052983159254,
+    "refined_rmsd": 1.9854610271195738,
+    "improvement": 0.03559195603968024,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x7491a",
+    "selected_index": 39,
+    "raw_rmsd": 2.024715896707988,
+    "refined_rmsd": 1.991514487336068,
+    "improvement": 0.033201409371919954,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "8eut-assembly1__protein-a__ligand-c__ccd-wv5",
+    "selected_index": 38,
+    "raw_rmsd": 2.0089864730364306,
+    "refined_rmsd": 1.9789550363339974,
+    "improvement": 0.030031436702433245,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x4291a",
+    "selected_index": 77,
+    "raw_rmsd": 2.0221421688064294,
+    "refined_rmsd": 1.995265612736924,
+    "improvement": 0.026876556069505453,
+    "pb_valid": true
+  },
+  {
+    "dataset": "openbind",
+    "repeat": 0,
+    "id": "a71ev2a-x4611a",
+    "selected_index": 60,
+    "raw_rmsd": 2.015250985850529,
+    "refined_rmsd": 1.9891139048802955,
+    "improvement": 0.026137080970233706,
+    "pb_valid": true
+  },
+  {
+    "dataset": "foldbench",
+    "repeat": 0,
+    "id": "8g3w-assembly1__protein-a__ligand-g__ccd-ykx",
+    "selected_index": 9,
+    "raw_rmsd": 2.000253113572231,
+    "refined_rmsd": 1.9757930261680403,
+    "improvement": 0.0244600874041907,
+    "pb_valid": true
+  },
+  {
+    "dataset": "posebusters",
+    "repeat": 2,
+    "id": "7moi_hps",
+    "selected_index": 1,
+    "raw_rmsd": 2.0157987876613825,
+    "refined_rmsd": 1.9916349424765014,
+    "improvement": 0.024163845184881128,
+    "pb_valid": true
+  }
+]
