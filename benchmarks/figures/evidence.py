@@ -255,49 +255,76 @@ def physical(data, out):
     save(fig, out, "S7_physical_validity")
 
 
+def structure_label(row):
+    ident = row["id"].upper()
+    if row["dataset"] == "foldbench":
+        pdb = ident.split("-", 1)[0]
+        ligand_chain = ident.split("__LIGAND-", 1)[1].split("__", 1)[0]
+        ccd = ident.split("__CCD-", 1)[1]
+        return f"{pdb} · {ccd} ({ligand_chain})"
+    return ident.replace("_", " · ")
+
+
 def structures(rows, out):
     from benchmarks.figures.structure_views import ELEMENT_COLORS, POSE_COLORS
 
+    datasets = list(NAMES)
+    titles = ["Successful pose", "Refinement rescue", "Selection failure"]
+    keyed = {(r["dataset"], r["title"]): r for r in rows}
+    if len(rows) != 15 or len(keyed) != 15:
+        raise ValueError("Expected three examples in each of five datasets")
     views = DATA / "structure_views"
-    fig, axes = plt.subplots(1, 3, figsize=(14.2, 4.6))
-    for i, row in enumerate(rows):
-        ax = axes[i]
-        ax.imshow(plt.imread(views / f"{row['id']}_pocket.png"))
-        ax.set_axis_off()
-        ax.set_title(
-            f"{chr(65 + i)}  {row['title']}",
-            loc="left",
-            fontweight="bold",
-            pad=7,
-        )
-        label_box = dict(facecolor="white", edgecolor="none", alpha=0.86, pad=3)
-        ax.text(
-            0.035,
-            0.965,
-            row["id"].upper(),
-            transform=ax.transAxes,
-            ha="left",
-            va="top",
-            fontsize=11,
-            fontweight="bold",
-            color=DARK,
-            bbox=label_box,
-        )
-        detail = f"Selected RMSD: {row['selected_rmsd']:.2f} Å"
-        if row["comparator_rmsd"] is not None:
-            label = "Raw (same pose)" if i == 1 else "Oracle RMSD"
-            detail += f"\n{label}: {row['comparator_rmsd']:.2f} Å"
-        ax.text(
-            0.035,
-            0.035,
-            detail,
-            transform=ax.transAxes,
+    fig, axes = plt.subplots(5, 3, figsize=(14.2, 20.5))
+    fig.subplots_adjust(left=0.02, right=0.985, top=0.935, bottom=0.04, hspace=0.16, wspace=0.035)
+    for i, ds in enumerate(datasets):
+        for j, title in enumerate(titles):
+            row = keyed[ds, title]
+            ax = axes[i, j]
+            ax.imshow(plt.imread(views / f"{row['view_key']}_pocket.png"))
+            ax.set_axis_off()
+            label_box = dict(facecolor="white", edgecolor="none", alpha=0.86, pad=3)
+            ax.text(
+                0.035,
+                0.965,
+                structure_label(row),
+                transform=ax.transAxes,
+                ha="left",
+                va="top",
+                fontsize=14,
+                fontweight="bold",
+                color=DARK,
+                bbox=label_box,
+            )
+            detail = f"Selected RMSD: {row['selected_rmsd']:.2f} Å"
+            if row["comparator_rmsd"] is not None:
+                label = "Raw (same pose)" if j == 1 else "Oracle RMSD"
+                detail += f"\n{label}: {row['comparator_rmsd']:.2f} Å"
+            ax.text(
+                0.035,
+                0.035,
+                detail,
+                transform=ax.transAxes,
+                ha="left",
+                va="bottom",
+                fontsize=13,
+                color=DARK,
+                linespacing=1.35,
+                bbox=label_box,
+            )
+        box = axes[i, 0].get_position()
+        fig.text(
+            box.x0,
+            box.y1 + 0.008,
+            f"{chr(65 + i)}  {NAMES[ds]}",
+            fontsize=17,
+            weight="bold",
             ha="left",
             va="bottom",
-            fontsize=10,
-            color=DARK,
-            linespacing=1.35,
-            bbox=label_box,
+        )
+    for j, title in enumerate(titles):
+        box = axes[0, j].get_position()
+        fig.text(
+            (box.x0 + box.x1) / 2, 0.979, title, fontsize=17, weight="bold", ha="center", va="top"
         )
     handles = [Line2D([], [], color=c, lw=4) for c in POSE_COLORS.values()]
     labels = ["Crystal carbon", "Selected carbon", "Raw / oracle carbon"]
@@ -306,10 +333,9 @@ def structures(rows, out):
     )
     for element, color in ELEMENT_COLORS.items():
         if element in present:
-            handles.append(Line2D([], [], marker="o", color=color, linestyle="none", ms=6))
+            handles.append(Line2D([], [], marker="o", color=color, linestyle="none", ms=7))
             labels.append(element)
-    fig.legend(handles, labels, ncol=len(labels), frameon=False, loc="lower center", fontsize=10)
-    fig.subplots_adjust(left=0.02, right=0.985, top=0.88, bottom=0.10, wspace=0.06)
+    fig.legend(handles, labels, ncol=len(labels), frameon=False, loc="lower center", fontsize=12)
     save(fig, out, "S8_structure_examples", dpi=400)
 
 

@@ -195,17 +195,56 @@ def verify():
         )
         close(r["refined_rmsd"], selected["selected_rmsd"])
         close(r["improvement"], r["raw_rmsd"] - r["refined_rmsd"])
-    example = json.loads((directory / "structures.json").read_text())[1]
-    best = rescues[0]
-    require(
-        all(example[k] == best[k] for k in ("dataset", "repeat", "id", "selected_index")),
-        "Not the maximum rescue",
-    )
-    require(
-        example["eligible_cases"] == len(rescues) and example["median_order"] is None,
-        "Extreme selection metadata",
-    )
-    close(example["comparator_rmsd"], best["raw_rmsd"])
+    examples = json.loads((directory / "structures.json").read_text())
+    keyed = {(r["dataset"], r["title"]): r for r in examples}
+    require(len(examples) == len(keyed) == 15, "Incomplete dataset triplets")
+    for ds in COUNTS:
+        candidates = [r for r in rescues if r["dataset"] == ds]
+        best = candidates[0]
+        example = keyed[ds, "Refinement rescue"]
+        require(
+            all(example[k] == best[k] for k in ("dataset", "repeat", "id", "selected_index")),
+            "Not the dataset maximum rescue",
+        )
+        require(
+            example["eligible_cases"] == len(candidates) and example["median_order"] is None,
+            "Extreme selection metadata",
+        )
+        close(example["comparator_rmsd"], best["raw_rmsd"])
+        excluded = {best["id"]}
+        pool = [r for r in cases if r["dataset"] == ds and r["stage"] == "refined"]
+        for title, metric in (
+            ("Successful pose", "selected_rmsd"),
+            ("Selection failure", "filtered_regret"),
+        ):
+            eligible = [
+                r
+                for r in pool
+                if r["id"] not in excluded
+                and (
+                    r["filtered_joint"]
+                    if title == "Successful pose"
+                    else r["oracle_success"] and not r["filtered_success"]
+                )
+            ]
+            eligible.sort(key=lambda r: (r[metric], r["repeat"], r["id"]))
+            order = (len(eligible) - 1) // 2
+            chosen = eligible[order]
+            example = keyed[ds, title]
+            require(
+                all(example[k] == chosen[k] for k in ("dataset", "repeat", "id", "selected_index")),
+                "Not the dataset lower median",
+            )
+            require(
+                example["eligible_cases"] == len(eligible) and example["median_order"] == order,
+                "Median selection metadata",
+            )
+            close(example["effect"], chosen[metric])
+            require(example["pb_valid"] == chosen["filtered_pb_valid"], "Displayed PB label drift")
+            if title == "Selection failure":
+                close(example["comparator_rmsd"], chosen["oracle_rmsd"])
+            excluded.add(example["id"])
+        require(len(excluded) == 3, "Repeated complex within dataset")
     sources = json.loads((directory / "rescue_search_sources.json").read_text())
     require(
         sources["complex_repeats"] == 6246 and len(sources["sources"]) == 15,
@@ -221,9 +260,9 @@ def verify():
         "Stale structure captures",
     )
     require(
-        {(r["id"], r["mode"]) for r in scene_manifest["records"]}
+        {(r["view_key"], r["mode"]) for r in scene_manifest["records"]}
         == {
-            (r["id"], mode)
+            (r["view_key"], mode)
             for r in json.loads((directory / "structures.json").read_text())
             for mode in ("pocket",)
         },
@@ -249,7 +288,7 @@ def verify():
             "Numerical source hash drift",
         )
     print(
-        "Verified 12,492 confidence banks, 24,984 PB rows, 2,082 relatedness records, 5,895 baseline rows, calibration denominators and three structures"
+        "Verified 12,492 confidence banks, 24,984 PB rows, 2,082 relatedness records, 5,895 baseline rows, calibration denominators and 15 dataset-specific structures"
     )
 
 

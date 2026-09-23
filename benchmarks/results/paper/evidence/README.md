@@ -57,7 +57,7 @@ elements retain the palette in `structure_views/manifest.json`. Display chains
 are selected by any protein heavy atom within 5 Å of the crystal ligand, then
 retained in full. This is a visualization selection, not a new pocket or metric.
 
-The ordinary 20-figure renderer uses the three checked pocket PNG captures, so it needs
+The ordinary 21-figure renderer uses the 15 checked pocket PNG captures, so it needs
 no browser or additional molecular-view dependencies. To regenerate the captures,
 use the optional `py3Dmol==2.5.5` and `playwright==1.62.0` packages with Playwright
 Chromium and its OS libraries. Download the pinned JavaScript file named below;
@@ -73,10 +73,14 @@ Camera and style settings are in `benchmarks/figures/structure_views.py`. The
 manifest records browser/library versions and per-view checksums. Rebuilding on
 a different software-rendering stack may change pixels, even with identical
 coordinates; update capture and paper-manifest hashes deliberately after review.
-Only pocket close-ups are shown. A and C retain their original Astex repeat-0
-median selections. B is the largest eligible same-candidate RMSD improvement
-across five cohorts and three repeats, an explicitly post-hoc extreme example
-(see the protocol amendment). `rescue_candidates.json` records all 138 eligible
-complex-repeat selections; `rescue_search_sources.json` records the 15 input
-ledger checksums. Re-running `benchmarks.analysis.evidence` exports these audits
-along with the structures. No new docking inference or PB evaluation is needed.
+Only pocket close-ups are shown: five dataset rows by three mechanism columns.
+Each dataset uses all three saved repeats. Select its maximum eligible same-pose
+RMSD rescue first; then select lower-median PB-valid success and lower-median
+RMSD selection failure, excluding previously chosen complex IDs. The full table
+in [EVIDENCE.md](../../../../docs/paper/EVIDENCE.md) gives IDs, repeats, RMSDs and
+eligible complex-repeat counts. Rescue examples are extremes, not typical effects.
+`rescue_candidates.json` records all 138 eligible rescues, and
+`rescue_search_sources.json` records the 15 source-ledger checksums. Re-running
+`benchmarks.analysis.evidence` exports these audits and all 15 structures. No new
+inference or PB evaluation is needed. Capture filenames include dataset, repeat,
+full ID and mechanism to prevent collisions; obsolete captures are not retained.

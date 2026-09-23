@@ -496,15 +496,7 @@ def sample_cases(root, out, cases, private, pb, result):
     """Export deterministic mechanism examples in their original receptor frame."""
     from rdkit import Chem
 
-    refined = [
-        r for r in cases if r["dataset"] == "astex" and r["repeat"] == 0 and r["stage"] == "refined"
-    ]
-    success = [(r["selected_rmsd"], r) for r in refined if r["filtered_joint"]]
-    failure = [
-        (r["filtered_regret"], r)
-        for r in refined
-        if r["oracle_success"] and not r["filtered_success"]
-    ]
+    refined = [r for r in cases if r["stage"] == "refined"]
     rescue = []
     for r in cases:
         if r["stage"] != "refined":
@@ -565,11 +557,39 @@ def sample_cases(root, out, cases, private, pb, result):
             ],
         )
 
-    for title, candidates in (
-        ("Successful pose", success),
-        ("Refinement rescue", rescue),
-        ("Selection failure", failure),
-    ):
+    selections = []
+    for ds in COUNTS:
+        pool = [r for r in refined if r["dataset"] == ds]
+        rescues = [(effect, r) for effect, r in rescue if r["dataset"] == ds]
+        require(bool(rescues), f"No eligible rescue for {ds}")
+        rescue_row = min(rescues, key=lambda x: (-x[0], x[1]["repeat"], x[1]["id"]))[1]
+        success = sorted(
+            [
+                (r["selected_rmsd"], r)
+                for r in pool
+                if r["filtered_joint"] and r["id"] != rescue_row["id"]
+            ],
+            key=lambda x: (x[0], x[1]["repeat"], x[1]["id"]),
+        )
+        require(bool(success), f"No distinct success for {ds}")
+        success_row = success[(len(success) - 1) // 2][1]
+        failure = [
+            (r["filtered_regret"], r)
+            for r in pool
+            if r["oracle_success"]
+            and not r["filtered_success"]
+            and r["id"] not in (rescue_row["id"], success_row["id"])
+        ]
+        require(bool(failure), f"No distinct selection failure for {ds}")
+        selections.extend(
+            (
+                ("Successful pose", success),
+                ("Refinement rescue", rescues),
+                ("Selection failure", failure),
+            )
+        )
+
+    for title, candidates in selections:
         require(bool(candidates), f"No eligible example for {title}")
         extreme = title == "Refinement rescue"
         ordered = sorted(
@@ -580,8 +600,13 @@ def sample_cases(root, out, cases, private, pb, result):
         effect, row = ordered[order]
         rec = private[row["dataset"], row["repeat"], row["id"], "refined"]
         raw = private[row["dataset"], row["repeat"], row["id"], "raw"]
-        conf = json.loads(Path(rec["confidence_summary"]).read_text())
-        ref = json.loads(Path(conf["inputs"]["refinement_summary"]).read_text())
+        conf_path = root / rec["confidence_summary"]
+        require(
+            hashlib.sha256(conf_path.read_bytes()).hexdigest() == rec["confidence_summary_sha256"],
+            "Confidence source changed",
+        )
+        conf = json.loads(conf_path.read_text())
+        ref = json.loads((root / conf["inputs"]["refinement_summary"]).read_text())
         inputs = ref["inputs"]
         reference = molecule(inputs["ligand_reference"], expected=inputs["ligand_reference_sha256"])
         chosen = molecule(rec["bank"], row["selected_index"], rec["bank_sha256"])
@@ -606,9 +631,10 @@ def sample_cases(root, out, cases, private, pb, result):
                 repeat=row["repeat"],
                 eligible_cases=len(ordered),
                 median_order=None if extreme else order,
-                selection_rule="maximum improvement across five cohorts and three repeats"
+                selection_rule="maximum improvement within dataset, three repeats"
                 if extreme
-                else "lower median in Astex repeat 0",
+                else "lower median within dataset, three repeats; previously chosen complex IDs excluded",
+                view_key=f"{row['dataset']}_{row['repeat']}_{row['id']}_{title.lower().replace(' ', '_')}",
                 effect=effect,
                 selected_rmsd=row["selected_rmsd"],
                 comparator_rmsd=comparator_rmsd,
@@ -647,7 +673,7 @@ def sample_cases(root, out, cases, private, pb, result):
         for r in geometries
     ]
     (out / "results.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
-    print("Collected all empirical evidence and three structure examples", flush=True)
+    print("Collected all empirical evidence and 15 dataset-specific structure examples", flush=True)
 
 
 if __name__ == "__main__":

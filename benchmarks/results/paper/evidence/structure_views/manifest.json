@@ -1,5 +1,5 @@
 {
-  "structures_sha256": "a0bce7e86e0d437368b4166132abfb6d3ca5a88f785d2250e8efb8a89b351391",
+  "structures_sha256": "c678e6780de6def465a6d2f609c3f58ab57418c775b4bff1c7eb1ea2987cb68e",
   "javascript_url": "https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js",
   "javascript_sha256": "f7cc78921ae72e7623e89cdd111434f58c2efddd2ffda1cd212644b406fb8016",
   "py3dmol_version": "2.5.5",
@@ -22,25 +22,78 @@
   },
   "records": [
     {
-      "id": "1owe",
+      "id": "1n1m",
+      "view_key": "astex_2_1n1m_successful_pose",
       "mode": "pocket",
-      "file": "1owe_pocket.png",
-      "sha256": "6124b4f6a662732811dd13b23a4048e1c3074b3edb5fdec9fa61480412a9d0a9",
+      "file": "astex_2_1n1m_successful_pose_pocket.png",
+      "sha256": "ed34e582f461139ac285fac1f9628c3ceaae66ac84cd956b27dd344d86656eca",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 1934,
+        "atoms": 5948,
         "secondary": {
-          "s": 103,
-          "c": 129,
-          "h": 13
+          "c": 335,
+          "h": 112,
+          "s": 279
         }
       },
-      "nonwhite_fraction": 0.2187683823529412
+      "nonwhite_fraction": 0.26345261437908496
+    },
+    {
+      "id": "1hvy",
+      "view_key": "astex_0_1hvy_refinement_rescue",
+      "mode": "pocket",
+      "file": "astex_0_1hvy_refinement_rescue_pocket.png",
+      "sha256": "b2c847537e38173e7c0585b6d5f46415640fff67a1f1773fd8dab09bde0909da",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2349,
+        "secondary": {
+          "c": 124,
+          "h": 90,
+          "s": 74
+        }
+      },
+      "nonwhite_fraction": 0.3086772875816993
+    },
+    {
+      "id": "1tz8",
+      "view_key": "astex_0_1tz8_selection_failure",
+      "mode": "pocket",
+      "file": "astex_0_1tz8_selection_failure_pocket.png",
+      "sha256": "b39a9ea052a231f2120aa67bb0ee8ccd6353b5e21eefcc6a43afa0df631568b8",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1711,
+        "secondary": {
+          "c": 90,
+          "s": 126,
+          "h": 14
+        }
+      },
+      "nonwhite_fraction": 0.2638288398692811
+    },
+    {
+      "id": "7dua_hj0",
+      "view_key": "posebusters_2_7dua_hj0_successful_pose",
+      "mode": "pocket",
+      "file": "posebusters_2_7dua_hj0_successful_pose_pocket.png",
+      "sha256": "3bf6ff1f06ab9459eba4799986dffe70a1792f290e092e610cbdd95ce26a5831",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2194,
+        "secondary": {
+          "h": 117,
+          "c": 98,
+          "s": 59
+        }
+      },
+      "nonwhite_fraction": 0.22823488562091504
     },
     {
       "id": "7fb7_8nf",
+      "view_key": "posebusters_0_7fb7_8nf_refinement_rescue",
       "mode": "pocket",
-      "file": "7fb7_8nf_pocket.png",
+      "file": "posebusters_0_7fb7_8nf_refinement_rescue_pocket.png",
       "sha256": "781f1c92d5e5789c73cfdeb5708d881364ddfb65e7205d10cf3da2ad9b76c963",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
@@ -53,20 +106,174 @@
       "nonwhite_fraction": 0.14810049019607843
     },
     {
-      "id": "1tz8",
+      "id": "8ay3_oe3",
+      "view_key": "posebusters_1_8ay3_oe3_selection_failure",
       "mode": "pocket",
-      "file": "1tz8_pocket.png",
-      "sha256": "b39a9ea052a231f2120aa67bb0ee8ccd6353b5e21eefcc6a43afa0df631568b8",
+      "file": "posebusters_1_8ay3_oe3_selection_failure_pocket.png",
+      "sha256": "b155aefdaca78e40a5e793b198efcb0704c9c76e2423baf3a9af3641e3205055",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 1711,
+        "atoms": 3809,
         "secondary": {
-          "c": 90,
-          "s": 126,
-          "h": 14
+          "c": 167,
+          "s": 172,
+          "h": 150
         }
       },
-      "nonwhite_fraction": 0.2638288398692811
+      "nonwhite_fraction": 0.39210089869281045
+    },
+    {
+      "id": "9dhh_a1a4o_a_1",
+      "view_key": "phibench_2_9dhh_a1a4o_a_1_successful_pose",
+      "mode": "pocket",
+      "file": "phibench_2_9dhh_a1a4o_a_1_successful_pose_pocket.png",
+      "sha256": "19a6fd3616655ea865fe51c3ccf4611c5615ffd68b0d2b625a3ce467a60d6e61",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2810,
+        "secondary": {
+          "h": 166,
+          "c": 137,
+          "s": 65
+        }
+      },
+      "nonwhite_fraction": 0.18031903594771242
+    },
+    {
+      "id": "9fyb_nmn_a_1_b",
+      "view_key": "phibench_0_9fyb_nmn_a_1_b_refinement_rescue",
+      "mode": "pocket",
+      "file": "phibench_0_9fyb_nmn_a_1_b_refinement_rescue_pocket.png",
+      "sha256": "9064eda6c97f2ae8019dbb633ab81ce88eb92fce824476944237a795c2f4ad61",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2982,
+        "secondary": {
+          "c": 139,
+          "s": 80,
+          "h": 148
+        }
+      },
+      "nonwhite_fraction": 0.30153839869281046
+    },
+    {
+      "id": "7hhm_uwd_c_1",
+      "view_key": "phibench_0_7hhm_uwd_c_1_selection_failure",
+      "mode": "pocket",
+      "file": "phibench_0_7hhm_uwd_c_1_selection_failure_pocket.png",
+      "sha256": "93f5030ca9bae259d10f9d016f198ef5b0cb5dcf22854954007571d71c9f2176",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 666,
+        "secondary": {
+          "c": 41,
+          "s": 25,
+          "h": 18
+        }
+      },
+      "nonwhite_fraction": 0.10727900326797386
+    },
+    {
+      "id": "9bbh-assembly1__protein-a__ligand-e__ccd-vvp",
+      "view_key": "foldbench_2_9bbh-assembly1__protein-a__ligand-e__ccd-vvp_successful_pose",
+      "mode": "pocket",
+      "file": "foldbench_2_9bbh-assembly1__protein-a__ligand-e__ccd-vvp_successful_pose_pocket.png",
+      "sha256": "aeb231c4f99b1ae25d260be96a3e1ac8eff9878ead33da00e749e0bb9a39a1b0",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 8497,
+        "secondary": {
+          "c": 429,
+          "s": 623,
+          "h": 52
+        }
+      },
+      "nonwhite_fraction": 0.310077614379085
+    },
+    {
+      "id": "8ug3-assembly1__protein-a__ligand-c__ccd-wre",
+      "view_key": "foldbench_2_8ug3-assembly1__protein-a__ligand-c__ccd-wre_refinement_rescue",
+      "mode": "pocket",
+      "file": "foldbench_2_8ug3-assembly1__protein-a__ligand-c__ccd-wre_refinement_rescue_pocket.png",
+      "sha256": "c7a1362f47471d3f3f579b2e358a01e6f705ff39389859173f883eb0e0dff028",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2223,
+        "secondary": {
+          "c": 119,
+          "s": 80,
+          "h": 99
+        }
+      },
+      "nonwhite_fraction": 0.2143782679738562
+    },
+    {
+      "id": "8g7f-assembly1__protein-b__ligand-h__ccd-1jj",
+      "view_key": "foldbench_0_8g7f-assembly1__protein-b__ligand-h__ccd-1jj_selection_failure",
+      "mode": "pocket",
+      "file": "foldbench_0_8g7f-assembly1__protein-b__ligand-h__ccd-1jj_selection_failure_pocket.png",
+      "sha256": "b41921a4698c5ecd1040db36b80d30ed0a7cb60e588062c5b270e814d54fc18a",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1162,
+        "secondary": {
+          "c": 59,
+          "s": 42,
+          "h": 37
+        }
+      },
+      "nonwhite_fraction": 0.18994648692810456
+    },
+    {
+      "id": "a71ev2a-x3177a",
+      "view_key": "openbind_1_a71ev2a-x3177a_successful_pose",
+      "mode": "pocket",
+      "file": "openbind_1_a71ev2a-x3177a_successful_pose_pocket.png",
+      "sha256": "5d9d44a2543fd588082466f2483448dbe1b52c7909200791a222b94b587c8a04",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1083,
+        "secondary": {
+          "c": 61,
+          "s": 75,
+          "h": 4
+        }
+      },
+      "nonwhite_fraction": 0.13950898692810457
+    },
+    {
+      "id": "a71ev2a-x7379a",
+      "view_key": "openbind_1_a71ev2a-x7379a_refinement_rescue",
+      "mode": "pocket",
+      "file": "openbind_1_a71ev2a-x7379a_refinement_rescue_pocket.png",
+      "sha256": "e71a020aa5b3a7d1dff24fbb44e5a0afb4cf277dc661909454ce49c5888eaa01",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1074,
+        "secondary": {
+          "c": 57,
+          "s": 73,
+          "h": 9
+        }
+      },
+      "nonwhite_fraction": 0.13267238562091505
+    },
+    {
+      "id": "a71ev2a-x3858b",
+      "view_key": "openbind_2_a71ev2a-x3858b_selection_failure",
+      "mode": "pocket",
+      "file": "openbind_2_a71ev2a-x3858b_selection_failure_pocket.png",
+      "sha256": "44922a4c66fea282a69919d81d4fe3e206e31defd5fa4bf7508567c513285660",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1074,
+        "secondary": {
+          "c": 59,
+          "s": 73,
+          "h": 7
+        }
+      },
+      "nonwhite_fraction": 0.15009395424836602
     }
   ]
 }

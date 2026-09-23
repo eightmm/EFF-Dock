@@ -127,7 +127,7 @@ async def capture(javascript, work, out):
         version = browser.version
         for row in rows:
             mode = "pocket"
-            stem = f"{row['id']}_{mode}"
+            stem = f"{row['view_key']}_{mode}"
             html = work / f"{stem}.html"
             html.write_text(make_html(row, javascript))
             page = await browser.new_page(
@@ -156,6 +156,7 @@ async def capture(javascript, work, out):
             records.append(
                 dict(
                     id=row["id"],
+                    view_key=row["view_key"],
                     mode=mode,
                     file=output.name,
                     sha256=hashlib.sha256(output.read_bytes()).hexdigest(),

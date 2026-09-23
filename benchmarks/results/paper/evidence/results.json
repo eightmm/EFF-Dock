@@ -39765,22 +39765,22 @@
     {
       "title": "Successful pose",
       "dataset": "astex",
-      "repeat": 0,
-      "id": "1owe",
-      "selected_rmsd": 0.7970416075945543,
+      "repeat": 2,
+      "id": "1n1m",
+      "selected_rmsd": 0.7544145501920207,
       "comparator_rmsd": null,
-      "eligible_cases": 66,
-      "selection_rule": "lower median in Astex repeat 0"
+      "eligible_cases": 201,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
     },
     {
       "title": "Refinement rescue",
-      "dataset": "posebusters",
+      "dataset": "astex",
       "repeat": 0,
-      "id": "7fb7_8nf",
-      "selected_rmsd": 0.30229048437531425,
-      "comparator_rmsd": 2.080733873936372,
-      "eligible_cases": 138,
-      "selection_rule": "maximum improvement across five cohorts and three repeats"
+      "id": "1hvy",
+      "selected_rmsd": 1.9802526302273775,
+      "comparator_rmsd": 2.3167792123460695,
+      "eligible_cases": 4,
+      "selection_rule": "maximum improvement within dataset, three repeats"
     },
     {
       "title": "Selection failure",
@@ -39789,8 +39789,128 @@
       "id": "1tz8",
       "selected_rmsd": 2.2721521695480176,
       "comparator_rmsd": 0.6478160251503586,
-      "eligible_cases": 14,
-      "selection_rule": "lower median in Astex repeat 0"
+      "eligible_cases": 36,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
+    },
+    {
+      "title": "Successful pose",
+      "dataset": "posebusters",
+      "repeat": 2,
+      "id": "7dua_hj0",
+      "selected_rmsd": 0.8752086129349804,
+      "comparator_rmsd": null,
+      "eligible_cases": 729,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
+    },
+    {
+      "title": "Refinement rescue",
+      "dataset": "posebusters",
+      "repeat": 0,
+      "id": "7fb7_8nf",
+      "selected_rmsd": 0.30229048437531425,
+      "comparator_rmsd": 2.080733873936372,
+      "eligible_cases": 10,
+      "selection_rule": "maximum improvement within dataset, three repeats"
+    },
+    {
+      "title": "Selection failure",
+      "dataset": "posebusters",
+      "repeat": 1,
+      "id": "8ay3_oe3",
+      "selected_rmsd": 3.042737609392944,
+      "comparator_rmsd": 1.1665582307273314,
+      "eligible_cases": 116,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
+    },
+    {
+      "title": "Successful pose",
+      "dataset": "phibench",
+      "repeat": 2,
+      "id": "9dhh_a1a4o_a_1",
+      "selected_rmsd": 1.046277990442338,
+      "comparator_rmsd": null,
+      "eligible_cases": 371,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
+    },
+    {
+      "title": "Refinement rescue",
+      "dataset": "phibench",
+      "repeat": 0,
+      "id": "9fyb_nmn_a_1_b",
+      "selected_rmsd": 1.5093836729254317,
+      "comparator_rmsd": 2.2274937238695776,
+      "eligible_cases": 11,
+      "selection_rule": "maximum improvement within dataset, three repeats"
+    },
+    {
+      "title": "Selection failure",
+      "dataset": "phibench",
+      "repeat": 0,
+      "id": "7hhm_uwd_c_1",
+      "selected_rmsd": 2.205091936722722,
+      "comparator_rmsd": 0.5300367469962287,
+      "eligible_cases": 161,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
+    },
+    {
+      "title": "Successful pose",
+      "dataset": "foldbench",
+      "repeat": 2,
+      "id": "9bbh-assembly1__protein-a__ligand-e__ccd-vvp",
+      "selected_rmsd": 0.9052604233690605,
+      "comparator_rmsd": null,
+      "eligible_cases": 1217,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
+    },
+    {
+      "title": "Refinement rescue",
+      "dataset": "foldbench",
+      "repeat": 2,
+      "id": "8ug3-assembly1__protein-a__ligand-c__ccd-wre",
+      "selected_rmsd": 1.2248922551961454,
+      "comparator_rmsd": 2.524276724792168,
+      "eligible_cases": 34,
+      "selection_rule": "maximum improvement within dataset, three repeats"
+    },
+    {
+      "title": "Selection failure",
+      "dataset": "foldbench",
+      "repeat": 0,
+      "id": "8g7f-assembly1__protein-b__ligand-h__ccd-1jj",
+      "selected_rmsd": 2.6960604504005476,
+      "comparator_rmsd": 1.02606773247391,
+      "eligible_cases": 287,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
+    },
+    {
+      "title": "Successful pose",
+      "dataset": "openbind",
+      "repeat": 1,
+      "id": "a71ev2a-x3177a",
+      "selected_rmsd": 1.121003617423307,
+      "comparator_rmsd": null,
+      "eligible_cases": 1457,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
+    },
+    {
+      "title": "Refinement rescue",
+      "dataset": "openbind",
+      "repeat": 1,
+      "id": "a71ev2a-x7379a",
+      "selected_rmsd": 1.5996253556904754,
+      "comparator_rmsd": 2.8813977560292674,
+      "eligible_cases": 79,
+      "selection_rule": "maximum improvement within dataset, three repeats"
+    },
+    {
+      "title": "Selection failure",
+      "dataset": "openbind",
+      "repeat": 2,
+      "id": "a71ev2a-x3858b",
+      "selected_rmsd": 2.6449118905894133,
+      "comparator_rmsd": 1.2071681268864465,
+      "eligible_cases": 978,
+      "selection_rule": "lower median within dataset, three repeats; previously chosen complex IDs excluded"
     }
   ]
 }

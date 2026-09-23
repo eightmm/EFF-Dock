@@ -1,6 +1,6 @@
 {
   "pdf": "docs/paper/paper_figures.pdf",
-  "pdf_sha256": "bac1b3f0fc4430993e5f0b40556fc4bceda33437860ed7e8f0ff52d2be8db56e",
+  "pdf_sha256": "804cb2a6f5cb445a8538f4119ed5cc6e22fbc86258b5ad52f0edd181fb769bb1",
   "figures": [
     {
       "page": 1,
@@ -256,14 +256,14 @@
     },
     {
       "page": 19,
-      "title": "보충 S8: 성공·refinement rescue·선택 실패 구조",
+      "title": "보충 S8: 데이터셋별 성공·rescue·선택 실패 구조",
       "section": "supplement",
       "source": "docs/paper/figures/S8_structure_examples.pdf",
-      "sha256": "f5bdd31d20a5eef05a9261a4760b386abf5ed12ea9b4f29a5e8322113dcbcf3d",
+      "sha256": "81239ee736b1de36c7b4db372cf4e5d8569836eabad56bc3aedf78c40e261eb1",
       "figure_id": "S8",
-      "caption_title": "Receptor-frame examples of success, refinement rescue and selection failure.",
-      "caption": "Binding-site close-ups in the original receptor frame, without independent ligand alignment. Protein cartoons use stored coordinates and 3Dmol.js secondary-structure assignment; display chains contact the crystal ligand within 5 Å, a visualization rule that does not change evaluation inputs. Ligand carbon atoms are green (crystal), blue (selected) or orange (raw/oracle); nitrogen is blue and oxygen red. Sticks show connectivity, not assigned interactions. (A) Astex Diverse Set 1OWE, repeat 0: selected RMSD 0.80 Å, the lower median among 66 PB-valid successes. (B) PoseBusters v2 7FB7–8NF, repeat 0: the same candidate (zero-based index 76) improves from 2.08 Å raw to 0.30 Å refined and is PB-valid after refinement. This is the largest RMSD improvement among 138 eligible complex-repeat selections across five external cohorts and three repeats, requiring raw RMSD ≥2 Å and refined RMSD <2 Å with PB validity. The post-hoc extreme-example rule was fixed before the expanded search; this panel illustrates a strong rescue, not a typical effect. (C) Astex Diverse Set 1TZ8, repeat 0: selected RMSD 2.27 Å versus refined oracle 0.65 Å, the lower-median regret among 14 selection failures with a near-native candidate. The original median selections in A and C are unchanged.",
-      "author_note_ko": "B는 5개 외부 셋·3회 반복의 적격 138건 중 동일 후보 RMSD 개선 최대 사례다. 사후 극단 사례 선택이며 평균적 효과나 빈도 추정으로 해석하지 않는다. 전체 단백질 뷰는 제거했다.",
+      "caption_title": "Dataset-specific examples of success, refinement rescue and selection failure.",
+      "caption": "Rows A–E show Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind; columns show successful selection, refinement rescue and selection failure. Examples use saved primary refined selections pooled across three repeats. Within each dataset, the rescue is selected first as the largest same-candidate RMSD decrease from ≥2 Å raw to <2 Å refined with final PB validity. Successful selection uses the lower-median selected RMSD among PB-valid successes, excluding the rescue complex. Selection failure uses the lower-median selected-minus-oracle RMSD among cases with selected RMSD ≥2 Å and an oracle <2 Å, excluding the two previously chosen complex IDs. Ties are broken by repeat and ID. Rescue panels illustrate extremes, not typical improvements; these examples do not estimate prevalence. Eligible rescue counts are 4, 10, 11, 34 and 79 complex-repeat records, respectively. Green, blue and orange carbons denote crystal, selected and raw/oracle poses; heteroatoms use element colors. All structures retain the receptor frame without independent ligand alignment. Protein cartoons use stored coordinates of chains contacting the crystal ligand within 5 Å for display only. Oracle denotes minimum saved-bank RMSD, without a PB-validity requirement. Full sample IDs, repeat indices and eligible counts are provided in the accompanying evidence table; FoldBench image labels abbreviate PDB/ligand/chain and OpenBind uses sample IDs.",
+      "author_note_ko": "5개 외부 셋마다 서로 다른 complex 3건. Rescue는 셋 내 최대 개선 사례이며 대표적 평균효과가 아니다. 성공·선택실패는 3회 반복을 합친 적격 기록의 lower median이며 먼저 뽑은 complex ID를 제외한다. n은 complex-repeat 수이다.",
       "latex_label": "fig:paper-s8",
       "bundle_file": "figures/page_19.pdf",
       "data_key": "evidence"
@@ -332,7 +332,7 @@
     },
     {
       "path": "benchmarks/results/paper/evidence/results.json",
-      "sha256": "7aef7b52af5a64118d43bcca726ed83934fd6e6d61449515de50eb0caafd176d"
+      "sha256": "dae822cc729c95aa5301dabc7938050665bdd6cc495fa750449ae2310d0d3aad"
     },
     {
       "path": "benchmarks/results/paper/evidence/confidence_cases.csv",
@@ -348,7 +348,7 @@
     },
     {
       "path": "benchmarks/results/paper/evidence/structures.json",
-      "sha256": "a0bce7e86e0d437368b4166132abfb6d3ca5a88f785d2250e8efb8a89b351391"
+      "sha256": "c678e6780de6def465a6d2f609c3f58ab57418c775b4bff1c7eb1ea2987cb68e"
     },
     {
       "path": "benchmarks/results/paper/evidence/baseline_cases.csv",
@@ -364,7 +364,7 @@
     },
     {
       "path": "benchmarks/results/paper/evidence/structure_views/manifest.json",
-      "sha256": "32a55fd28c22466ce81914a5df8043b4b38a55c3b799800278cde08244bce1fb"
+      "sha256": "6ad28c05231730cc6fba8de2cbc360721cc955575d967a8335396a6dacfcd59a"
     },
     {
       "path": "benchmarks/results/paper/evidence/rescue_candidates.json",

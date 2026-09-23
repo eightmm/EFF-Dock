@@ -100,31 +100,52 @@ failures remain; it is not a universal stereochemical repair claim.
 
 ## Structure examples — Figure S8
 
-A and C retain their original lower-median selections in Astex repeat 0.
-At the user's request, B uses an expanded, explicitly post-hoc extreme-example
-rule: maximize same-candidate RMSD improvement among primary refined selections
-in five cohorts and three repeats, requiring raw RMSD ≥2 Å, refined RMSD <2 Å
-and refined PB validity. Dataset, repeat and ID break ties. The rule was fixed
-before the expanded search; this is not a typical effect or prevalence estimate.
+All five external cohorts now have three different complex IDs, selected from
+all three saved repeats. This replaces the earlier mixed-dataset triplet.
+Rescue is chosen first by maximum same-candidate RMSD improvement, requiring raw
+RMSD ≥2 Å, refined RMSD <2 Å and refined PB validity. Success uses the lower
+median selected RMSD among PB-valid successes after excluding that complex ID.
+Selection failure uses the lower median regret among selected RMSD failures with
+an oracle below 2 Å, excluding both earlier complex IDs. Ties: repeat, then ID.
+These are post-hoc illustrations. Median cases describe their selected pools;
+rescue is explicitly extreme, not an estimate of typical improvement or frequency.
 
-| Mechanism | Dataset / repeat | Complex | Selected refined RMSD | Comparator | Eligible examples |
-|---|---|---|---:|---|---:|
-| Successful pose | Astex / 0 | 1OWE | 0.80 Å | — | 66 |
-| Refinement rescue | PoseBusters v2 / 0 | 7FB7–8NF | 0.30 Å | 2.08 Å (raw, same index 76) | 138 |
-| Selection failure | Astex / 0 | 1TZ8 | 2.27 Å | 0.65 Å (refined oracle) | 14 |
+| Dataset | Example | Complete sample ID | Repeat (zero-based) | Selected RMSD (Å) | Comparator RMSD (Å) | Eligible records |
+|---|---|---|---:|---:|---:|---:|
+| Astex Diverse Set | Successful pose | `1n1m` | 2 | 0.754 | — | 201 |
+| Astex Diverse Set | Refinement rescue | `1hvy` | 0 | 1.980 | 2.317 (raw, same candidate) | 4 |
+| Astex Diverse Set | Selection failure | `1tz8` | 0 | 2.272 | 0.648 (refined oracle) | 36 |
+| PoseBusters v2 | Successful pose | `7dua_hj0` | 2 | 0.875 | — | 729 |
+| PoseBusters v2 | Refinement rescue | `7fb7_8nf` | 0 | 0.302 | 2.081 (raw, same candidate) | 10 |
+| PoseBusters v2 | Selection failure | `8ay3_oe3` | 1 | 3.043 | 1.167 (refined oracle) | 116 |
+| PhiBench | Successful pose | `9dhh_a1a4o_a_1` | 2 | 1.046 | — | 371 |
+| PhiBench | Refinement rescue | `9fyb_nmn_a_1_b` | 0 | 1.509 | 2.227 (raw, same candidate) | 11 |
+| PhiBench | Selection failure | `7hhm_uwd_c_1` | 0 | 2.205 | 0.530 (refined oracle) | 161 |
+| FoldBench | Successful pose | `9bbh-assembly1__protein-a__ligand-e__ccd-vvp` | 2 | 0.905 | — | 1217 |
+| FoldBench | Refinement rescue | `8ug3-assembly1__protein-a__ligand-c__ccd-wre` | 2 | 1.225 | 2.524 (raw, same candidate) | 34 |
+| FoldBench | Selection failure | `8g7f-assembly1__protein-b__ligand-h__ccd-1jj` | 0 | 2.696 | 1.026 (refined oracle) | 287 |
+| OpenBind | Successful pose | `a71ev2a-x3177a` | 1 | 1.121 | — | 1457 |
+| OpenBind | Refinement rescue | `a71ev2a-x7379a` | 1 | 1.600 | 2.881 (raw, same candidate) | 79 |
+| OpenBind | Selection failure | `a71ev2a-x3858b` | 2 | 2.645 | 1.207 (refined oracle) | 978 |
 
-The rescue improves by 1.7784 Å; all 27 saved non-RMSD PB checks pass after
-refinement. The 138 eligible records are complex-repeat selections, not 138
-independent complexes. The audit lists all eligible candidates in
-`benchmarks/results/paper/evidence/rescue_candidates.json` and the 15 ledger
-checksums in `rescue_search_sources.json`. No new pose generation or PB
-measurement was run. Numerical aggregate results elsewhere are unchanged.
+Eligible records are complex-repeat observations, not independent complex counts.
+The same complex may qualify in several repeats, but no displayed triplet repeats
+a complex ID. All successful and rescued selections pass all 27 saved non-RMSD
+PB checks; an oracle is the minimum RMSD candidate and need not be PB-valid.
+Astex's largest eligible rescue is only 2.317 →1.980 Å; the panel retains this
+small improvement rather than substituting a stronger case from another dataset.
 
-Only binding-site close-ups are shown; the full-protein overview row was
-removed. Carbon colors identify poses; heteroatom colors identify elements.
-Stored coordinates, displayed receptor chains, connectivity and three software
-rendered captures are distributed for re-rendering. No independent ligand
-superposition or contact/interaction assignment is used.
+`rescue_candidates.json` lists the 138 eligible rescues across all five datasets;
+`rescue_search_sources.json` records the 15 ledger checksums. `structures.json`
+contains the full selected/comparator geometry and exact candidate indices.
+No new docking or PB evaluation was run. Aggregate benchmark outcomes are unchanged.
+
+Rows A–E identify datasets; the three columns identify mechanisms. PDB/sample
+labels and RMSDs are placed inside each pocket image. FoldBench labels shorten
+the full identifier to PDB, CCD ligand and ligand chain; OpenBind labels are its
+sample IDs, not PDB accessions. Carbon colors identify poses, heteroatom colors
+identify elements. All 15 software-rendered captures and receptor coordinates
+are included, with no independent ligand alignment or assigned interactions.
 
 ## Local-baseline paired uncertainty — Figure S9
 
@@ -208,8 +229,8 @@ Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and cam
 
 This additional illustration reuses an existing trace and requires no new model
 inference. See `benchmarks/results/paper/trajectory/README.md` for the frame,
-fragment, camera and source-integrity checks. Existing benchmark outcomes and
-the three S8 examples are unchanged.
+fragment, camera and source-integrity checks. The ODE illustration is separate from the 15 S8 structure examples; existing
+benchmark outcomes are unchanged.
 
 The trajectory artwork is intended as manuscript Figure 1; it has time labels
 without panel letters. Page 21 / S10 remains its working-bundle identifier until

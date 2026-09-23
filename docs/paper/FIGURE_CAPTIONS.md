@@ -2,7 +2,7 @@
 
 현재 **21페이지 PDF** 기준: 본문용 Figure 1–11, 보충 Figure S1–S10. 최종 논문 번호는 편집 시 변경 가능하다. 각 영문 캡션은 복사해서 사용할 수 있으며, 한국어 메모는 저자 참고용이다.
 
-PDF SHA-256: `bac1b3f0fc4430993e5f0b40556fc4bceda33437860ed7e8f0ff52d2be8db56e`
+PDF SHA-256: `804cb2a6f5cb445a8538f4119ed5cc6e22fbc86258b5ad52f0edd181fb769bb1`
 
 ## 공통 Methods 메모
 
@@ -196,13 +196,13 @@ Each benchmark compares its full cohort with a fixed stringent subset: maximum o
 
 ## PDF page 19 · Figure S8
 
-**Receptor-frame examples of success, refinement rescue and selection failure.**
+**Dataset-specific examples of success, refinement rescue and selection failure.**
 
-Binding-site close-ups in the original receptor frame, without independent ligand alignment. Protein cartoons use stored coordinates and 3Dmol.js secondary-structure assignment; display chains contact the crystal ligand within 5 Å, a visualization rule that does not change evaluation inputs. Ligand carbon atoms are green (crystal), blue (selected) or orange (raw/oracle); nitrogen is blue and oxygen red. Sticks show connectivity, not assigned interactions. (A) Astex Diverse Set 1OWE, repeat 0: selected RMSD 0.80 Å, the lower median among 66 PB-valid successes. (B) PoseBusters v2 7FB7–8NF, repeat 0: the same candidate (zero-based index 76) improves from 2.08 Å raw to 0.30 Å refined and is PB-valid after refinement. This is the largest RMSD improvement among 138 eligible complex-repeat selections across five external cohorts and three repeats, requiring raw RMSD ≥2 Å and refined RMSD <2 Å with PB validity. The post-hoc extreme-example rule was fixed before the expanded search; this panel illustrates a strong rescue, not a typical effect. (C) Astex Diverse Set 1TZ8, repeat 0: selected RMSD 2.27 Å versus refined oracle 0.65 Å, the lower-median regret among 14 selection failures with a near-native candidate. The original median selections in A and C are unchanged.
+Rows A–E show Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind; columns show successful selection, refinement rescue and selection failure. Examples use saved primary refined selections pooled across three repeats. Within each dataset, the rescue is selected first as the largest same-candidate RMSD decrease from ≥2 Å raw to <2 Å refined with final PB validity. Successful selection uses the lower-median selected RMSD among PB-valid successes, excluding the rescue complex. Selection failure uses the lower-median selected-minus-oracle RMSD among cases with selected RMSD ≥2 Å and an oracle <2 Å, excluding the two previously chosen complex IDs. Ties are broken by repeat and ID. Rescue panels illustrate extremes, not typical improvements; these examples do not estimate prevalence. Eligible rescue counts are 4, 10, 11, 34 and 79 complex-repeat records, respectively. Green, blue and orange carbons denote crystal, selected and raw/oracle poses; heteroatoms use element colors. All structures retain the receptor frame without independent ligand alignment. Protein cartoons use stored coordinates of chains contacting the crystal ligand within 5 Å for display only. Oracle denotes minimum saved-bank RMSD, without a PB-validity requirement. Full sample IDs, repeat indices and eligible counts are provided in the accompanying evidence table; FoldBench image labels abbreviate PDB/ligand/chain and OpenBind uses sample IDs.
 
 - 원본: [S8_structure_examples.pdf](figures/S8_structure_examples.pdf)
 - LaTeX label: `fig:paper-s8`
-- 저자 메모: B는 5개 외부 셋·3회 반복의 적격 138건 중 동일 후보 RMSD 개선 최대 사례다. 사후 극단 사례 선택이며 평균적 효과나 빈도 추정으로 해석하지 않는다. 전체 단백질 뷰는 제거했다.
+- 저자 메모: 5개 외부 셋마다 서로 다른 complex 3건. Rescue는 셋 내 최대 개선 사례이며 대표적 평균효과가 아니다. 성공·선택실패는 3회 반복을 합친 적격 기록의 lower median이며 먼저 뽑은 complex ID를 제외한다. n은 complex-repeat 수이다.
 
 ## PDF page 20 · Figure S9
 

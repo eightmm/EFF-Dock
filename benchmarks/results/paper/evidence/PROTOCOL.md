@@ -79,3 +79,18 @@ representative effect or a prevalence estimate. Freeze this rule before the
 expanded search; export eligible candidates and source-ledger hashes for audit.
 No new inference or PB evaluation; reuse saved coordinates and labels. Use
 pocket-only cartoons, element-colored ligands and existing CPU render budget.
+
+### Dataset-specific structure triplets (2026-09-23)
+
+Expand S8 to all five external datasets, three examples per dataset. Use all
+three repeats of the frozen primary selected poses. Within each dataset select
+maximum same-index raw-to-refined RMSD improvement crossing 2 A and ending
+PB-valid; then the lower-median selected RMSD among PB-valid successes excluding
+that complex ID; then lower-median regret among RMSD selection failures with an
+oracle below 2 A, excluding the two already chosen complex IDs. Ties: repeat, ID.
+These are post-hoc illustrative examples; rescue is extreme, not representative
+of typical improvement. Do not substitute another dataset if eligibility is
+empty, or change selection based on visual appearance. Record eligible counts
+and complete IDs in the report. One 5-row by 3-column pocket-only figure, with
+ID/RMSD inside each image. No new inference/PB evaluation; CPU-only 2 CPUs/8G,
+10min collection/capture. Preserve other PDF pages and all aggregate metrics.

@@ -34,7 +34,7 @@ numbering and placement may change during writing.
 | 16 | 보충 S5: Confidence reliability·후보 밀도 | [PDF](figures/S5_confidence_reliability.pdf) | [PNG](figures/S5_confidence_reliability.png) |
 | 17 | 보충 S6: 서열·리간드 동시 저유사도 subset | [PDF](figures/S6_stringent_subset.pdf) | [PNG](figures/S6_stringent_subset.png) |
 | 18 | 보충 S7: Refinement PB 실패·전이 | [PDF](figures/S7_physical_validity.pdf) | [PNG](figures/S7_physical_validity.png) |
-| 19 | 보충 S8: 성공·refinement rescue·선택 실패 구조 | [PDF](figures/S8_structure_examples.pdf) | [PNG](figures/S8_structure_examples.png) |
+| 19 | 보충 S8: 5개 셋 × 성공·rescue·선택 실패 | [PDF](figures/S8_structure_examples.pdf) | [PNG](figures/S8_structure_examples.png) |
 | 20 | 보충 S9: 로컬 baseline과 paired 신뢰구간 | [PDF](figures/S9_baseline_uncertainty.pdf) | [PNG](figures/S9_baseline_uncertainty.png) |
 | 21 | 보충 S10: Fragment 생성 경로 | [PDF](figures/S10_fragment_trajectory.pdf) | [PNG](figures/S10_fragment_trajectory.png) |
 
