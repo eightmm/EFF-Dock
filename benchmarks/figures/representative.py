@@ -1,6 +1,9 @@
 """Render the Figure 1 concept image from the saved 1T46-STI fragment trajectory."""
 
 import argparse
+import asyncio
+import hashlib
+import importlib.metadata
 import json
 from pathlib import Path
 
@@ -9,17 +12,15 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 
-from benchmarks.figures.structure_views import ELEMENT_COLORS
-from benchmarks.figures.trajectory import COLORS, DATA, ROOT, verify
+from benchmarks.figures.structure_views import ELEMENT_COLORS, JS_SHA256, JS_URL
+from benchmarks.figures.trajectory import COLORS, DATA, ROOT, scene, verify
 
 NAME = "Fig1_representative"
-# Saved frames nearest to t = 0, 0.5 and 0.75, plus the t = 1 endpoint (views/manifest.json).
-FLOW_INDICES = (0, 2, 4)
+# Saved frames nearest to t = 0 and 0.5, plus the t = 1 endpoint (views/manifest.json).
+FLOW_INDICES = (0, 2)
 POSE_INDEX = 10
-# Arbitrary schematic placement, independent of the trajectory coordinates.
-SCHEMATIC_GRID = ((0, 1, 5), (4, 2, 3))
 DARK = "#3E434A"
 MUTED = "#7B838D"
 CONNECTOR = "#B4BBC4"
@@ -28,18 +29,129 @@ POSE_EDGE = "#8C96A3"
 
 # Figure geometry in inches; two-column width.
 WIDTH = 7.2
-FRAME_W = 1.25
-FRAME_GAP = 0.07
-ARROW_GAP = 0.3
-SCHEMATIC_W = 1.3
-MARGIN = 0.05
-BOTTOM = 0.44
-TOP = 0.46
+
+
+def verify_extra_views():
+    captures = json.loads((DATA / "views/manifest.json").read_text())
+    for stem in ("supplied_pocket", "refined_endpoint"):
+        metadata = json.loads((DATA / f"views/{stem}.json").read_text())
+        sources = [
+            ("trace.json", metadata["trace_sha256"]),
+            (f"views/{stem}.png", metadata["sha256"]),
+        ]
+        if stem == "refined_endpoint":
+            sources.append(("representative_refinement.json", metadata["refinement_sha256"]))
+        for name, expected in sources:
+            if hashlib.sha256((DATA / name).read_bytes()).hexdigest() != expected:
+                raise ValueError(f"Stale molecular capture: {stem}")
+        if not np.allclose(metadata["camera"], captures["records"][0]["camera"], atol=1e-7):
+            raise ValueError(f"Camera differs from the trajectory: {stem}")
+
+
+async def capture_views(javascript, work):
+    from playwright.async_api import async_playwright
+
+    verify()
+    row = json.loads((DATA / "trace.json").read_text())
+    refined = json.loads((DATA / "representative_refinement.json").read_text())
+    camera = json.loads((DATA / "views/manifest.json").read_text())["records"][0]["camera"]
+    final = dict(row, coordinates=row["coordinates"][:-1] + [refined["coordinates"][-1]])
+    work.mkdir(parents=True, exist_ok=True)
+    async with async_playwright() as api:
+        browser = await api.chromium.launch(
+            args=[
+                "--use-gl=angle",
+                "--use-angle=swiftshader",
+                "--enable-unsafe-swiftshader",
+                "--disable-dev-shm-usage",
+            ]
+        )
+        for stem, source, index, pocket in (
+            ("supplied_pocket", row, 0, True),
+            ("refined_endpoint", final, 10, False),
+        ):
+            html = work / f"{stem}.html"
+            html.write_text(scene(source, index, javascript, pocket_only=pocket, camera=camera))
+            output = DATA / f"views/{stem}.png"
+            page = await browser.new_page(
+                viewport={"width": 900, "height": 680}, device_scale_factor=2
+            )
+            errors = []
+            page.on("pageerror", lambda error: errors.append(str(error)))
+            await page.goto(html.resolve().as_uri(), wait_until="load")
+            await page.wait_for_function("window.sceneReady === true", timeout=60000)
+            info = await page.evaluate("window.sceneInfo")
+            actual = await page.evaluate("window.sceneCamera")
+            if (
+                errors
+                or "SwiftShader" not in info["renderer"]
+                or not np.allclose(actual, camera, atol=1e-7)
+            ):
+                raise ValueError(f"Molecular capture failed: {stem}, {errors}, {info}")
+            await page.screenshot(path=str(output), animations="disabled")
+            metadata = dict(
+                trace_sha256=hashlib.sha256((DATA / "trace.json").read_bytes()).hexdigest(),
+                sha256=hashlib.sha256(output.read_bytes()).hexdigest(),
+                camera=actual,
+                scene=info,
+                javascript_url=JS_URL,
+                javascript_sha256=JS_SHA256,
+                chromium_version=browser.version,
+                py3dmol_version=importlib.metadata.version("py3Dmol"),
+                playwright_version=importlib.metadata.version("playwright"),
+                description=(
+                    "Stored receptor only; ligand hidden; darker input cartoon. No predicted pocket or cutoff boundary."
+                    if pocket
+                    else "CPU refinement of the exact stored N1 endpoint; original camera and fragment colors."
+                ),
+            )
+            if not pocket:
+                metadata["refinement_sha256"] = hashlib.sha256(
+                    (DATA / "representative_refinement.json").read_bytes()
+                ).hexdigest()
+            (DATA / f"views/{stem}.json").write_text(json.dumps(metadata, indent=2) + "\n")
+            await page.close()
+        await browser.close()
+    verify_extra_views()
+    print("Captured supplied pocket and matched refined endpoint")
+
+
+def verify_refinement(row):
+    record = json.loads((DATA / "representative_refinement.json").read_text())
+    expected = hashlib.sha256((DATA / "trace.json").read_bytes()).hexdigest()
+    raw = np.asarray(row["coordinates"][-1])
+    coords = np.asarray(record["coordinates"])
+    if record["trace_sha256"] != expected or not np.array_equal(record["raw_coordinates"], raw):
+        raise ValueError("Refinement does not start from this trajectory")
+    if (
+        coords.shape[1:] != raw.shape
+        or not np.isfinite(coords).all()
+        or not np.allclose(coords[0], raw, atol=1e-4)
+    ):
+        raise ValueError("Invalid refinement geometry")
+    for f in range(6):
+        xyz = coords[:, np.asarray(row["fragment_id"]) == f]
+        distances = np.linalg.norm(xyz[:, :, None] - xyz[:, None, :], axis=-1)
+        if np.max(np.abs(distances - distances[0])) > 1e-3:
+            raise ValueError("Non-rigid refined fragment")
+    energies = np.asarray(
+        [[r[k] for k in ("physical", "interaction", "combined")] for r in record["energies"]]
+    )
+    if not np.isfinite(energies).all() or not np.allclose(
+        energies[:, 0] + energies[:, 1], energies[:, 2], atol=1e-4
+    ):
+        raise ValueError("Invalid refinement energy groups")
+    for name, digest in record["source_code"].items():
+        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != digest:
+            raise ValueError("Refinement implementation differs from the recorded source")
+    return record
 
 
 def load():
     verify()
+    verify_extra_views()
     row = json.loads((DATA / "trace.json").read_text())
+    verify_refinement(row)
     xyz = np.asarray(row["coordinates"])
     frag = np.asarray(row["fragment_id"])
     for f in range(len(COLORS)):
@@ -98,60 +210,57 @@ def frame(fig, rect, image, crop, edge, lw):
     return art
 
 
-def schematic(ax, row):
-    """Six rigid bodies drawn from saved intra-fragment geometry; placement is arbitrary."""
-    xyz = np.asarray(row["coordinates"])[0]
-    frag = np.asarray(row["fragment_id"])
-    elements = row["elements"]
-    step_x, step_y = 5.2, 5.6
-    anchors = {
-        f: np.array([c * step_x, -r * step_y])
-        for r, line in enumerate(SCHEMATIC_GRID)
-        for c, f in enumerate(line)
-    }
-    all_points = []
-    for f, carbon in enumerate(COLORS):
-        ids = np.flatnonzero(frag == f)
-        local = xyz[ids] - xyz[ids].mean(0)
-        # Orthographic projection onto the fragment's principal plane.
-        flat = local @ np.linalg.svd(local, full_matrices=False)[2][:2].T
-        flat *= np.sign(np.sum(flat**3, axis=0) + 1e-12)
-        flat += anchors[f]
-        all_points.append(flat)
-        colors = [carbon if elements[i] == "C" else ELEMENT_COLORS[elements[i]] for i in ids]
-        where = {int(i): k for k, i in enumerate(ids)}
-        for a, b in row["bonds"]:
-            if a in where and b in where:
-                p, q = flat[where[a]], flat[where[b]]
-                mid = (p + q) / 2
-                for s, e, color in ((p, mid, colors[where[a]]), (mid, q, colors[where[b]])):
-                    ax.plot(*zip(s, e), color=color, lw=2.1, solid_capstyle="butt", zorder=2)
-        ax.scatter(*flat.T, s=15, c=colors, edgecolors="#00000033", linewidths=0.4, zorder=3)
-    cue(ax, anchors[0])
+def ligand_diagram(ax, row, fragmented=False):
+    diagram = json.loads((DATA / "ligand_diagram.json").read_text())
+    if diagram["trace_sha256"] != hashlib.sha256((DATA / "trace.json").read_bytes()).hexdigest():
+        raise ValueError("Stale ligand decomposition diagram")
+    if diagram["elements"] != row["elements"] or diagram["fragment_id"] != row["fragment_id"]:
+        raise ValueError("Diagram fragment identity differs from trajectory")
+    if sorted(sorted(b["atoms"]) for b in diagram["bonds"]) != sorted(
+        sorted(b) for b in row["bonds"]
+    ):
+        raise ValueError("Diagram connectivity mismatch")
+    xy = np.asarray(diagram["coordinates"])
+    colors = [
+        ELEMENT_COLORS.get(e, COLORS[f] if fragmented else "#7D8791")
+        for e, f in zip(diagram["elements"], diagram["fragment_id"], strict=True)
+    ]
+    for bond in diagram["bonds"]:
+        a, b = bond["atoms"]
+        cut = diagram["fragment_id"][a] != diagram["fragment_id"][b]
+        if cut != bond["cut"]:
+            raise ValueError("Diagram cut-bond assignment mismatch")
+        if cut and fragmented:
+            continue
+        p, q = xy[a], xy[b]
+        d = q - p
+        normal = np.array([-d[1], d[0]]) / np.linalg.norm(d) * 0.11
+        offsets = (-normal, normal) if bond["order"] in (1.5, 2) else (np.zeros(2),)
+        for k, offset in enumerate(offsets):
+            mid = (p + q) / 2 + offset
+            style = "--" if bond["aromatic"] and k == 1 else "-"
+            for start, end, color in ((p + offset, mid, colors[a]), (mid, q + offset, colors[b])):
+                ax.plot(
+                    *zip(start, end),
+                    color=color,
+                    linewidth=1.25,
+                    linestyle=style,
+                    solid_capstyle="round",
+                    zorder=2,
+                )
+        if cut and not fragmented:
+            mid = (p + q) / 2
+            ax.plot(
+                *zip(mid - 2.7 * normal, mid + 2.7 * normal),
+                color="#C58A73",
+                linewidth=1.3,
+                zorder=4,
+            )
+    ax.scatter(*xy.T, s=8, c=colors, linewidths=0, zorder=3)
+    ax.set_xlim(xy[:, 0].min() - 0.7, xy[:, 0].max() + 0.7)
+    ax.set_ylim(xy[:, 1].min() - 0.7, xy[:, 1].max() + 0.7)
     ax.set_aspect("equal")
-    points = np.concatenate(all_points)
-    ax.set_xlim(min(-2.9, points[:, 0].min() - 0.65), points[:, 0].max() + 0.65)
-    ax.set_ylim(min(-step_y - 3.0, points[:, 1].min() - 0.65), 3.0)
     ax.set_axis_off()
-
-
-def cue(ax, centre):
-    """Qualitative rotation and translation glyph on one fragment; not a measured motion."""
-    style = dict(
-        color=MUTED,
-        lw=0.8,
-        shrinkA=0,
-        shrinkB=0,
-        zorder=4,
-        arrowstyle="-|>,head_length=2.4,head_width=1.3",
-    )
-    x, y = centre
-    ax.add_patch(
-        FancyArrowPatch(
-            (x - 1.9, y + 1.8), (x + 1.9, y + 1.8), connectionstyle="arc3,rad=-0.45", **style
-        )
-    )
-    ax.add_patch(FancyArrowPatch((x + 2.0, y - 2.3), (x + 3.1, y - 1.2), **style))
 
 
 def connector(fig, x0, x1, y, width, height):
@@ -171,95 +280,97 @@ def connector(fig, x0, x1, y, width, height):
 
 def compose(row):
     images = {i: plt.imread(DATA / f"views/frame_{i:02d}.png") for i in row["shown_indices"]}
-    crop = common_crop(list(images.values()))
-    frame_h = FRAME_W * (crop[1] - crop[0]) / (crop[3] - crop[2])
-    height = BOTTOM + frame_h + TOP
+    refined = plt.imread(DATA / "views/refined_endpoint.png")
+    crop = common_crop([*images.values(), refined])
+    height = 3.12
+    fw = 1.65
+    fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
+    bottom = 0.30
     fig = plt.figure(figsize=(WIDTH, height))
 
     def rect(x, y, w, h):
         return [x / WIDTH, y / height, w / WIDTH, h / height]
 
-    def header(x, title, note):
+    def label(x, y, text, size=9, weight="semibold", color=DARK):
         fig.text(
             x / WIDTH,
-            (top + 0.24) / height,
-            title,
-            fontsize=9,
-            fontweight="semibold",
-            color=DARK,
+            y / height,
+            text,
+            fontsize=size,
+            weight=weight,
+            color=color,
             ha="center",
-            va="baseline",
-        )
-        fig.text(
-            x / WIDTH,
-            (top + 0.1) / height,
-            note,
-            fontsize=7,
-            color=MUTED,
-            ha="center",
-            va="baseline",
+            va="center",
         )
 
-    mid = BOTTOM + frame_h / 2
-    top = BOTTOM + frame_h
+    ligand_diagram(fig.add_axes(rect(0.07, 1.90, 2.02, 0.82)), row)
+    ligand_diagram(fig.add_axes(rect(2.92, 1.90, 2.02, 0.82)), row, fragmented=True)
+    label(1.08, 2.94, "Ligand")
+    label(3.93, 2.94, "Rigid fragments")
+    label(2.50, 2.62, "Fragmentation", size=8, weight="normal")
+    connector(fig, 2.20, 2.79, 2.31, WIDTH, height)
 
-    schematic(fig.add_axes(rect(MARGIN, BOTTOM - 0.12, SCHEMATIC_W, frame_h + 0.12)), row)
-    sx = MARGIN + SCHEMATIC_W / 2
-    header(sx, "Rigid fragments", "fixed internal geometry")
-    fig.text(
-        sx / WIDTH,
-        (BOTTOM - 0.3) / height,
-        "schematic",
-        fontsize=7,
-        style="italic",
-        color=MUTED,
-        ha="center",
-        va="baseline",
+    pocket = plt.imread(DATA / "views/supplied_pocket.png")
+    ax = fig.add_axes(rect(5.49, 1.83, 1.60, 0.98))
+    arts = [ax.imshow(pocket, interpolation="none")]
+    y0, y1, x0, x1 = crop
+    ax.add_patch(
+        Rectangle(
+            (x0, y0),
+            x1 - x0,
+            y1 - y0,
+            fill=False,
+            edgecolor="#61788F",
+            linewidth=0.7,
+            linestyle=(0, (3, 2)),
+        )
     )
+    ax.set_axis_off()
+    label(6.29, 2.94, "Supplied pocket")
 
-    start = x = MARGIN + SCHEMATIC_W + ARROW_GAP
-    connector(fig, x - ARROW_GAP + 0.06, x - 0.06, mid, WIDTH, height)
-    arts, centres = [], []
-    for index in FLOW_INDICES:
-        arts.append(
-            frame(fig, rect(x, BOTTOM, FRAME_W, frame_h), images[index], crop, FRAME_EDGE, 0.6)
+    # Both supplied inputs condition the flow; the bracket is not a learned module.
+    for x in (3.93, 6.29):
+        fig.add_artist(
+            plt.Line2D(
+                [x / WIDTH, x / WIDTH, 2.70 / WIDTH],
+                [1.81 / height, 1.66 / height, 1.66 / height],
+                color=CONNECTOR,
+                linewidth=0.8,
+            )
         )
-        centres.append((x + FRAME_W / 2, row["times"][index]))
-        x += FRAME_W + FRAME_GAP
-    x -= FRAME_GAP
-    header((start + x) / 2, "SE(3) flow", "Fragment rotation and translation")
-
-    x += ARROW_GAP
-    connector(fig, x - ARROW_GAP + 0.06, x - 0.06, mid, WIDTH, height)
-    arts.append(
-        frame(fig, rect(x, BOTTOM, FRAME_W, frame_h), images[POSE_INDEX], crop, POSE_EDGE, 1.0)
-    )
-    centres.append((x + FRAME_W / 2, row["times"][POSE_INDEX]))
-    header(x + FRAME_W / 2, "Generated pose", "")
-
-    # Flow-time baseline under the four saved states; labels are the recorded times.
-    first, last = centres[0][0] - FRAME_W / 2, centres[-1][0] + FRAME_W / 2
-    axis_y = BOTTOM - 0.3
-    connector(fig, first, last, axis_y, WIDTH, height)
-    for cx, t in centres:
-        fig.text(
-            cx / WIDTH,
-            (BOTTOM - 0.16) / height,
-            f"$t$ = {t:.3f}",
-            fontsize=7.5,
-            color=DARK,
-            ha="center",
-            va="baseline",
+    fig.add_artist(
+        FancyArrowPatch(
+            (2.70 / WIDTH, 1.66 / height),
+            (2.70 / WIDTH, 1.53 / height),
+            transform=fig.transFigure,
+            arrowstyle="-|>",
+            mutation_scale=7,
+            color=CONNECTOR,
+            linewidth=0.8,
         )
-    fig.text(
-        (first - 0.04) / WIDTH,
-        axis_y / height,
-        "flow time",
-        fontsize=7,
-        color=MUTED,
-        ha="right",
-        va="center",
     )
+    label(2.70, 1.43, "SE(3) flow")
+    label(6.305, 1.52, "Energy refinement")
+    label(6.305, 1.32, r"$E_{\mathrm{physical}}+E_{\mathrm{interaction}}$", size=8, weight="normal")
+
+    positions = (0.05, 1.86, 3.67, 5.48)
+    for x, index in zip(positions[:3], FLOW_INDICES + (POSE_INDEX,), strict=True):
+        arts.append(frame(fig, rect(x, bottom, fw, fh), images[index], crop, FRAME_EDGE, 0.5))
+        time = row["times"][index]
+        text = f"$t$ = {time:.3f}" if index == 2 else f"$t$ = {int(time)}"
+        if index == POSE_INDEX:
+            text += " · Generated pose"
+        label(x + fw / 2, bottom - 0.16, text, size=7.5, weight="normal")
+    arts.append(frame(fig, rect(positions[-1], bottom, fw, fh), refined, crop, POSE_EDGE, 0.65))
+    record = verify_refinement(row)
+    label(
+        6.305,
+        bottom - 0.16,
+        f"Refined pose · {record['saved_steps'][-1]} steps",
+        size=7.5,
+        weight="normal",
+    )
+    connector(fig, 5.34, 5.46, bottom + fh / 2, WIDTH, height)
     return fig, arts
 
 
@@ -293,8 +404,21 @@ def render(out):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "outputs/paper_figures")
+    parser.add_argument(
+        "--javascript", type=Path, help="Recapture the pocket and refined pose with pinned 3Dmol.js"
+    )
+    parser.add_argument("--work-dir", type=Path, default=ROOT / "outputs/representative_webgl")
+    parser.add_argument("--capture-only", action="store_true")
     args = parser.parse_args()
-    render(args.output)
+    if args.capture_only and not args.javascript:
+        parser.error("--capture-only requires --javascript")
+    if args.javascript:
+        blob = args.javascript.read_bytes()
+        if hashlib.sha256(blob).hexdigest() != JS_SHA256:
+            raise ValueError("3Dmol.js identity mismatch")
+        asyncio.run(capture_views(blob.decode(), args.work_dir))
+    if not args.capture_only:
+        render(args.output)
 
 
 if __name__ == "__main__":

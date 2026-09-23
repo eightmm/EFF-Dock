@@ -18,7 +18,7 @@ DATA = ROOT / "benchmarks/results/paper/trajectory"
 COLORS = ["#77AFD1", "#E6AC83", "#85BDA3", "#AF98C5", "#C8BC78", "#D38EAE"]
 
 
-def scene(row, frame_index, javascript):
+def scene(row, frame_index, javascript, *, pocket_only=False, camera=None):
     import py3Dmol
 
     view = py3Dmol.view(width=900, height=680)
@@ -47,7 +47,7 @@ def scene(row, frame_index, javascript):
                 "sphere": {"colorscheme": scheme, "scale": 0.23},
             },
         )
-    if frame_index == len(row["times"]) - 1:
+    if not pocket_only and frame_index == len(row["times"]) - 1:
         for a, b in row["bonds"]:
             if fragment_ids[a] != fragment_ids[b]:
                 view.addCylinder(
@@ -72,6 +72,17 @@ def scene(row, frame_index, javascript):
     view.rotate(-15, "x")
     view.zoomTo({"model": 7})
     view.zoom(2.0)
+    if pocket_only:
+        view.setStyle({"model": list(range(1, 7))}, {})
+        view.setStyle(
+            {"model": 0},
+            {"cartoon": {"color": "#94ABC3", "opacity": 0.85, "arrows": True}},
+        )
+    if camera is not None:
+        values = np.asarray(camera, dtype=float)
+        if values.shape != (8,) or not np.isfinite(values).all():
+            raise ValueError("Invalid fixed molecular camera")
+        view.setView(values.tolist())
     view.render()
     return viewer_html(view, javascript)
 

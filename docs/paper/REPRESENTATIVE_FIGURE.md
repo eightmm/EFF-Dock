@@ -1,80 +1,111 @@
 # Figure 1 representative image
 
-Concept figure, not the architecture diagram. Rendered by
-`benchmarks/figures/representative.py` from the committed 1T46–STI trace and
-captures already used by Figure S10; no inference or recapture.
-
-```bash
-python -m benchmarks.figures.representative --output outputs/paper_figures
-```
-
-Outputs `Fig1_representative.pdf` (manuscript), `.svg` (editable, text kept as
-text) and `.png` (400 dpi preview). The renderer first calls
-`benchmarks.figures.trajectory.verify()` (trace/capture SHA-256, frame times,
-identical cameras) and additionally checks that every fragment's intra-fragment
-distances are unchanged across all 11 saved frames (≤1e-3 Å) and that no
-ligand pixel touches a capture border.
-
-## Displayed states
-
-| Stage | Saved frame | Recorded t | Capture |
-|---|---|---|---|
-| SE(3) flow | 0 | 0.000 | `views/frame_00.png` |
-| SE(3) flow | 2 | 0.488 | `views/frame_02.png` |
-| SE(3) flow | 4 | 0.784 | `views/frame_04.png` |
-| Generated pose | 10 | 1.000 | `views/frame_10.png` |
-
-Frame 1 (t=0.271) is omitted; it is visually close to t=0 at this size.
-
-## Design
-
-- Three stages left to right: Rigid fragments → SE(3) flow → Generated pose.
-  Stage names are small semibold headers, with minimal explanatory text. There
-  are no panel letters, figure title, legend or metrics.
-- All four molecular frames share one crop and one displayed size. The crop is
-  the union bounding box of ligand pixels across all five verified captures
-  plus a 4.5% margin, so camera and scale stay identical. Pixels are never
-  altered; vector outputs embed them unresampled. Rounded clipping and a
-  darker border on the endpoint set the visual hierarchy.
-- The left schematic is drawn in vector form from saved coordinates. Each
-  fragment's local geometry is projected onto its principal plane. Orientation
-  and grid placement are arbitrary, so it is neither an input pose nor a
-  conformer. One fragment carries a qualitative rotation and
-  translation glyph.
-- Connectors are thin pale-grey arrows between stages, plus one flow-time
-  baseline under the four frames labelled with the recorded times.
-- Colors are the fragment-carbon palette from `trajectory.COLORS`. N and O use
-  `ELEMENT_COLORS`. There is no swatch legend.
-
-## Caption
-
-**EFF-Dock generates a ligand pose by moving rigid ligand fragments with an
-SE(3) flow inside a fixed receptor pocket.** Left (schematic): the six rigid
-fragments of STI from Astex Diverse Set 1T46–STI, drawn from the
-saved intra-fragment atom geometry, which is identical at every saved time.
-Each fragment is shown as an orthographic projection onto its principal plane
-with arbitrary orientation and placement; this depiction is not an input pose
-or conformer. The curved and straight arrows on one fragment are qualitative
-rotation and translation glyphs, not measured motion. Middle and right: actual
-saved states of one generative ODE trajectory at flow times t = 0.000, 0.488,
-0.784 and 1.000 (saved frames 0, 2, 4 and 10 of 11), rendered with an
-identical camera, receptor and crop; no coordinates are interpolated. At t = 0
-fragments are sampled around the supplied pocket centre. The receptor is fixed
-and shown as a pale cartoon. Carbon colours identify the same six fragments
-throughout; nitrogen is blue and oxygen red. Bonds joining different fragments
-are hidden before t = 1 and drawn in grey at t = 1 as a display convention
-using the known ligand connectivity; they do not represent chemical bond
-formation. t is the dimensionless generative-flow time, not physical time or
-energy refinement. This is a separate illustrative N1 run (one sample, ten ODE
-steps, positional prior σ = 2 Å, seed 42, no guidance or confidence
-selection), distinct from the N100 benchmark runs. The generated pose is shown
-with no claim of accuracy, PoseBusters validity or representativeness.
-
-## Draft files
+A standalone concept figure for known-pocket redocking: intact ligand → rigid
+fragments, combined with a supplied pocket → unguided SE(3) generation →
+post-generation energy refinement.
+The layout was reviewed with Claude Opus 5.5 and implemented/verified locally.
+This draft does not change the existing 21-page reference package.
 
 - [PDF](figures/Fig1_representative.pdf)
 - [Editable SVG](figures/Fig1_representative.svg)
 - [PNG preview](figures/Fig1_representative.png)
 
-This is a separate Figure 1 design draft; the existing 21-page reference PDF
-and its figure numbering are unchanged.
+## Reproduction
+
+```bash
+python -m benchmarks.figures.representative --output outputs/paper_figures
+```
+
+Rendering uses committed molecular captures and ordinary figure dependencies.
+It checks source hashes, identical molecular cameras, raw-endpoint identity,
+rigid-fragment geometry and energy-group accounting. PDF/SVG text and the ligand
+fragment schematic remain vector elements; the molecular views are embedded
+3Dmol.js captures. PNG previews use 400 dpi.
+
+To regenerate the two added captures with the pinned JavaScript and optional
+py3Dmol/Playwright stack described in the trajectory README:
+
+```bash
+python -m benchmarks.figures.representative --javascript /path/to/3Dmol-min.js --work-dir /tmp/representative-views --output outputs/paper_figures
+```
+
+With the original source SDF/PDB files available, the one-pose CPU refinement
+is reproducible with:
+
+```bash
+python -m benchmarks.analysis.representative_refinement --source-root /path/to/source-checkout
+python -m benchmarks.analysis.representative_ligand --source-root /path/to/source-checkout
+```
+
+The first command invokes the existing rigid-fragment optimizer, not the docking
+model. The second exports a 2D depiction of the original ligand graph with the
+saved fragment boundaries; it does not generate a new 3D conformer.
+The numerical record is
+`benchmarks/results/paper/trajectory/representative_refinement.json`; separate
+capture metadata record its hash and the unchanged camera. Source-file hashes,
+energy parameter identities and implementation checksums are retained.
+
+## Displayed states and interpretation
+
+| State | Source | Time / iteration |
+|---|---|---|
+| Ligand | Original prepared STI molecular graph; five fragment boundaries marked | 2D input diagram |
+| Rigid fragments | Same 2D coordinates, with those five bonds omitted; six saved fragment identities | Schematic decomposition |
+| Supplied pocket | Stored 1T46 receptor; ligand models hidden | Input |
+| Initial state | Saved ODE frame 0 | t = 0 |
+| Intermediate state | Saved ODE frame 2 | t = 0.488 |
+| Generated pose | Saved ODE frame 10 | t = 1 |
+| Refined pose | CPU refinement of that exact endpoint | Step 100 |
+
+The receptor-only thumbnail uses the same orientation and camera. Its dashed
+rectangle marks the image region displayed in the molecular panels, not a
+predicted pocket, selected residue set or a radial cutoff. The thumbnail is
+shown at a smaller display scale; all four trajectory/refinement panels share
+one camera, crop and display scale. Darker receptor coloring is used only for
+the supplied-pocket thumbnail.
+
+Refinement used the original prepared ligand for parameterization, stored
+fragment assignments, a fixed receptor, an 18 Å receptor shell, and 100 maximum
+rigid-fragment optimization steps. Physics and interaction terms are both
+active; the separate chemical-constraint channel is not added. Production-like
+energy-plateau thresholds are 0.02 absolute / 0.001 relative, patience 5, starting
+at step 25. Other numerical controls are recorded in the JSON configuration.
+
+The run reached its **100-step budget**, not a convergence certificate. Its
+combined diagnostic energy decreased from 1473.786 to −34.909 kcal/mol. The
+finite-shell envelope flag is **false**: the geometry exceeds the region in
+which the 18 Å shell guarantees complete interactions up to the maximum active
+cutoff. This is an illustration of the recorded finite-shell protocol, not a
+claim of a fully covered receptor environment. No RMSD/PoseBusters improvement
+or validity claim is made. The optimizer's diagnostic reference argument was
+the raw endpoint; its displacement-to-reference metrics are deliberately not
+published as crystal RMSD. No new docking inference or confidence selection
+was performed.
+
+## Caption
+
+**Pocket-conditioned fragment generation followed by energy refinement.**
+A ligand is decomposed into rigid fragments and combined with a supplied receptor
+pocket to condition unguided SE(3) pose generation. Top: a 2D depiction of STI
+marks the five bonds crossing the saved fragment boundaries; omitting these
+bonds reveals the six color-coded fragments. The two depictions share the same
+2D coordinates and are neither docking poses nor newly generated conformers.
+The supplied-pocket thumbnail shows the stored 1T46 receptor without ligand;
+its dashed rectangle marks the close-up region, not a predicted pocket or
+distance-cutoff boundary. Bottom: actual saved ODE states at t = 0, 0.488
+and 1 (frames 0, 2 and 10 of 11). The generated t = 1 pose then undergoes
+100 CPU optimization steps using physical and protein–ligand interaction
+energies, with fixed receptor coordinates and rigid fragment internal geometry.
+The refined panel shows the resulting coordinates of this same pose. Physical
+terms describe covalent geometry and nonbonded/steric contributions; interaction
+terms describe typed protein–ligand contacts. These postprocessing energies are
+distinct from the learned vector field and are not binding affinities. All
+molecular trajectory/refinement panels share a camera, crop and scale. Carbon colors track fragments;
+heteroatoms retain element colors. Interfragment bonds are hidden in the early
+ODE panels and drawn at the endpoint and after refinement solely for display;
+no chemical bond formation is simulated. Flow time is dimensionless and is not
+physical time or optimization iteration. This separate N1/S10 illustration uses
+prior sigma 2 Å and seed 42. The refinement reaches the step budget and uses a
+finite 18 Å receptor shell whose full-neighborhood envelope is not satisfied;
+it does not establish convergence, docking accuracy, PB validity or representative
+improvement. Confidence/chirality selection is downstream and is not shown.

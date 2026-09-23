@@ -1,0 +1,609 @@
+{
+  "description": "2D depiction of the original prepared input ligand; coordinates are a diagram, not a docking conformer.",
+  "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
+  "source": {
+    "path": "data/external_benchmarks/data/astex_diverse_set/1T46_STI/1T46_STI_ligand_start_conf.sdf",
+    "sha256": "34bda6fac3c2f7555639b46d87d356375ac771d6837b4e79aa10c176e0bcd4f5"
+  },
+  "smiles": "Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc1nccc(-c2cccnc2)n1",
+  "coordinates": [
+    [
+      10.346262312539022,
+      -3.0612744214520227
+    ],
+    [
+      9.089999434145168,
+      -2.241638172638204
+    ],
+    [
+      9.171693808283589,
+      -0.7438644817108563
+    ],
+    [
+      10.509651060815864,
+      -0.06572703959732618
+    ],
+    [
+      11.76591393920972,
+      -0.8853632884111442
+    ],
+    [
+      11.684219565071299,
+      -2.3831369793384924
+    ],
+    [
+      7.915430929889735,
+      0.07577176710296141
+    ],
+    [
+      7.997125304028155,
+      1.5735454580303117
+    ],
+    [
+      6.740862425634299,
+      2.393181706844128
+    ],
+    [
+      5.402905173102023,
+      1.7150442647305977
+    ],
+    [
+      5.321210798963601,
+      0.21727057380324927
+    ],
+    [
+      6.577473677357456,
+      -0.6023656750105678
+    ],
+    [
+      3.9832535464313263,
+      -0.46086686831028145
+    ],
+    [
+      2.7269906680374714,
+      0.3587693805035359
+    ],
+    [
+      2.8086850421758927,
+      1.8565430714308855
+    ],
+    [
+      1.5524221637820377,
+      2.6761793202447017
+    ],
+    [
+      0.21446491124976116,
+      1.9980418781311704
+    ],
+    [
+      0.13277053711133968,
+      0.5002681872038222
+    ],
+    [
+      1.3890334155051949,
+      -0.31936806160999476
+    ],
+    [
+      -1.2051867154209368,
+      -0.17786925490970854
+    ],
+    [
+      -2.4614495938147916,
+      0.6417669939041095
+    ],
+    [
+      -3.799406846347068,
+      -0.0363704482094212
+    ],
+    [
+      -5.055669724740925,
+      0.7832658006043971
+    ],
+    [
+      -6.3936269772731995,
+      0.10512835849086638
+    ],
+    [
+      -6.475321351411624,
+      -1.3926453324364816
+    ],
+    [
+      -5.219058473017768,
+      -2.2122815812502994
+    ],
+    [
+      -3.8811012204854913,
+      -1.5341441391367694
+    ],
+    [
+      -7.813278603943905,
+      -2.070782774550014
+    ],
+    [
+      -9.06954148233776,
+      -1.2511465257361962
+    ],
+    [
+      -8.98784710819934,
+      0.24662716519115346
+    ],
+    [
+      -10.244109986593193,
+      1.0662634140049705
+    ],
+    [
+      -11.58206723912547,
+      0.38812597189143994
+    ],
+    [
+      -12.838330117519325,
+      1.207762220705256
+    ],
+    [
+      -11.66376161326389,
+      -1.1096477190359084
+    ],
+    [
+      -10.407498734870035,
+      -1.9292839678497258
+    ],
+    [
+      -2.37975521967637,
+      2.13954068483146
+    ],
+    [
+      4.146642294708169,
+      2.5346805135444166
+    ]
+  ],
+  "elements": [
+    "C",
+    "C",
+    "C",
+    "C",
+    "N",
+    "C",
+    "C",
+    "C",
+    "C",
+    "N",
+    "C",
+    "N",
+    "N",
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+    "N",
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+    "C",
+    "N",
+    "C",
+    "C",
+    "N",
+    "C",
+    "C",
+    "C",
+    "O",
+    "C"
+  ],
+  "fragment_id": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    4,
+    4,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    4,
+    5
+  ],
+  "bonds": [
+    {
+      "atoms": [
+        0,
+        1
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        1,
+        2
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        2,
+        3
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        3,
+        4
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        0,
+        5
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        4,
+        5
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        2,
+        6
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": true
+    },
+    {
+      "atoms": [
+        6,
+        7
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        7,
+        8
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        8,
+        9
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        9,
+        10
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        6,
+        11
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        10,
+        11
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        10,
+        12
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": true
+    },
+    {
+      "atoms": [
+        12,
+        13
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        13,
+        14
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        14,
+        15
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        15,
+        16
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        16,
+        17
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        13,
+        18
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        17,
+        18
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        17,
+        19
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": true
+    },
+    {
+      "atoms": [
+        19,
+        20
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        20,
+        21
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": true
+    },
+    {
+      "atoms": [
+        21,
+        22
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        22,
+        23
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        23,
+        24
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        24,
+        25
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        21,
+        26
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        25,
+        26
+      ],
+      "order": 1.5,
+      "aromatic": true,
+      "cut": false
+    },
+    {
+      "atoms": [
+        24,
+        27
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": true
+    },
+    {
+      "atoms": [
+        27,
+        28
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        28,
+        29
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        29,
+        30
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        30,
+        31
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        31,
+        32
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        31,
+        33
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        28,
+        34
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        33,
+        34
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        20,
+        35
+      ],
+      "order": 2.0,
+      "aromatic": false,
+      "cut": false
+    },
+    {
+      "atoms": [
+        14,
+        36
+      ],
+      "order": 1.0,
+      "aromatic": false,
+      "cut": false
+    }
+  ],
+  "rdkit_version": "2025.09.5"
+}
