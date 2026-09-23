@@ -29,7 +29,8 @@ overlay; crystal coordinates are not used for candidate selection. Confidence di
 selected/not-selected marks overlaid in the upper-left image corners.
 Time and step labels use that same corner. Molecular panel width is 1.55 inches (previously 1.30), with preserved aspect
 ratio and larger structures at the same canvas size. Stage boxes have equal
-widths and uniform gaps, with aligned connectors and white backgrounds with neutral gray borders.
+widths and uniform gaps, with aligned connectors, white molecular panels and very pale stage backgrounds
+(mint, blue, warm ivory and lavender); the selected output repeats mint.
 A coordinated blue, peach, mint, violet, gold and rose palette identifies the six
 fragments consistently across 2D inputs and 3D poses. The pocket uses light teal;
 the selected/reference overlay uses blue/peach. Heteroatom colors remain unchanged.
@@ -125,6 +126,14 @@ the four displayed coordinates and their source provenance. The primary selector
 ranks eligible
 refined poses by predicted RMSD; raw and refined banks are scored independently.
 
+The input and downstream pose panels use the same 1T46–STI receptor coordinates.
+All 295 atoms in the 37-residue input crop are present with identical coordinates
+in the 2,359-atom A-chain display used behind the poses. The original supplied
+receptor has 2,369 atom records. Thus the downstream ribbon is a wider display
+context, not a different receptor or the exact 10 Å input crop; its complete
+chain selection is for illustration only. The renderer checks both coordinate
+containment relationships.
+
 All pose views use the same camera, crop and display scale. Input surfaces have
 separate fitted viewports so the complete shapes fill their enlarged panels.
 The full-receptor overview deliberately uses a wider camera scale while keeping
@@ -132,8 +141,12 @@ the same orientation, so the complete supplied structure fits inside its panel. 
 gallery (`views/overview`) retain the original camera center and orientation
 with a common 0.70 zoom factor so that all four confidence candidates are fully
 visible. Original captures for the other manuscript figures remain unchanged.
-The two input protein panels use 3Dmol MS molecular surfaces rather than
-cartoons. The full receptor surface is gray at 45% opacity. The teal pocket surface is
+The two input protein panels combine 3Dmol MS molecular surfaces with
+protein cartoons. The full receptor surface is gray at 30% opacity, while the teal pocket surface
+is at 45% opacity. Gray full-chain ribbons and dark-teal retained-residue ribbons
+remain visible beneath the surfaces. The isolated view displays only the retained
+residue ribbons, using secondary-structure context from the original chain.
+The teal pocket surface is
 computed separately from the exact cropped atom records and placed inside it
 without translation, rotation or scaling. Both input views use that same complete
 crop surface, avoiding disconnected mesh pieces at the retained-residue boundary. Surface completion
@@ -232,7 +245,9 @@ The crop retains complete residues within 10 Å of the supplied center and is
 not a pocket prediction. The translucent full receptor contains the teal cropped-pocket surface at its
 original coordinates, with a terracotta dot marking the supplied center in both
 input views; the cropped surface
-is computed from those retained atoms. Enlarged image panels preserve molecular
+is computed from those retained atoms. Translucent surfaces reveal the underlying
+protein ribbons. Downstream pose panels show the same receptor coordinates over
+a wider chain context, while the model input retains the supplied-center crop. Enlarged image panels preserve molecular
 geometry and aspect ratio. Time and iteration labels are overlaid inside
 the corresponding images. Refinement step 0 equals the generated t = 1 pose.
 Method subtitles appear beneath the stage headings; η-based guidance is omitted.

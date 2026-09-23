@@ -144,6 +144,21 @@ def pocket_data():
     for name, digest in record["source_code"].items():
         if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != digest:
             raise ValueError("Pocket crop implementation changed")
+
+    def atom_records(pdb):
+        return {
+            (line[21], line[22:27], line[12:16], line[16]): line[30:54]
+            for line in pdb.splitlines()
+            if line.startswith(("ATOM  ", "HETATM"))
+        }
+
+    full = atom_records(record["full_pdb"])
+    cropped = atom_records(record["cropped_pdb"])
+    displayed = atom_records(trace["protein_display"]["pdb"])
+    if any(full.get(k) != v for k, v in displayed.items()) or any(
+        displayed.get(k) != v for k, v in cropped.items()
+    ):
+        raise ValueError("Input and pose-panel receptor coordinates differ")
     return record
 
 
@@ -153,17 +168,24 @@ def input_scene(row, javascript, camera, *, full=False):
     record = pocket_data()
     view = py3Dmol.view(width=900, height=680)
     view.setBackgroundColor("white")
-    view.addModel(record["full_pdb"] if full else record["cropped_pdb"], "pdb", {"keepH": False})
+    view.addModel(record["full_pdb"], "pdb", {"keepH": False})
     view.setStyle({"model": 0}, {})
+    pocket_selection = {
+        "model": 0,
+        "or": [
+            {"chain": chain, "resi": [r[1] for r in record["residues"] if r[0] == chain]}
+            for chain in sorted({r[0] for r in record["residues"]})
+        ],
+    }
     if full:
-        view.addSurface("MS", {"color": "#ADB5BD", "opacity": 0.45}, {"model": 0})
-        # Use the same complete crop surface in both views, rather than pieces
-        # cut from the full receptor mesh at the retained-residue boundary.
-        view.addModel(record["cropped_pdb"], "pdb", {"keepH": False})
-        view.setStyle({"model": 1}, {})
-        view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 1}, {"model": 1})
-    else:
-        view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 1}, {"model": 0})
+        view.setStyle({"model": 0}, {"cartoon": {"color": "#9EABB7", "opacity": 1}})
+        view.addSurface("MS", {"color": "#ADB5BD", "opacity": 0.30}, {"model": 0})
+    # Keep secondary-structure context from the original chain while showing
+    # only retained residues in the cropped view.
+    view.setStyle(pocket_selection, {"cartoon": {"color": "#368F83", "opacity": 1}})
+    view.addModel(record["cropped_pdb"], "pdb", {"keepH": False})
+    view.setStyle({"model": 1}, {})
+    view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 0.45}, {"model": 1})
     view.setProjection("orthographic")
     view.setView(camera)
     if full:
@@ -409,15 +431,17 @@ async def capture_views(javascript, work, *, stems=None):
                 metadata["surface_type"] = "MS"
                 metadata["surface_complete"] = True
                 metadata["pocket_color"] = POCKET_COLOR
-                metadata["receptor_opacity"] = 0.45 if stem == "full_protein" else None
+                metadata["receptor_opacity"] = 0.30 if stem == "full_protein" else None
+                metadata["pocket_opacity"] = 0.45
+                metadata["ribbon_context"] = "full_pdb; retained residues only in cropped view"
                 metadata["pocket_surface_context"] = "cropped_pdb"
                 metadata["center_marker"] = pocket_data()["center"]
                 metadata["center_marker_color"] = POCKET_CENTER_COLOR
                 metadata["center_marker_screen"] = await page.evaluate("window.pocketCenterScreen")
                 metadata["description"] = (
-                    "Translucent full receptor surface with complete teal crop surface in original coordinates and projected supplied-center marker"
+                    "Translucent full receptor and teal crop surfaces with original-chain ribbons and projected supplied-center marker"
                     if stem == "full_protein"
-                    else "Teal surface of the exact residue-aware crop with projected supplied-center marker"
+                    else "Translucent teal crop surface with retained-residue ribbons and projected supplied-center marker"
                 )
             if not pocket:
                 metadata["display_palette"] = OUTPUT_COLORS if stem in OUTPUT_VIEWS else COLORS
@@ -721,8 +745,9 @@ def compose(row):
             zorder=8,
         )
 
-    for x in columns[:4]:
-        card(x, 0.30, box_width, 4.80, edge="#C6C6C6", fill="white", lw=0.85)
+    stage_fills = ("#F2F8F6", "#F3F7FC", "#FCF7F1", "#F7F4FA")
+    for x, fill in zip(columns[:4], stage_fills, strict=True):
+        card(x, 0.30, box_width, 4.80, edge="#C9CFD3", fill=fill, lw=0.75)
     for left, right in zip(columns[1:-1], columns[2:], strict=True):
         connector(fig, left + box_width + 0.065, right - 0.065, middle, WIDTH, height)
 
@@ -883,7 +908,7 @@ def compose(row):
 
     center = columns[4] + box_width / 2
     px = center - fw / 2
-    card(columns[4], 1.57, box_width, 1.90, edge="#C6C6C6", fill="white", lw=0.85)
+    card(columns[4], 1.57, box_width, 1.90, edge="#BED2CB", fill="#F2F8F6", lw=0.75)
     header(center, 3.47, "Selected pose", "Crystal comparison")
     arts.append(frame(fig, rect(px, middle - fh / 2, fw, fh), overlay, crop, "#78B9A5", 0.9))
     corner(px, middle - fh / 2, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")
