@@ -180,11 +180,14 @@ def input_scene(row, javascript, camera, *, full=False):
     if full:
         view.setStyle({"model": 0}, {"cartoon": {"color": "#9EABB7", "opacity": 1}})
         view.addSurface("MS", {"color": "#ADB5BD", "opacity": 0.30}, {"model": 0})
-    # Keep secondary-structure context from the original chain while showing
-    # only retained residues in the cropped view.
-    view.setStyle(pocket_selection, {"cartoon": {"color": "#368F83", "opacity": 1}})
+        view.setStyle(pocket_selection, {"cartoon": {"color": "#368F83", "opacity": 1}})
     view.addModel(record["cropped_pdb"], "pdb", {"keepH": False})
     view.setStyle({"model": 1}, {})
+    if not full:
+        view.setStyle(
+            {"model": 1},
+            {"stick": {"colorscheme": dict(ELEMENT_COLORS, C="#58A899"), "radius": 0.12}},
+        )
     view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 0.45}, {"model": 1})
     view.setProjection("orthographic")
     view.setView(camera)
@@ -219,6 +222,7 @@ def input_scene(row, javascript, camera, *, full=False):
 const finishSurface=()=>{
   if(!viewer.surfacesFinished()){setTimeout(finishSurface,25);return;}
   viewer.render();window.surfaceReady=true;
+  window.cropAtomCount=viewer.selectedAtoms({model:1}).length;
   CENTER_MARKER
   requestAnimationFrame(()=>requestAnimationFrame(()=>{window.sceneReady=true;}));
 };finishSurface();
@@ -275,6 +279,9 @@ def verify_extra_views():
                 metadata.get("pocket_color") != POCKET_COLOR
                 or metadata.get("center_marker") != pocket_data()["center"]
                 or metadata.get("pocket_surface_context") != "cropped_pdb"
+                or metadata.get("crop_atom_count") != pocket_data()["cropped_atom_count"]
+                or metadata.get("representation")
+                != ("full-chain ribbons" if stem == "full_protein" else "all-heavy-atom sticks")
             ):
                 raise ValueError("Input pocket highlight or center marker differs")
             sources.append(("input_pocket.json", metadata["input_pocket_sha256"]))
@@ -433,7 +440,12 @@ async def capture_views(javascript, work, *, stems=None):
                 metadata["pocket_color"] = POCKET_COLOR
                 metadata["receptor_opacity"] = 0.30 if stem == "full_protein" else None
                 metadata["pocket_opacity"] = 0.45
-                metadata["ribbon_context"] = "full_pdb; retained residues only in cropped view"
+                metadata["representation"] = (
+                    "full-chain ribbons" if stem == "full_protein" else "all-heavy-atom sticks"
+                )
+                metadata["crop_atom_count"] = await page.evaluate("window.cropAtomCount")
+                if metadata["crop_atom_count"] != pocket_data()["cropped_atom_count"]:
+                    raise ValueError("Rendered pocket atom count differs from input")
                 metadata["pocket_surface_context"] = "cropped_pdb"
                 metadata["center_marker"] = pocket_data()["center"]
                 metadata["center_marker_color"] = POCKET_CENTER_COLOR
@@ -441,7 +453,7 @@ async def capture_views(javascript, work, *, stems=None):
                 metadata["description"] = (
                     "Translucent full receptor and teal crop surfaces with original-chain ribbons and projected supplied-center marker"
                     if stem == "full_protein"
-                    else "Translucent teal crop surface with retained-residue ribbons and projected supplied-center marker"
+                    else "Translucent teal crop surface with all retained heavy atoms as element-colored sticks and projected supplied-center marker"
                 )
             if not pocket:
                 metadata["display_palette"] = OUTPUT_COLORS if stem in OUTPUT_VIEWS else COLORS
@@ -547,7 +559,7 @@ def common_crop(images, pad=0.045):
     )
 
 
-def surface_crop(pixels, aspect, *, right_shift=0.0):
+def surface_crop(pixels, aspect):
     """Fit the complete input surface at the pose-panel aspect, without clipping."""
     ys, xs = np.nonzero(np.min(pixels[..., :3], axis=-1) < 0.96)
     if not len(ys):
@@ -562,7 +574,6 @@ def surface_crop(pixels, aspect, *, right_shift=0.0):
     if cw > w or ch > h:
         raise ValueError("Surface needs a wider source camera")
     x0 = min(max(int(round((xs.min() + xs.max() - cw) / 2)), 0), w - cw)
-    x0 = max(0, x0 - int(round(right_shift * cw)))
     y0 = min(max(int(round((ys.min() + ys.max() - ch) / 2)), 0), h - ch)
     if not (x0 <= xs.min() <= xs.max() < x0 + cw and y0 <= ys.min() <= ys.max() < y0 + ch):
         raise ValueError("Input surface crop excludes visible geometry")
@@ -674,6 +685,7 @@ def compose(row):
     annotations = annotation_data()
     reference = reference_data()
     crop = common_crop([*flow, *refinement, *candidates, overlay])
+    input_aspect = (crop[3] - crop[2]) / (crop[1] - crop[0])
     height, fw, box_width = 5.25, 1.55, 1.75
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
     positions = (3.75, 2.68, 1.61, 0.54)
@@ -732,11 +744,10 @@ def compose(row):
             )
         )
 
-    def corner(x, y, text, panel_height=None):
-        panel_height = fh if panel_height is None else panel_height
+    def corner(x, y, text):
         fig.text(
             (x + 0.07) / WIDTH,
-            (y + panel_height - 0.095) / height,
+            (y + fh - 0.095) / height,
             text,
             fontsize=7,
             color=DARK,
@@ -755,18 +766,14 @@ def compose(row):
     center = columns[0] + box_width / 2
     px = center - fw / 2
     header(center, 5.10, "Input preparation", "Protein + ligand")
-    pocket_height = 1.20 * fh
-    pocket_y = positions[1] - (pocket_height - fh) / 2
-    for y, title, pixels, panel_height in (
-        (positions[0], "Pocket extraction", protein, fh),
-        (pocket_y, "Cropped pocket", pocket, pocket_height),
+    for y, title, pixels in (
+        (positions[0], "Pocket extraction", protein),
+        (positions[1], "Cropped pocket", pocket),
     ):
-        input_crop = surface_crop(
-            pixels, fw / panel_height, right_shift=0.09 if title == "Cropped pocket" else 0.0
-        )
-        arts.append(frame(fig, rect(px, y, fw, panel_height), pixels, input_crop, FRAME_EDGE, 0.6))
-        corner(px, y, title, panel_height)
-    down(center, positions[0] - 0.025, pocket_y + pocket_height + 0.025)
+        input_crop = surface_crop(pixels, input_aspect)
+        arts.append(frame(fig, rect(px, y, fw, fh), pixels, input_crop, FRAME_EDGE, 0.6))
+        corner(px, y, title)
+    down(center, positions[0] - 0.045, positions[1] + fh + 0.045)
     for y, title, fragmented in (
         (positions[2], "Rigid fragments", True),
         (positions[3], "Ligand", False),

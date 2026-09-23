@@ -14,7 +14,7 @@ ligand branch runs upward (ligand → rigid fragments). Their connectors merge
 at the center and enter generation from the left; the pocket center is supplied,
 not predicted. The complete cropped-pocket surface is shown in teal inside the translucent
 gray receptor, at its original coordinates. The lower view shows that same
-surface alone at a larger display scale. A terracotta dot with a white
+surface with atomic detail at a larger display scale. A terracotta dot with a white
 halo marks the same supplied 3D center in both images; it is projected onto the
 image plane and drawn above the surface for visibility, not a molecular atom.
 Generation and refinement are enclosed in separate large boxes;
@@ -43,10 +43,7 @@ N → 1 denotes selection. Here N = 100 in the primary candidate-bank protocol.
 Each confidence image has a compact white score panel inside its upper-left
 corner, separate from the selection glyph. The pRMSD and RMSD labels are
 left-aligned and their values right-aligned in two consistent rows, with both
-values in ångströms. All pose panels have equal dimensions. The cropped-pocket input panel is 20%
-taller, with its center preserved, to enlarge the 10 Å pocket without changing
-the residue selection. Its viewport shifts the structure slightly right to keep
-the upper-left label clear. Source coordinates and camera orientation are unchanged.
+values in ångströms. All molecular panels have equal dimensions.
 This draft does not change the existing 21-page reference package.
 
 - [PDF](figures/Fig1_representative.pdf)
@@ -102,7 +99,7 @@ energy parameter identities and implementation checksums are retained.
 | Ligand | Original prepared STI graph; five fragment boundaries marked |
 | Rigid fragments | Same 2D coordinates with those five bonds omitted; six saved fragment identities |
 | Pocket extraction | Full supplied 1T46 receptor molecular surface, translucent gray receptor with complete teal crop surface overlaid at original coordinates; supplied center marked by a terracotta dot |
-| Cropped pocket | Molecular surface of retained residues from the saved center and 10 Å cutoff; unchanged coordinates; wider camera than pose panels |
+| Cropped pocket | All-heavy-atom sticks under the translucent molecular surface of retained residues from the saved center and 10 Å cutoff; unchanged coordinates; wider camera than pose panels |
 | Pose generation | Saved frames 0, 2, 4 and 10: t = 0, 0.488, 0.784 and 1 |
 | Pose refinement | Steps 0, 25, 50 and 100 from the recorded CPU refinement of that exact endpoint |
 | Confidence candidates | Astex repeat 0, same 1T46 complex, existing N100 refined bank; eligible ranks 1, 25, 50 and 100 |
@@ -144,11 +141,13 @@ the same orientation, so the complete supplied structure fits inside its panel. 
 gallery (`views/overview`) retain the original camera center and orientation
 with a common 0.70 zoom factor so that all four confidence candidates are fully
 visible. Original captures for the other manuscript figures remain unchanged.
-The two input protein panels combine 3Dmol MS molecular surfaces with
-protein cartoons. The full receptor surface is gray at 30% opacity, while the teal pocket surface
-is at 45% opacity. Gray full-chain ribbons and dark-teal retained-residue ribbons
-remain visible beneath the surfaces. The isolated view displays only the retained
-residue ribbons, using secondary-structure context from the original chain.
+The input panels combine 3Dmol MS molecular surfaces with a full-protein
+cartoon in the upper view and all-heavy-atom sticks in the cropped view. The full receptor surface is gray at 30% opacity, while the teal pocket surface
+is at 45% opacity. Gray full-chain ribbons and dark-teal pocket-residue ribbons remain visible
+beneath the surface in the full-protein view. The isolated view shows all 295 retained heavy atoms (37 residues) as sticks:
+teal carbon and the same element colors used elsewhere. It has no cartoon
+segments, and no hydrogens are added. The 10 Å complete-residue crop and all
+coordinates are unchanged; the renderer verifies the displayed atom count.
 The teal pocket surface is
 computed separately from the exact cropped atom records and placed inside it
 without translation, rotation or scaling. Both input views use that same complete
@@ -248,8 +247,8 @@ The crop retains complete residues within 10 Å of the supplied center and is
 not a pocket prediction. The translucent full receptor contains the teal cropped-pocket surface at its
 original coordinates, with a terracotta dot marking the supplied center in both
 input views; the cropped surface
-is computed from those retained atoms. Translucent surfaces reveal the underlying
-protein ribbons. Downstream pose panels show the same receptor coordinates over
+is computed from those retained atoms. Translucent surfaces reveal the full-protein ribbon above and retained
+heavy-atom sticks in the cropped pocket below. Downstream pose panels show the same receptor coordinates over
 a wider chain context, while the model input retains the supplied-center crop. Enlarged image panels preserve molecular
 geometry and aspect ratio. Time and iteration labels are overlaid inside
 the corresponding images. Refinement step 0 equals the generated t = 1 pose.

@@ -33,7 +33,8 @@
   "pocket_color": "#80C8BC",
   "receptor_opacity": 0.3,
   "pocket_opacity": 0.45,
-  "ribbon_context": "full_pdb; retained residues only in cropped view",
+  "representation": "full-chain ribbons",
+  "crop_atom_count": 295,
   "pocket_surface_context": "cropped_pdb",
   "center_marker": [
     26.578163146972656,
