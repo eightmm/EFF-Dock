@@ -5,7 +5,9 @@ fragmentation + given pocket → candidate generation → post-generation refine
 → confidence selection → one output pose. Refinement is downstream of the
 completed generative flow. No η-based guidance is depicted.
 The ligand, fragments and given pocket occupy equally sized panels in a vertical
-input column enclosed in an Input preparation box. Generation and refinement are enclosed in separate large boxes;
+input column enclosed in a compact Input preparation box. Names sit inside
+the upper-left corners; a short arrow connects ligand to fragments, and a plus
+sign combines the fragments with the independently supplied pocket. Generation and refinement are enclosed in separate large boxes;
 each contains four states ordered from top to bottom with downward arrows.
 The stages progress from left to right. Method subtitles sit inside each box
 under its heading. Confidence displays four distinct recorded poses in a matching large box, with
@@ -69,7 +71,7 @@ energy parameter identities and implementation checksums are retained.
 |---|---|
 | Ligand | Original prepared STI graph; five fragment boundaries marked |
 | Rigid fragments | Same 2D coordinates with those five bonds omitted; six saved fragment identities |
-| Given pocket | Stored 1T46 receptor, ligand hidden, matching close-up crop |
+| Given pocket | Stored 1T46 receptor, ligand hidden, pale blue-gray cartoon, matching close-up crop |
 | Pose generation | Saved frames 0, 2, 4 and 10: t = 0, 0.488, 0.784 and 1 |
 | Post-refinement | Steps 0, 25, 50 and 100 from the recorded CPU refinement of that exact endpoint |
 | Confidence candidates | Astex repeat 0, same 1T46 complex, existing N100 refined bank; eligible ranks 1, 25, 50 and 100 |
@@ -100,6 +102,8 @@ All molecular views use the same camera, crop and display scale. The overview
 gallery (`views/overview`) retains the original camera center and orientation
 with a common 0.70 zoom factor so that all four confidence candidates are fully
 visible. Original captures for the other manuscript figures remain unchanged.
+The supplied-pocket cartoon uses a lighter blue-gray color and 0.55 opacity;
+its receptor coordinates, camera and crop remain unchanged.
 The three input panels have identical width and height; the ligand diagrams preserve their 2D
 aspect ratio inside these bounds. They are not docking conformers. Refinement
 step 0 reuses the generated t = 1 capture, preserving the exact transition between
@@ -153,7 +157,8 @@ panels show recorded states at t = 0, 0.488, 0.784 and 1. Physics- and
 interaction-based post-generation refinement is illustrated at iterations 0,
 25, 50 and 100. Each boxed sequence proceeds from top to bottom, while the complete
 workflow progresses from left to right. Input preparation groups the ligand,
-fragmentation and supplied pocket. Time and iteration labels are overlaid inside
+fragmentation and independently supplied pocket, with inset labels and a plus
+sign indicating the combined inputs. Time and iteration labels are overlaid inside
 the corresponding images. Refinement step 0 equals the generated t = 1 pose.
 Method subtitles appear beneath the stage headings; η-based guidance is omitted.
 Empty backplates and × N schematically indicate parallel candidate processing

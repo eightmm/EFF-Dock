@@ -100,6 +100,20 @@ def reference_data():
     return record
 
 
+def input_scene(row, javascript, camera):
+    import py3Dmol
+
+    view = py3Dmol.view(width=900, height=680)
+    view.setBackgroundColor("white")
+    view.addModel(row["protein_display"]["pdb"], "pdb", {"keepH": False})
+    view.setStyle({"model": 0}, {"cartoon": {"color": "#ABC4D3", "opacity": 0.55, "arrows": True}})
+    view.setProjection("orthographic")
+    view.setView(camera)
+    view.zoom(OVERVIEW_ZOOM)
+    view.render()
+    return viewer_html(view, javascript)
+
+
 def output_scene(row, selection, javascript, camera):
     import py3Dmol
 
@@ -218,7 +232,9 @@ async def capture_views(javascript, work, *, stems=None):
                 )
             html = work / f"{stem}.html"
             html.write_text(
-                output_scene(row, candidates, javascript, camera)
+                input_scene(row, javascript, camera)
+                if pocket
+                else output_scene(row, candidates, javascript, camera)
                 if stem in OUTPUT_VIEWS
                 else scene(
                     source,
@@ -258,7 +274,7 @@ async def capture_views(javascript, work, *, stems=None):
                 py3dmol_version=importlib.metadata.version("py3Dmol"),
                 playwright_version=importlib.metadata.version("playwright"),
                 description=(
-                    "Stored receptor only; ligand hidden; darker input cartoon. No predicted pocket or cutoff boundary."
+                    "Stored receptor only; pale blue-gray input cartoon. No predicted pocket or cutoff boundary."
                     if pocket
                     else "Recorded refinement of the stored N1 endpoint; shared overview camera and original fragment colors."
                 ),
@@ -541,21 +557,23 @@ def compose(row):
         ("#FBF5F0", "#DCCBBE"),
         ("#F1F8F5", "#BBD3C9"),
     )
-    for x, (fill, edge) in zip(columns[:4], palettes, strict=True):
-        card(x, 0.30, box_width, 4.80, edge=edge, fill=fill, lw=0.85)
+    for i, (x, (fill, edge)) in enumerate(zip(columns[:4], palettes, strict=True)):
+        bottom = 1.39 if i == 0 else 0.30
+        card(x, bottom, box_width, 5.10 - bottom, edge=edge, fill=fill, lw=0.85)
     for left, right in zip(columns[:-1], columns[1:], strict=True):
         connector(fig, left + box_width + 0.065, right - 0.065, middle, WIDTH, height)
 
     center = columns[0] + box_width / 2
     px = center - fw / 2
     label(center, 4.95, "Input preparation", size=9)
-    for y, title, fragmented in ((3.80, "Ligand", False), (2.21, "Rigid fragments", True)):
+    for y, title, fragmented in ((3.80, "Ligand", False), (2.73, "Rigid fragments", True)):
         card(px, y, fw, fh, fill="#FCFDFE")
         ligand_diagram(fig.add_axes(rect(px, y, fw, fh)), row, fragmented=fragmented)
-        label(center, 4.70 if not fragmented else y + fh + 0.16, title, size=8.5)
-    down(center, 3.61, 2.21 + fh + 0.35)
-    arts.append(frame(fig, rect(px, 0.59, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
-    label(center, 0.59 + fh + 0.16, "Given pocket", size=8.5)
+        corner(px, y, title)
+    down(center, 3.80 - 0.07, 2.73 + fh + 0.07)
+    label(center, (2.73 + 1.66 + fh) / 2, "+", size=14, weight="normal", color=MUTED)
+    arts.append(frame(fig, rect(px, 1.66, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
+    corner(px, 1.66, "Given pocket")
 
     def trajectory(box_x, title, method, images, labels):
         center = box_x + box_width / 2
