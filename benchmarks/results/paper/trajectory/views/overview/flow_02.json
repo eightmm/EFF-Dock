@@ -1,6 +1,6 @@
 {
   "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
-  "sha256": "c395607402461a9edbf73f52425e08b3df353d8dae7d7401e7f5ab22495874de",
+  "sha256": "add9ca7bfd66958ec10d7f34a1ccb65c94307094e10fab7d25279dc4ba0541e2",
   "camera": [
     -27.49601372383736,
     -25.89508024679648,
@@ -27,5 +27,13 @@
   "py3dmol_version": "2.5.5",
   "playwright_version": "1.62.0",
   "description": "Stored ODE frame; overview camera; unchanged coordinates",
+  "display_palette": [
+    "#5EAFC7",
+    "#E9A16C",
+    "#68B99B",
+    "#A68BD0",
+    "#C9B458",
+    "#D67FA7"
+  ],
   "flow_index": 2
 }

@@ -18,7 +18,16 @@ DATA = ROOT / "benchmarks/results/paper/trajectory"
 COLORS = ["#77AFD1", "#E6AC83", "#85BDA3", "#AF98C5", "#C8BC78", "#D38EAE"]
 
 
-def scene(row, frame_index, javascript, *, pocket_only=False, camera=None, zoom_factor=1.0):
+def scene(
+    row,
+    frame_index,
+    javascript,
+    *,
+    pocket_only=False,
+    camera=None,
+    zoom_factor=1.0,
+    fragment_colors=None,
+):
     import py3Dmol
 
     view = py3Dmol.view(width=900, height=680)
@@ -27,7 +36,10 @@ def scene(row, frame_index, javascript, *, pocket_only=False, camera=None, zoom_
     view.setStyle({"model": 0}, {"cartoon": {"color": "#B7C7D8", "opacity": 0.35, "arrows": True}})
     xyz = np.asarray(row["coordinates"])[frame_index]
     fragment_ids = np.asarray(row["fragment_id"])
-    for frag, carbon in enumerate(COLORS):
+    palette = COLORS if fragment_colors is None else fragment_colors
+    if len(palette) != len(COLORS):
+        raise ValueError("Fragment palette must contain six colors")
+    for frag, carbon in enumerate(palette):
         ids = np.flatnonzero(fragment_ids == frag)
         mapping = {int(i): j for j, i in enumerate(ids)}
         molecule = dict(

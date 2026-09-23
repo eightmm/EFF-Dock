@@ -1,6 +1,6 @@
 {
   "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
-  "sha256": "fcefb57ac72c0a06b50c6387491116c395ce1457bffd98c271b546b8a81f5d03",
+  "sha256": "9651b5a720ee6becfd128f768364a85bf426e2e9ad8c7a9662517bfd12d642ab",
   "camera": [
     -27.49601372383736,
     -25.89508024679648,
@@ -30,7 +30,7 @@
   "input_pocket_sha256": "a1e03e0b0aad2ef2c544853fba9c4762f0b67bd5e41f3dedc438e541f2b95f2e",
   "surface_type": "MS",
   "surface_complete": true,
-  "pocket_color": "#83B8AE",
+  "pocket_color": "#80C8BC",
   "receptor_opacity": null,
   "pocket_surface_context": "cropped_pdb",
   "center_marker": [
@@ -38,7 +38,7 @@
     25.020668029785156,
     40.60732650756836
   ],
-  "center_marker_color": "#C77860",
+  "center_marker_color": "#E59A77",
   "center_marker_screen": {
     "x": 435.24900113057384,
     "y": 355.2859246289108

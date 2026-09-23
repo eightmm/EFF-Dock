@@ -1,6 +1,6 @@
 {
   "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
-  "sha256": "660c6bdf939e793c9595d1111a5fbc9a6a639a096a5ed7611e4943e1881da805",
+  "sha256": "ec03e7dfb5be4d4a25537f8040a311824a9e1ba0f0ca84dc0c49e42ec8594add",
   "camera": [
     -27.49601372383736,
     -25.89508024679648,
@@ -27,6 +27,14 @@
   "py3dmol_version": "2.5.5",
   "playwright_version": "1.62.0",
   "description": "Existing N100 refined candidate; matched receptor frame and camera; selected/not-selected marks are not PB validity",
+  "display_palette": [
+    "#5EAFC7",
+    "#E9A16C",
+    "#68B99B",
+    "#A68BD0",
+    "#C9B458",
+    "#D67FA7"
+  ],
   "candidate_index": 3,
   "selection_sha256": "1d65ed7a6bfd8daecf1f1981627e10e4332697cb3547b304d510d64f22e1bc19"
 }

@@ -23,10 +23,14 @@ selected/not-selected marks overlaid in the upper-left image corners.
 Time and step labels use that same corner. Molecular panel width is 1.55 inches (previously 1.30), with preserved aspect
 ratio and larger structures at the same canvas size. Stage boxes have equal
 widths and uniform gaps, with aligned connectors and white backgrounds with neutral gray borders.
+A coordinated blue, peach, mint, violet, gold and rose palette identifies the six
+fragments consistently across 2D inputs and 3D poses. The pocket uses light teal;
+the selected/reference overlay uses blue/peach. Heteroatom colors remain unchanged.
+This palette applies to the standalone Figure 1 only.
 Typography uses Matplotlib-bundled DejaVu Sans fonts for both text and mathematical
 labels. The final panel omits the PDB identifier; source identity remains here.
-Empty stacked backplates and × N denote candidate multiplicity in the generation
-and refinement stages; confidence ellipses omit intervening candidates, and
+Generation and refinement use single image frames without stacked backplates.
+The × N labels denote candidate multiplicity; confidence ellipses omit intervening candidates, and
 N → 1 denotes selection. Here N = 100 in the primary candidate-bank protocol.
 Each confidence image has a compact white score panel inside its upper-left
 corner, separate from the selection glyph. The pRMSD and RMSD labels are
@@ -137,9 +141,9 @@ stages. The overview gallery uses stored coordinates; no optimization was rerun.
 Generation times and refinement iterations are labeled separately inside the
 upper-left corner of each image. The four
 panels within each trajectory stage are successive states of one example, not four
-independently sampled candidates. The empty backplates and × N are schematic
+independently sampled candidates. The × N labels are schematic
 cues for applying these stages across a candidate bank, not extra captured
-trajectories. Only the front sequence is a recorded trajectory.
+trajectories. Only the displayed sequence is a recorded trajectory.
 
 Refinement used the original prepared ligand for parameterization, stored
 fragment assignments, a fixed receptor, an 18 Å receptor shell, and 100 maximum
@@ -225,8 +229,8 @@ is computed from those retained atoms. Enlarged image panels preserve molecular
 geometry and aspect ratio. Time and iteration labels are overlaid inside
 the corresponding images. Refinement step 0 equals the generated t = 1 pose.
 Method subtitles appear beneath the stage headings; η-based guidance is omitted.
-Empty backplates and × N schematically indicate parallel candidate processing
-(N = 100 in the primary protocol); the four temporal frames on the front card
+The × N labels schematically indicate parallel candidate processing
+(N = 100 in the primary protocol); the four temporal frames in each trajectory
 are successive states of one illustrative trajectory. Ellipses between the
 confidence examples denote omitted candidates, and N → 1 indicates selection.
 The confidence stage displays four distinct refined candidates from the existing

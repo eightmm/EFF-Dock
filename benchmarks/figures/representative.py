@@ -15,7 +15,7 @@ import numpy as np
 from matplotlib.patches import Ellipse, FancyArrowPatch, FancyBboxPatch
 
 from benchmarks.figures.structure_views import ELEMENT_COLORS, JS_SHA256, JS_URL, atoms, viewer_html
-from benchmarks.figures.trajectory import COLORS, DATA, ROOT, scene, verify
+from benchmarks.figures.trajectory import DATA, ROOT, scene, verify
 
 NAME = "Fig1_representative"
 POSE_INDEX = 10
@@ -35,7 +35,8 @@ CANDIDATE_VIEWS = {
     "candidate_worst": 3,
 }
 OUTPUT_VIEWS = {"selected_overlay": 0}
-OUTPUT_COLORS = {"selected": "#79AEC8", "crystal": "#D9A080"}
+COLORS = ["#5EAFC7", "#E9A16C", "#68B99B", "#A68BD0", "#C9B458", "#D67FA7"]
+OUTPUT_COLORS = {"selected": "#5FAECC", "crystal": "#E7A078"}
 FLOW_VIEWS = {f"flow_{i:02d}": i for i in FLOW_INDICES}
 OVERVIEW_DIR = DATA / "views/overview"
 OVERVIEW_ZOOM = 0.70
@@ -44,8 +45,8 @@ MUTED = "#7B838D"
 CONNECTOR = "#A4A4A4"
 FRAME_EDGE = "#D8D8D8"
 POSE_EDGE = "#8C96A3"
-POCKET_COLOR = "#83B8AE"
-POCKET_CENTER_COLOR = "#C77860"
+POCKET_COLOR = "#80C8BC"
+POCKET_CENTER_COLOR = "#E59A77"
 
 # Landscape overview; preserve vector labels when scaling for the manuscript.
 WIDTH = 10.35
@@ -255,6 +256,10 @@ def verify_extra_views():
             ):
                 raise ValueError("Input pocket highlight or center marker differs")
             sources.append(("input_pocket.json", metadata["input_pocket_sha256"]))
+        if stem not in ("supplied_pocket", "full_protein"):
+            expected_palette = OUTPUT_COLORS if stem in OUTPUT_VIEWS else COLORS
+            if metadata.get("display_palette") != expected_palette:
+                raise ValueError(f"Stale overview palette: {stem}")
         if stem in OUTPUT_VIEWS:
             reference_data()
             sources.append(("selected_reference.json", metadata["reference_sha256"]))
@@ -354,6 +359,7 @@ async def capture_views(javascript, work, *, stems=None):
                     pocket_only=pocket,
                     camera=camera,
                     zoom_factor=OVERVIEW_ZOOM,
+                    fragment_colors=COLORS,
                 )
             )
             output = OVERVIEW_DIR / f"{stem}.png"
@@ -393,7 +399,7 @@ async def capture_views(javascript, work, *, stems=None):
                 description=(
                     "Stored receptor only; pale blue-gray input cartoon. No predicted pocket or cutoff boundary."
                     if pocket
-                    else "Recorded refinement of the stored N1 endpoint; shared overview camera and original fragment colors."
+                    else "Recorded refinement of the stored N1 endpoint; shared overview camera and consistent Figure 1 fragment colors."
                 ),
             )
             if pocket:
@@ -413,6 +419,8 @@ async def capture_views(javascript, work, *, stems=None):
                     if stem == "full_protein"
                     else "Teal surface of the exact residue-aware crop with projected supplied-center marker"
                 )
+            if not pocket:
+                metadata["display_palette"] = OUTPUT_COLORS if stem in OUTPUT_VIEWS else COLORS
             if stem in OUTPUT_VIEWS:
                 metadata["description"] = (
                     "Selected pose and evaluated crystal reference; receptor frame; no alignment"
@@ -764,9 +772,6 @@ def compose(row):
         px = center - fw / 2
         label(center, 4.95, title)
         label(center, 4.76, method, size=8, weight="normal")
-        # Empty backplates denote parallel candidates, not additional saved traces.
-        for dx, dy in ((0.035, 0.02), (0.01, 0.01), (-0.025, 0.0)):
-            card(px + dx, 0.49 + dy, fw + 0.04, 4.13, edge="#D7D7D7", fill="white", lw=0.55)
         label(center, 0.415, r"$\times\,N$", size=8.5, weight="normal", color=MUTED)
         for i, (py, pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
             arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.55))
@@ -841,7 +846,7 @@ def compose(row):
                 zorder=9,
             )
         selected = candidate["selected"]
-        edge = "#82B7A4" if selected else FRAME_EDGE
+        edge = "#78B9A5" if selected else FRAME_EDGE
         arts.append(frame(fig, rect(px, y, fw, fh), pixels, crop, edge, 0.9 if selected else 0.6))
         cx, cy = px + 0.11, y + fh - 0.10
         fig.add_artist(
@@ -855,7 +860,7 @@ def compose(row):
                 zorder=8,
             )
         )
-        color = "#619D86" if selected else "#C28F8F"
+        color = "#519E83" if selected else "#C88D94"
         paths = (
             [[(-0.05, 0), (-0.01, -0.04), (0.055, 0.05)]]
             if selected
@@ -878,7 +883,7 @@ def compose(row):
     px = center - fw / 2
     card(columns[4], 1.57, box_width, 1.90, edge="#C6C6C6", fill="white", lw=0.85)
     label(center, 3.25, "Selected pose")
-    arts.append(frame(fig, rect(px, middle - fh / 2, fw, fh), overlay, crop, "#82B7A4", 0.9))
+    arts.append(frame(fig, rect(px, middle - fh / 2, fw, fh), overlay, crop, "#78B9A5", 0.9))
     corner(px, middle - fh / 2, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")
     for y, key, text in ((1.98, "selected", "Selected"), (1.76, "crystal", "Crystal")):
         fig.add_artist(
