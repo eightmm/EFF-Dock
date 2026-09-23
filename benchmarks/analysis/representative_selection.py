@@ -70,10 +70,10 @@ def export(source_root):
         raise ValueError("Incomplete candidate bank")
     order = sorted(range(100), key=lambda i: (record["predicted_rmsd"][i], i))
     eligible = [i for i in order if record["chirality_valid"][i]]
-    if len(eligible) < 3 or eligible[0] != selected:
+    if len(eligible) < 4 or eligible[0] != selected:
         raise ValueError("Unexpected selector eligibility")
     candidates = []
-    for rank_index in (0, (len(eligible) - 1) // 2, len(eligible) - 1):
+    for rank_index in (0, (len(eligible) - 1) // 4, (len(eligible) - 1) // 2, len(eligible) - 1):
         index = eligible[rank_index]
         mol = bank[index]
         if Chem.MolToSmiles(mol) != Chem.MolToSmiles(template):
@@ -108,7 +108,7 @@ def export(source_root):
         repeat=0,
         bank_size=100,
         trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),
-        rule="Best, lower-median and worst predicted-RMSD ranks among chirality-eligible refined candidates",
+        rule="Best, lower-quartile, lower-median and worst predicted-RMSD ranks among chirality-eligible refined candidates",
         note="Same complex, separate N100 run from the N1 illustrative trajectory; check/cross denotes selection, not PB validity",
         predicted_rmsd=record["predicted_rmsd"],
         chirality_valid=record["chirality_valid"],

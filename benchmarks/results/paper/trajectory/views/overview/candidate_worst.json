@@ -28,5 +28,5 @@
   "playwright_version": "1.62.0",
   "description": "Existing N100 refined candidate; matched receptor frame and camera; selected/not-selected marks are not PB validity",
   "candidate_index": 84,
-  "selection_sha256": "b1dbeb7184bb4420e5502514352b5d9f4d4f47827be4b9d8097f1749147a07e2"
+  "selection_sha256": "1d65ed7a6bfd8daecf1f1981627e10e4332697cb3547b304d510d64f22e1bc19"
 }

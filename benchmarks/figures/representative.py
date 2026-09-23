@@ -27,7 +27,12 @@ EXTRA_VIEWS = {
     "refined_step_025": 25,
     "refined_step_050": 50,
 }
-CANDIDATE_VIEWS = {"candidate_best": 0, "candidate_median": 1, "candidate_worst": 2}
+CANDIDATE_VIEWS = {
+    "candidate_best": 0,
+    "candidate_quartile": 1,
+    "candidate_median": 2,
+    "candidate_worst": 3,
+}
 FLOW_VIEWS = {f"flow_{i:02d}": i for i in FLOW_INDICES}
 OVERVIEW_DIR = DATA / "views/overview"
 OVERVIEW_ZOOM = 0.70
@@ -50,8 +55,8 @@ def selection_data():
         raise ValueError("Invalid stored confidence scores")
     order = sorted(range(100), key=lambda i: (predictions[i], i))
     eligible = [i for i in order if record["chirality_valid"][i]]
-    ranks = (0, (len(eligible) - 1) // 2, len(eligible) - 1)
-    if record["selected_index"] != eligible[0] or len(record["candidates"]) != 3:
+    ranks = (0, (len(eligible) - 1) // 4, (len(eligible) - 1) // 2, len(eligible) - 1)
+    if record["selected_index"] != eligible[0] or len(record["candidates"]) != 4:
         raise ValueError("Stored confidence selection differs")
     for candidate, rank in zip(record["candidates"], ranks, strict=True):
         index = eligible[rank]
@@ -438,22 +443,24 @@ def compose(row):
             )
         )
 
+    card(0.025, 0.30, 1.60, 4.80, edge="#BAC7D2", fill="#F8FAFC", lw=0.85)
+    label(0.825, 4.95, "Input preparation", size=9)
     for y, title, fragmented in ((3.80, "Ligand", False), (2.21, "Rigid fragments", True)):
-        card(0.10, y, fw, fh, fill="#FAFBFC")
-        ligand_diagram(fig.add_axes(rect(0.10, y, fw, fh)), row, fragmented=fragmented)
-        label(0.75, 4.95 if not fragmented else y + fh + 0.16, title)
-    down(0.75, 3.64, 2.21 + fh + 0.35)
-    arts.append(frame(fig, rect(0.10, 0.62, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
-    label(0.75, 0.62 + fh + 0.16, "Given pocket")
+        card(0.175, y, fw, fh, fill="#FAFBFC")
+        ligand_diagram(fig.add_axes(rect(0.175, y, fw, fh)), row, fragmented=fragmented)
+        label(0.825, 4.70 if not fragmented else y + fh + 0.16, title, size=8.5)
+    down(0.825, 3.64, 2.21 + fh + 0.35)
+    arts.append(frame(fig, rect(0.175, 0.62, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
+    label(0.825, 0.62 + fh + 0.16, "Given pocket", size=8.5)
     fig.add_artist(
         plt.Line2D(
-            [1.44 / WIDTH, 1.66 / WIDTH, 1.66 / WIDTH, 1.44 / WIDTH],
+            [1.52 / WIDTH, 1.76 / WIDTH, 1.76 / WIDTH, 1.52 / WIDTH],
             [(0.62 + fh / 2) / height, (0.62 + fh / 2) / height, middle / height, middle / height],
             color=CONNECTOR,
             linewidth=0.8,
         )
     )
-    connector(fig, 1.66, 1.90, middle, WIDTH, height)
+    connector(fig, 1.76, 1.90, middle, WIDTH, height)
 
     def trajectory(box_x, title, method, images, labels):
         box_width = 1.65
@@ -465,9 +472,19 @@ def compose(row):
         positions = (3.80, 2.73, 1.66, 0.59)
         for i, (py, pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
             arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.55))
-            label(center, py - 0.12, text, size=8, weight="normal")
+            fig.text(
+                (px + 0.055) / WIDTH,
+                (py + 0.075) / height,
+                text,
+                fontsize=7,
+                color=DARK,
+                ha="left",
+                va="center",
+                bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.90, "pad": 1.2},
+                zorder=8,
+            )
             if i < 3:
-                down(center, py - 0.22, positions[i + 1] + fh + 0.03)
+                down(center, py - 0.05, positions[i + 1] + fh + 0.03)
 
     trajectory(
         1.95,
@@ -484,12 +501,13 @@ def compose(row):
         refinement,
         [f"Step {step}" for step in REFINEMENT_STEPS],
     )
-    connector(fig, 5.70, 6.05, middle, WIDTH, height)
+    connector(fig, 5.70, 5.87, middle, WIDTH, height)
 
+    card(5.925, 0.30, 1.65, 4.80, edge="#BAC7D2", fill="#F8FAFC", lw=0.85)
     label(6.75, 4.95, "Confidence selection", size=9)
     label(6.75, 4.70, "Predicted RMSD\nranking", size=8, weight="normal")
     for pixels, candidate, y in zip(
-        candidates, selection["candidates"], (3.80, 2.21, 0.62), strict=True
+        candidates, selection["candidates"], (3.80, 2.73, 1.66, 0.59), strict=True
     ):
         selected = candidate["selected"]
         edge = "#78A797" if selected else FRAME_EDGE
@@ -525,7 +543,7 @@ def compose(row):
                     zorder=9,
                 )
             )
-    connector(fig, 7.45, 7.95, 3.80 + fh / 2, WIDTH, height)
+    connector(fig, 7.62, 7.95, 3.80 + fh / 2, WIDTH, height)
     arts.append(frame(fig, rect(8.00, 3.80, fw, fh), candidates[0], crop, "#78A797", 1.0))
     label(8.65, 4.95, "Selected pose")
     return fig, arts
