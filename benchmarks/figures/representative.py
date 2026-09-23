@@ -44,6 +44,8 @@ MUTED = "#7B838D"
 CONNECTOR = "#A4A4A4"
 FRAME_EDGE = "#D8D8D8"
 POSE_EDGE = "#8C96A3"
+POCKET_COLOR = "#83B8AE"
+POCKET_CENTER_COLOR = "#C77860"
 
 # Landscape overview; preserve vector labels when scaling for the manuscript.
 WIDTH = 10.35
@@ -162,13 +164,13 @@ def input_scene(row, javascript, camera, *, full=False):
         }
         view.addSurface(
             "MS",
-            {"color": "#D9D9D9", "opacity": 1},
+            {"color": "#D9D9D9", "opacity": 0.3},
             {"model": 0, "not": pocket_selection},
             {"model": 0},
         )
-        view.addSurface("MS", {"color": "#929292", "opacity": 1}, pocket_selection, {"model": 0})
+        view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 1}, pocket_selection, {"model": 0})
     else:
-        view.addSurface("MS", {"color": "#BDBDBD", "opacity": 1}, {"model": 0})
+        view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 1}, {"model": 0})
     view.setProjection("orthographic")
     view.setView(camera)
     if full:
@@ -185,15 +187,27 @@ def input_scene(row, javascript, camera, *, full=False):
     ready = "requestAnimationFrame(()=>requestAnimationFrame(()=>{window.sceneReady=true;}));"
     if html.count(ready) != 1:
         raise ValueError("Surface capture readiness hook changed")
+    center = dict(zip(("x", "y", "z"), record["center"], strict=True))
+    marker = """
+  const center = viewer.modelToScreen(CENTER_COORDINATES);
+  const marker = document.createElement("div");
+  Object.assign(marker.style, {position:"absolute", left:center.x+"px",
+    top:center.y+"px", width:"14px", height:"14px", borderRadius:"50%",
+    background:"CENTER_COLOR", border:"2px solid white", boxSizing:"border-box",
+    transform:"translate(-50%,-50%)", pointerEvents:"none", zIndex:10});
+  document.body.appendChild(marker);
+  window.pocketCenterScreen = center;
+""".replace("CENTER_COORDINATES", json.dumps(center)).replace("CENTER_COLOR", POCKET_CENTER_COLOR)
     return html.replace(
         ready,
         """
 const finishSurface=()=>{
   if(!viewer.surfacesFinished()){setTimeout(finishSurface,25);return;}
   viewer.render();window.surfaceReady=true;
+  CENTER_MARKER
   requestAnimationFrame(()=>requestAnimationFrame(()=>{window.sceneReady=true;}));
 };finishSurface();
-""",
+""".replace("CENTER_MARKER", marker),
     )
 
 
@@ -242,6 +256,11 @@ def verify_extra_views():
             pocket_data()
             if metadata.get("surface_type") != "MS" or metadata.get("surface_complete") is not True:
                 raise ValueError("Input surface metadata missing")
+            if (
+                metadata.get("pocket_color") != POCKET_COLOR
+                or metadata.get("center_marker") != pocket_data()["center"]
+            ):
+                raise ValueError("Input pocket highlight or center marker differs")
             sources.append(("input_pocket.json", metadata["input_pocket_sha256"]))
         if stem in OUTPUT_VIEWS:
             reference_data()
@@ -390,10 +409,15 @@ async def capture_views(javascript, work, *, stems=None):
                 ).hexdigest()
                 metadata["surface_type"] = "MS"
                 metadata["surface_complete"] = True
+                metadata["pocket_color"] = POCKET_COLOR
+                metadata["nonpocket_opacity"] = 0.3 if stem == "full_protein" else None
+                metadata["center_marker"] = pocket_data()["center"]
+                metadata["center_marker_color"] = POCKET_CENTER_COLOR
+                metadata["center_marker_screen"] = await page.evaluate("window.pocketCenterScreen")
                 metadata["description"] = (
-                    "Full supplied receptor molecular surface with retained residues highlighted"
+                    "Full supplied receptor surface; teal retained residues and projected supplied-center marker"
                     if stem == "full_protein"
-                    else "Molecular surface of the exact supplied-center residue-aware crop"
+                    else "Teal surface of the exact residue-aware crop with projected supplied-center marker"
                 )
             if stem in OUTPUT_VIEWS:
                 metadata["description"] = (
