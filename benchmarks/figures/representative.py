@@ -150,21 +150,25 @@ def input_scene(row, javascript, camera, *, full=False):
     record = pocket_data()
     view = py3Dmol.view(width=900, height=680)
     view.setBackgroundColor("white")
-    view.addModel(record["full_pdb"], "pdb", {"keepH": False})
-    # Preserve secondary-structure context, then hide all non-pocket residues in the close-up.
-    view.setStyle({"model": 0}, {"cartoon": {"color": "#D6D6D6", "opacity": 0.85}} if full else {})
-    for chain in sorted({r[0] for r in record["residues"]}):
-        resi = [r[1] for r in record["residues"] if r[0] == chain]
-        view.setStyle(
-            {"model": 0, "chain": chain, "resi": resi},
-            {
-                "cartoon": {
-                    "color": "#858585" if full else "#B8B8B8",
-                    "opacity": 0.9 if full else 0.65,
-                    "arrows": True,
-                }
-            },
+    view.addModel(record["full_pdb"] if full else record["cropped_pdb"], "pdb", {"keepH": False})
+    view.setStyle({"model": 0}, {})
+    if full:
+        pocket_selection = {
+            "model": 0,
+            "or": [
+                {"chain": chain, "resi": [r[1] for r in record["residues"] if r[0] == chain]}
+                for chain in sorted({r[0] for r in record["residues"]})
+            ],
+        }
+        view.addSurface(
+            "MS",
+            {"color": "#D9D9D9", "opacity": 1},
+            {"model": 0, "not": pocket_selection},
+            {"model": 0},
         )
+        view.addSurface("MS", {"color": "#929292", "opacity": 1}, pocket_selection, {"model": 0})
+    else:
+        view.addSurface("MS", {"color": "#BDBDBD", "opacity": 1}, {"model": 0})
     view.setProjection("orthographic")
     view.setView(camera)
     if full:
@@ -173,7 +177,24 @@ def input_scene(row, javascript, camera, *, full=False):
     else:
         view.zoom(0.38)
     view.render()
-    return viewer_html(view, javascript)
+    html = viewer_html(view, javascript)
+    html = html.replace(
+        "var $3Dmolpromise=Promise.resolve();",
+        "$3Dmol.setSyncSurface(true);var $3Dmolpromise=Promise.resolve();",
+    )
+    ready = "requestAnimationFrame(()=>requestAnimationFrame(()=>{window.sceneReady=true;}));"
+    if html.count(ready) != 1:
+        raise ValueError("Surface capture readiness hook changed")
+    return html.replace(
+        ready,
+        """
+const finishSurface=()=>{
+  if(!viewer.surfacesFinished()){setTimeout(finishSurface,25);return;}
+  viewer.render();window.surfaceReady=true;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{window.sceneReady=true;}));
+};finishSurface();
+""",
+    )
 
 
 def output_scene(row, selection, javascript, camera):
@@ -219,6 +240,8 @@ def verify_extra_views():
         ]
         if stem in ("supplied_pocket", "full_protein"):
             pocket_data()
+            if metadata.get("surface_type") != "MS" or metadata.get("surface_complete") is not True:
+                raise ValueError("Input surface metadata missing")
             sources.append(("input_pocket.json", metadata["input_pocket_sha256"]))
         if stem in OUTPUT_VIEWS:
             reference_data()
@@ -330,6 +353,8 @@ async def capture_views(javascript, work, *, stems=None):
             await page.goto(html.resolve().as_uri(), wait_until="load")
             await page.wait_for_function("window.sceneReady === true", timeout=60000)
             info = await page.evaluate("window.sceneInfo")
+            if pocket and not await page.evaluate("window.surfaceReady === true"):
+                raise ValueError("Input molecular surface was not complete")
             actual = await page.evaluate("window.sceneCamera")
             if (
                 errors
@@ -363,10 +388,12 @@ async def capture_views(javascript, work, *, stems=None):
                 metadata["input_pocket_sha256"] = hashlib.sha256(
                     (DATA / "input_pocket.json").read_bytes()
                 ).hexdigest()
+                metadata["surface_type"] = "MS"
+                metadata["surface_complete"] = True
                 metadata["description"] = (
-                    "Full supplied receptor with retained residues highlighted"
+                    "Full supplied receptor molecular surface with retained residues highlighted"
                     if stem == "full_protein"
-                    else "Recorded supplied-center residue-aware pocket crop; non-pocket residues hidden"
+                    else "Molecular surface of the exact supplied-center residue-aware crop"
                 )
             if stem in OUTPUT_VIEWS:
                 metadata["description"] = (
@@ -468,6 +495,27 @@ def common_crop(images, pad=0.045):
         max(xs.min() - p, 0),
         min(xs.max() + p + 1, w),
     )
+
+
+def surface_crop(pixels, aspect):
+    """Fit the complete input surface at the pose-panel aspect, without clipping."""
+    ys, xs = np.nonzero(np.min(pixels[..., :3], axis=-1) < 0.96)
+    if not len(ys):
+        raise ValueError("Blank input molecular surface")
+    h, w = pixels.shape[:2]
+    if xs.min() == 0 or ys.min() == 0 or xs.max() == w - 1 or ys.max() == h - 1:
+        raise ValueError("Surface touches the capture border")
+    ch = int(
+        np.ceil(max((ys.max() - ys.min() + 1) * 1.08, (xs.max() - xs.min() + 1) * 1.08 / aspect))
+    )
+    cw = int(round(ch * aspect))
+    if cw > w or ch > h:
+        raise ValueError("Surface needs a wider source camera")
+    x0 = min(max(int(round((xs.min() + xs.max() - cw) / 2)), 0), w - cw)
+    y0 = min(max(int(round((ys.min() + ys.max() - ch) / 2)), 0), h - ch)
+    if not (x0 <= xs.min() <= xs.max() < x0 + cw and y0 <= ys.min() <= ys.max() < y0 + ch):
+        raise ValueError("Input surface crop excludes visible geometry")
+    return y0, y0 + ch, x0, x0 + cw
 
 
 def frame(fig, rect, image, crop, edge, lw):
@@ -575,16 +623,12 @@ def compose(row):
     annotations = annotation_data()
     reference = reference_data()
     crop = common_crop([*flow, *refinement, *candidates, overlay])
-    y0, y1, x0, x1 = crop
-    visible = np.min(protein[..., :3], axis=-1) < 0.90
-    ys, xs = np.nonzero(visible)
-    if ys.min() < y0 or ys.max() >= y1 or xs.min() < x0 or xs.max() >= x1:
-        raise ValueError("Full receptor extends outside the display crop")
-    height, fw, box_width = 5.25, 1.30, 1.75
+    input_aspect = (crop[3] - crop[2]) / (crop[1] - crop[0])
+    height, fw, box_width = 5.25, 1.55, 1.75
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
-    positions = (3.80, 2.73, 1.66, 0.59)
+    positions = (3.75, 2.68, 1.61, 0.54)
     columns = (0.10, 2.20, 4.30, 6.40, 8.50)
-    middle = 2.21 + fh / 2
+    middle = (positions[1] + positions[2] + fh) / 2
     fig = plt.figure(figsize=(WIDTH, height))
     arts = []
 
@@ -649,38 +693,68 @@ def compose(row):
 
     for x in columns[:4]:
         card(x, 0.30, box_width, 4.80, edge="#C6C6C6", fill="white", lw=0.85)
-    for left, right in zip(columns[:-1], columns[1:], strict=True):
+    for left, right in zip(columns[1:-1], columns[2:], strict=True):
         connector(fig, left + box_width + 0.065, right - 0.065, middle, WIDTH, height)
 
     center = columns[0] + box_width / 2
     px = center - fw / 2
     label(center, 4.95, "Input preparation", size=9)
-    for y, title, fragmented in ((3.80, "Ligand", False), (2.73, "Rigid fragments", True)):
+    for y, title, pixels in (
+        (positions[0], "Protein", protein),
+        (positions[1], "Given pocket", pocket),
+    ):
+        input_crop = surface_crop(pixels, input_aspect)
+        arts.append(frame(fig, rect(px, y, fw, fh), pixels, input_crop, FRAME_EDGE, 0.6))
+        corner(px, y, title)
+    down(center, positions[0] - 0.045, positions[1] + fh + 0.045)
+    for y, title, fragmented in (
+        (positions[2], "Rigid fragments", True),
+        (positions[3], "Ligand", False),
+    ):
         card(px, y, fw, fh, fill="white")
         ligand_diagram(fig.add_axes(rect(px, y, fw, fh)), row, fragmented=fragmented)
         corner(px, y, title)
-    down(center, 3.80 - 0.07, 2.73 + fh + 0.07)
-    label(center, (2.73 + 1.66 + fh) / 2, "+", size=14, weight="normal", color=MUTED)
-    arts.append(frame(fig, rect(px, 1.66, fw, fh), protein, crop, FRAME_EDGE, 0.6))
-    corner(px, 1.66, "Protein")
-    down(center, 1.66 - 0.07, 0.59 + fh + 0.07)
-    arts.append(frame(fig, rect(px, 0.59, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
-    corner(px, 0.59, "Given pocket")
+    # The same connector points upward for the ligand-to-fragment branch.
+    down(center, positions[3] + fh + 0.045, positions[2] - 0.045)
+    junction = columns[0] + box_width + 0.12
+    for y in (positions[1], positions[2]):
+        fig.add_artist(
+            plt.Line2D(
+                [(px + fw + 0.025) / WIDTH, junction / WIDTH, junction / WIDTH],
+                [(y + fh / 2) / height, (y + fh / 2) / height, middle / height],
+                transform=fig.transFigure,
+                color=CONNECTOR,
+                linewidth=0.9,
+                solid_capstyle="round",
+                solid_joinstyle="round",
+            )
+        )
+    fig.add_artist(
+        Ellipse(
+            (junction / WIDTH, middle / height),
+            0.032 / WIDTH,
+            0.032 / height,
+            transform=fig.transFigure,
+            facecolor=CONNECTOR,
+            edgecolor="none",
+        )
+    )
+    connector(fig, junction, columns[1] - 0.055, middle, WIDTH, height)
 
     def trajectory(box_x, title, method, images, labels):
         center = box_x + box_width / 2
         px = center - fw / 2
         label(center, 4.95, title)
-        label(center, 4.73, method, size=8, weight="normal")
+        label(center, 4.76, method, size=8, weight="normal")
         # Empty backplates denote parallel candidates, not additional saved traces.
-        for dx, dy in ((0.07, 0.04), (0.025, 0.02), (-0.04, 0.0)):
-            card(px + dx, 0.53 + dy, fw + 0.08, 4.01, edge="#D7D7D7", fill="white", lw=0.55)
+        for dx, dy in ((0.035, 0.02), (0.01, 0.01), (-0.025, 0.0)):
+            card(px + dx, 0.49 + dy, fw + 0.04, 4.13, edge="#D7D7D7", fill="white", lw=0.55)
         label(center, 0.415, r"$\times\,N$", size=8.5, weight="normal", color=MUTED)
         for i, (py, pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
             arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.55))
             corner(px, py, text)
             if i < 3:
-                down(center, py - 0.07, positions[i + 1] + fh + 0.07)
+                down(center, py - 0.045, positions[i + 1] + fh + 0.045)
 
     trajectory(
         columns[1],
@@ -700,7 +774,7 @@ def compose(row):
     center = columns[3] + box_width / 2
     px = center - fw / 2
     label(center, 4.95, "Confidence selection", size=9)
-    label(center, 4.70, "Predicted RMSD\nranking", size=8, weight="normal")
+    label(center, 4.76, "Predicted RMSD\nranking", size=8, weight="normal")
     for upper, lower in zip(positions[:-1], positions[1:], strict=True):
         label(center, (upper + lower + fh) / 2, "…", size=10, weight="normal", color=MUTED)
     label(center, 0.415, r"$N\,\to\,1$", size=8.5, weight="normal", color=MUTED)
@@ -757,8 +831,8 @@ def compose(row):
     px = center - fw / 2
     card(columns[4], 1.57, box_width, 1.90, edge="#C6C6C6", fill="white", lw=0.85)
     label(center, 3.25, "Selected pose")
-    arts.append(frame(fig, rect(px, 2.21, fw, fh), overlay, crop, "#82B7A4", 0.9))
-    corner(px, 2.21, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")
+    arts.append(frame(fig, rect(px, middle - fh / 2, fw, fh), overlay, crop, "#82B7A4", 0.9))
+    corner(px, middle - fh / 2, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")
     for y, key, text in ((1.98, "selected", "Selected"), (1.76, "crystal", "Crystal")):
         fig.add_artist(
             plt.Line2D(

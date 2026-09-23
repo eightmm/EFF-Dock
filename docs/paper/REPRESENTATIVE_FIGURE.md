@@ -4,17 +4,20 @@ A standalone left-to-right overview for known-pocket redocking: ligand
 fragmentation + given pocket → candidate generation → post-generation refinement
 → confidence selection → one output pose. Refinement is downstream of the
 completed generative flow. No η-based guidance is depicted.
-The ligand, fragments, full supplied receptor and given pocket occupy equally sized panels in a vertical
+The full supplied receptor, given pocket, fragments and ligand occupy equally sized panels in a vertical
 input column enclosed in an Input preparation box with the same height as
 the generation, refinement and confidence stages. Names sit inside
-the upper-left corners. Separate arrows show ligand → fragments and full
-receptor → given-pocket crop; the pocket center is supplied, not predicted. Generation and refinement are enclosed in separate large boxes;
+the upper-left corners. The protein branch runs downward (full receptor → supplied pocket), and the
+ligand branch runs upward (ligand → rigid fragments). Their connectors merge
+at the center and enter generation from the left; the pocket center is supplied,
+not predicted. Generation and refinement are enclosed in separate large boxes;
 each contains four states ordered from top to bottom with downward arrows.
 The stages progress from left to right. Method subtitles sit inside each box
 under its heading. Confidence displays four distinct recorded poses in a matching large box, with
 selected/not-selected marks overlaid in the upper-left image corners.
-Time and step labels use that same corner. Stage boxes have equal widths and
-uniform gaps, with aligned connectors and white backgrounds with neutral gray borders.
+Time and step labels use that same corner. Molecular panel width is 1.55 inches (previously 1.30), with preserved aspect
+ratio and larger structures at the same canvas size. Stage boxes have equal
+widths and uniform gaps, with aligned connectors and white backgrounds with neutral gray borders.
 Typography uses Matplotlib-bundled DejaVu Sans fonts for both text and mathematical
 labels. The final panel omits the PDB identifier; source identity remains here.
 Empty stacked backplates and × N denote candidate multiplicity in the generation
@@ -78,8 +81,8 @@ energy parameter identities and implementation checksums are retained.
 |---|---|
 | Ligand | Original prepared STI graph; five fragment boundaries marked |
 | Rigid fragments | Same 2D coordinates with those five bonds omitted; six saved fragment identities |
-| Protein | Full supplied 1T46 receptor structure, retained pocket residues highlighted in darker gray |
-| Given pocket | Only retained residues from the saved center and 10 Å cutoff; unchanged coordinates; wider camera than the pose panels to show the cropped region |
+| Protein | Full supplied 1T46 receptor molecular surface, retained pocket residues highlighted in darker gray |
+| Given pocket | Molecular surface of retained residues from the saved center and 10 Å cutoff; unchanged coordinates; wider camera than pose panels |
 | Pose generation | Saved frames 0, 2, 4 and 10: t = 0, 0.488, 0.784 and 1 |
 | Post-refinement | Steps 0, 25, 50 and 100 from the recorded CPU refinement of that exact endpoint |
 | Confidence candidates | Astex repeat 0, same 1T46 complex, existing N100 refined bank; eligible ranks 1, 25, 50 and 100 |
@@ -106,16 +109,20 @@ the four displayed coordinates and their source provenance. The primary selector
 ranks eligible
 refined poses by predicted RMSD; raw and refined banks are scored independently.
 
-All pose views use the same camera, crop and display scale.
+All pose views use the same camera, crop and display scale. Input surfaces have
+separate fitted viewports so the complete shapes fill their enlarged panels.
 The full-receptor overview deliberately uses a wider camera scale while keeping
 the same orientation, so the complete supplied structure fits inside its panel. Pose captures in the overview
 gallery (`views/overview`) retain the original camera center and orientation
 with a common 0.70 zoom factor so that all four confidence candidates are fully
 visible. Original captures for the other manuscript figures remain unchanged.
-The supplied-pocket cartoon now hides non-pocket residues using the verified
-model crop, and uses neutral gray at 0.65 opacity. Its retained atom coordinates
-remain unchanged; its input camera is widened to display more of the crop. The full receptor is light gray with the
-same retained residues highlighted in darker gray.
+The two input protein panels use opaque 3Dmol MS molecular surfaces rather than
+cartoons. The full receptor is light gray with retained pocket residues in darker
+gray; the lower crop surface uses the exact retained atom records. Surface completion
+is checked before each screenshot. Each input surface is framed from its visible
+outline with a margin, preserving the panel aspect to pixel-rounding precision;
+clipping checks cover the capture border and the displayed crop. Source coordinates and camera orientations
+are unchanged; pose-stage cartoons and all molecular scores remain unchanged.
 The four input panels have identical width and height; the ligand diagrams preserve their 2D
 aspect ratio inside these bounds. They are not docking conformers. Refinement
 step 0 reuses the generated t = 1 capture, preserving the exact transition between
@@ -155,8 +162,10 @@ shown in the crop exactly match the production crop coordinates. Full protein
 means the complete supplied receptor structure, including its experimental gaps,
 not a reconstruction of the full-length biological sequence. This input export performs
 no ligand or pocket prediction. The overview and cropped panel share orientation but
-use different camera scales. The input pocket uses a wider view than the trajectory panels; hiding
-non-pocket residues is an input illustration and does not change other panels.
+use different camera scales. The input pocket uses a wider view than the trajectory panels; computing its
+surface from the retained atoms is an input illustration and does not change
+other panels. The full-receptor surface highlights the same retained residues.
+All surface captures wait for `surfacesFinished()` before recording an image.
 
 ## Confidence candidate annotations
 
@@ -198,10 +207,13 @@ receptor pocket. Fragment-level SE(3) flow matching generates poses; the four
 panels show recorded states at t = 0, 0.488, 0.784 and 1. Physics- and
 interaction-based post-generation refinement is illustrated at iterations 0,
 25, 50 and 100. Each boxed sequence proceeds from top to bottom, while the complete
-workflow progresses from left to right. Input preparation groups the ligand,
-fragmentation and full supplied receptor → pocket crop, with inset labels.
+workflow progresses from left to right. Input preparation shows the full supplied receptor → pocket surface from top
+to bottom, and ligand → fragments from bottom to top. The two branches merge
+centrally before entering pose generation, with inset labels.
 The crop retains complete residues within 10 Å of the supplied center and is
-not a pocket prediction. The full receptor highlights those residues in gray. Time and iteration labels are overlaid inside
+not a pocket prediction. The full receptor surface highlights those residues in gray; the cropped surface
+is computed from those retained atoms. Enlarged image panels preserve molecular
+geometry and aspect ratio. Time and iteration labels are overlaid inside
 the corresponding images. Refinement step 0 equals the generated t = 1 pose.
 Method subtitles appear beneath the stage headings; η-based guidance is omitted.
 Empty backplates and × N schematically indicate parallel candidate processing

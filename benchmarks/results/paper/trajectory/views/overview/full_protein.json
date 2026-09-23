@@ -1,6 +1,6 @@
 {
   "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
-  "sha256": "2a119670f8f669bf70fed8619bf5752918ac9cf29c15ae2fef1de10fd905f707",
+  "sha256": "585ec31c8d144b5655e8538e12953ed759bbd5e1f55094670e6dc596f603915a",
   "camera": [
     -31.897461798227052,
     -25.963865766146114,
@@ -26,6 +26,8 @@
   "chromium_version": "151.0.7922.34",
   "py3dmol_version": "2.5.5",
   "playwright_version": "1.62.0",
-  "description": "Full supplied receptor with retained residues highlighted",
-  "input_pocket_sha256": "a1e03e0b0aad2ef2c544853fba9c4762f0b67bd5e41f3dedc438e541f2b95f2e"
+  "description": "Full supplied receptor molecular surface with retained residues highlighted",
+  "input_pocket_sha256": "a1e03e0b0aad2ef2c544853fba9c4762f0b67bd5e41f3dedc438e541f2b95f2e",
+  "surface_type": "MS",
+  "surface_complete": true
 }
