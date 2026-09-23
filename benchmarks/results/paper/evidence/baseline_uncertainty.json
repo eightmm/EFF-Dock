@@ -1,0 +1,841 @@
+{
+  "comparisons": [
+    {
+      "dataset": "astex",
+      "method": "SigmaDock",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": -8.235294117647058,
+        "ci95_pp": [
+          -14.509803921568627,
+          -2.7450980392156863
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": -8.235294117647058,
+        "ci95_pp": [
+          -14.509803921568627,
+          -2.7450980392156863
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "SigmaDock",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": -9.80392156862745,
+        "ci95_pp": [
+          -17.254901960784313,
+          -3.529411764705882
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": -9.80392156862745,
+        "ci95_pp": [
+          -17.254901960784313,
+          -3.529411764705882
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "DiffDock-Pocket",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": 28.627450980392155,
+        "ci95_pp": [
+          18.03921568627451,
+          39.6078431372549
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 28.627450980392155,
+        "ci95_pp": [
+          18.03921568627451,
+          39.6078431372549
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "DiffDock-Pocket",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": 47.843137254901976,
+        "ci95_pp": [
+          36.86274509803921,
+          58.4313725490196
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 47.843137254901976,
+        "ci95_pp": [
+          36.86274509803921,
+          58.4313725490196
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "RLDiff RL++",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": -1.96078431372549,
+        "ci95_pp": [
+          -9.019607843137253,
+          5.490196078431372
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": -1.96078431372549,
+        "ci95_pp": [
+          -9.019607843137253,
+          5.490196078431372
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "RLDiff RL++",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": -3.1372549019607843,
+        "ci95_pp": [
+          -10.588235294117645,
+          4.313725490196079
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": -3.1372549019607843,
+        "ci95_pp": [
+          -10.588235294117645,
+          4.313725490196079
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "DiffBindFR + MDN/EC",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": 1.5686274509803915,
+        "ci95_pp": [
+          -6.666666666666665,
+          9.80392156862745
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 1.5686274509803915,
+        "ci95_pp": [
+          -6.666666666666665,
+          9.80392156862745
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "DiffBindFR + MDN/EC",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": 10.588235294117647,
+        "ci95_pp": [
+          0.39215686274509914,
+          20.784313725490193
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 10.588235294117647,
+        "ci95_pp": [
+          0.39215686274509914,
+          20.784313725490193
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "SurfDock",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": -8.235294117647058,
+        "ci95_pp": [
+          -16.470588235294116,
+          -0.3921568627450978
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": -8.235294117647058,
+        "ci95_pp": [
+          -16.470588235294116,
+          -0.3921568627450978
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "astex",
+      "method": "SurfDock",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": -6.666666666666667,
+        "ci95_pp": [
+          -15.686274509803921,
+          2.3529411764705883
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": -6.666666666666667,
+        "ci95_pp": [
+          -15.686274509803921,
+          2.3529411764705883
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "SigmaDock",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": 2.7056277056277054,
+        "ci95_pp": [
+          -1.948051948051948,
+          7.142857142857143
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 2.7056277056277054,
+        "ci95_pp": [
+          -1.948051948051948,
+          7.142857142857143
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "SigmaDock",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": 2.813852813852813,
+        "ci95_pp": [
+          -2.0562770562770565,
+          7.362012987012973
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 2.813852813852813,
+        "ci95_pp": [
+          -2.0562770562770565,
+          7.362012987012973
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "DiffDock-Pocket",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": 49.78354978354978,
+        "ci95_pp": [
+          44.37229437229437,
+          55.411255411255404
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 49.78354978354978,
+        "ci95_pp": [
+          44.37229437229437,
+          55.411255411255404
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "DiffDock-Pocket",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": 64.39393939393939,
+        "ci95_pp": [
+          58.98268398268399,
+          69.69696969696969
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 64.39393939393939,
+        "ci95_pp": [
+          58.98268398268399,
+          69.69696969696969
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "RLDiff RL++",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": 7.142857142857142,
+        "ci95_pp": [
+          2.270021645021644,
+          12.229437229437226
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 7.142857142857142,
+        "ci95_pp": [
+          2.270021645021644,
+          12.229437229437226
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "RLDiff RL++",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": 6.277056277056277,
+        "ci95_pp": [
+          1.1904761904761907,
+          11.471861471861471
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 6.277056277056277,
+        "ci95_pp": [
+          1.1904761904761907,
+          11.471861471861471
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "DiffBindFR + MDN/EC",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": 27.38095238095238,
+        "ci95_pp": [
+          21.966991341991342,
+          32.683982683982684
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 27.38095238095238,
+        "ci95_pp": [
+          21.966991341991342,
+          32.683982683982684
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "DiffBindFR + MDN/EC",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": 43.18181818181818,
+        "ci95_pp": [
+          37.55411255411255,
+          49.02867965367964
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 43.18181818181818,
+        "ci95_pp": [
+          37.55411255411255,
+          49.02867965367964
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "SurfDock",
+      "metric": "rmsd_lt2",
+      "complex_bootstrap": {
+        "delta_pp": -2.705627705627706,
+        "ci95_pp": [
+          -7.467532467532467,
+          2.0562770562770565
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": -2.705627705627706,
+        "ci95_pp": [
+          -7.467532467532467,
+          2.0562770562770565
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    },
+    {
+      "dataset": "posebusters",
+      "method": "SurfDock",
+      "metric": "joint",
+      "complex_bootstrap": {
+        "delta_pp": 1.4069264069264065,
+        "ci95_pp": [
+          -3.6796536796536796,
+          6.712662337662322
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      },
+      "pdb_bootstrap": {
+        "delta_pp": 1.4069264069264065,
+        "ci95_pp": [
+          -3.6796536796536796,
+          6.712662337662322
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20260923
+      }
+    }
+  ],
+  "sources": {
+    "outputs/benchmarks/external_models/evaluation/sigmadock_official_r4_20260830/astex_diverse/repeat_0/per_target.csv": "d9504bf5c62310fcc02c2f8cac27ef4aa901afff18c8914787fb6f3aac8aed08",
+    "outputs/benchmarks/external_models/evaluation/sigmadock_official_r4_20260830/astex_diverse/repeat_1/per_target.csv": "d3ba0a890b4da19a7bce13bb4a97bc45c936dc4de4240973710cbdb41a1b07ee",
+    "outputs/benchmarks/external_models/evaluation/sigmadock_official_r4_20260830/astex_diverse/repeat_2/per_target.csv": "540604cb2d2f839ebd44f1afa0990ea93edba1145d3cc4aeabd64b6c2308acb2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_000_of_012/results.csv": "9d3515e01452bf1420577903f57ae796152fd99b6bf3a930bb8475b9f75f580f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_001_of_012/results.csv": "fd88f0c4bd2f7d44c31d791929bb2f3dc2679fc675bfc3279740a5f1154b2f99",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_002_of_012/results.csv": "750eb2c5a7a50849e404234968cb15a108f7409cebd4463223b4aad3b1820f1e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_003_of_012/results.csv": "ff832b8946e91c8df86998158cc2842c9d214cdc839200828a87a3e01c415918",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_004_of_012/results.csv": "11ac22587286e21cbc3620a559fb97738215b814bdab534b9d3ff6c2dd88a57d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_005_of_012/results.csv": "a63ecc65cf59c9b07eecff9e76cd8999d60b8319583998700c789b9b8679b898",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_006_of_012/results.csv": "f260bb8481a712203cc032ba80648aa2147f55d3e3c75b8e941c6f929cfd75b3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_007_of_012/results.csv": "f2c97aa626b5e3a69b98ce52a8faccef7c3ab52319ca9b54e2dddb1334117b35",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_008_of_012/results.csv": "894def9bc1e2356babb45d8c02fde3238ce1f3541264605ccb1fc73c2d040040",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_009_of_012/results.csv": "20903f83b770d16b045d6f06802dc8218e7716d3d60cea2c190f2b4fcb755dfa",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_010_of_012/results.csv": "83e6d8ce05da80f2d5e42122a3183a4448410954e31c26c3045e35678692cc90",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_0/shard_011_of_012/results.csv": "508b03c20fa6ed7fcb2ee44209250a24aa10a33d30317b38ad97235b64e50e8d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_000_of_012/results.csv": "d48880d4248146e6e3977bc0daa009bf7adaef38ab7ad02f2186a859c6b61ac7",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_001_of_012/results.csv": "056a0738cd8b6a7d39a874e5f0e5ac7350edf4d2d36374762561e79ec18217e4",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_002_of_012/results.csv": "38781b82030ee5d7728639fcff0c2b41baf019bcd957c28e364ae7940e09c1af",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_003_of_012/results.csv": "ce2b09bde7437521b7a989b3e657bbd5b472a84bcdbc0481880100d60073688b",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_004_of_012/results.csv": "e77bfb5f0be252536e3c170ff89e978bde3629b9acf620e3e2288b895ba3f1d3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_005_of_012/results.csv": "b3cc316c3b8782067acdf8812be6fb6623a13bc1916baacc4f0ec0afb9036b5e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_006_of_012/results.csv": "467b67f90527027d399dd190808bfe5329be0f084e5fce6e41d7b8b902c66d85",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_007_of_012/results.csv": "f54c71eb000e81e60adf331b3294cd0f1baab658633bfdc4bb7dde7c7c300bad",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_008_of_012/results.csv": "06e7ddaf91e521b8476a8e2c9acf3a77c77cd844ef5c3983d78b1ddc7fd638a9",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_009_of_012/results.csv": "6dda15816d01e4daac2f61e8567a9cc1a5619f114666f0c2e76b4085bb038a48",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_010_of_012/results.csv": "0b258196f5a08274c24ef7e8471459cfb649ab2ec31294db5dfa1c228a67e6a8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_1/shard_011_of_012/results.csv": "af7e8d9aed1f97402e9f6d9e3dc8143c1ff902ab42eb1bfa3891ae3f8031a2a1",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_000_of_012/results.csv": "138a025677c121b84cf342048debcde552911a02df6fc457d790726afcd766d1",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_001_of_012/results.csv": "1565f2bc7b0a26435f299b73bb89e3c0f02ad2d8752dfd721bfe8f10101f3399",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_002_of_012/results.csv": "d170f6a6ea9a7c01c58a09f547a9dce051a3893b609337ca90459fbaff99c0f6",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_003_of_012/results.csv": "c3676b29f9dc3092f34717bd4ff2d4c015d651bb1c3cb193b87337f78cb27777",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_004_of_012/results.csv": "346405e436861c472b119d525eeaa8818d463fc9ca6de9a30ff764e8471d0445",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_005_of_012/results.csv": "a2063e70dc12c773d63ed47eb7747fab3eaaf096436d9ce865b9d4d8f2f805d7",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_006_of_012/results.csv": "7aa1885c9dc678b9134158050583af73a85545c15af564cf178f57e3c4a7d654",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_007_of_012/results.csv": "2dc982dc9e372e25fd1a586a2523cf6f7ee31628f7303dc428eea33acec1a7a0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_008_of_012/results.csv": "47f308031278b28999d6a454e0240a6dae5863cbab3afed9df3ee0133c7a732d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_009_of_012/results.csv": "158e552df8e986c0fb978c51bfbd4c34966922d078616044f4a1222e79feb16f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_010_of_012/results.csv": "bab68003301c9f67c0b5c58614eef9a1c560f0ecfc6ed35ae876e7683428a684",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/astex_diverse/repeat_2/shard_011_of_012/results.csv": "90d5079f5c05e60dc84dbaeb18f0a886b657d9d1f1441efd2876f64f3b5726c2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_000_of_012/results.csv": "1619ac1a5bbb6168506ee278bda3f509d20b978edced6bef4e946df049f1da25",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_001_of_012/results.csv": "89d8c43f4681b95ad2ea6f6f1f782327b946bb512d1450e62eda8208074981ee",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_002_of_012/results.csv": "29416fcdbc137d34509347c19d1ee8b57a69f571d83b380ec9e73ead449bb9b2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_003_of_012/results.csv": "58355afc1ade5fa0c01cec48ed8c6d4b7816ee7adcbd9b321b84d488ce7041ce",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_004_of_012/results.csv": "989ef34cd6c262640fff2d1b8d5f9c02d27e2ae59306f434cf8dcefa04dab09b",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_005_of_012/results.csv": "1f19957db726f63489c252d8043190bf9c8532775521c3cb30ff7cf4f3642fca",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_006_of_012/results.csv": "7ea3470daf720178cca5c9b757241c5b2323dbe0962e80985b67038372419f05",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_007_of_012/results.csv": "bd8a61369d49d01cdd2a623da2df6e3d10b27bf844613f88b9cb37274b2b16f0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_008_of_012/results.csv": "fdf2023f9c037a1decdba24be2173d322b4329d94b9a2c7a9c394c0feebb7cea",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_009_of_012/results.csv": "ff83e79088f99dfe8c7b368c4381d6202c36b92fda7cc4fff008fc658b1cb168",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_010_of_012/results.csv": "466faf1f5bb4d3bd15c27e651142c4e6e0910f31023da40ce17366222a9e4e29",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_0/shard_011_of_012/results.csv": "4b0c4b37b7836797a26f71f742c12d43e4c0d8e7f6985ef7b03d8476774b7ca3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_000_of_012/results.csv": "8a8bb69acd83dcc31c3fc7df83966c159f1b8902b9c92fa7dcb0987d4e78f9fe",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_001_of_012/results.csv": "a38dc9869ded7a4a36a5a819d4f75ee710016814f199361cb33fa131f938ac92",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_002_of_012/results.csv": "99aa608ccdf67463d6d37109ead0def0634ae730efa7740b6c50f517785d7f34",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_003_of_012/results.csv": "326fe2b56a8ccaf4934bdef64b281da96295956c90832356c054e16d67a69175",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_004_of_012/results.csv": "673f1127b496f6064f29ddeee0e3c3e02893654bf2aa154a28dd83ca0823d4f8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_005_of_012/results.csv": "86a168fc31319b24458274fd3bd65643f88be4a980661911bd116e740078314e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_006_of_012/results.csv": "0b6896228227489a78088ec73435c1bc126f4a4468661056dd2299bbad7c5a40",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_007_of_012/results.csv": "22f5c3e4c80aba5c59eab7e34d1280cf1b43f502a3aa55ffee9eb806b9dc56ec",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_008_of_012/results.csv": "26fba3dd5953c157e0af01ad6462c66fa88f2e53587ea56804e75b01f24c0b2f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_009_of_012/results.csv": "d9abbe5206abeefcade357df92783cf6da6556290eb96c60398d45eb8b218dcd",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_010_of_012/results.csv": "2ad16a170a5ff5fc72fb81c82d1377759048b9bc5ce4483ecda5942184f465e1",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_1/shard_011_of_012/results.csv": "10dcb694c5bd8c6066bdc9496afab25246c54690fc6fa4671cf35921ec889c08",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_000_of_012/results.csv": "93c24d58e76dd372c5a0d2045bbeb577b483620c4411aa6342b389128fe248fb",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_001_of_012/results.csv": "a680f0b580637e25472673bffe9da686f3dc8481876b7ce8b1cbed9c7b2cdc73",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_002_of_012/results.csv": "247a6bb4d280658687ab164f1c9e4eea60d60302b2b986cbad8ed6ca0a44844d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_003_of_012/results.csv": "97bf86a29e2c09ebcb0996cb5408c8014584fda85f6c5f8b71a26d5b1b9a99e6",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_004_of_012/results.csv": "f1a700c58d2cf969953d84dbd40ab72aed5c22e325b2bea820971bacc35bb293",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_005_of_012/results.csv": "2803715a5dae3d92b68ecf2b273f27c33c70eb74e311b32b801a2e17c920f2c0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_006_of_012/results.csv": "788c21d5d2a908d4d9595dccff4c727a7d312b67763ece6f148fb1531256b499",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_007_of_012/results.csv": "cc8d43b62397a5f2e2acbd1579bf631ce967f09bb180836b5bfa4bd0fcb6c713",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_008_of_012/results.csv": "a287db796d5b17adfb3ce6342c07251067da116b44c0b88a71c0b13382f70f76",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_009_of_012/results.csv": "33a726e271c906209558636ab13210d19bbaafa28b1b2a489e5fe61a29523e63",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_010_of_012/results.csv": "b6452e3639651baba8768a5ad24cb257b1ad2d8c9dba5d4d9158e89825cab978",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/astex_diverse/repeat_2/shard_011_of_012/results.csv": "8b35c0b62247bc50294762d980e7a5136a81aac8820fa3f72ed8f5766031a335",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_000_of_012/results.csv": "0e4235c87b3596ffa864b8a7b9d74964b48cf42c0a591e0fd4b8a657e7b62620",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_001_of_012/results.csv": "25c7ee026dcaadfa9d8a78a4dd1ba699f5ad81e511f9d53eec6e251feca443f3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_002_of_012/results.csv": "4ebd703b1b2a735b698475fc6f3f41134f6b265fb666c47a640f60a112b92943",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_003_of_012/results.csv": "da7cda7f68a110cc23969b4b49730906d371bf5c7f10aa544739a4d889da38e7",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_004_of_012/results.csv": "1b92a6b9056fcb02f9a44cf4e8c647092b89d793ac74d4d46dbec1da7674d278",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_005_of_012/results.csv": "c8d91b47284ef7dfba581afd96b675973080a26a39c9abe31d487af257d3a4ea",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_006_of_012/results.csv": "47d4b62c6fd01b3138fb238aa773c53338dca41b2330124df49eeeda22769303",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_007_of_012/results.csv": "b837e4a3b03802a98016a4cd346a1350386f5c055091a4ad71d08017bbc26786",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_008_of_012/results.csv": "71de30927a63421e358d07e11614dd783b5bd79a3044028fae947997ddab71d3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_009_of_012/results.csv": "f1599abcfd062cc0f0d6defa396907bd92f0d559dd86c9c9c12aa3f06fee6e77",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_010_of_012/results.csv": "de492330c30986a488de5558621bce71b44c8d113038fa16c2d5e1e8e97701ad",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_0/shard_011_of_012/results.csv": "4a4c7225599b9c3f39f60576de633b2ea8ef262ff10b12e329bf54787f901cb6",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_000_of_012/results.csv": "5bdc4e4a1a7eeaa7d78813d4c648025a621a27ef1918de221b217a3880c51371",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_001_of_012/results.csv": "2ecd7db0a20a68f0904789e5cbc9595a0c128711826ffeab6d3c347c0227cfd2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_002_of_012/results.csv": "345b48b4d1a1716556ed2d4f1e0c024c6f13718f5c7d0a172e6e168f57403276",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_003_of_012/results.csv": "a138f2da75b4d89e640086e5b938afab4f6de38261b72b2e92b5f3ebaf58632d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_004_of_012/results.csv": "b24c0e5132a106b7b4f3dca1f08650159df5d83725207a88309adc0ee19de46b",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_005_of_012/results.csv": "b4369638b015621664c5a25b98fc5f1054406bf9760cd1c41a57b22debb46cce",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_006_of_012/results.csv": "c61f518104df83c39fd00a04922550b0b7a7ae6659426607f258b76a9141963a",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_007_of_012/results.csv": "6c1a83555870eb13832e55293ac5ba4a1199f1b9e33cfcb77a3e0aa0b0602573",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_008_of_012/results.csv": "7872e8e35958befe9d028511a7ec7a9300800579b8f21ac1bbe5ffe77765b4e0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_009_of_012/results.csv": "1826818635c2939616e1b2b468ff2102782dc0a1261b8089be89e33f8755cb7d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_010_of_012/results.csv": "0ddbd093f4bcebb3b873d4a092d12d799c58e253033265c2f59f30dbf7a772b9",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_1/shard_011_of_012/results.csv": "a58935c9444dcd95c5b816428d54a9d3ff8a2a86fccf15bef42ae0f8169d740a",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_000_of_012/results.csv": "5a5f4e2087ea57dfedc718f3d90c1e9727950a03d5658f4784117bf5b356d692",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_001_of_012/results.csv": "899802185348f8f5e8e42a7d9036526e9f74ad044c4d7a7aa1e5bc6084adbf21",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_002_of_012/results.csv": "e97ff5e8643a2981b65887b5b1c68a1d82e4822b5346d5136de0acb6a751a465",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_003_of_012/results.csv": "9d55e8fdd423e03315e804dc9df33b48c069bafb97c2e8beb6f2a29f30b10e6f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_004_of_012/results.csv": "d2abb112c3f1a5e8ff790bd247de8608dc7d943b55953477e5e54f69d4880ea5",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_005_of_012/results.csv": "37ae68acbe169bae094695f30271c129a1ae0576e9f45d57f3aa127b47c92db3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_006_of_012/results.csv": "da57948b664c6451847c0368d49ea474c05ffeda759a55726124c2c064aae293",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_007_of_012/results.csv": "1f157b10f291cb87ac3e281c78ec4b6f5a661886c3b90c380b7efed751070296",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_008_of_012/results.csv": "b363aac2057f53dffd4e5d2076654f1bee1ffe7da913c7f95cb95ede3e4dba8c",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_009_of_012/results.csv": "1089a908776b075ffbe2b7e9904a5711c71fffe0349769fd9c3f3cc5b6cea137",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_010_of_012/results.csv": "e3d2e824eb7187d8bd0153e500d9a702380b858feace3dbd8a6cc81ec6e56cc3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/astex_diverse/repeat_2/shard_011_of_012/results.csv": "a6f73cebc6b26bde12213459d7fde9a37e7bbb2444ed6194ee6acabca7fdf58e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_000_of_012/results.csv": "2883d214eb92606cdb2c8234526354f9b2dd636d02205f67edadee215b479c6c",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_001_of_012/results.csv": "94eeb3cadb1a0f8d760b2ec0cad0c01f932270b6186bfdb21fdaa96a2eabe31f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_002_of_012/results.csv": "848e4c0e7217c48fd7ac92c21367d83c51333d5e420f499283ed27c34541a37b",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_003_of_012/results.csv": "f0b32ff6e3003fa48af21ee86837aa359ee1a8f1a85c46cdda67cb3bf908a4f0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_004_of_012/results.csv": "13e8ece4b9941a22fc7251dc7acd5b24e8e493571ca2fda4d712b1241ace73b2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_005_of_012/results.csv": "eacbd4891907e4715a5968f3cbd26391aa003de9b73248852cb27c3b462583f6",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_006_of_012/results.csv": "7086740c41906c87e60e16fc87932eb335e7b3bad68388dc1e25f88a53262148",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_007_of_012/results.csv": "6c9827cd437378a18823b4bc92c7ba0c111a7119eb6b02e815970368c0eae3c5",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_008_of_012/results.csv": "ca69de9e6882da3dc7bb4e4e7f42dafd602e0bc6c86492fcaa0a35d07bfb4b4a",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_009_of_012/results.csv": "a24c54ca9c8b323f8e5a38741a796e32e685f1061b0c05929024cd2ce18c6108",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_010_of_012/results.csv": "1bea031d38196538415b82e253838875cc019e8c703ca854b7d49b5a959135f1",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_0/shard_011_of_012/results.csv": "1c848c4de6c9f208b0ef255a4b6874fb6348fc2f36623e7aaf6cd6e98d180110",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_000_of_012/results.csv": "bf50c5ed727c148feafd3c266ee73c5e0f1237c906c02cb18f0c14f590d006ce",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_001_of_012/results.csv": "3e03eecbb922f50a5b7832166028caca147c78c88ec6e48a4eaa4e9f11cfe410",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_002_of_012/results.csv": "bce87ef6ec2d817db6c4c603b473a58e44156624ddd22818a6c7b47519139d2a",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_003_of_012/results.csv": "eceed14a6bcd34fa10ebf16db1dafc8e0013f7e92abce059f477769b61c08e6b",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_004_of_012/results.csv": "1e5d1fb1ee1495b91eb997720d2c50ad00b1af215fe62faf3b7da51dcc3f43df",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_005_of_012/results.csv": "5f081dc67690e8622981fcd478a1e9f010ad0a5279e6c81ea15f8557c26a2d7a",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_006_of_012/results.csv": "37e4d6820f6b309e43165cd74fa9b9e9933c1cb2a1ea409bb5a44e65642b05e6",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_007_of_012/results.csv": "38bceabe69408eecd8602e4858d97d62b1d4f8e5ea69acde93cb3320f305f74f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_008_of_012/results.csv": "35512f065bbd5d892d68e9f9f61a4c02fcaee517498189d539166302c5e432b3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_009_of_012/results.csv": "3dc890a88df3991b30dc4e18c3f69b426bb29a80ed1adb39424cd8e7be441300",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_010_of_012/results.csv": "0ccae86529afdf806677cabd2f9222ed7dd45020c91a1e33899099af3939890b",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_1/shard_011_of_012/results.csv": "1b8430fddb153481c04c525dfbaecc3675889c3a765a8f98af99012b51d3c2cf",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_000_of_012/results.csv": "30582da3c5a1d33ccc11d84406d2959fa915ddcb66ef2788164cd346f0e8cf63",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_001_of_012/results.csv": "6bafb10d78aeffa752a0f7d7974d9200717038c811fbfc11bdf8d19828e14156",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_002_of_012/results.csv": "da3e9d865de558c179b4bc1ff338db044971548c4aab788c2ee2f00c593f65df",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_003_of_012/results.csv": "6da68b1719ba4bac765d40e5c813030d0e1c3d3b5661c3f8a5085778b99164ff",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_004_of_012/results.csv": "e9e1f9f1af593be77d36f351ac6a19460a074f6d49623df893385c43cdde6fd9",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_005_of_012/results.csv": "4a1bfeafcdd8338c626f75fae8cb61ab3c8445f4aa6ae488e5b969a051cb8843",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_006_of_012/results.csv": "6c7dfd5d05fea990c2f062b13e79f0642a90727c759739911fd1687a6c962b32",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_007_of_012/results.csv": "85498ea46f36b0f4bd15d8edbdfa6306c4b5b4d8049fe54ca970b16baa838fca",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_008_of_012/results.csv": "6b8ec6c41fad108854c64565276684237139fcb23fac30498ad74bf43a4a1d66",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_009_of_012/results.csv": "b44cf5cc118c85d02010c46393d1fbd796e9d074b94f13bfcf3c49552eab01d8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_010_of_012/results.csv": "d7d1098f5b0a232cb3ab4b34f9fd21ceedf7cf8df797b6a56d50758cbaafbff8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/astex_diverse/repeat_2/shard_011_of_012/results.csv": "ecf229bfe34333a3f242b289baeb977f1e14e976415d7bc7d025135937663f75",
+    "outputs/benchmarks/external_models/evaluation/sigmadock_official_r6_20260831/posebusters_benchmark/repeat_0/per_target.csv": "3ef66f71312bb8382e6abd991d836594c58420e4fad3c23c4b32f1448e8efb2f",
+    "outputs/benchmarks/external_models/evaluation/sigmadock_official_r6_20260831/posebusters_benchmark/repeat_1/per_target.csv": "9ffc49ce15f6584e67a4ea77c759a942a77f6372b8095fa7efaef308f8ffa764",
+    "outputs/benchmarks/external_models/evaluation/sigmadock_official_r6_20260831/posebusters_benchmark/repeat_2/per_target.csv": "125ed7a76a74dd21b9a55b8a823947e443772e0e6a2a22e8c31c43c59eff70af",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_000_of_012/results.csv": "413d69d1fd515f36a3ddade6f4a977781525ea5c03acd79c5cad285f99d87ac6",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_001_of_012/results.csv": "106644e96ee69b0db7787ede79e91fe2aa5132e4a53ecfc9895c11086e47e82e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_002_of_012/results.csv": "e656463c17413173628d15b8917870add4015231df9f72d04b7c675244b14e29",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_003_of_012/results.csv": "598abd2f8040b4ce64852b11b88861cbcb772fc31c9ce2505729ce439d9f6883",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_004_of_012/results.csv": "7012b65427da69990fdc54eaf64bd6be0b6ffb02889b0fa8cb69a98a6dcbacbb",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_005_of_012/results.csv": "7498956f294eb3fb5078209aba13dc5901fc9441d9289b0e351fdb2986700c8e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_006_of_012/results.csv": "4c65bee13efcc59e6937fa60aa9fe45c2110c46c9f4260a919294617bbf052e4",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_007_of_012/results.csv": "c44ef2747b1cde34dedbab920555bd956f08e53fdc494a7d41f157a8cf6d68fd",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_008_of_012/results.csv": "9324d743093898fe175ff2fe934953c176ed1e48636549cedd28fd95a706edd5",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_009_of_012/results.csv": "39a764cdc22d8c34de9a78a287213f03d0b0e24a12e6b7e9a9a995eeefa7fd19",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_010_of_012/results.csv": "d1e8acefd9d9ede8dcfc89510ff2eed67d77b6d8c28b15635fabe2a21af1f000",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_0/shard_011_of_012/results.csv": "ea43fc8f43b73daa3bf3bcc6772692ace0a78b0c65f67f022e46e9ef92657f40",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_000_of_012/results.csv": "dab079fa11029a3969b267507158584573aac3dcd2fc008e61a58becc48cc584",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_001_of_012/results.csv": "91b75787bd4a9a3df096623c6aa601258964000b04f85b0e93f5204b113f6d9a",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_002_of_012/results.csv": "8b4b1d6f480bc4d6bb145d0e1c1c78169a48427f6dd9bd9620068785e3b75d31",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_003_of_012/results.csv": "c1793fc3cc1a47b559180d403547fdb8b096d8a096fef779770e66fbb39df75e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_004_of_012/results.csv": "ae014d7b75309b87cec47f0fb10d5cb4c3684ae0035b2ec98cb019123aedc008",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_005_of_012/results.csv": "ffcb21821dc81b9c93c9c85faaf56c4dff3ca055c60627c183d800d2a86d31b3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_006_of_012/results.csv": "dbc63c9b1e491656dd9e553be97485654d2c1ab97984041ac5b10dd05053ee03",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_007_of_012/results.csv": "0e8bcc716ba727b6e105339b7da25836558c0bc62d4f772a85b4ba20872f9108",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_008_of_012/results.csv": "5b1be2531df2271559be2be04e34eff1f7813064b1fc460f4c9f502b136fedf8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_009_of_012/results.csv": "0ac113e1b481f93e59721397f318a539556dccf411883762cfadce3c994e20a3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_010_of_012/results.csv": "a25c93d4afc96c7b280f64616069db78f4961058042976837553363fa9ff4f7e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_1/shard_011_of_012/results.csv": "7fb7d3ec5ca0c39c0751edbe5bd0fe8205287b4d861269a7e77bbe951b6e0ecf",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_000_of_012/results.csv": "b5698496c6666f6de42004d34d2ce21533ebd2e193f87752d1849370abc544b3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_001_of_012/results.csv": "4c2c8e042c27c203da9630373568c61dc16e663674c1780f95f80d9e773d8ea7",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_002_of_012/results.csv": "adf3e5d4ba31ac4de64f539c80e2c92a6f546250975becc38da5d4628037b391",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_003_of_012/results.csv": "33954e1ac53d3c096c1ed91a0bb3ca22025e4a3e0270bc5afcbd92370c76da8a",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_004_of_012/results.csv": "f513fab2aa3682804d3c28cf82dc3d01dde8f79523eb3c048ae44a25c90cc311",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_005_of_012/results.csv": "51bd833805a50a0e5dc37d6dd5a20aa91da9b12d016cddccd2eac17bbfc6cb2d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_006_of_012/results.csv": "ad4f0f73482b2757989dc55e038d05e106d0d88b3a90c8f76a02b7b991dc77a0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_007_of_012/results.csv": "fd696a1ab460c5ba1b4ea91226002b366e4f0063d6f8b904f147de9c7f9240f8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_008_of_012/results.csv": "5a65b1d91ca4a51ddafd13bc9820bde585e29a00abe5c3640f1d376f1c38f9d1",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_009_of_012/results.csv": "a9dec498603b5ca219ae88be3c46d5f4f0b8f806be98ceaf7a626a00f1cdc4d1",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_010_of_012/results.csv": "4c590f24e032de19f41b0491cca4fc54930527ab4f173c68727538806972ae37",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffdock_pocket/posebusters_benchmark/repeat_2/shard_011_of_012/results.csv": "8b4b9e499a4dcac475d7434f54e4840d1c1f8710e1f334eaeae58ecafda3af58",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_000_of_012/results.csv": "29fcbbd01e4ec5c5615acda3c075f8236cc9cc57fb052836b5117760d20f7de8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_001_of_012/results.csv": "82543a94dc4be7b03f83b89f91af490c54b47c3b01b2a3d962220f58ca248fad",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_002_of_012/results.csv": "32559b9116a05254d72d86bb3da750e8a65cee292511a2f437f3a50dd8d07053",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_003_of_012/results.csv": "376d5e99d65fd6d06089fb24d3c4c2534d580ac2f3a231f8a127e37991e2f33c",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_004_of_012/results.csv": "6789c30b9dc808f000246a8d1d7169912a16bc6fa41e75108582188fab0bb0e2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_005_of_012/results.csv": "9b7d9a8ac530119d0901bb0be835537723962d30fecfd35190f0f5d43d4066d9",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_006_of_012/results.csv": "409565d70c669dc38f35ad8c3cec5771161c34ad65d1c363f81a1fdb9c7e946d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_007_of_012/results.csv": "f1232343e4578ac69c9e715c0922376ce4bf91a8052549b3f330fbd5e96b0660",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_008_of_012/results.csv": "14950c496922ca3a2140bb9e05cf4d19c2d97048e3e68180bd8fc3e510123871",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_009_of_012/results.csv": "ca93807c2083d1a3cab5126277e97fcd202e791c98b6c4b76a6faa7c75c7b29c",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_010_of_012/results.csv": "60dc481aed1c1c4bfa6a0fd5d61a20c74eb37a7cadeb50b07c17cba89d2ad6d2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_0/shard_011_of_012/results.csv": "4479dd298ad057f562e62dc58e4e956279f6c5a8715a20299b3fa7ba21f61572",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_000_of_012/results.csv": "8c860fedf97b0adeeb80e3f320f8c4bee5ae9028c27972647f95015b0bc26f2e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_001_of_012/results.csv": "28ecf42cf78c6f1d2c53600e641018d91b220fac3ff170bdb2a89d15675b4b73",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_002_of_012/results.csv": "587bc7548a529a036ce50736b1ab5cf83a295bd505c5ff0831de74132a85c53e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_003_of_012/results.csv": "9e49547bac07eb80791fcbb72cfe1e0565fd0edf6f53a3522244ec6440a271e0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_004_of_012/results.csv": "6c1912b2342dd93a91298cb588ffbc210304792bc889d4e80853f43fc1078bd3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_005_of_012/results.csv": "b604c31950779cffe23735390afa924512d105e90ace3c2ab6b782157342b821",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_006_of_012/results.csv": "81e79c7e7f1b3a176c22c48a730f7eba64aea54ab524542d41222b85612230da",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_007_of_012/results.csv": "e8e79c286bee42dfe9f0accfac0ccaf53b2736e7273f0558a4cff3a1a42dfb38",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_008_of_012/results.csv": "b91eaa2cf3395d43ee2bcebf38a807e68d3fcae77efb56eb3683c69e347ea519",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_009_of_012/results.csv": "58aab0fd6213e3788bbcfb7c6558b3c819fa62865b567d750527816fb91d861f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_010_of_012/results.csv": "f225bbdbcc7b140cfd470b091bb7d2d270bea2c7ac8024c37d0f0f783cd783cb",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_1/shard_011_of_012/results.csv": "d1fa8cc1504a72e0d069da6da32d4a52a1c4587d5a990788cdeadb4bfa704e73",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_000_of_012/results.csv": "56e67ede9ecd6a6567c59a07c7afc88aaafd382ed449af9ebfc44bbbadfa0df5",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_001_of_012/results.csv": "316089b2273ed0c9e16f9c7dfc260b35a010577e421c73db04503b514ff64291",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_002_of_012/results.csv": "6519a97a5083eab32d3e789fe1fd4477216628766924664eb822baecc7ec01e8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_003_of_012/results.csv": "390df2217a84ddfa5d9b44e8a330f941081ddc765df9dd5cb257d07e0ff8dbfd",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_004_of_012/results.csv": "49bfca30a95b6d29dda704da1be3fd44ab31e3656248b18bc54707d722298a69",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_005_of_012/results.csv": "65dfa43b3dd9acbb82d728cdd98e95270f483f95d2369cba8129957173eb1911",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_006_of_012/results.csv": "1cc95bd29c4049bfbe5549fb855b1e46634268c13ec317cf3ae96be61c92468b",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_007_of_012/results.csv": "a5d9fed7a7b82589eb5fd8b0357c4413c8043649b0c59b1a2a0346bf7c994e91",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_008_of_012/results.csv": "d8d3fb8664b9e4fa10f5b61640d1110afb7c51a5de79612e15a2e4c75875c4b5",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_009_of_012/results.csv": "c8b037ce3eca3378ba74c92483cbfd5b2581e3081ec87a4a3d6a0fa84fbebd87",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_010_of_012/results.csv": "d4822a3b52d3cd74a57e7eb32a0e5d5a5fca4ffcd8c8e2b949d84c0be8ec5370",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/rldiff_rlpp/posebusters_benchmark/repeat_2/shard_011_of_012/results.csv": "2477563030b3e61da881228a2f3135082bc5f54b6c5ca101fd8e279a194d5f03",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_000_of_012/results.csv": "979768845f68a5ad9aece3e1ee3f600f1fa0652896f357a4b93fc40bbea76e20",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_001_of_012/results.csv": "54ee0ed0b83859847f86fe3f0e4f00c1dbb38462602e0986bc834cc8b41687e1",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_002_of_012/results.csv": "00bdd3a7893e595c43e047bdf64772814db8cec9842f9c3af67d9e8c1c9ec974",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_003_of_012/results.csv": "6552c39f283e9b66a74c9e117bfb475e9c2dc85ecbb6e6f7818bbda0baef6084",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_004_of_012/results.csv": "3e2b47261ba8c7c4cecd816120e892a12420ef5f218b0497eaf1ddf11d1cc4bd",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_005_of_012/results.csv": "417273dbfbb3fb7471d69017bb5938c360ba650fc6d73c8593866fd1635c2525",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_006_of_012/results.csv": "e8cc22d4940a1ccc340a77b6cc65f269ec973ff2d933dc52efb7209900f7401c",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_007_of_012/results.csv": "42e9f27c1e66ceff7777ba17e29820f58763c8c7a7d8c6172ea546b5e55f5dd9",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_008_of_012/results.csv": "870dcb1981adf4b4310aa5508327437eb0c50fc84fa6268eaf02e9ab28b959d6",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_009_of_012/results.csv": "ee881061063898b1a265160db4dc01b678f4983d4fa7d9bf6bd38da0d543b425",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_010_of_012/results.csv": "d1c3728f8aecad9804d7ffd3102983360659e4529f58efbefb2c32804e2f120d",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_0/shard_011_of_012/results.csv": "1349008d312829d8b82c55f32cb988880790410a2c36e3fe7fdab8616f0af356",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_000_of_012/results.csv": "e86d33d87188e154c9905d86134d3f9fd15737ee49f7c6cae6afc65d776ec633",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_001_of_012/results.csv": "2cb1c0103f7df6c5e65ad9ad4a475fbcc745b4043edab3cc8dac9ef69e646178",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_002_of_012/results.csv": "3f28a91805509608a24f8e07bdafa8307431396cedd2980c8c856873a7c392f0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_003_of_012/results.csv": "1935dc82a979bdfec8f0e59a2e915c4300557d0058a41bd9239dcb974a38ccae",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_004_of_012/results.csv": "973f0c1d3933a5dbc3db37545dfa65e91dcccf32103f4359568525020ce28c71",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_005_of_012/results.csv": "92ee753122e2d952850edf2e05967b8dd9533d1d8748b91fbce66508142a78eb",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_006_of_012/results.csv": "ba19566cb9eb568af5641be7e006f88193ee0b4fe8fc0a0c49f68684c84c6a1e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_007_of_012/results.csv": "f351823747bf677e1e5c2b1941c8f01fd3c3cedba8536fbffb4d44a34175f402",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_008_of_012/results.csv": "a544fb46654d838990e4a2287405442647f2db45dbb34c6ade7ed4cdd5b9f49f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_009_of_012/results.csv": "9bc60e4887dbef41c5958adceb2c554cd6bfaa7d6a865e145f8b5dfdccb068d6",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_010_of_012/results.csv": "f1537e376f20f2678dd313ff1673b091fc1662323af25f6cb59318120dd7dd11",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_1/shard_011_of_012/results.csv": "bf7c98e7cca181d18125002c3483411288de29a6269f751c89ba0cb0a3821d61",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_000_of_012/results.csv": "4102e08904761def192e686aaecf5830ff4b3668e448922d1d27bad459d78316",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_001_of_012/results.csv": "2b2677a98b6fbdc11310867017b73117a53feafdb1beac6effa82b453520e982",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_002_of_012/results.csv": "eebb7bf2396846e6cf426e252c1373131f58d01a96764f60b25cb4be76152293",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_003_of_012/results.csv": "bf50e26e507f88adb411a973cf09a8b061a5c6c13ec1f4a8ba9457ae841b3401",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_004_of_012/results.csv": "2198591b6c36efd8c3e17e2376aa1a37f307f4b1ac1be5c68dba4844a3ec1252",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_005_of_012/results.csv": "a9357aead493d8333329ad0b7a8a08f46507a33c30413adf9e76720d3686e5d8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_006_of_012/results.csv": "1e044a6ce431a3bc541d99683d51762e813591a20845d452ddf605e19c2a2b22",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_007_of_012/results.csv": "62b48121d4dedf2971c1d70f306ce859067251702ffd26557d69fdc7e1012612",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_008_of_012/results.csv": "11bbc30046b932fc54e3d382327f878794bb58bfed99db307238f7d3874885a2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_009_of_012/results.csv": "2867c5816ea414d608e170654c80b22d0c10f67412ee705e479dea73c45548a5",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_010_of_012/results.csv": "dd710bce5b1f4c789b95c862a8cab93e171d1bcebf96d2d18f27dd3b97db655b",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/diffbindfr/posebusters_benchmark/repeat_2/shard_011_of_012/results.csv": "04ee49a857a2c971878a9a21b0d4b92e8838c295135c6a5eff54b35d3f6c0e2a",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_000_of_012/results.csv": "4c64a49cfa36db33699c2eb657be0847b0d110bef71c9a4ad7df6bc8c39f75b0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_001_of_012/results.csv": "d3b0686e4970d5a0a61a9253b08fa7c8c6409f03b9307fbaf068588076377c76",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_002_of_012/results.csv": "524ae6d9978cca9684e65607919f8e296fe33ffabc17d246faef9e46db489197",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_003_of_012/results.csv": "998031490e9c7501fc14ccae78e2c19830bbcb77f1188bf5e1ede7406397ba13",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_004_of_012/results.csv": "474a2690050759982183aef8dd2d94d63245b46a1df1e279e91d56c70edb6333",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_005_of_012/results.csv": "7b992840976cb772e9ea2a6e4e5ef3121af67739df913dfd1cd6045d86462d61",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_006_of_012/results.csv": "a10208a7f751613d6ea5542da44256818286f4fb9f9ec62caa6b6c8317e53591",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_007_of_012/results.csv": "cbbe6fc5216667d0446a1c97acaf1c01561f361eb049e8b4f2c6690fa2505006",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_008_of_012/results.csv": "aaedcac140ece9b1ec7eeb7851240432e5feac21cd8f92829f645193d11ab91f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_009_of_012/results.csv": "da1950da9ce875fca51594ec11c87a38074bc4dd8717a24bd5db4e471a12f094",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_010_of_012/results.csv": "0258d0a0cdb47b7e236b8b283942e355ad244869f557ff44fc280508bc533699",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_0/shard_011_of_012/results.csv": "497424bed20a496c1fe68bb3badf6409e4f34d45628c2118ae428daf3711bfeb",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_000_of_012/results.csv": "a20972224b2dd2211df8ee282781b60afcb9d5002924e7c563c1c503332934d0",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_001_of_012/results.csv": "016886896b78f62c8e7a89a7402c345ab913bf87859ef3a1595b47b5314e26fa",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_002_of_012/results.csv": "72fdbddfe140068d1d3b4c1e5076517eaed7df47c58e77bae413c6f21a4fa3d2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_003_of_012/results.csv": "66b0f9e9d8348ade4fdd3a63b23d544669928171a2e293d9cb64ed1840c0ea15",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_004_of_012/results.csv": "aaf4d86c5c4e32774eeab2b326ab9cb75e77f1b817cb43eb5e5b27f47008c105",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_005_of_012/results.csv": "fd094c70dc0193815cb2e80a6f807110bbdb7e8d5a860b3d4b62548e1c4c413f",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_006_of_012/results.csv": "764fc2f30ce261e338940725ba317f3283dd96fe6b4d4938dd3bfa0911e556ca",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_007_of_012/results.csv": "77a73bc3f4503e31a39d0afe6fc6d910d7ef51fdb620cdb0a42a2804470a0849",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_008_of_012/results.csv": "e215b74efe19c54fdc4bc99584f5ca9e690b87830240e169f22eba07fede2529",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_009_of_012/results.csv": "3fa6c1db14a13477e9eccef6030f37a70e733d6d2c130c5527b5f5dbb1810cc8",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_010_of_012/results.csv": "05fbf60a0540532436b01a1f58c9947e145b5dfefcc384b4b3976cd36e43999e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_1/shard_011_of_012/results.csv": "708fa1a7d3ac0e85d42f900db1daf042902ed309ae1f093261bfa78910a4445e",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_000_of_012/results.csv": "1931057d480b67d75de67ba9b6fd98f3757338bc2efbbce1b43d52efaec753a2",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_001_of_012/results.csv": "68f2444575630fb5588422643005ea141ab7c73959f9bd4cd2f1e43b3991aadd",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_002_of_012/results.csv": "d405ec099a7a670ba4ff6a2c64cda00aab73e2d1863cd21419b05778a7a9f936",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_003_of_012/results.csv": "a350d81400c302fa4fc88f11db9925655e39145428e2ff2c041d8eb84ac9c187",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_004_of_012/results.csv": "812e66a5caf28477eaf04666a0d3baede9f9671b30b1260411f486a5cc30abf3",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_005_of_012/results.csv": "54f304e79cac226a3125093368e46021058e40cf3e9a0547fe1311fefabfdb22",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_006_of_012/results.csv": "dd043d61131ff2cbff4f5621b0d068717fd44ef68f44fcf777921c09bdd00786",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_007_of_012/results.csv": "80fc0dcd3c6acafa21f85e0b7e8bae59b0c66e974ecb8269f3a7859743eac373",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_008_of_012/results.csv": "dd7ce7d4e88b8382920167930a9503aaea6a33d8a33f453d6e5e05bcaa6bcab9",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_009_of_012/results.csv": "e54d077d3c4b41749db69466215ba50d5a20bca62e6109fdfd327c7ca5e0312c",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_010_of_012/results.csv": "6b72ede1f36b6902020239ffe83b4646a2846cf690dcd66237b596efeb54c034",
+    "outputs/benchmarks/external_models/evaluation/official_selected_posebusters_20260901/surfdock_force_opt/posebusters_benchmark/repeat_2/shard_011_of_012/results.csv": "3129fa2f962cdedc279f83400092922b83498677aa020e0d346f313bf5cfa213"
+  },
+  "scope": "Fixed published native-method conditions; three-repeat means paired by complex, not equal budgets or paired random seeds; percentile CIs without multiplicity adjustment."
+}

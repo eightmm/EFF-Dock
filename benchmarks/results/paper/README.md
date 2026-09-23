@@ -1,6 +1,6 @@
 # Numerical source data for the manuscript figures
 
-These files reproduce the current 14 figures in
+These files reproduce the current 20 figures in
 [docs/paper](../../../docs/paper/README.md) using a public checkout, without
 raw structures, checkpoints, private pose banks or cluster directories.
 
@@ -13,7 +13,7 @@ For a figure-only CPU environment, use
 `uv run --locked --only-group dev python -m benchmarks.figures.paper`.
 The development group pins Matplotlib; this form omits the model's CUDA stack.
 
-The renderer produces 14 PDF/PNG pairs with the published names and a
+The renderer produces 20 PDF/PNG pairs with the published names and a
 `source_data.csv` containing the input values in long form. Its columns are
 `json_pointer` and `value_json`: pointers index the named input tables/arrays,
 and JSON scalars retain numbers, strings, booleans and explicit nulls. The
@@ -31,6 +31,7 @@ hierarchical JSON inputs remain the canonical numerical source.
 | S1 | `figure_data.json` → `uncertainty` |
 | S2 | `candidate_metrics.json` |
 | S3 | `figure_data.json` → `complexity_failures` |
+| S4–S9 | `evidence/` JSON and case-level CSV files |
 
 `selected_outcomes.csv` contains 24,984 rows: 2,082 external complexes × three
 seeds × raw/refined × ordinary/chirality-filtered selection. Boolean RMSD/PB
@@ -52,7 +53,7 @@ not required external files for this renderer.
 The renderer verifies input hashes, repeat means/sample SD, cohort/stratum
 counts, cumulative endpoints, failure partitions, training ID hashes and
 witness eligibility. It reconstructs the headline metrics and sequence-bin
-performance from selected-outcome rows. All 14 regenerated PNGs matched the
+performance from selected-outcome rows. At the earlier 14-figure release, all regenerated PNGs matched the
 published images pixel-for-pixel in the pinned environment during release
 verification; PDF bytes can differ through creation metadata.
 
@@ -63,3 +64,12 @@ collector scripts require separately obtained data/pose banks and are not an
 end-to-end raw-data reproduction promise. Fonts/library versions can change
 rendered pixels outside the pinned environment. Use the captions for which
 conditions are main, guided, auxiliary or literature-reported.
+
+The added Figures S4–S9 use [saved-bank evidence](evidence/README.md), with
+[results and interpretation](../../../docs/paper/EVIDENCE.md). Original 14
+figure files and their numerical sources remain unchanged. New source tables
+are supplied alongside `source_data.csv`; that original CSV covers Figures
+1–11 and S1–S3.
+
+The 20-figure extension was also regenerated in the figure-only CPU environment
+on 2026-09-23; all 20 PNGs matched the packaged previews pixel-for-pixel.

@@ -3,7 +3,8 @@
 Working figures and captions for writing the EFF-Dock manuscript. Figure
 numbering and placement may change during writing.
 
-- [Combined PDF](paper_figures.pdf): 14 pages.
+- [Combined PDF](paper_figures.pdf): 20 pages.
+- [New empirical evidence and interpretation](EVIDENCE.md)
 - [Figure captions](FIGURE_CAPTIONS.md): English captions and author notes.
 - [Sequence-relatedness definitions](RELATEDNESS.md)
 - [Prism package](prism/prism_figure_reference.zip): PDFs, equations and LaTeX reference blocks.
@@ -29,11 +30,17 @@ numbering and placement may change during writing.
 | 12 | 보충 S1: 개선량과 95% 신뢰구간 | [PDF](figures/S1_paired_uncertainty.pdf) | [PNG](figures/S1_paired_uncertainty.png) |
 | 13 | 보충 S2: Top-k 요약·near-native 밀도 | [PDF](figures/S2_candidate_ranking.pdf) | [PNG](figures/S2_candidate_ranking.png) |
 | 14 | 보충 S3: 복잡도별 실패 분해 | [PDF](figures/S3_complexity_failures.pdf) | [PNG](figures/S3_complexity_failures.png) |
+| 15 | 보충 S4: Confidence ranking·selection 진단 | [PDF](figures/S4_confidence_diagnostics.pdf) | [PNG](figures/S4_confidence_diagnostics.png) |
+| 16 | 보충 S5: Confidence reliability·후보 밀도 | [PDF](figures/S5_confidence_reliability.pdf) | [PNG](figures/S5_confidence_reliability.png) |
+| 17 | 보충 S6: 서열·리간드 동시 저유사도 subset | [PDF](figures/S6_stringent_subset.pdf) | [PNG](figures/S6_stringent_subset.png) |
+| 18 | 보충 S7: Refinement PB 실패·전이 | [PDF](figures/S7_physical_validity.pdf) | [PNG](figures/S7_physical_validity.png) |
+| 19 | 보충 S8: 성공·refinement rescue·선택 실패 구조 | [PDF](figures/S8_structure_examples.pdf) | [PNG](figures/S8_structure_examples.png) |
+| 20 | 보충 S9: 로컬 baseline과 paired 신뢰구간 | [PDF](figures/S9_baseline_uncertainty.pdf) | [PNG](figures/S9_baseline_uncertainty.png) |
 
-Pages 1–11 are currently main figures; pages 12–14 are supplementary.
+Pages 1–11 are currently main figures; pages 12–20 are supplementary.
 PB-valid success is solid; only RMSD-passing but PB-invalid portions are hatched.
 
-All 14 selected figures can be rendered using the versioned numerical inputs:
+All 20 selected figures can be rendered using the versioned numerical inputs:
 
 ```bash
 uv run python -m benchmarks.figures.paper --check
@@ -43,7 +50,8 @@ uv run python -m benchmarks.figures.paper --output outputs/paper_figures
 The renderer produces PDF/PNG pairs and a long-form source-data CSV. It verifies
 hashes, counts, repeat statistics, outcome joins and training-witness membership.
 This rebuild starts from frozen numerical records; it does not rerun docking,
-PB evaluation, sequence alignment or bootstrap sampling. Historical collection
+PB evaluation, sequence alignment or bootstrap sampling. The six empirical-evidence figures additionally use the
+[evidence tables](../../benchmarks/results/paper/evidence/README.md). Historical collection
 helpers still require separately supplied pose banks. Older drafts and internal
 verification logs remain local.
 

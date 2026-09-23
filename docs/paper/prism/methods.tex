@@ -38,7 +38,7 @@ centroid, $q_f$ a unit quaternion and $\ell_a$ its fixed local coordinate:
 \end{equation}
 The heterogeneous graph contains ligand atoms, fragments, protein atoms and
 residue virtual nodes. Static topology and dynamic protein--ligand contacts
-within $5\,\mathrm{\AA}$ condition six equivariant interaction layers, using
+within $5\,\text{\AA}$ condition six equivariant interaction layers, using
 32 radial basis functions and spherical harmonics through degree two. Hidden
 irreps are $384\times0e+32\times1o+32\times1e+16\times2e+16\times2o$,
 with flattened width 736. Irrep notation alone does not establish full
@@ -122,8 +122,8 @@ Warmup lasts 1,000 updates; cosine decay begins at 40,000 and reaches
 $2\times10^{-6}$ at 50,000. The released docking state is terminal EMA.
 
 \subsection{Sampling and confidence}
-Main sampling uses $N=100$ candidates, $S=10$ steps, $\sigma=2\,\mathrm{\AA}$
-and a $10\,\mathrm{\AA}$ crop. The late-power-three Euler grid and updates are
+Main sampling uses $N=100$ candidates, $S=10$ steps, $\sigma=2\,\text{\AA}$
+and a $10\,\text{\AA}$ crop. The late-power-three Euler grid and updates are
 \begin{align}
  t_j&=1-(1-j/S)^3,\quad j=0,\ldots,S,\\
  T_f^{j+1}&=T_f^j+\Delta t_jv_{\theta,f}(t_j),\qquad
@@ -137,7 +137,7 @@ and attention pooling over global and contact features. It predicts log-one-plus
 RMSD $\widehat y_k$, pose-success logit $z_k$, atom log displacement
 $\widehat y_{ka}$ and atom-success logit $z_{ka}$. Atom and pose regression
 use Huber loss with transition one; classification uses BCE with logits and
-strict $2\,\mathrm{\AA}$ labels. Let $y_k=\log(1+r_k)$:
+strict $2\,\text{\AA}$ labels. Let $y_k=\log(1+r_k)$:
 \begin{align}
  L_{\rm rank}&=\underset{y_j-y_i>0.3}{\operatorname{mean}}
  \max(0,0.05-(\widehat y_j-\widehat y_i)),\\
@@ -227,15 +227,15 @@ fragment mass $M_f$, centre of mass $C_f$, centroid $T_f$ and $r_a=x_a-C_f$,
 \end{align}
 Independent per-pose backtracking tries $\alpha=0.5^b$, $b=0,\ldots,12$,
 accepting finite energy no greater than
-$E+10^{-10}\max(1,|E|)$. Each step is capped at $0.10\,\mathrm{\AA}$
-translation, five degrees rotation and $0.10\,\mathrm{\AA}$ actual atom
+$E+10^{-10}\max(1,|E|)$. Each step is capped at $0.10\,\text{\AA}$
+translation, five degrees rotation and $0.10\,\text{\AA}$ actual atom
 movement. At most 100 iterations are run. Stop after 20 consecutive accepted
-steps with maximum atom movement below $10^{-5}\,\mathrm{\AA}$, or, from
+steps with maximum atom movement below $10^{-5}\,\text{\AA}$, or, from
 iteration 25, five consecutive steps with energy decrease at most
-$0.02+0.001\max(1,|E|)$. External runs use an $18\,\mathrm{\AA}$ receptor
-shell, $8\,\mathrm{\AA}$ physical cutoff and $10\,\mathrm{\AA}$ maximum
+$0.02+0.001\max(1,|E|)$. External runs use an $18\,\text{\AA}$ receptor
+shell, $8\,\text{\AA}$ physical cutoff and $10\,\text{\AA}$ maximum
 interaction cutoff. Training-bank refinement instead used displacement
-threshold $0.01\,\mathrm{\AA}$ with patience five. Failed line searches retain
+threshold $0.01\,\text{\AA}$ with patience five. Failed line searches retain
 the last accepted pose and an explicit status.
 
 \subsection{Guided-sampling diagnostics}
@@ -250,12 +250,12 @@ $\operatorname{RMS}(U)=\sqrt{A^{-1}\sum_a\|U_a\|^2}$. Before capping,
  \bar r_j=\frac{1}{\Delta t_j}\int_{t_j}^{t_{j+1}}\max(0,2t-1)\,dt.
 \end{equation}
 Here $(V,\Omega)$ projects energy forces capped at atom norm 20. The physical
-LJ softcore decreases from 1.5 to $0.75\,\mathrm{\AA}$ over the active
+LJ softcore decreases from 1.5 to $0.75\,\text{\AA}$ over the active
 half-interval, evaluated at the active interval midpoint. The drift vanishes
 when either RMS is at most $10^{-8}$ or the direction is nonfinite.
 One scale per pose enforces added translation/angular velocity limits of
 5 and 5 per unit flow time, and an estimated atom-displacement bound of
-$0.25\,\mathrm{\AA}$. The sampler adds the drift to the learned field before
+$0.25\,\text{\AA}$. The sampler adds the drift to the learned field before
 its Euler update. Chemical-constraint drift is zero. This is separate from
 the subsequent energy-based refinement.
 
@@ -270,8 +270,8 @@ reference RMSD, PB test or E/Z criterion.
 For $M$ complexes, selected index $k_i^*$, RMSD $r_{ik}$ and official
 selected-pose PB validity $b_{ik}$,
 \begin{equation}
- \mathrm{SR}=\frac{100}{M}\sum_i\mathbf1[r_{i,k_i^*}<2\,\mathrm{\AA}],\quad
- \mathrm{SR}_{\rm PB}=\frac{100}{M}\sum_i\mathbf1[r_{i,k_i^*}<2\,\mathrm{\AA}]b_{i,k_i^*}.
+ \mathrm{SR}=\frac{100}{M}\sum_i\mathbf1[r_{i,k_i^*}<2\,\text{\AA}],\quad
+ \mathrm{SR}_{\rm PB}=\frac{100}{M}\sum_i\mathbf1[r_{i,k_i^*}<2\,\text{\AA}]b_{i,k_i^*}.
 \end{equation}
 RMSD uses symmetry-aware no-alignment heavy-atom CalcRMS. Solid bars show
 $\mathrm{SR}_{\rm PB}$; hatched extensions show $\mathrm{SR}-\mathrm{SR}_{\rm PB}$.

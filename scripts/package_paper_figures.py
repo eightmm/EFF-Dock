@@ -33,9 +33,9 @@ def pdf_text(path):
 def sources(metadata):
     rows = metadata["figures"]
     paths = [ROOT / row["source"] for row in rows]
-    assert len(paths) == len(set(paths)) == 14
-    assert [row["page"] for row in rows] == list(range(1, 15))
-    assert len({row["latex_label"] for row in rows}) == 14
+    assert len(paths) == len(set(paths)) and len(paths) > 0
+    assert [row["page"] for row in rows] == list(range(1, len(rows) + 1))
+    assert len({row["latex_label"] for row in rows}) == len(rows)
     for path in paths:
         assert path.is_relative_to(BASE / "figures")
         info = subprocess.check_output(["pdfinfo", str(path)], text=True)
@@ -66,7 +66,7 @@ def bundle_manifest(metadata):
 def write_bundle(metadata):
     target = PRISM / "prism_figure_reference.zip"
     temporary = target.with_suffix(".build.zip")
-    readme = """# Manuscript figure reference
+    readme = f"""# Manuscript figure reference
 
 Working materials for writing the EFF-Dock manuscript, not a published paper.
 
@@ -74,7 +74,7 @@ Working materials for writing the EFF-Dock manuscript, not a published paper.
 - [English captions and author notes](FIGURE_CAPTIONS.md)
 - `methods.tex`: editable equations and current methods.
 - `main.tex` and `figure_captions.tex`: reference LaTeX document and figure blocks.
-- `figures/`: 14 individual PDFs in manuscript page order.
+- `figures/`: {len(metadata["figures"])} individual PDFs in manuscript page order.
 - `captions.json`: file, caption, label and checksum mapping. The
   `repository_numerical_inputs` entries refer to the GitHub source checkout.
 
@@ -86,7 +86,8 @@ the repository methods and parameter tables provide implementation detail.
         archive.writestr("README.md", readme)
         archive.writestr("FIGURE_CAPTIONS.md", bundle_captions(metadata))
         archive.writestr(
-            "captions.json", json.dumps(bundle_manifest(metadata), ensure_ascii=False, indent=2) + "\n"
+            "captions.json",
+            json.dumps(bundle_manifest(metadata), ensure_ascii=False, indent=2) + "\n",
         )
         for name in ("main.tex", "figure_captions.tex", "methods.tex"):
             archive.write(PRISM / name, name)
@@ -128,7 +129,9 @@ def verify(metadata):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--check", action="store_true", help="Verify existing files without rewriting")
+    mode.add_argument(
+        "--check", action="store_true", help="Verify existing files without rewriting"
+    )
     mode.add_argument("--bundle-only", action="store_true", help="Refresh ZIP without merging PDFs")
     args = parser.parse_args()
     required = ["pdfinfo", "pdftotext"]
@@ -151,14 +154,18 @@ def main():
                 row["sha256"] = digest(path)
             MANIFEST.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
             caption_path = BASE / "FIGURE_CAPTIONS.md"
-            caption_path.write_text(re.sub(
-                r"PDF SHA-256: `[0-9a-f]{64}`",
-                f"PDF SHA-256: `{metadata['pdf_sha256']}`",
-                caption_path.read_text(),
-            ))
+            caption_path.write_text(
+                re.sub(
+                    r"PDF SHA-256: `[0-9a-f]{64}`",
+                    f"PDF SHA-256: `{metadata['pdf_sha256']}`",
+                    caption_path.read_text(),
+                )
+            )
         write_bundle(metadata)
     verify(metadata)
-    print("Verified 14 source PDFs, merged page order, captions, methods, manifest and Prism ZIP")
+    print(
+        f"Verified {len(paths)} source PDFs, merged page order, captions, methods, manifest and Prism ZIP"
+    )
 
 
 if __name__ == "__main__":

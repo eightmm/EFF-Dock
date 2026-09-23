@@ -114,3 +114,51 @@
 \caption{\textbf{Descriptive failure decomposition across ligand-complexity strata.} Rows stratify refined, chirality-filtered results by (A) heavy-atom count, (B) strict rotatable-bond count, and (C) saved rigid-fragment count for the five external benchmarks. Each complex belongs to one of four mutually exclusive categories: no refined candidate with RMSD $<$2 Å; an RMSD-successful candidate exists but the selected pose fails the threshold; the selected pose passes RMSD but fails PoseBusters; or the selected pose passes both. Bars show mean fractions over three repeats, using all complexes within each stratum. If O, T, and J denote RMSD oracle coverage, selected Top-1 RMSD success, and selected RMSD-plus-PB success, respectively, the four fractions are 100$-$O, O$-$T, T$-$J, and J. Thus this is a decomposition of the complexity-performance results, not an independent causal experiment. Generation failure refers to the refined bank and does not isolate the sampler from refinement effects; selection failure includes chirality-mask exclusions. Labels give complex counts, and dashes denote empty bins.}
 \label{fig:paper-s3}
 \end{figure}
+
+% PDF page 15 / Figure S4
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth,height=0.57\textheight,keepaspectratio]{figures/page_15.pdf}
+\caption{\textbf{Confidence ranking and remaining selection loss.} (A) Within-complex Spearman correlation between predicted and symmetry-aware observed RMSD for the 100 raw or refined candidates. (B) Refined-bank AUROC and average precision for strict RMSD $<$2 Å labels, ranked by negative predicted RMSD. Each complex receives equal weight; single-class banks are excluded from both binary metrics. Eligible complex counts for the three repeats are 83/82/82 (Astex Diverse Set), 291/289/290 (PoseBusters v2), 183/181/185 (PhiBench), 513/509/511 (FoldBench), and 818/812/808 (OpenBind). (C) Median selected-minus-oracle RMSD regret within each repeat. (D) Selected Top-1 success conditional on the bank containing at least one near-native candidate. C and D use the primary chirality-filtered selector, so their loss includes mask exclusions. Bars show repeat means and error bars the sample SD across three repeats. The full cohorts contain 85, 308, 206, 558 and 925 complexes, respectively. Binary discrimination and final pose selection are different endpoints; a high AUROC does not imply reliable Top-1 selection.}
+\label{fig:paper-s4}
+\end{figure}
+
+% PDF page 16 / Figure S5
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth,height=0.57\textheight,keepaspectratio]{figures/page_16.pdf}
+\caption{\textbf{Reliability of saved confidence predictions and candidate-density dependence.} (A) Empirical near-native fraction versus the saved success-head probability, using ten equal-width probability bins. (B) Mean observed RMSD versus mean predicted RMSD in fixed bins [0,1), [1,2), [2,3), [3,4), [4,6), [6,10), and [10,infinity). Dashed diagonals denote agreement. A and B pool all unfiltered refined candidates from three repeats; empty bins are omitted and each point represents a bin mean. No probability recalibration or threshold fitting was performed. Candidate observations within complexes are correlated, so no independent-candidate confidence intervals are shown. (C) Primary chirality-filtered Top-1 success versus the number of near-native refined candidates among 100, in fixed bins 0, 1–5, 6–20, 21–50, and 51–100. Points and dark error bars are repeat means and sample SD; empty repeat strata are omitted from that aggregate. Bin counts and eligible repeats are supplied in the source data. These are descriptive reliability and density associations, not evidence that the auxiliary probability head is the production selector; production selection uses predicted RMSD.}
+\label{fig:paper-s5}
+\end{figure}
+
+% PDF page 17 / Figure S6
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth,height=0.57\textheight,keepaspectratio]{figures/page_17.pdf}
+\caption{\textbf{Performance under simultaneous sequence and ligand relatedness restrictions.} Each benchmark compares its full cohort with a fixed stringent subset: maximum observed training-relative binding-chain sequence identity $<$30\%, maximum Morgan fingerprint Tanimoto similarity $<$0.5, and no observed exact training-ligand match. All conditions must hold for the same complex. Sequence identity retains the query-normalized definition and reference-eligibility limitations described for Figure 9. Surviving counts are 2/85, 4/308, 7/206, 9/558 and 0/925 for Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind, respectively. Refined primary Top-1 success is split into PB-valid solid segments and RMSD-successful but PB-invalid hatched extensions; diamonds indicate the full-bank RMSD oracle. Bars and points show means over three repeats with sample SD. OpenBind has no eligible complex and no imputed performance. Thresholds were not relaxed after observing these counts. Small retained cohorts preclude a strong generalization claim; this is a descriptive restriction of previously evaluated benchmarks, not a newly held-out test or an audit of all precursor training exposure.}
+\label{fig:paper-s6}
+\end{figure}
+
+% PDF page 18 / Figure S7
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth,height=0.57\textheight,keepaspectratio]{figures/page_18.pdf}
+\caption{\textbf{Physical-validity failures before and after refinement.} (A,B) Failure percentages among primary chirality-filtered selected poses in raw and refined banks. Each stage may select a different candidate; these panels describe the complete pipeline, not a fixed-pose intervention. (C,D) Fail-to-pass and pass-to-fail percentages among candidate indices for which saved official PoseBusters evaluations exist at both stages, deduplicating identical ordinary and chirality-filtered selections. These matched subsets contain 40/26/29, 112/93/111, 78/75/70, 183/183/188 and 483/446/432 candidate pairs across three repeats for Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind, respectively. Values are means of repeat-specific percentages, with all evaluated pairs as the denominator, not just initially failing or passing pairs. A grouped check fails if any constituent check fails. Bond geometry combines bond length and angle checks; receptor clash combines protein minimum-distance and volume-overlap checks; stereochemistry combines tetrahedral and double-bond checks; ring planarity combines aromatic-ring and double-bond flatness checks. All PB checks combines all 27 non-RMSD checks, including those not displayed separately. The common color scale is 0–50\%. Categories overlap and do not sum to 100\%. The matched subset is selection-biased and cannot establish full-bank repair rates. This figure reports PB validity irrespective of RMSD success.}
+\label{fig:paper-s7}
+\end{figure}
+
+% PDF page 19 / Figure S8
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth,height=0.57\textheight,keepaspectratio]{figures/page_19.pdf}
+\caption{\textbf{Receptor-frame examples of success, refinement rescue and selection failure.} Illustrative Astex Diverse Set cases from repeat 0. Crystal ligands are green, selected refined poses blue, comparator poses orange, and nearby protein C$\alpha$ traces grey. All poses retain the original receptor frame; one common rigid viewing transformation is applied per panel without independent ligand alignment. (A) 1OWE, the lower-median selected RMSD among 66 PB-valid successes (0.80 Å). (B) 1HVY, the sole eligible same-candidate RMSD rescue among this repeat's refined primary selections: 2.32 Å before refinement and 1.98 Å after refinement, with the final selected pose PB-valid. This small threshold crossing is illustrative, not evidence of a typical large rescue. (C) 1TZ8, the lower-median regret among 14 selection failures with a near-native candidate available: selected RMSD 2.27 Å versus oracle RMSD 0.65 Å. Medians and ID tie breaking were specified before inspecting the structures. Protein traces provide spatial context and are not contact or interaction assignments.}
+\label{fig:paper-s8}
+\end{figure}
+
+% PDF page 20 / Figure S9
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth,height=0.57\textheight,keepaspectratio]{figures/page_20.pdf}
+\caption{\textbf{Paired uncertainty relative to locally executed baselines.} (A) Astex Diverse Set (n=85) and (B) PoseBusters v2 (n=308). Points show EFF-Dock minus baseline success-rate differences in percentage points for RMSD $<$2 Å and same-selected-pose RMSD-plus-PB success. Each complex contributes the difference between method-specific three-repeat means. Horizontal intervals are percentile 95\% paired bootstrap intervals from 2,000 resamples (seed 20260923), resampling exact PDB-accession groups and preserving complex-weighted means. Every retained complex has a distinct PDB accession in these two cohorts, so PDB-group and complex resampling coincide; this does not account for protein-family dependence. EFF-Dock uses the primary refined chirality-filtered protocol. The five locally run baselines retain the native budgets and selectors of Figure 1; SurfDock uses its force-optimized variant. Literature-only rows are excluded. Positive differences favor EFF-Dock. Intervals are descriptive, unadjusted for multiple comparisons, and conditional on the three available repeats; they do not establish equal-compute superiority.}
+\label{fig:paper-s9}
+\end{figure}

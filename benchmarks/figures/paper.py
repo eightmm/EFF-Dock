@@ -1207,6 +1207,9 @@ def main():
         )
     }
     validate(data, bundle)
+    from benchmarks.analysis.verify_evidence import verify
+
+    verify()
     if args.check:
         print(
             "Verified figure inputs, repeat statistics, 24,984 outcomes, 3,158 relatedness records and training memberships"
@@ -1237,8 +1240,11 @@ def main():
             }
         ):
             render(*arguments, args.output)
+    from benchmarks.figures.evidence import render as render_evidence
+
+    render_evidence(args.output)
     export_csv(dict(bundle, **data), args.output / "source_data.csv")
-    print(f"Rendered 14 figures (PDF/PNG) and source_data.csv in {args.output}")
+    print(f"Rendered 20 figures (PDF/PNG) and source_data.csv in {args.output}")
 
 
 if __name__ == "__main__":

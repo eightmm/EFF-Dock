@@ -1,14 +1,14 @@
 # Current manuscript figure captions — Prism reference
 
-현재 **14페이지 PDF** 기준: 본문용 Figure 1–11, 보충 Figure S1–S3. 최종 논문 번호는 편집 시 변경 가능하다. 각 영문 캡션은 복사해서 사용할 수 있으며, 한국어 메모는 저자 참고용이다.
+현재 **20페이지 PDF** 기준: 본문용 Figure 1–11, 보충 Figure S1–S9. 최종 논문 번호는 편집 시 변경 가능하다. 각 영문 캡션은 복사해서 사용할 수 있으며, 한국어 메모는 저자 참고용이다.
 
-PDF SHA-256: `478cbb4a0e865c34c9f63b89735ad0713b2306a21546a6ff4cdc3a8467bf528a`
+PDF SHA-256: `11b64abec8cdba1c069b7c8b833234c2a12f84248c3990a04eff1f962c157460`
 
 ## 공통 Methods 메모
 
 - RMSD는 symmetry-aware, no-alignment RMSD <2 Å 기준이다. 주어진 포켓 조건 평가이며 blind docking으로 기술하지 않는다.
 - 주 분석은 unguided N100/S10 및 세 반복이다. 그림6의 예산/guidance 변형, 그림8의 guided robustness, 그림1의 외부 모델·문헌 조건은 별도다.
-- 기본 오차막대는 같은 complex 집합에서 세 생성 반복의 sample SD다. Figure S1만 paired bootstrap 95% CI다.
+- 기본 오차막대는 같은 complex 집합에서 세 생성 반복의 sample SD다. Figure S1과 S9는 paired bootstrap 95% CI이며, S5 A/B는 pooled reliability, S7은 반복 평균, S8은 사례 그림이다.
 - PhiBench 복구 3건, OpenBind의 단일 protease·quality/covalent flags, FoldBench PB 3개 shard의 InChI 호환성 처리는 데이터/평가 Methods에 유지한다.
 - 학습 관련성은 실행된 docking train 47,277개 기준이다. 모든 선행 pretraining 노출의 합집합 감사라고 주장하지 않는다.
 - Figure1 GOLD/Vina 문헌값 인용: https://doi.org/10.1039/D3SC04185A 및 https://zenodo.org/records/8278563 . Bibliography의 실제 cite key로 연결한다.
@@ -153,3 +153,63 @@ Rows stratify refined, chirality-filtered results by (A) heavy-atom count, (B) s
 - 원본: [S3_complexity_failures.pdf](figures/S3_complexity_failures.pdf)
 - LaTeX label: `fig:paper-s3`
 - 저자 메모: 네 범주는 같은 결과의 대수적 분해이며 독립 원인 검증이 아니다. Full-bank PB oracle는 계산하지 않았다.
+
+## PDF page 15 · Figure S4
+
+**Confidence ranking and remaining selection loss.**
+
+(A) Within-complex Spearman correlation between predicted and symmetry-aware observed RMSD for the 100 raw or refined candidates. (B) Refined-bank AUROC and average precision for strict RMSD <2 Å labels, ranked by negative predicted RMSD. Each complex receives equal weight; single-class banks are excluded from both binary metrics. Eligible complex counts for the three repeats are 83/82/82 (Astex Diverse Set), 291/289/290 (PoseBusters v2), 183/181/185 (PhiBench), 513/509/511 (FoldBench), and 818/812/808 (OpenBind). (C) Median selected-minus-oracle RMSD regret within each repeat. (D) Selected Top-1 success conditional on the bank containing at least one near-native candidate. C and D use the primary chirality-filtered selector, so their loss includes mask exclusions. Bars show repeat means and error bars the sample SD across three repeats. The full cohorts contain 85, 308, 206, 558 and 925 complexes, respectively. Binary discrimination and final pose selection are different endpoints; a high AUROC does not imply reliable Top-1 selection.
+
+- 원본: [S4_confidence_diagnostics.pdf](figures/S4_confidence_diagnostics.pdf)
+- LaTeX label: `fig:paper-s4`
+- 저자 메모: AUROC/AP는 양·음성 후보가 모두 있는 complex만 집계. 높은 AUROC와 선택 손실이 함께 존재한다.
+
+## PDF page 16 · Figure S5
+
+**Reliability of saved confidence predictions and candidate-density dependence.**
+
+(A) Empirical near-native fraction versus the saved success-head probability, using ten equal-width probability bins. (B) Mean observed RMSD versus mean predicted RMSD in fixed bins [0,1), [1,2), [2,3), [3,4), [4,6), [6,10), and [10,infinity). Dashed diagonals denote agreement. A and B pool all unfiltered refined candidates from three repeats; empty bins are omitted and each point represents a bin mean. No probability recalibration or threshold fitting was performed. Candidate observations within complexes are correlated, so no independent-candidate confidence intervals are shown. (C) Primary chirality-filtered Top-1 success versus the number of near-native refined candidates among 100, in fixed bins 0, 1–5, 6–20, 21–50, and 51–100. Points and dark error bars are repeat means and sample SD; empty repeat strata are omitted from that aggregate. Bin counts and eligible repeats are supplied in the source data. These are descriptive reliability and density associations, not evidence that the auxiliary probability head is the production selector; production selection uses predicted RMSD.
+
+- 원본: [S5_confidence_reliability.pdf](figures/S5_confidence_reliability.pdf)
+- LaTeX label: `fig:paper-s5`
+- 저자 메모: 확률 head를 새로 fitting하지 않았다. OpenBind의 낮은 Brier는 클래스 불균형 영향도 있으므로 calibration 우수성으로 단정하지 않는다.
+
+## PDF page 17 · Figure S6
+
+**Performance under simultaneous sequence and ligand relatedness restrictions.**
+
+Each benchmark compares its full cohort with a fixed stringent subset: maximum observed training-relative binding-chain sequence identity <30%, maximum Morgan fingerprint Tanimoto similarity <0.5, and no observed exact training-ligand match. All conditions must hold for the same complex. Sequence identity retains the query-normalized definition and reference-eligibility limitations described for Figure 9. Surviving counts are 2/85, 4/308, 7/206, 9/558 and 0/925 for Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind, respectively. Refined primary Top-1 success is split into PB-valid solid segments and RMSD-successful but PB-invalid hatched extensions; diamonds indicate the full-bank RMSD oracle. Bars and points show means over three repeats with sample SD. OpenBind has no eligible complex and no imputed performance. Thresholds were not relaxed after observing these counts. Small retained cohorts preclude a strong generalization claim; this is a descriptive restriction of previously evaluated benchmarks, not a newly held-out test or an audit of all precursor training exposure.
+
+- 원본: [S6_stringent_subset.pdf](figures/S6_stringent_subset.pdf)
+- LaTeX label: `fig:paper-s6`
+- 저자 메모: 남는 표본이 총 22개뿐이다. 성능 증명보다 엄격한 비교의 표본 한계를 보고하는 SI로 사용.
+
+## PDF page 18 · Figure S7
+
+**Physical-validity failures before and after refinement.**
+
+(A,B) Failure percentages among primary chirality-filtered selected poses in raw and refined banks. Each stage may select a different candidate; these panels describe the complete pipeline, not a fixed-pose intervention. (C,D) Fail-to-pass and pass-to-fail percentages among candidate indices for which saved official PoseBusters evaluations exist at both stages, deduplicating identical ordinary and chirality-filtered selections. These matched subsets contain 40/26/29, 112/93/111, 78/75/70, 183/183/188 and 483/446/432 candidate pairs across three repeats for Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind, respectively. Values are means of repeat-specific percentages, with all evaluated pairs as the denominator, not just initially failing or passing pairs. A grouped check fails if any constituent check fails. Bond geometry combines bond length and angle checks; receptor clash combines protein minimum-distance and volume-overlap checks; stereochemistry combines tetrahedral and double-bond checks; ring planarity combines aromatic-ring and double-bond flatness checks. All PB checks combines all 27 non-RMSD checks, including those not displayed separately. The common color scale is 0–50%. Categories overlap and do not sum to 100%. The matched subset is selection-biased and cannot establish full-bank repair rates. This figure reports PB validity irrespective of RMSD success.
+
+- 원본: [S7_physical_validity.pdf](figures/S7_physical_validity.pdf)
+- LaTeX label: `fig:paper-s7`
+- 저자 메모: 동일 complex의 재선택과 동일 pose의 refinement를 분리. full-bank PB 평가로 오해하지 않도록 한다.
+
+## PDF page 19 · Figure S8
+
+**Receptor-frame examples of success, refinement rescue and selection failure.**
+
+Illustrative Astex Diverse Set cases from repeat 0. Crystal ligands are green, selected refined poses blue, comparator poses orange, and nearby protein Cα traces grey. All poses retain the original receptor frame; one common rigid viewing transformation is applied per panel without independent ligand alignment. (A) 1OWE, the lower-median selected RMSD among 66 PB-valid successes (0.80 Å). (B) 1HVY, the sole eligible same-candidate RMSD rescue among this repeat's refined primary selections: 2.32 Å before refinement and 1.98 Å after refinement, with the final selected pose PB-valid. This small threshold crossing is illustrative, not evidence of a typical large rescue. (C) 1TZ8, the lower-median regret among 14 selection failures with a near-native candidate available: selected RMSD 2.27 Å versus oracle RMSD 0.65 Å. Medians and ID tie breaking were specified before inspecting the structures. Protein traces provide spatial context and are not contact or interaction assignments.
+
+- 원본: [S8_structure_examples.pdf](figures/S8_structure_examples.pdf)
+- LaTeX label: `fig:paper-s8`
+- 저자 메모: 시각적으로 가장 좋은 사례를 고르지 않았다. Rescue는 해당 정의에서 1건뿐이며 2 Å 경계 부근의 작은 변화이다.
+
+## PDF page 20 · Figure S9
+
+**Paired uncertainty relative to locally executed baselines.**
+
+(A) Astex Diverse Set (n=85) and (B) PoseBusters v2 (n=308). Points show EFF-Dock minus baseline success-rate differences in percentage points for RMSD <2 Å and same-selected-pose RMSD-plus-PB success. Each complex contributes the difference between method-specific three-repeat means. Horizontal intervals are percentile 95% paired bootstrap intervals from 2,000 resamples (seed 20260923), resampling exact PDB-accession groups and preserving complex-weighted means. Every retained complex has a distinct PDB accession in these two cohorts, so PDB-group and complex resampling coincide; this does not account for protein-family dependence. EFF-Dock uses the primary refined chirality-filtered protocol. The five locally run baselines retain the native budgets and selectors of Figure 1; SurfDock uses its force-optimized variant. Literature-only rows are excluded. Positive differences favor EFF-Dock. Intervals are descriptive, unadjusted for multiple comparisons, and conditional on the three available repeats; they do not establish equal-compute superiority.
+
+- 원본: [S9_baseline_uncertainty.pdf](figures/S9_baseline_uncertainty.pdf)
+- LaTeX label: `fig:paper-s9`
+- 저자 메모: 음수·0을 포함하는 CI도 모두 유지. Exact PDB가 모두 달라서 여기서는 complex/PDB bootstrap이 같다.

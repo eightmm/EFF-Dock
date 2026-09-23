@@ -1,0 +1,68 @@
+{
+  "models": [
+    {
+      "name": "Docking",
+      "parameters": 5719970,
+      "checkpoint": "weights/effdock_docking_early_time_t0p10_50k.pt",
+      "sha256": "65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6"
+    },
+    {
+      "name": "Confidence",
+      "parameters": 9403274,
+      "checkpoint": "weights/effdock_confidence_s50_raw_refined_u70k.pt",
+      "sha256": "ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638"
+    }
+  ],
+  "throughput": [
+    {
+      "dataset": "foldbench",
+      "seconds_per_complex": 103.92476421809982,
+      "repeat_sd_seconds": 0.34572481772744607,
+      "amortized_poses_per_second": 0.9622345622082606,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ]
+    },
+    {
+      "dataset": "openbind",
+      "seconds_per_complex": 107.24775779793147,
+      "repeat_sd_seconds": 1.7703458915352726,
+      "amortized_poses_per_second": 0.932420425874197,
+      "devices": [
+        "NVIDIA H100 PCIe",
+        "NVIDIA RTX 6000 Ada Generation"
+      ]
+    },
+    {
+      "dataset": "phibench",
+      "seconds_per_complex": 115.80103984625049,
+      "repeat_sd_seconds": 11.606042259724077,
+      "amortized_poses_per_second": 0.8635501039780852,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ]
+    },
+    {
+      "dataset": "astex",
+      "seconds_per_complex": 103.91453519431879,
+      "repeat_sd_seconds": 0.36884370549562123,
+      "amortized_poses_per_second": 0.9623292815870401,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ]
+    },
+    {
+      "dataset": "posebusters",
+      "seconds_per_complex": 103.67037539044999,
+      "repeat_sd_seconds": 1.0232616276097957,
+      "amortized_poses_per_second": 0.9645957162147201,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation"
+      ]
+    }
+  ],
+  "timing_sha256": "853e0409010c83087ceb6a0eedd2e8d71ab219fdecd4d0e9b6b54f78fe37e878",
+  "training_wall_time_seconds": null,
+  "training_wall_time_note": "A complete, interruption-aware wall-time ledger for all precursor and fine-tuning runs was not audited. Step counts are not elapsed training time.",
+  "throughput_note": "Inverse of existing mean per-complex pipeline time, multiplied by 100 poses. Includes sampling, refinement and confidence evaluation of both banks; excludes separate official PB assessment. Not a measured saturated service throughput or a new timing experiment."
+}

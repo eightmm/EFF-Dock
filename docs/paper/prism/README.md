@@ -1,6 +1,6 @@
 # Prism manuscript reference package
 
-[Download the ZIP](prism_figure_reference.zip) for the combined 14-page figure
+[Download the ZIP](prism_figure_reference.zip) for the combined 20-page figure
 PDF, individual PDFs, English captions, source mapping and editable LaTeX.
 `methods.tex` contains the current model, loss, refinement, selection and
 relatedness equations. `main.tex` includes the methods followed by
@@ -21,7 +21,7 @@ The manifest's numerical inputs refer to the repository; they are not required
 to compile the figure/methods ZIP. These files are manuscript working materials.
 
 The assembled ZIP compiled successfully with Tectonic 0.17.0 (XeTeX) on
-2026-09-22, including all methods and figure blocks, with no TeX warnings.
+2026-09-23, including all methods and figure blocks, with no TeX warnings.
 The font files are resolved from the TeX distribution rather than a
 system-installed font family. LuaLaTeX and the Prism upload interface were
 not separately exercised.
