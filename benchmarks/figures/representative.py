@@ -19,6 +19,14 @@ from benchmarks.figures.trajectory import COLORS, DATA, ROOT, scene, verify
 
 NAME = "Fig1_representative"
 POSE_INDEX = 10
+FLOW_INDICES = (0, 2, 4, 10)
+REFINEMENT_STEPS = (0, 25, 50, 100)
+EXTRA_VIEWS = {
+    "supplied_pocket": None,
+    "refined_endpoint": 100,
+    "refined_step_025": 25,
+    "refined_step_050": 50,
+}
 DARK = "#3E434A"
 MUTED = "#7B838D"
 CONNECTOR = "#B4BBC4"
@@ -31,13 +39,15 @@ WIDTH = 9.4
 
 def verify_extra_views():
     captures = json.loads((DATA / "views/manifest.json").read_text())
-    for stem in ("supplied_pocket", "refined_endpoint"):
+    for stem, step in EXTRA_VIEWS.items():
         metadata = json.loads((DATA / f"views/{stem}.json").read_text())
         sources = [
             ("trace.json", metadata["trace_sha256"]),
             (f"views/{stem}.png", metadata["sha256"]),
         ]
-        if stem == "refined_endpoint":
+        if step is not None:
+            if stem != "refined_endpoint" and metadata.get("refinement_step") != step:
+                raise ValueError(f"Incorrect refinement step: {stem}")
             sources.append(("representative_refinement.json", metadata["refinement_sha256"]))
         for name, expected in sources:
             if hashlib.sha256((DATA / name).read_bytes()).hexdigest() != expected:
@@ -46,14 +56,16 @@ def verify_extra_views():
             raise ValueError(f"Camera differs from the trajectory: {stem}")
 
 
-async def capture_views(javascript, work):
+async def capture_views(javascript, work, *, stems=None):
     from playwright.async_api import async_playwright
 
     verify()
     row = json.loads((DATA / "trace.json").read_text())
     refined = json.loads((DATA / "representative_refinement.json").read_text())
     camera = json.loads((DATA / "views/manifest.json").read_text())["records"][0]["camera"]
-    final = dict(row, coordinates=row["coordinates"][:-1] + [refined["coordinates"][-1]])
+    verify_refinement(row)
+    if stems is not None and set(stems) - EXTRA_VIEWS.keys():
+        raise ValueError("Unknown molecular capture request")
     work.mkdir(parents=True, exist_ok=True)
     async with async_playwright() as api:
         browser = await api.chromium.launch(
@@ -64,10 +76,17 @@ async def capture_views(javascript, work):
                 "--disable-dev-shm-usage",
             ]
         )
-        for stem, source, index, pocket in (
-            ("supplied_pocket", row, 0, True),
-            ("refined_endpoint", final, 10, False),
-        ):
+        for stem, step in EXTRA_VIEWS.items():
+            if stems is not None and stem not in stems:
+                continue
+            pocket = step is None
+            index = 0 if pocket else POSE_INDEX
+            source = row
+            if not pocket:
+                saved = refined["saved_steps"].index(step)
+                source = dict(
+                    row, coordinates=row["coordinates"][:-1] + [refined["coordinates"][saved]]
+                )
             html = work / f"{stem}.html"
             html.write_text(scene(source, index, javascript, pocket_only=pocket, camera=camera))
             output = DATA / f"views/{stem}.png"
@@ -104,6 +123,7 @@ async def capture_views(javascript, work):
                 ),
             )
             if not pocket:
+                metadata["refinement_step"] = step
                 metadata["refinement_sha256"] = hashlib.sha256(
                     (DATA / "representative_refinement.json").read_bytes()
                 ).hexdigest()
@@ -111,7 +131,7 @@ async def capture_views(javascript, work):
             await page.close()
         await browser.close()
     verify_extra_views()
-    print("Captured supplied pocket and matched refined endpoint")
+    print("Captured requested pocket/refinement views with matched cameras")
 
 
 def verify_refinement(row):
@@ -157,7 +177,7 @@ def load():
         d = np.linalg.norm(xyz[:, ids, None] - xyz[:, None, ids], axis=-1)
         if len(ids) < 2 or np.abs(d - d[0]).max() > 1e-3:
             raise ValueError(f"Fragment {f} is not rigid across saved frames")
-    if POSE_INDEX not in row["shown_indices"]:
+    if set(FLOW_INDICES) - set(row["shown_indices"]):
         raise ValueError("Displayed frame lacks a verified capture")
     if POSE_INDEX != len(row["times"]) - 1:
         raise ValueError("Generated pose must be the t = 1 state")
@@ -277,15 +297,17 @@ def connector(fig, x0, x1, y, width, height):
 
 
 def compose(row):
-    raw = plt.imread(DATA / f"views/frame_{POSE_INDEX:02d}.png")
-    refined = plt.imread(DATA / "views/refined_endpoint.png")
+    flow = [plt.imread(DATA / f"views/frame_{i:02d}.png") for i in FLOW_INDICES]
+    refinement = [flow[-1]] + [
+        plt.imread(DATA / f"views/{stem}.png")
+        for stem in ("refined_step_025", "refined_step_050", "refined_endpoint")
+    ]
     pocket = plt.imread(DATA / "views/supplied_pocket.png")
-    crop = common_crop([raw, refined])
-    height = 2.2
-    fw = 1.43
+    crop = common_crop([*flow, *refinement])
+    height = 3.2
+    fw = 1.15
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
-    middle = 1.23
-    bottom = middle - fh / 2
+    middle = 1.60
     fig = plt.figure(figsize=(WIDTH, height))
     arts = []
 
@@ -304,72 +326,86 @@ def compose(row):
             va="center",
         )
 
-    def card(x, y, w, h, edge=FRAME_EDGE, fill="white", lw=0.7):
-        patch = FancyBboxPatch(
-            (x / WIDTH, y / height),
-            w / WIDTH,
-            h / height,
-            boxstyle="round,pad=0,rounding_size=0.006",
-            transform=fig.transFigure,
-            facecolor=fill,
-            edgecolor=edge,
-            linewidth=lw,
-            mutation_aspect=WIDTH / height,
-            zorder=-1,
+    def card(x, y, w, h, edge=FRAME_EDGE, fill="white"):
+        fig.add_artist(
+            FancyBboxPatch(
+                (x / WIDTH, y / height),
+                w / WIDTH,
+                h / height,
+                boxstyle="round,pad=0,rounding_size=0.005",
+                transform=fig.transFigure,
+                facecolor=fill,
+                edgecolor=edge,
+                linewidth=0.6,
+                mutation_aspect=WIDTH / height,
+                zorder=-1,
+            )
         )
-        fig.add_artist(patch)
 
-    def candidates(x, pixels):
-        # Empty backing cards denote multiplicity, not fabricated molecular poses.
-        for offset, fill in ((0.14, "#F3F6F8"), (0.07, "#FAFBFC")):
-            card(x + offset, bottom + offset, fw, fh, fill=fill)
-        arts.append(frame(fig, rect(x, bottom, fw, fh), pixels, crop, FRAME_EDGE, 0.7))
-
-    label(0.60, 1.96, "Ligand")
-    label(2.04, 1.96, "Rigid fragments")
-    ligand_diagram(fig.add_axes(rect(0.03, middle - 0.32, 1.13, 0.64)), row)
-    ligand_diagram(fig.add_axes(rect(1.47, middle - 0.32, 1.13, 0.64)), row, fragmented=True)
-    connector(fig, 1.20, 1.42, middle, WIDTH, height)
-
-    pw = 1.05
-    ph = pw * (crop[1] - crop[0]) / (crop[3] - crop[2])
-    arts.append(frame(fig, rect(1.515, 0.10, pw, ph), pocket, crop, FRAME_EDGE, 0.6))
-    label(2.04, 0.10 + ph + 0.13, "Given pocket", size=8, weight="normal")
-    # A short local join combines the two supplied inputs before generation.
+    # All three input panels have identical bounds; molecular geometry is never stretched.
+    for y, title, fragmented in ((2.30, "Ligand", False), (1.26, "Rigid fragments", True)):
+        card(0.06, y, fw, fh, fill="#FAFBFC")
+        ligand_diagram(fig.add_axes(rect(0.06, y, fw, fh)), row, fragmented=fragmented)
+        label(0.635, y + fh + 0.13, title, size=9)
     fig.add_artist(
-        plt.Line2D(
-            [2.62 / WIDTH, 2.81 / WIDTH, 2.81 / WIDTH],
-            [(0.10 + ph / 2) / height, (0.10 + ph / 2) / height, middle / height],
+        FancyArrowPatch(
+            (0.635 / WIDTH, 2.23 / height),
+            (0.635 / WIDTH, (1.26 + fh + 0.28) / height),
+            transform=fig.transFigure,
+            arrowstyle="-|>",
+            mutation_scale=8,
             color=CONNECTOR,
             linewidth=0.9,
         )
     )
-    connector(fig, 2.65, 2.97, middle, WIDTH, height)
+    arts.append(frame(fig, rect(0.06, 0.22, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
+    label(0.635, 0.22 + fh + 0.13, "Given pocket", size=9)
+    fig.add_artist(
+        plt.Line2D(
+            [1.24 / WIDTH, 1.43 / WIDTH, 1.43 / WIDTH, 1.24 / WIDTH],
+            [(0.22 + fh / 2) / height, (0.22 + fh / 2) / height, middle / height, middle / height],
+            color=CONNECTOR,
+            linewidth=0.8,
+        )
+    )
+    connector(fig, 1.43, 1.65, middle, WIDTH, height)
 
-    candidates(3.02, raw)
-    label(3.79, 1.96, "Pose generation")
-    label(3.79, 0.56, r"SE(3) flow · $t$: 0 → 1", size=8, weight="normal")
-    connector(fig, 4.63, 4.89, middle, WIDTH, height)
+    def trajectory(x, images, labels):
+        positions = ((x, 2.06), (x + 1.32, 2.06), (x, 0.98), (x + 1.32, 0.98))
+        for i, ((px, py), pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
+            if i == 3:
+                # Backing cards indicate a candidate bank, not additional measured trajectories.
+                for offset in (0.07, 0.035):
+                    card(px + offset, py + offset, fw, fh, fill="#F4F7F9")
+            arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.6))
+            label(px + fw / 2, py - 0.14, text, size=8, weight="normal")
+        for py in (2.06, 0.98):
+            connector(fig, x + fw + 0.025, x + 1.295, py + fh / 2, WIDTH, height)
 
-    candidates(4.94, refined)
-    label(5.71, 1.96, "Post-refinement")
-    label(5.71, 0.56, "Physical + interaction energy", size=8, weight="normal")
-    connector(fig, 6.55, 6.79, middle, WIDTH, height)
+    trajectory(1.70, flow, [f"$t$ = {row['times'][i]:.2f}" for i in FLOW_INDICES])
+    label(2.935, 2.99, "Pose generation")
+    label(2.935, 0.42, "SE(3) flow", size=8.5, weight="normal")
+    connector(fig, 4.27, 4.55, middle, WIDTH, height)
 
-    label(7.14, 1.96, "Confidence\nselection", size=9)
-    # Rank glyphs are conceptual. No confidence scores were computed for this N1 example.
+    trajectory(4.60, refinement, [f"Step {step}" for step in REFINEMENT_STEPS])
+    label(5.835, 2.99, "Post-refinement")
+    label(5.835, 0.42, "Physical + interaction energy", size=8.5, weight="normal")
+    connector(fig, 7.17, 7.37, middle, WIDTH, height)
+
+    label(7.68, 2.99, "Confidence\nselection", size=9)
     for y, text, edge, fill in (
         (middle - 0.10, "1", "#78A797", "#E6F1EA"),
         (middle - 0.37, "2", FRAME_EDGE, "#F4F6F8"),
         (middle - 0.64, "⋯", FRAME_EDGE, "#F4F6F8"),
     ):
-        card(6.87, y, 0.54, 0.20, edge=edge, fill=fill)
-        label(7.14, y + 0.10, text, size=8, weight="normal")
-    label(7.14, 0.30, "Lowest predicted\nRMSD", size=8, weight="normal")
-    connector(fig, 7.47, 7.84, middle, WIDTH, height)
-
-    arts.append(frame(fig, rect(7.90, bottom, fw, fh), refined, crop, "#78A797", 1.0))
-    label(8.615, 1.96, "Selected pose")
+        card(7.41, y, 0.54, 0.20, edge=edge, fill=fill)
+        label(7.68, y + 0.10, text, size=8, weight="normal")
+    label(7.68, 0.63, "Lowest predicted\nRMSD", size=7.5, weight="normal")
+    connector(fig, 7.98, 8.10, middle, WIDTH, height)
+    arts.append(
+        frame(fig, rect(8.15, middle - fh / 2, fw, fh), refinement[-1], crop, "#78A797", 1.0)
+    )
+    label(8.725, 2.99, "Selected pose")
     return fig, arts
 
 
@@ -403,7 +439,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "outputs/paper_figures")
     parser.add_argument(
-        "--javascript", type=Path, help="Recapture the pocket and refined pose with pinned 3Dmol.js"
+        "--javascript",
+        type=Path,
+        help="Recapture the pocket and refinement states with pinned 3Dmol.js",
     )
     parser.add_argument("--work-dir", type=Path, default=ROOT / "outputs/representative_webgl")
     parser.add_argument("--capture-only", action="store_true")

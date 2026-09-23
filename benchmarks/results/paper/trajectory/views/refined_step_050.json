@@ -1,0 +1,31 @@
+{
+  "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
+  "sha256": "78720b18d4e3a4111c89c262c13ad9a291e8b10e9371f2cce4bd542651dee0b2",
+  "camera": [
+    -27.49601372383736,
+    -25.89508024679648,
+    -41.17907703502758,
+    119.49219642875086,
+    -0.12607862007251908,
+    0.25660481229257065,
+    0.03378266443126182,
+    0.9576621969425486
+  ],
+  "scene": {
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "atoms": 2359,
+    "secondary": {
+      "c": 127,
+      "s": 55,
+      "h": 115
+    }
+  },
+  "javascript_url": "https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js",
+  "javascript_sha256": "f7cc78921ae72e7623e89cdd111434f58c2efddd2ffda1cd212644b406fb8016",
+  "chromium_version": "151.0.7922.34",
+  "py3dmol_version": "2.5.5",
+  "playwright_version": "1.62.0",
+  "description": "CPU refinement of the exact stored N1 endpoint; original camera and fragment colors.",
+  "refinement_step": 50,
+  "refinement_sha256": "0a1493a9a614bb019dfc2f6c92333abf7349b19b989ff0d2b3d525e7cb1e369e"
+}
