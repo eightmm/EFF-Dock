@@ -171,6 +171,35 @@ def verify():
                     xyz.shape == (len(mol["elements"]), 3) and np.isfinite(xyz).all(),
                     "Structure coordinates",
                 )
+    views = directory / "structure_views"
+    scene_manifest = json.loads((views / "manifest.json").read_text())
+    require(
+        hashlib.sha256((directory / "structures.json").read_bytes()).hexdigest()
+        == scene_manifest["structures_sha256"],
+        "Stale structure captures",
+    )
+    require(
+        {(r["id"], r["mode"]) for r in scene_manifest["records"]}
+        == {
+            (r["id"], mode)
+            for r in json.loads((directory / "structures.json").read_text())
+            for mode in ("overview", "pocket")
+        },
+        "Missing structure view",
+    )
+    for record in scene_manifest["records"]:
+        require(
+            hashlib.sha256((views / record["file"]).read_bytes()).hexdigest() == record["sha256"],
+            "Structure view hash mismatch",
+        )
+    for row in json.loads((directory / "structures.json").read_text()):
+        display = row["protein_display"]
+        atoms = [line for line in display["pdb"].splitlines() if line.startswith("ATOM  ")]
+        require(
+            len(atoms) == display["atom_records"]
+            and sorted({line[21] for line in atoms}) == display["chains"],
+            "Receptor display records mismatch",
+        )
     metadata = json.loads((ROOT / "docs/paper/manifest.json").read_text())
     for row in metadata["numerical_inputs"]:
         require(

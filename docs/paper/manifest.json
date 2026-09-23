@@ -1,6 +1,6 @@
 {
   "pdf": "docs/paper/paper_figures.pdf",
-  "pdf_sha256": "11b64abec8cdba1c069b7c8b833234c2a12f84248c3990a04eff1f962c157460",
+  "pdf_sha256": "fd6c2b8d7839c9ce39e6be113fc76ad0d2fd11fab17495a44089e8cc409b05fc",
   "figures": [
     {
       "page": 1,
@@ -259,10 +259,10 @@
       "title": "보충 S8: 성공·refinement rescue·선택 실패 구조",
       "section": "supplement",
       "source": "docs/paper/figures/S8_structure_examples.pdf",
-      "sha256": "b9e843d8f75d452d33a2568985f2cce56ea04582f8612376afb58c374025efa7",
+      "sha256": "35f084be1f8e665df17a97ea6eba0bcc16687d18f18743e9189e5b3352cc11db",
       "figure_id": "S8",
       "caption_title": "Receptor-frame examples of success, refinement rescue and selection failure.",
-      "caption": "Illustrative Astex Diverse Set cases from repeat 0. Crystal ligands are green, selected refined poses blue, comparator poses orange, and nearby protein Cα traces grey. All poses retain the original receptor frame; one common rigid viewing transformation is applied per panel without independent ligand alignment. (A) 1OWE, the lower-median selected RMSD among 66 PB-valid successes (0.80 Å). (B) 1HVY, the sole eligible same-candidate RMSD rescue among this repeat's refined primary selections: 2.32 Å before refinement and 1.98 Å after refinement, with the final selected pose PB-valid. This small threshold crossing is illustrative, not evidence of a typical large rescue. (C) 1TZ8, the lower-median regret among 14 selection failures with a near-native candidate available: selected RMSD 2.27 Å versus oracle RMSD 0.65 Å. Medians and ID tie breaking were specified before inspecting the structures. Protein traces provide spatial context and are not contact or interaction assignments.",
+      "caption": "Illustrative Astex Diverse Set cases from repeat 0. Upper views show complete ligand-contacting protein chains as cartoons; lower views enlarge the binding site. Displayed chains have at least one heavy atom within 5 Å of a crystal-ligand heavy atom; this display rule does not change evaluation inputs. Ligands are ball-and-stick, with green crystal, blue selected and orange comparator carbon atoms; heteroatoms use element colors (nitrogen blue, oxygen red, sulfur yellow). Sticks show connectivity. The cartoons are rendered from stored receptor coordinates using 3Dmol.js secondary-structure assignment. All poses retain the original receptor frame, with no independent ligand alignment. (A) 1OWE, the lower-median selected RMSD among 66 PB-valid successes (0.80 Å). (B) 1HVY, the sole eligible same-candidate RMSD rescue among this repeat's refined primary selections: 2.32 Å before refinement and 1.98 Å after refinement, with the final selected pose PB-valid. This small threshold crossing is illustrative. (C) 1TZ8, the lower-median regret among 14 selection failures with a near-native candidate available: selected RMSD 2.27 Å versus oracle RMSD 0.65 Å. Median rules and ID tie breaking were specified before inspecting the structures. The views do not assign contacts or interaction types.",
       "author_note_ko": "시각적으로 가장 좋은 사례를 고르지 않았다. Rescue는 해당 정의에서 1건뿐이며 2 Å 경계 부근의 작은 변화이다.",
       "latex_label": "fig:paper-s8",
       "bundle_file": "figures/page_19.pdf",
@@ -334,7 +334,7 @@
     },
     {
       "path": "benchmarks/results/paper/evidence/structures.json",
-      "sha256": "1519abfebb5e8485d2645b631d3c6d53022d7a69d437b261dd36c64f928255d9"
+      "sha256": "ef63c8978119fe9e4d8d41380ff5c4b944ece8118146cedbc6871bfc1e4f827e"
     },
     {
       "path": "benchmarks/results/paper/evidence/baseline_cases.csv",
@@ -347,6 +347,10 @@
     {
       "path": "benchmarks/results/paper/evidence/model_cost.json",
       "sha256": "242e6c4aab1fba0b2b967ac11bcbb003e6807bb84488f258a6b765bde1e18029"
+    },
+    {
+      "path": "benchmarks/results/paper/evidence/structure_views/manifest.json",
+      "sha256": "49d1917b591df0eebe87dbcbfca3f98b9f5ae02f5bedbc2be8954c2ff26d0a6b"
     }
   ],
   "render_command": "uv run python -m benchmarks.figures.paper --output outputs/paper_figures"

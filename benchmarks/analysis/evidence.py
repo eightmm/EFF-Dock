@@ -469,6 +469,29 @@ def main():
     sample_cases(args.root.resolve(), args.output, cases, private, pb, result)
 
 
+def binding_chain_display(pdb, reference_coordinates, cutoff=5.0):
+    """Retain complete protein chains contacting the crystal ligand for display."""
+    ref = np.asarray(reference_coordinates)
+    records = [line for line in pdb.splitlines() if line.startswith("ATOM  ")]
+    chains = set()
+    for line in records:
+        element = line[76:78].strip() or line[12:16].strip()[0]
+        if element in ("H", "D"):
+            continue
+        xyz = np.array([float(line[30:38]), float(line[38:46]), float(line[46:54])])
+        if np.min(np.linalg.norm(ref - xyz, axis=1)) <= cutoff:
+            chains.add(line[21])
+    require(bool(chains), "No ligand-contacting protein chain")
+    retained = [line for line in records if line[21] in chains]
+    return dict(
+        pdb="\n".join(retained) + "\nEND\n",
+        chains=sorted(chains),
+        contact_cutoff_angstrom=cutoff,
+        atom_records=len(retained),
+        selection="Complete ATOM chains with a heavy atom within cutoff of a crystal ligand heavy atom; display only",
+    )
+
+
 def sample_cases(root, out, cases, private, pb, result):
     """Export deterministic mechanism examples in their original receptor frame."""
     from rdkit import Chem
@@ -539,23 +562,6 @@ def sample_cases(root, out, cases, private, pb, result):
             hashlib.sha256(protein.read_bytes()).hexdigest() == inputs["protein_sha256"],
             "Receptor changed",
         )
-        ca = []
-        for line in protein.read_text().splitlines():
-            if line.startswith("ATOM  ") and line[12:16].strip() == "CA":
-                ca.append(
-                    (
-                        line[21],
-                        int(line[22:26]),
-                        [float(line[30:38]), float(line[38:46]), float(line[46:54])],
-                    )
-                )
-        refpos = np.array(reference["coordinates"])
-        nearby = [v for v in ca if np.min(np.linalg.norm(refpos - np.array(v[2]), axis=1)) < 10]
-        trace = [
-            [a[2], b[2]]
-            for a, b in zip(nearby, nearby[1:])
-            if a[0] == b[0] and b[1] == a[1] + 1 and np.linalg.norm(np.array(a[2]) - b[2]) < 4.5
-        ]
         geometries.append(
             dict(
                 title=title,
@@ -573,7 +579,9 @@ def sample_cases(root, out, cases, private, pb, result):
                 reference=reference,
                 selected=chosen,
                 comparator=comparator,
-                protein_trace=trace,
+                protein_display=binding_chain_display(
+                    protein.read_text(), reference["coordinates"]
+                ),
                 source_hashes=dict(
                     reference=inputs["ligand_reference_sha256"],
                     protein=inputs["protein_sha256"],

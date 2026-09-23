@@ -1,0 +1,121 @@
+{
+  "structures_sha256": "ef63c8978119fe9e4d8d41380ff5c4b944ece8118146cedbc6871bfc1e4f827e",
+  "javascript_url": "https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js",
+  "javascript_sha256": "f7cc78921ae72e7623e89cdd111434f58c2efddd2ffda1cd212644b406fb8016",
+  "py3dmol_version": "2.5.5",
+  "playwright_version": "1.62.0",
+  "chromium_version": "151.0.7922.34",
+  "pose_carbon_colors": {
+    "reference": "#78BAA1",
+    "selected": "#73ACD1",
+    "comparator": "#E7AA7C"
+  },
+  "element_colors": {
+    "N": "#365BD4",
+    "O": "#E44545",
+    "S": "#D9BC32",
+    "P": "#B877CB",
+    "F": "#69B871",
+    "Cl": "#55A862",
+    "Br": "#A86842",
+    "I": "#9158AF"
+  },
+  "records": [
+    {
+      "id": "1owe",
+      "mode": "overview",
+      "file": "1owe_overview.png",
+      "sha256": "21d098f836e202390935fd9e09554c3413c52d3265e77d18e084ebefb1c9bd43",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1934,
+        "secondary": {
+          "s": 103,
+          "c": 129,
+          "h": 13
+        }
+      },
+      "nonwhite_fraction": 0.09127736928104575
+    },
+    {
+      "id": "1owe",
+      "mode": "pocket",
+      "file": "1owe_pocket.png",
+      "sha256": "6124b4f6a662732811dd13b23a4048e1c3074b3edb5fdec9fa61480412a9d0a9",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1934,
+        "secondary": {
+          "s": 103,
+          "c": 129,
+          "h": 13
+        }
+      },
+      "nonwhite_fraction": 0.2187683823529412
+    },
+    {
+      "id": "1hvy",
+      "mode": "overview",
+      "file": "1hvy_overview.png",
+      "sha256": "aa2d4d65dd8aa425818f53fda5cfd2c153ade7ccab216669c6062f0a7dc27a17",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2349,
+        "secondary": {
+          "c": 124,
+          "h": 90,
+          "s": 74
+        }
+      },
+      "nonwhite_fraction": 0.11078308823529412
+    },
+    {
+      "id": "1hvy",
+      "mode": "pocket",
+      "file": "1hvy_pocket.png",
+      "sha256": "b2c847537e38173e7c0585b6d5f46415640fff67a1f1773fd8dab09bde0909da",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2349,
+        "secondary": {
+          "c": 124,
+          "h": 90,
+          "s": 74
+        }
+      },
+      "nonwhite_fraction": 0.3086772875816993
+    },
+    {
+      "id": "1tz8",
+      "mode": "overview",
+      "file": "1tz8_overview.png",
+      "sha256": "b8fb51d1a70f9a17181429563105d211599a97b1b6ed8fecc4377ab6b6c359dd",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1711,
+        "secondary": {
+          "c": 90,
+          "s": 126,
+          "h": 14
+        }
+      },
+      "nonwhite_fraction": 0.05862990196078431
+    },
+    {
+      "id": "1tz8",
+      "mode": "pocket",
+      "file": "1tz8_pocket.png",
+      "sha256": "b39a9ea052a231f2120aa67bb0ee8ccd6353b5e21eefcc6a43afa0df631568b8",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1711,
+        "secondary": {
+          "c": 90,
+          "s": 126,
+          "h": 14
+        }
+      },
+      "nonwhite_fraction": 0.2638288398692811
+    }
+  ]
+}

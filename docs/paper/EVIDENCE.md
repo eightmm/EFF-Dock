@@ -109,9 +109,12 @@ Astex repeat 0, chosen by fixed median rules before viewing structures:
 | Selection failure | 1TZ8 | 2.27 Å | 0.65 Å (refined oracle) | 14 |
 
 The rescue crosses the 2 Å threshold only narrowly, and is the sole eligible
-example under this rule. The drawings preserve the receptor frame and show
-nearby Cα traces, not inferred contacts. Atom coordinates and bond connectivity
-are distributed for re-rendering; no independent ligand superposition is used.
+example under this rule. The drawings preserve the receptor frame and show actual protein cartoons, with
+complete ligand-contacting chains above and a binding-site enlargement below.
+Carbon colors identify poses; heteroatom colors identify elements. Stored
+coordinates, displayed receptor chains, connectivity and software-rendered
+captures are distributed for re-rendering. No independent ligand superposition
+or contact/interaction assignment is used.
 
 ## Local-baseline paired uncertainty — Figure S9
 

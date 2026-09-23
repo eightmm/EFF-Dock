@@ -26,9 +26,12 @@ COLORS = ["#8FB9D8", "#E8B395", "#9AC9B4", "#B8A6CE", "#C7BD8C"]
 DARK = "#41434A"
 
 
-def save(fig, out, name):
+def save(fig, out, name, **pdf_options):
     fig.savefig(
-        out / f"{name}.pdf", bbox_inches="tight", metadata={"CreationDate": None, "ModDate": None}
+        out / f"{name}.pdf",
+        bbox_inches="tight",
+        metadata={"CreationDate": None, "ModDate": None},
+        **pdf_options,
     )
     fig.savefig(out / f"{name}.png", dpi=190, bbox_inches="tight")
     plt.close(fig)
@@ -253,57 +256,42 @@ def physical(data, out):
 
 
 def structures(rows, out):
-    fig = plt.figure(figsize=(14.2, 5.2))
+    from benchmarks.figures.structure_views import ELEMENT_COLORS, POSE_COLORS
+
+    views = DATA / "structure_views"
+    fig, axes = plt.subplots(2, 3, figsize=(14.2, 8.8), gridspec_kw={"height_ratios": [1, 1.15]})
     for i, row in enumerate(rows):
-        ax = fig.add_subplot(1, 3, i + 1, projection="3d")
-        molecules = [(row["reference"], COLORS[2]), (row["selected"], COLORS[0])]
-        if row["comparator"] is not None:
-            molecules.append((row["comparator"], COLORS[1]))
-        ref = np.array(row["reference"]["coordinates"])
-        center = ref.mean(axis=0)
-        # One rigid camera transform is shared by every structure in a panel.
-        _, _, rotation = np.linalg.svd(ref - center, full_matrices=False)
-        if np.linalg.det(rotation) < 0:
-            rotation[-1] *= -1
-
-        def transform(coords):
-            return (np.array(coords) - center) @ rotation.T
-
-        for segment in row["protein_trace"]:
-            points = transform(segment)
-            ax.plot(*points.T, color="#B5BDC6", lw=1.3, alpha=0.5, zorder=0)
-        all_points = []
-        for mol, color in molecules:
-            points = transform(mol["coordinates"])
-            all_points.extend(points)
-            for a, b in mol["bonds"]:
-                ax.plot(*points[[a, b]].T, color=color, linewidth=2.5, solid_capstyle="round")
-            ax.scatter(*points.T, color=color, s=10, depthshade=False)
-        radius = max(5, float(np.max(np.abs(all_points))) + 1)
-        ax.set(xlim=(-radius, radius), ylim=(-radius, radius), zlim=(-radius, radius))
-        ax.set_box_aspect((1, 1, 1))
-        ax.view_init(elev=65, azim=-65)
-        ax.set_axis_off()
-        ax.set_title(
+        for j, mode in enumerate(("overview", "pocket")):
+            ax = axes[j, i]
+            ax.imshow(plt.imread(views / f"{row['id']}_{mode}.png"))
+            ax.set_axis_off()
+        axes[0, i].set_title(
             f"{chr(65 + i)}  {row['title']}\n{row['id'].upper()}",
             loc="left",
             fontweight="bold",
-            pad=4,
+            pad=7,
         )
         detail = f"Selected: {row['selected_rmsd']:.2f} Å"
         if row["comparator_rmsd"] is not None:
             label = "Raw, same pose" if i == 1 else "Oracle"
             detail += f"   ·   {label}: {row['comparator_rmsd']:.2f} Å"
-        ax.text2D(0.5, -0.02, detail, transform=ax.transAxes, ha="center", fontsize=10)
-    fig.legend(
-        [Line2D([], [], color=c, lw=3) for c in (COLORS[2], COLORS[0], COLORS[1], "#B5BDC6")],
-        ["Crystal ligand", "Selected pose", "Raw pose / oracle", "Protein Cα trace"],
-        ncol=4,
-        frameon=False,
-        loc="lower center",
+        axes[1, i].text(
+            0.5, -0.065, detail, transform=axes[1, i].transAxes, ha="center", fontsize=10
+        )
+    fig.text(0.012, 0.72, "Protein", rotation=90, va="center", fontsize=11, color=DARK)
+    fig.text(0.012, 0.32, "Binding site", rotation=90, va="center", fontsize=11, color=DARK)
+    handles = [Line2D([], [], color=c, lw=4) for c in POSE_COLORS.values()]
+    labels = ["Crystal carbon", "Selected carbon", "Raw / oracle carbon"]
+    present = set(
+        e for row in rows for key in POSE_COLORS if row[key] for e in row[key]["elements"]
     )
-    fig.subplots_adjust(left=0.02, right=0.98, top=0.88, bottom=0.14, wspace=0.02)
-    save(fig, out, "S8_structure_examples")
+    for element, color in ELEMENT_COLORS.items():
+        if element in present:
+            handles.append(Line2D([], [], marker="o", color=color, linestyle="none", ms=6))
+            labels.append(element)
+    fig.legend(handles, labels, ncol=len(labels), frameon=False, loc="lower center", fontsize=10)
+    fig.subplots_adjust(left=0.035, right=0.985, top=0.89, bottom=0.10, hspace=0.10, wspace=0.045)
+    save(fig, out, "S8_structure_examples", dpi=400)
 
 
 def baselines(data, out):
