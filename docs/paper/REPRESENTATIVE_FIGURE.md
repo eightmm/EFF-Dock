@@ -17,8 +17,13 @@ halo marks the same supplied 3D center in both images; it is projected onto the
 image plane and drawn above the surface for visibility, not a molecular atom.
 Generation and refinement are enclosed in separate large boxes;
 each contains four states ordered from top to bottom with downward arrows.
-The stages progress from left to right. Method subtitles sit inside each box
-under its heading. Confidence displays four distinct recorded poses in a matching large box, with
+The stages progress from left to right. Every box uses a 9 pt bold title and a single-line 7.1 pt muted subtitle,
+with common title/subtitle offsets (0.16/0.38 inches below the box top).
+The stage labels are Input preparation / Pocket crop + fragmentation;
+Pose generation / Fragment SE(3) flow; Pose refinement / Physics + interaction
+energy; Confidence selection / Predicted RMSD ranking; and Selected pose /
+Crystal comparison. The final subtitle identifies the retrospective reference
+overlay; crystal coordinates are not used for candidate selection. Confidence displays four distinct recorded poses in a matching large box, with
 selected/not-selected marks overlaid in the upper-left image corners.
 Time and step labels use that same corner. Molecular panel width is 1.55 inches (previously 1.30), with preserved aspect
 ratio and larger structures at the same canvas size. Stage boxes have equal
@@ -93,7 +98,7 @@ energy parameter identities and implementation checksums are retained.
 | Protein | Full supplied 1T46 receptor molecular surface, translucent gray receptor with complete teal crop surface overlaid at original coordinates; supplied center marked by a terracotta dot |
 | Given pocket | Molecular surface of retained residues from the saved center and 10 Å cutoff; unchanged coordinates; wider camera than pose panels |
 | Pose generation | Saved frames 0, 2, 4 and 10: t = 0, 0.488, 0.784 and 1 |
-| Post-refinement | Steps 0, 25, 50 and 100 from the recorded CPU refinement of that exact endpoint |
+| Pose refinement | Steps 0, 25, 50 and 100 from the recorded CPU refinement of that exact endpoint |
 | Confidence candidates | Astex repeat 0, same 1T46 complex, existing N100 refined bank; eligible ranks 1, 25, 50 and 100 |
 | Selected pose | Actual confidence-selected candidate, zero-based index 41, overlaid with its crystal reference; symmetry-aware heavy-atom RMSD 0.96 Å |
 

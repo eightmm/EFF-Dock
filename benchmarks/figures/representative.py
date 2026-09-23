@@ -673,6 +673,10 @@ def compose(row):
             va="center",
         )
 
+    def header(center, top, title, subtitle):
+        label(center, top - 0.16, title, size=9)
+        label(center, top - 0.38, subtitle, size=7.1, weight="normal", color=MUTED)
+
     def card(x, y, w, h, edge=FRAME_EDGE, fill="white", lw=0.6):
         fig.add_artist(
             FancyBboxPatch(
@@ -724,7 +728,7 @@ def compose(row):
 
     center = columns[0] + box_width / 2
     px = center - fw / 2
-    label(center, 4.95, "Input preparation", size=9)
+    header(center, 5.10, "Input preparation", "Pocket crop + fragmentation")
     for y, title, pixels in (
         (positions[0], "Protein", protein),
         (positions[1], "Given pocket", pocket),
@@ -770,8 +774,7 @@ def compose(row):
     def trajectory(box_x, title, method, images, labels):
         center = box_x + box_width / 2
         px = center - fw / 2
-        label(center, 4.95, title)
-        label(center, 4.76, method, size=8, weight="normal")
+        header(center, 5.10, title, method)
         label(center, 0.415, r"$\times\,N$", size=8.5, weight="normal", color=MUTED)
         for i, (py, pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
             arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.55))
@@ -782,22 +785,21 @@ def compose(row):
     trajectory(
         columns[1],
         "Pose generation",
-        "Fragment SE(3)\nflow matching",
+        "Fragment SE(3) flow",
         flow,
         [f"$t$ = {row['times'][i]:.2f}" for i in FLOW_INDICES],
     )
     trajectory(
         columns[2],
-        "Post-refinement",
-        "Physics- and\ninteraction-based",
+        "Pose refinement",
+        "Physics + interaction energy",
         refinement,
         [f"Step {step}" for step in REFINEMENT_STEPS],
     )
 
     center = columns[3] + box_width / 2
     px = center - fw / 2
-    label(center, 4.95, "Confidence selection", size=9)
-    label(center, 4.76, "Predicted RMSD\nranking", size=8, weight="normal")
+    header(center, 5.10, "Confidence selection", "Predicted RMSD ranking")
     for upper, lower in zip(positions[:-1], positions[1:], strict=True):
         label(center, (upper + lower + fh) / 2, "…", size=10, weight="normal", color=MUTED)
     label(center, 0.415, r"$N\,\to\,1$", size=8.5, weight="normal", color=MUTED)
@@ -882,7 +884,7 @@ def compose(row):
     center = columns[4] + box_width / 2
     px = center - fw / 2
     card(columns[4], 1.57, box_width, 1.90, edge="#C6C6C6", fill="white", lw=0.85)
-    label(center, 3.25, "Selected pose")
+    header(center, 3.47, "Selected pose", "Crystal comparison")
     arts.append(frame(fig, rect(px, middle - fh / 2, fw, fh), overlay, crop, "#78B9A5", 0.9))
     corner(px, middle - fh / 2, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")
     for y, key, text in ((1.98, "selected", "Selected"), (1.76, "crystal", "Crystal")):

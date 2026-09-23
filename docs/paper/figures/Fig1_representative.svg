@@ -2125,16 +2125,18 @@ L 657.72 251.28
 " style="fill: none; stroke: #e7a078; stroke-width: 2.8; stroke-linecap: round"/>
   </g>
   <g id="text_1">
-   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="70.2" y="24.083438" transform="rotate(-0 70.2 24.083438)">Input preparation</text>
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="70.2" y="24.803438" transform="rotate(-0 70.2 24.803438)">Input preparation</text>
   </g>
   <g id="text_2">
-   <text style="font-weight: 700; font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="221.4" y="24.184297" transform="rotate(-0 221.4 24.184297)">Pose generation</text>
+   <text style="font-size: 7.1px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="70.2" y="40.119156" transform="rotate(-0 70.2 40.119156)">Pocket crop + fragmentation</text>
   </g>
   <g id="text_3">
-   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(190.289375 33.008375)">Fragment SE(3)</text>
-   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(193.055 41.966625)">flow matching</text>
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="221.4" y="24.768281" transform="rotate(-0 221.4 24.768281)">Pose generation</text>
   </g>
   <g id="text_4">
+   <text style="font-size: 7.1px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="221.4" y="40.119156" transform="rotate(-0 221.4 40.119156)">Fragment SE(3) flow</text>
+  </g>
+  <g id="text_5">
    <!-- $\times\,N$ -->
    <g style="fill: #7b838d" transform="translate(213.9625 350.465469)">
     <text>
@@ -2143,14 +2145,13 @@ L 657.72 251.28
     </text>
    </g>
   </g>
-  <g id="text_5">
-   <text style="font-weight: 700; font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="372.6" y="24.221406" transform="rotate(-0 372.6 24.221406)">Post-refinement</text>
-  </g>
   <g id="text_6">
-   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(347.5675 33.008375)">Physics- and</text>
-   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(337.449375 41.966625)">interaction-based</text>
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="372.6" y="24.803438" transform="rotate(-0 372.6 24.803438)">Pose refinement</text>
   </g>
   <g id="text_7">
+   <text style="font-size: 7.1px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="372.6" y="40.119156" transform="rotate(-0 372.6 40.119156)">Physics + interaction energy</text>
+  </g>
+  <g id="text_8">
    <!-- $\times\,N$ -->
    <g style="fill: #7b838d" transform="translate(365.1625 350.465469)">
     <text>
@@ -2159,23 +2160,22 @@ L 657.72 251.28
     </text>
    </g>
   </g>
-  <g id="text_8">
-   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="523.8" y="24.083438" transform="rotate(-0 523.8 24.083438)">Confidence selection</text>
-  </g>
   <g id="text_9">
-   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(491.9025 33.008375)">Predicted RMSD</text>
-   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(508.6675 41.966625)">ranking</text>
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="523.8" y="24.803438" transform="rotate(-0 523.8 24.803438)">Confidence selection</text>
   </g>
   <g id="text_10">
-   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="118.450864" transform="rotate(-0 523.8 118.450864)">…</text>
+   <text style="font-size: 7.1px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="40.119156" transform="rotate(-0 523.8 40.119156)">Predicted RMSD ranking</text>
   </g>
   <g id="text_11">
-   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="195.490864" transform="rotate(-0 523.8 195.490864)">…</text>
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="118.450864" transform="rotate(-0 523.8 118.450864)">…</text>
   </g>
   <g id="text_12">
-   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="272.530864" transform="rotate(-0 523.8 272.530864)">…</text>
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="195.490864" transform="rotate(-0 523.8 195.490864)">…</text>
   </g>
   <g id="text_13">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="272.530864" transform="rotate(-0 523.8 272.530864)">…</text>
+  </g>
+  <g id="text_14">
    <!-- $N\,\to\,1$ -->
    <g style="fill: #7b838d" transform="translate(511.305 350.465469)">
     <text>
@@ -2185,13 +2185,16 @@ L 657.72 251.28
     </text>
    </g>
   </g>
-  <g id="text_14">
-   <text style="font-weight: 700; font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="675" y="146.621406" transform="rotate(-0 675 146.621406)">Selected pose</text>
-  </g>
   <g id="text_15">
-   <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="664.2" y="237.6475" transform="rotate(-0 664.2 237.6475)">Selected</text>
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="675" y="142.163437" transform="rotate(-0 675 142.163437)">Selected pose</text>
   </g>
   <g id="text_16">
+   <text style="font-size: 7.1px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="675" y="157.479156" transform="rotate(-0 675 157.479156)">Crystal comparison</text>
+  </g>
+  <g id="text_17">
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="664.2" y="237.6475" transform="rotate(-0 664.2 237.6475)">Selected</text>
+  </g>
+  <g id="text_18">
    <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="664.2" y="253.4875" transform="rotate(-0 664.2 253.4875)">Crystal</text>
   </g>
   <g id="patch_37">
@@ -2298,7 +2301,7 @@ C 472.553122 290.460205 474.201484 291.142979 475.92 291.142979
 z
 " style="fill: #ffffff"/>
   </g>
-  <g id="text_17">
+  <g id="text_19">
    <g id="patch_45">
     <path d="M 17.97 58.040322
 L 45.443906 58.040322
@@ -2309,7 +2312,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="19.44" y="55.114541" transform="rotate(-0 19.44 55.114541)">Protein</text>
   </g>
-  <g id="text_18">
+  <g id="text_20">
    <g id="patch_46">
     <path d="M 17.97 135.080322
 L 66.816875 135.080322
@@ -2320,7 +2323,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="19.44" y="132.154541" transform="rotate(-0 19.44 132.154541)">Given pocket</text>
   </g>
-  <g id="text_19">
+  <g id="text_21">
    <g id="patch_47">
     <path d="M 17.97 212.120322
 L 76.803906 212.120322
@@ -2331,7 +2334,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="19.44" y="209.194541" transform="rotate(-0 19.44 209.194541)">Rigid fragments</text>
   </g>
-  <g id="text_20">
+  <g id="text_22">
    <g id="patch_48">
     <path d="M 17.97 289.160322
 L 44.36875 289.160322
@@ -2342,7 +2345,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="19.44" y="286.234541" transform="rotate(-0 19.44 286.234541)">Ligand</text>
   </g>
-  <g id="text_21">
+  <g id="text_23">
    <g id="patch_49">
     <path d="M 169.17 58.040322
 L 200.81 58.040322
@@ -2365,7 +2368,7 @@ z
     </text>
    </g>
   </g>
-  <g id="text_22">
+  <g id="text_24">
    <g id="patch_50">
     <path d="M 169.17 135.080322
 L 200.81 135.080322
@@ -2388,7 +2391,7 @@ z
     </text>
    </g>
   </g>
-  <g id="text_23">
+  <g id="text_25">
    <g id="patch_51">
     <path d="M 169.17 212.120322
 L 200.25 212.120322
@@ -2411,7 +2414,7 @@ z
     </text>
    </g>
   </g>
-  <g id="text_24">
+  <g id="text_26">
    <g id="patch_52">
     <path d="M 169.17 289.160322
 L 200.81 289.160322
@@ -2434,7 +2437,7 @@ z
     </text>
    </g>
   </g>
-  <g id="text_25">
+  <g id="text_27">
    <g id="patch_53">
     <path d="M 320.37 58.040322
 L 345.927656 58.040322
@@ -2445,7 +2448,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="321.84" y="55.114541" transform="rotate(-0 321.84 55.114541)">Step 0</text>
   </g>
-  <g id="text_26">
+  <g id="text_28">
    <g id="patch_54">
     <path d="M 320.37 135.080322
 L 350.381406 135.080322
@@ -2456,7 +2459,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="321.84" y="132.154541" transform="rotate(-0 321.84 132.154541)">Step 25</text>
   </g>
-  <g id="text_27">
+  <g id="text_29">
    <g id="patch_55">
     <path d="M 320.37 212.120322
 L 350.381406 212.120322
@@ -2467,7 +2470,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="321.84" y="209.194541" transform="rotate(-0 321.84 209.194541)">Step 50</text>
   </g>
-  <g id="text_28">
+  <g id="text_30">
    <g id="patch_56">
     <path d="M 320.37 289.160322
 L 354.835156 289.160322
@@ -2478,7 +2481,7 @@ z
    </g>
    <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="321.84" y="286.234541" transform="rotate(-0 321.84 286.234541)">Step 100</text>
   </g>
-  <g id="text_29">
+  <g id="text_31">
    <g id="patch_57">
     <path d="M 622.77 173.600322
 L 671.27125 173.600322
@@ -2525,52 +2528,52 @@ L 478.8 281.782979
 L 478.8 287.542979
 " style="fill: none; stroke: #c88d94; stroke-width: 1.5; stroke-linecap: round"/>
   </g>
-  <g id="text_30">
+  <g id="text_32">
    <text style="font-size: 5.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7b838d" x="485.64" y="54.933447" transform="rotate(-0 485.64 54.933447)">pRMSD</text>
   </g>
-  <g id="text_31">
+  <g id="text_33">
    <text style="font-weight: 500; font-size: 5.5px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #3e434a" x="527.76" y="54.988635" transform="rotate(-0 527.76 54.988635)">1.59 Å</text>
   </g>
-  <g id="text_32">
+  <g id="text_34">
    <text style="font-size: 5.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7b838d" x="485.64" y="61.917447" transform="rotate(-0 485.64 61.917447)">RMSD</text>
   </g>
-  <g id="text_33">
+  <g id="text_35">
    <text style="font-weight: 500; font-size: 5.5px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #3e434a" x="527.76" y="61.972635" transform="rotate(-0 527.76 61.972635)">0.96 Å</text>
   </g>
-  <g id="text_34">
+  <g id="text_36">
    <text style="font-size: 5.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7b838d" x="485.64" y="131.973447" transform="rotate(-0 485.64 131.973447)">pRMSD</text>
   </g>
-  <g id="text_35">
+  <g id="text_37">
    <text style="font-weight: 500; font-size: 5.5px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #3e434a" x="527.76" y="132.028635" transform="rotate(-0 527.76 132.028635)">2.33 Å</text>
   </g>
-  <g id="text_36">
+  <g id="text_38">
    <text style="font-size: 5.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7b838d" x="485.64" y="138.957447" transform="rotate(-0 485.64 138.957447)">RMSD</text>
   </g>
-  <g id="text_37">
+  <g id="text_39">
    <text style="font-weight: 500; font-size: 5.5px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #3e434a" x="527.76" y="139.012635" transform="rotate(-0 527.76 139.012635)">1.84 Å</text>
   </g>
-  <g id="text_38">
+  <g id="text_40">
    <text style="font-size: 5.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7b838d" x="485.64" y="209.013447" transform="rotate(-0 485.64 209.013447)">pRMSD</text>
   </g>
-  <g id="text_39">
+  <g id="text_41">
    <text style="font-weight: 500; font-size: 5.5px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #3e434a" x="527.76" y="209.068635" transform="rotate(-0 527.76 209.068635)">2.82 Å</text>
   </g>
-  <g id="text_40">
+  <g id="text_42">
    <text style="font-size: 5.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7b838d" x="485.64" y="215.997447" transform="rotate(-0 485.64 215.997447)">RMSD</text>
   </g>
-  <g id="text_41">
+  <g id="text_43">
    <text style="font-weight: 500; font-size: 5.5px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #3e434a" x="527.76" y="216.052635" transform="rotate(-0 527.76 216.052635)">1.81 Å</text>
   </g>
-  <g id="text_42">
+  <g id="text_44">
    <text style="font-size: 5.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7b838d" x="485.64" y="286.053447" transform="rotate(-0 485.64 286.053447)">pRMSD</text>
   </g>
-  <g id="text_43">
+  <g id="text_45">
    <text style="font-weight: 500; font-size: 5.5px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #3e434a" x="527.76" y="286.108635" transform="rotate(-0 527.76 286.108635)">4.44 Å</text>
   </g>
-  <g id="text_44">
+  <g id="text_46">
    <text style="font-size: 5.3px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #7b838d" x="485.64" y="293.037447" transform="rotate(-0 485.64 293.037447)">RMSD</text>
   </g>
-  <g id="text_45">
+  <g id="text_47">
    <text style="font-weight: 500; font-size: 5.5px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #3e434a" x="527.76" y="293.092635" transform="rotate(-0 527.76 293.092635)">4.31 Å</text>
   </g>
  </g>
