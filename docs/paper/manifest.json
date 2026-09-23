@@ -1,6 +1,6 @@
 {
   "pdf": "docs/paper/paper_figures.pdf",
-  "pdf_sha256": "6490d04e699a84d969c9b660338418c61b8a94528963b1ddfafece5285d5b83b",
+  "pdf_sha256": "bac1b3f0fc4430993e5f0b40556fc4bceda33437860ed7e8f0ff52d2be8db56e",
   "figures": [
     {
       "page": 1,
@@ -259,7 +259,7 @@
       "title": "보충 S8: 성공·refinement rescue·선택 실패 구조",
       "section": "supplement",
       "source": "docs/paper/figures/S8_structure_examples.pdf",
-      "sha256": "179d776ad50a1361afd38215c307f3b3691af36bdbb4c6fb8cbc470cfca27630",
+      "sha256": "f5bdd31d20a5eef05a9261a4760b386abf5ed12ea9b4f29a5e8322113dcbcf3d",
       "figure_id": "S8",
       "caption_title": "Receptor-frame examples of success, refinement rescue and selection failure.",
       "caption": "Binding-site close-ups in the original receptor frame, without independent ligand alignment. Protein cartoons use stored coordinates and 3Dmol.js secondary-structure assignment; display chains contact the crystal ligand within 5 Å, a visualization rule that does not change evaluation inputs. Ligand carbon atoms are green (crystal), blue (selected) or orange (raw/oracle); nitrogen is blue and oxygen red. Sticks show connectivity, not assigned interactions. (A) Astex Diverse Set 1OWE, repeat 0: selected RMSD 0.80 Å, the lower median among 66 PB-valid successes. (B) PoseBusters v2 7FB7–8NF, repeat 0: the same candidate (zero-based index 76) improves from 2.08 Å raw to 0.30 Å refined and is PB-valid after refinement. This is the largest RMSD improvement among 138 eligible complex-repeat selections across five external cohorts and three repeats, requiring raw RMSD ≥2 Å and refined RMSD <2 Å with PB validity. The post-hoc extreme-example rule was fixed before the expanded search; this panel illustrates a strong rescue, not a typical effect. (C) Astex Diverse Set 1TZ8, repeat 0: selected RMSD 2.27 Å versus refined oracle 0.65 Å, the lower-median regret among 14 selection failures with a near-native candidate. The original median selections in A and C are unchanged.",

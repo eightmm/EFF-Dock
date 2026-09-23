@@ -259,22 +259,46 @@ def structures(rows, out):
     from benchmarks.figures.structure_views import ELEMENT_COLORS, POSE_COLORS
 
     views = DATA / "structure_views"
-    fig, axes = plt.subplots(1, 3, figsize=(14.2, 5.3))
+    fig, axes = plt.subplots(1, 3, figsize=(14.2, 4.6))
     for i, row in enumerate(rows):
         ax = axes[i]
         ax.imshow(plt.imread(views / f"{row['id']}_pocket.png"))
         ax.set_axis_off()
         ax.set_title(
-            f"{chr(65 + i)}  {row['title']}\n{row['id'].upper()}",
+            f"{chr(65 + i)}  {row['title']}",
             loc="left",
             fontweight="bold",
             pad=7,
         )
-        detail = f"Selected: {row['selected_rmsd']:.2f} Å"
+        label_box = dict(facecolor="white", edgecolor="none", alpha=0.86, pad=3)
+        ax.text(
+            0.035,
+            0.965,
+            row["id"].upper(),
+            transform=ax.transAxes,
+            ha="left",
+            va="top",
+            fontsize=11,
+            fontweight="bold",
+            color=DARK,
+            bbox=label_box,
+        )
+        detail = f"Selected RMSD: {row['selected_rmsd']:.2f} Å"
         if row["comparator_rmsd"] is not None:
-            label = "Raw, same pose" if i == 1 else "Oracle"
-            detail += f"   ·   {label}: {row['comparator_rmsd']:.2f} Å"
-        axes[i].text(0.5, -0.065, detail, transform=axes[i].transAxes, ha="center", fontsize=10)
+            label = "Raw (same pose)" if i == 1 else "Oracle RMSD"
+            detail += f"\n{label}: {row['comparator_rmsd']:.2f} Å"
+        ax.text(
+            0.035,
+            0.035,
+            detail,
+            transform=ax.transAxes,
+            ha="left",
+            va="bottom",
+            fontsize=10,
+            color=DARK,
+            linespacing=1.35,
+            bbox=label_box,
+        )
     handles = [Line2D([], [], color=c, lw=4) for c in POSE_COLORS.values()]
     labels = ["Crystal carbon", "Selected carbon", "Raw / oracle carbon"]
     present = set(
@@ -285,7 +309,7 @@ def structures(rows, out):
             handles.append(Line2D([], [], marker="o", color=color, linestyle="none", ms=6))
             labels.append(element)
     fig.legend(handles, labels, ncol=len(labels), frameon=False, loc="lower center", fontsize=10)
-    fig.subplots_adjust(left=0.02, right=0.985, top=0.84, bottom=0.18, wspace=0.06)
+    fig.subplots_adjust(left=0.02, right=0.985, top=0.88, bottom=0.10, wspace=0.06)
     save(fig, out, "S8_structure_examples", dpi=400)
 
 
