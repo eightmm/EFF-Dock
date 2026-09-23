@@ -15,7 +15,7 @@ under its heading. Confidence displays four distinct recorded poses in a matchin
 selected/not-selected marks overlaid in the upper-left image corners.
 Time and step labels use that same corner. Stage boxes have equal widths and
 uniform gaps, with aligned connectors and restrained pastel fills.
-Typography uses Matplotlib-bundled STIX fonts for both text and mathematical
+Typography uses Matplotlib-bundled DejaVu Sans fonts for both text and mathematical
 labels. The final panel omits the PDB identifier; source identity remains here.
 Empty stacked backplates and × N denote candidate multiplicity in the generation
 and refinement stages; confidence ellipses omit intervening candidates, and

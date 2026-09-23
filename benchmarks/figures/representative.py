@@ -714,8 +714,8 @@ def render(out):
     row = load()
     out.mkdir(parents=True, exist_ok=True)
     style = {
-        "font.family": "STIXGeneral",
-        "mathtext.fontset": "stix",
+        "font.family": "DejaVu Sans",
+        "mathtext.fontset": "dejavusans",
         "pdf.fonttype": 42,
         "svg.fonttype": "none",
         "svg.hashsalt": NAME,

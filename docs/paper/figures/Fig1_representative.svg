@@ -2148,89 +2148,89 @@ L 657.72 251.28
 " style="fill: none; stroke: #d9a080; stroke-width: 2.8; stroke-linecap: round"/>
   </g>
   <g id="text_1">
-   <text style="font-weight: 700; font-size: 9px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="70.2" y="23.786719" transform="rotate(-0 70.2 23.786719)">Input preparation</text>
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="70.2" y="24.083438" transform="rotate(-0 70.2 24.083438)">Input preparation</text>
   </g>
   <g id="text_2">
-   <text style="font-size: 14px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="70.2" y="197.365392" transform="rotate(-0 70.2 197.365392)">+</text>
+   <text style="font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="70.2" y="197.966955" transform="rotate(-0 70.2 197.966955)">+</text>
   </g>
   <g id="text_3">
-   <text style="font-weight: 700; font-size: 9.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="221.4" y="23.90375" transform="rotate(-0 221.4 23.90375)">Pose generation</text>
+   <text style="font-weight: 700; font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="221.4" y="24.184297" transform="rotate(-0 221.4 24.184297)">Pose generation</text>
   </g>
   <g id="text_4">
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; fill: #3e434a" transform="translate(195.736875 35.146125)">Fragment SE(3)</text>
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; fill: #3e434a" transform="translate(198.18 43.446375)">flow matching</text>
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(190.289375 35.168375)">Fragment SE(3)</text>
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(193.055 44.126625)">flow matching</text>
   </g>
   <g id="text_5">
    <!-- $\times\,N$ -->
-   <g style="fill: #7b838d" transform="translate(215.3225 350.100234)">
+   <g style="fill: #7b838d" transform="translate(213.9625 350.465469)">
     <text>
-     <tspan x="0" y="-0.125" style="font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">×</tspan>
-     <tspan x="6.462855" y="-0.125" style="font-style: italic; font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">N</tspan>
+     <tspan x="0" y="-0.4375" style="font-size: 8.5px; font-family: 'DejaVu Sans'; fill: #7b838d">×</tspan>
+     <tspan x="8.502103" y="-0.4375" style="font-style: oblique; font-size: 8.5px; font-family: 'DejaVu Sans'; fill: #7b838d">N</tspan>
     </text>
    </g>
   </g>
   <g id="text_6">
-   <text style="font-weight: 700; font-size: 9.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="372.6" y="23.836953" transform="rotate(-0 372.6 23.836953)">Post-refinement</text>
+   <text style="font-weight: 700; font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="372.6" y="24.221406" transform="rotate(-0 372.6 24.221406)">Post-refinement</text>
   </g>
   <g id="text_7">
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; fill: #3e434a" transform="translate(352.263125 35.153625)">Physics- and</text>
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; fill: #3e434a" transform="translate(345.05125 43.453875)">interaction-based</text>
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(347.5675 35.168375)">Physics- and</text>
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(337.449375 44.126625)">interaction-based</text>
   </g>
   <g id="text_8">
    <!-- $\times\,N$ -->
-   <g style="fill: #7b838d" transform="translate(366.5225 350.100234)">
+   <g style="fill: #7b838d" transform="translate(365.1625 350.465469)">
     <text>
-     <tspan x="0" y="-0.125" style="font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">×</tspan>
-     <tspan x="6.462855" y="-0.125" style="font-style: italic; font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">N</tspan>
+     <tspan x="0" y="-0.4375" style="font-size: 8.5px; font-family: 'DejaVu Sans'; fill: #7b838d">×</tspan>
+     <tspan x="8.502103" y="-0.4375" style="font-style: oblique; font-size: 8.5px; font-family: 'DejaVu Sans'; fill: #7b838d">N</tspan>
     </text>
    </g>
   </g>
   <g id="text_9">
-   <text style="font-weight: 700; font-size: 9px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="23.719219" transform="rotate(-0 523.8 23.719219)">Confidence selection</text>
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="523.8" y="24.083438" transform="rotate(-0 523.8 24.083438)">Confidence selection</text>
   </g>
   <g id="text_10">
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; fill: #3e434a" transform="translate(496.35125 37.313625)">Predicted RMSD</text>
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; fill: #3e434a" transform="translate(511.58 45.606375)">ranking</text>
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(491.9025 37.328375)">Predicted RMSD</text>
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; fill: #3e434a" transform="translate(508.6675 46.286625)">ranking</text>
   </g>
   <g id="text_11">
-   <text style="font-size: 10px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="125.449688" transform="rotate(-0 523.8 125.449688)">…</text>
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="125.879375" transform="rotate(-0 523.8 125.879375)">…</text>
   </g>
   <g id="text_12">
-   <text style="font-size: 10px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="202.489688" transform="rotate(-0 523.8 202.489688)">…</text>
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="202.919375" transform="rotate(-0 523.8 202.919375)">…</text>
   </g>
   <g id="text_13">
-   <text style="font-size: 10px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #7b838d" x="523.8" y="279.529688" transform="rotate(-0 523.8 279.529688)">…</text>
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #7b838d" x="523.8" y="279.959375" transform="rotate(-0 523.8 279.959375)">…</text>
   </g>
   <g id="text_14">
    <!-- $N\,\to\,1$ -->
-   <g style="fill: #7b838d" transform="translate(512.6225 352.980234)">
+   <g style="fill: #7b838d" transform="translate(511.305 353.345469)">
     <text>
-     <tspan x="0" y="-0.921875" style="font-style: italic; font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">N</tspan>
-     <tspan x="7.919746" y="-0.921875" style="font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">→</tspan>
-     <tspan x="18.041" y="-0.921875" style="font-size: 8.5px; font-family: 'STIXGeneral'; fill: #7b838d">1</tspan>
+     <tspan x="0" y="-0.4375" style="font-style: oblique; font-size: 8.5px; font-family: 'DejaVu Sans'; fill: #7b838d">N</tspan>
+     <tspan x="9.394437" y="-0.4375" style="font-size: 8.5px; font-family: 'DejaVu Sans'; fill: #7b838d">→</tspan>
+     <tspan x="19.552545" y="-0.4375" style="font-size: 8.5px; font-family: 'DejaVu Sans'; fill: #7b838d">1</tspan>
     </text>
    </g>
   </g>
   <g id="text_15">
-   <text style="font-size: 6.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="113.297695" transform="rotate(-0 523.8 113.297695)">pRMSD 1.59 Å  /  RMSD 0.96 Å</text>
+   <text style="font-size: 6.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="523.8" y="113.221016" transform="rotate(-0 523.8 113.221016)">pRMSD 1.59 Å  /  RMSD 0.96 Å</text>
   </g>
   <g id="text_16">
-   <text style="font-size: 6.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="190.337695" transform="rotate(-0 523.8 190.337695)">pRMSD 2.33 Å  /  RMSD 1.84 Å</text>
+   <text style="font-size: 6.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="523.8" y="190.261016" transform="rotate(-0 523.8 190.261016)">pRMSD 2.33 Å  /  RMSD 1.84 Å</text>
   </g>
   <g id="text_17">
-   <text style="font-size: 6.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="267.377695" transform="rotate(-0 523.8 267.377695)">pRMSD 2.82 Å  /  RMSD 1.81 Å</text>
+   <text style="font-size: 6.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="523.8" y="267.301016" transform="rotate(-0 523.8 267.301016)">pRMSD 2.82 Å  /  RMSD 1.81 Å</text>
   </g>
   <g id="text_18">
-   <text style="font-size: 6.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="523.8" y="344.417695" transform="rotate(-0 523.8 344.417695)">pRMSD 4.44 Å  /  RMSD 4.31 Å</text>
+   <text style="font-size: 6.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="523.8" y="344.341016" transform="rotate(-0 523.8 344.341016)">pRMSD 4.44 Å  /  RMSD 4.31 Å</text>
   </g>
   <g id="text_19">
-   <text style="font-weight: 700; font-size: 9.5px; font-family: 'STIXGeneral'; text-anchor: middle; fill: #3e434a" x="675" y="146.313398" transform="rotate(-0 675 146.313398)">Selected pose</text>
+   <text style="font-weight: 700; font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #3e434a" x="675" y="146.621406" transform="rotate(-0 675 146.621406)">Selected pose</text>
   </g>
   <g id="text_20">
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="664.2" y="237.30375" transform="rotate(-0 664.2 237.30375)">Selected</text>
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="664.2" y="237.6475" transform="rotate(-0 664.2 237.6475)">Selected</text>
   </g>
   <g id="text_21">
-   <text style="font-size: 8px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="664.2" y="253.14" transform="rotate(-0 664.2 253.14)">Crystal</text>
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="664.2" y="253.4875" transform="rotate(-0 664.2 253.4875)">Crystal</text>
   </g>
   <g id="patch_40">
    <path d="M 484.92 66.36766
@@ -2286,183 +2286,183 @@ z
   </g>
   <g id="text_22">
    <g id="patch_44">
-    <path d="M 26.97 64.150941
-L 49.740781 64.150941
-L 49.740781 54.904378
-L 26.97 54.904378
+    <path d="M 26.97 64.385003
+L 53.36875 64.385003
+L 53.36875 54.670316
+L 26.97 54.670316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
-   <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="28.44" y="61.15516" transform="rotate(-0 28.44 61.15516)">Ligand</text>
+   <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="28.44" y="61.459222" transform="rotate(-0 28.44 61.459222)">Ligand</text>
   </g>
   <g id="text_23">
    <g id="patch_45">
-    <path d="M 26.97 141.190941
-L 75.214219 141.190941
-L 75.214219 131.944378
-L 26.97 131.944378
+    <path d="M 26.97 141.425003
+L 85.803906 141.425003
+L 85.803906 131.710316
+L 26.97 131.710316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
-   <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="28.44" y="138.19516" transform="rotate(-0 28.44 138.19516)">Rigid fragments</text>
+   <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="28.44" y="138.499222" transform="rotate(-0 28.44 138.499222)">Rigid fragments</text>
   </g>
   <g id="text_24">
    <g id="patch_46">
-    <path d="M 26.97 218.22766
-L 67.431094 218.22766
-L 67.431094 208.98766
-L 26.97 208.98766
+    <path d="M 26.97 218.465003
+L 75.816875 218.465003
+L 75.816875 208.750316
+L 26.97 208.750316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
-   <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="28.44" y="215.238441" transform="rotate(-0 28.44 215.238441)">Given pocket</text>
+   <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="28.44" y="215.539222" transform="rotate(-0 28.44 215.539222)">Given pocket</text>
   </g>
   <g id="text_25">
    <g id="patch_47">
-    <path d="M 178.17 64.14766
-L 203.65 64.14766
-L 203.65 54.90766
-L 178.17 54.90766
+    <path d="M 178.17 64.385003
+L 209.81 64.385003
+L 209.81 54.670316
+L 178.17 54.670316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
    <!-- $t$ = 0.00 -->
-   <g style="fill: #3e434a" transform="translate(179.64 61.158441)">
+   <g style="fill: #3e434a" transform="translate(179.64 61.459222)">
     <text>
-     <tspan x="0" y="-0.265625" style="font-style: italic; font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">t</tspan>
-     <tspan x="1.945999" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a"> </tspan>
-     <tspan x="3.695999" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">=</tspan>
-     <tspan x="8.490997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a"> </tspan>
-     <tspan x="10.240997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">0</tspan>
-     <tspan x="13.740997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">.</tspan>
-     <tspan x="15.490997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">0</tspan>
-     <tspan x="18.990997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">0</tspan>
+     <tspan x="0" y="-0.796875" style="font-style: oblique; font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">t</tspan>
+     <tspan x="2.744629" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a"> </tspan>
+     <tspan x="4.969727" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">=</tspan>
+     <tspan x="10.834961" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a"> </tspan>
+     <tspan x="13.060059" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">0</tspan>
+     <tspan x="17.513672" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">.</tspan>
+     <tspan x="19.73877" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">0</tspan>
+     <tspan x="24.192383" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">0</tspan>
     </text>
    </g>
   </g>
   <g id="text_26">
    <g id="patch_48">
-    <path d="M 178.17 141.18766
-L 203.65 141.18766
-L 203.65 131.94766
-L 178.17 131.94766
+    <path d="M 178.17 141.425003
+L 209.81 141.425003
+L 209.81 131.710316
+L 178.17 131.710316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
    <!-- $t$ = 0.49 -->
-   <g style="fill: #3e434a" transform="translate(179.64 138.198441)">
+   <g style="fill: #3e434a" transform="translate(179.64 138.499222)">
     <text>
-     <tspan x="0" y="-0.265625" style="font-style: italic; font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">t</tspan>
-     <tspan x="1.945999" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a"> </tspan>
-     <tspan x="3.695999" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">=</tspan>
-     <tspan x="8.490997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a"> </tspan>
-     <tspan x="10.240997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">0</tspan>
-     <tspan x="13.740997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">.</tspan>
-     <tspan x="15.490997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">4</tspan>
-     <tspan x="18.990997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">9</tspan>
+     <tspan x="0" y="-0.796875" style="font-style: oblique; font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">t</tspan>
+     <tspan x="2.744629" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a"> </tspan>
+     <tspan x="4.969727" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">=</tspan>
+     <tspan x="10.834961" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a"> </tspan>
+     <tspan x="13.060059" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">0</tspan>
+     <tspan x="17.513672" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">.</tspan>
+     <tspan x="19.73877" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">4</tspan>
+     <tspan x="24.192383" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">9</tspan>
     </text>
    </g>
   </g>
   <g id="text_27">
    <g id="patch_49">
-    <path d="M 178.17 218.22766
-L 203.65 218.22766
-L 203.65 208.98766
-L 178.17 208.98766
+    <path d="M 178.17 218.465003
+L 209.25 218.465003
+L 209.25 208.750316
+L 178.17 208.750316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
    <!-- $t$ = 0.78 -->
-   <g style="fill: #3e434a" transform="translate(179.64 215.238441)">
+   <g style="fill: #3e434a" transform="translate(179.64 215.539222)">
     <text>
-     <tspan x="0" y="-0.265625" style="font-style: italic; font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">t</tspan>
-     <tspan x="1.945999" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a"> </tspan>
-     <tspan x="3.695999" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">=</tspan>
-     <tspan x="8.490997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a"> </tspan>
-     <tspan x="10.240997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">0</tspan>
-     <tspan x="13.740997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">.</tspan>
-     <tspan x="15.490997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">7</tspan>
-     <tspan x="18.990997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">8</tspan>
+     <tspan x="0" y="-0.796875" style="font-style: oblique; font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">t</tspan>
+     <tspan x="2.744629" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a"> </tspan>
+     <tspan x="4.969727" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">=</tspan>
+     <tspan x="10.834961" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a"> </tspan>
+     <tspan x="13.060059" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">0</tspan>
+     <tspan x="17.513672" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">.</tspan>
+     <tspan x="19.23877" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">7</tspan>
+     <tspan x="23.692383" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">8</tspan>
     </text>
    </g>
   </g>
   <g id="text_28">
    <g id="patch_50">
-    <path d="M 178.17 295.26766
-L 203.65 295.26766
-L 203.65 286.02766
-L 178.17 286.02766
+    <path d="M 178.17 295.505003
+L 209.81 295.505003
+L 209.81 285.790316
+L 178.17 285.790316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
    <!-- $t$ = 1.00 -->
-   <g style="fill: #3e434a" transform="translate(179.64 292.278441)">
+   <g style="fill: #3e434a" transform="translate(179.64 292.579222)">
     <text>
-     <tspan x="0" y="-0.265625" style="font-style: italic; font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">t</tspan>
-     <tspan x="1.945999" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a"> </tspan>
-     <tspan x="3.695999" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">=</tspan>
-     <tspan x="8.490997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a"> </tspan>
-     <tspan x="10.240997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">1</tspan>
-     <tspan x="13.740997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">.</tspan>
-     <tspan x="15.490997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">0</tspan>
-     <tspan x="18.990997" y="-0.265625" style="font-size: 7px; font-family: 'STIXGeneral'; fill: #3e434a">0</tspan>
+     <tspan x="0" y="-0.796875" style="font-style: oblique; font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">t</tspan>
+     <tspan x="2.744629" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a"> </tspan>
+     <tspan x="4.969727" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">=</tspan>
+     <tspan x="10.834961" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a"> </tspan>
+     <tspan x="13.060059" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">1</tspan>
+     <tspan x="17.513672" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">.</tspan>
+     <tspan x="19.73877" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">0</tspan>
+     <tspan x="24.192383" y="-0.796875" style="font-size: 7px; font-family: 'DejaVu Sans'; fill: #3e434a">0</tspan>
     </text>
    </g>
   </g>
   <g id="text_29">
    <g id="patch_51">
-    <path d="M 329.37 64.14766
-L 350.005781 64.14766
-L 350.005781 54.90766
-L 329.37 54.90766
+    <path d="M 329.37 64.385003
+L 354.927656 64.385003
+L 354.927656 54.670316
+L 329.37 54.670316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
-   <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="330.84" y="61.158441" transform="rotate(-0 330.84 61.158441)">Step 0</text>
+   <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="330.84" y="61.459222" transform="rotate(-0 330.84 61.459222)">Step 0</text>
   </g>
   <g id="text_30">
    <g id="patch_52">
-    <path d="M 329.37 141.20516
-L 353.505781 141.20516
-L 353.505781 131.93016
-L 329.37 131.93016
+    <path d="M 329.37 141.425003
+L 359.381406 141.425003
+L 359.381406 131.710316
+L 329.37 131.710316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
-   <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="330.84" y="138.215941" transform="rotate(-0 330.84 138.215941)">Step 25</text>
+   <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="330.84" y="138.499222" transform="rotate(-0 330.84 138.499222)">Step 25</text>
   </g>
   <g id="text_31">
    <g id="patch_53">
-    <path d="M 329.37 218.24516
-L 353.505781 218.24516
-L 353.505781 208.97016
-L 329.37 208.97016
+    <path d="M 329.37 218.465003
+L 359.381406 218.465003
+L 359.381406 208.750316
+L 329.37 208.750316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
-   <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="330.84" y="215.255941" transform="rotate(-0 330.84 215.255941)">Step 50</text>
+   <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="330.84" y="215.539222" transform="rotate(-0 330.84 215.539222)">Step 50</text>
   </g>
   <g id="text_32">
    <g id="patch_54">
-    <path d="M 329.37 295.26766
-L 357.005781 295.26766
-L 357.005781 286.02766
-L 329.37 286.02766
+    <path d="M 329.37 295.505003
+L 363.835156 295.505003
+L 363.835156 285.790316
+L 329.37 285.790316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
-   <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="330.84" y="292.278441" transform="rotate(-0 330.84 292.278441)">Step 100</text>
+   <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="330.84" y="292.579222" transform="rotate(-0 330.84 292.579222)">Step 100</text>
   </g>
   <g id="text_33">
    <g id="patch_55">
-    <path d="M 631.77 178.91805
-L 675.352656 178.91805
-L 675.352656 169.097269
-L 631.77 169.097269
+    <path d="M 631.77 178.865003
+L 680.27125 178.865003
+L 680.27125 169.150316
+L 631.77 169.150316
 z
 " style="fill: #ffffff; opacity: 0.92"/>
    </g>
-   <text style="font-size: 7px; font-family: 'STIXGeneral'; text-anchor: start; fill: #3e434a" x="633.24" y="175.928831" transform="rotate(-0 633.24 175.928831)">RMSD 0.96 Å</text>
+   <text style="font-size: 7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #3e434a" x="633.24" y="175.939222" transform="rotate(-0 633.24 175.939222)">RMSD 0.96 Å</text>
   </g>
   <g id="line2d_262">
    <path d="M 481.32 59.88766
