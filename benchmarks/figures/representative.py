@@ -155,20 +155,12 @@ def input_scene(row, javascript, camera, *, full=False):
     view.addModel(record["full_pdb"] if full else record["cropped_pdb"], "pdb", {"keepH": False})
     view.setStyle({"model": 0}, {})
     if full:
-        pocket_selection = {
-            "model": 0,
-            "or": [
-                {"chain": chain, "resi": [r[1] for r in record["residues"] if r[0] == chain]}
-                for chain in sorted({r[0] for r in record["residues"]})
-            ],
-        }
-        view.addSurface(
-            "MS",
-            {"color": "#D9D9D9", "opacity": 0.3},
-            {"model": 0, "not": pocket_selection},
-            {"model": 0},
-        )
-        view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 1}, pocket_selection, {"model": 0})
+        view.addSurface("MS", {"color": "#ADB5BD", "opacity": 0.45}, {"model": 0})
+        # Use the same complete crop surface in both views, rather than pieces
+        # cut from the full receptor mesh at the retained-residue boundary.
+        view.addModel(record["cropped_pdb"], "pdb", {"keepH": False})
+        view.setStyle({"model": 1}, {})
+        view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 1}, {"model": 1})
     else:
         view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 1}, {"model": 0})
     view.setProjection("orthographic")
@@ -192,7 +184,7 @@ def input_scene(row, javascript, camera, *, full=False):
   const center = viewer.modelToScreen(CENTER_COORDINATES);
   const marker = document.createElement("div");
   Object.assign(marker.style, {position:"absolute", left:center.x+"px",
-    top:center.y+"px", width:"14px", height:"14px", borderRadius:"50%",
+    top:center.y+"px", width:"20px", height:"20px", borderRadius:"50%",
     background:"CENTER_COLOR", border:"2px solid white", boxSizing:"border-box",
     transform:"translate(-50%,-50%)", pointerEvents:"none", zIndex:10});
   document.body.appendChild(marker);
@@ -259,6 +251,7 @@ def verify_extra_views():
             if (
                 metadata.get("pocket_color") != POCKET_COLOR
                 or metadata.get("center_marker") != pocket_data()["center"]
+                or metadata.get("pocket_surface_context") != "cropped_pdb"
             ):
                 raise ValueError("Input pocket highlight or center marker differs")
             sources.append(("input_pocket.json", metadata["input_pocket_sha256"]))
@@ -410,12 +403,13 @@ async def capture_views(javascript, work, *, stems=None):
                 metadata["surface_type"] = "MS"
                 metadata["surface_complete"] = True
                 metadata["pocket_color"] = POCKET_COLOR
-                metadata["nonpocket_opacity"] = 0.3 if stem == "full_protein" else None
+                metadata["receptor_opacity"] = 0.45 if stem == "full_protein" else None
+                metadata["pocket_surface_context"] = "cropped_pdb"
                 metadata["center_marker"] = pocket_data()["center"]
                 metadata["center_marker_color"] = POCKET_CENTER_COLOR
                 metadata["center_marker_screen"] = await page.evaluate("window.pocketCenterScreen")
                 metadata["description"] = (
-                    "Full supplied receptor surface; teal retained residues and projected supplied-center marker"
+                    "Translucent full receptor surface with complete teal crop surface in original coordinates and projected supplied-center marker"
                     if stem == "full_protein"
                     else "Teal surface of the exact residue-aware crop with projected supplied-center marker"
                 )
