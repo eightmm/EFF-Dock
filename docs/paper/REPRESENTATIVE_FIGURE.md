@@ -4,7 +4,7 @@ A standalone left-to-right overview for known-pocket redocking: ligand
 fragmentation + given pocket → candidate generation → post-generation refinement
 → confidence selection → one output pose. Refinement is downstream of the
 completed generative flow. No η-based guidance is depicted.
-The full supplied receptor, given pocket, fragments and ligand occupy equally sized panels in a vertical
+The full supplied receptor, given pocket, fragments and ligand occupy aligned panels in a vertical
 input column enclosed in an Input preparation box with the same height as
 the generation, refinement and confidence stages. Names sit inside
 the upper-left corners. The full-receptor panel is labeled "Pocket extraction"
@@ -43,7 +43,10 @@ N → 1 denotes selection. Here N = 100 in the primary candidate-bank protocol.
 Each confidence image has a compact white score panel inside its upper-left
 corner, separate from the selection glyph. The pRMSD and RMSD labels are
 left-aligned and their values right-aligned in two consistent rows, with both
-values in ångströms. All pose panels have equal dimensions.
+values in ångströms. All pose panels have equal dimensions. The cropped-pocket input panel is 20%
+taller, with its center preserved, to enlarge the 10 Å pocket without changing
+the residue selection. Its viewport shifts the structure slightly right to keep
+the upper-left label clear. Source coordinates and camera orientation are unchanged.
 This draft does not change the existing 21-page reference package.
 
 - [PDF](figures/Fig1_representative.pdf)

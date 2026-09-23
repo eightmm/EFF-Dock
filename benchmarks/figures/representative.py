@@ -547,7 +547,7 @@ def common_crop(images, pad=0.045):
     )
 
 
-def surface_crop(pixels, aspect):
+def surface_crop(pixels, aspect, *, right_shift=0.0):
     """Fit the complete input surface at the pose-panel aspect, without clipping."""
     ys, xs = np.nonzero(np.min(pixels[..., :3], axis=-1) < 0.96)
     if not len(ys):
@@ -562,6 +562,7 @@ def surface_crop(pixels, aspect):
     if cw > w or ch > h:
         raise ValueError("Surface needs a wider source camera")
     x0 = min(max(int(round((xs.min() + xs.max() - cw) / 2)), 0), w - cw)
+    x0 = max(0, x0 - int(round(right_shift * cw)))
     y0 = min(max(int(round((ys.min() + ys.max() - ch) / 2)), 0), h - ch)
     if not (x0 <= xs.min() <= xs.max() < x0 + cw and y0 <= ys.min() <= ys.max() < y0 + ch):
         raise ValueError("Input surface crop excludes visible geometry")
@@ -673,7 +674,6 @@ def compose(row):
     annotations = annotation_data()
     reference = reference_data()
     crop = common_crop([*flow, *refinement, *candidates, overlay])
-    input_aspect = (crop[3] - crop[2]) / (crop[1] - crop[0])
     height, fw, box_width = 5.25, 1.55, 1.75
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
     positions = (3.75, 2.68, 1.61, 0.54)
@@ -732,10 +732,11 @@ def compose(row):
             )
         )
 
-    def corner(x, y, text):
+    def corner(x, y, text, panel_height=None):
+        panel_height = fh if panel_height is None else panel_height
         fig.text(
             (x + 0.07) / WIDTH,
-            (y + fh - 0.095) / height,
+            (y + panel_height - 0.095) / height,
             text,
             fontsize=7,
             color=DARK,
@@ -754,14 +755,18 @@ def compose(row):
     center = columns[0] + box_width / 2
     px = center - fw / 2
     header(center, 5.10, "Input preparation", "Protein + ligand")
-    for y, title, pixels in (
-        (positions[0], "Pocket extraction", protein),
-        (positions[1], "Cropped pocket", pocket),
+    pocket_height = 1.20 * fh
+    pocket_y = positions[1] - (pocket_height - fh) / 2
+    for y, title, pixels, panel_height in (
+        (positions[0], "Pocket extraction", protein, fh),
+        (pocket_y, "Cropped pocket", pocket, pocket_height),
     ):
-        input_crop = surface_crop(pixels, input_aspect)
-        arts.append(frame(fig, rect(px, y, fw, fh), pixels, input_crop, FRAME_EDGE, 0.6))
-        corner(px, y, title)
-    down(center, positions[0] - 0.045, positions[1] + fh + 0.045)
+        input_crop = surface_crop(
+            pixels, fw / panel_height, right_shift=0.09 if title == "Cropped pocket" else 0.0
+        )
+        arts.append(frame(fig, rect(px, y, fw, panel_height), pixels, input_crop, FRAME_EDGE, 0.6))
+        corner(px, y, title, panel_height)
+    down(center, positions[0] - 0.025, pocket_y + pocket_height + 0.025)
     for y, title, fragmented in (
         (positions[2], "Rigid fragments", True),
         (positions[3], "Ligand", False),
