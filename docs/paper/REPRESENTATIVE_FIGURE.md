@@ -9,7 +9,9 @@ input column enclosed in an Input preparation box. Generation and refinement are
 each contains four states ordered from top to bottom with downward arrows.
 The stages progress from left to right. Method subtitles sit inside each box
 under its heading. Confidence displays four distinct recorded poses in a matching large box, with
-selected/not-selected marks overlaid in the image corners. All pose panels
+selected/not-selected marks overlaid in the upper-left image corners.
+Time and step labels use that same corner. Stage boxes have equal widths and
+uniform gaps, with aligned connectors and restrained pastel fills. All pose panels
 have equal dimensions.
 This draft does not change the existing 21-page reference package.
 
@@ -66,7 +68,7 @@ energy parameter identities and implementation checksums are retained.
 | Pose generation | Saved frames 0, 2, 4 and 10: t = 0, 0.488, 0.784 and 1 |
 | Post-refinement | Steps 0, 25, 50 and 100 from the recorded CPU refinement of that exact endpoint |
 | Confidence candidates | Astex repeat 0, same 1T46 complex, existing N100 refined bank; eligible ranks 1, 25, 50 and 100 |
-| Selected pose | Actual confidence-selected candidate, zero-based index 41, repeated as output |
+| Selected pose | Actual confidence-selected candidate, zero-based index 41, overlaid with its crystal reference; symmetry-aware heavy-atom RMSD 0.96 Å |
 
 **Selection is measured; the whole pipeline is an overview assembled from two
 runs.** The generation/refinement trajectory is the saved N1 example. The
@@ -98,7 +100,7 @@ aspect ratio inside these bounds. They are not docking conformers. Refinement
 step 0 reuses the generated t = 1 capture, preserving the exact transition between
 stages. The overview gallery uses stored coordinates; no optimization was rerun.
 Generation times and refinement iterations are labeled separately inside the
-lower-left corner of each image. The four
+upper-left corner of each image. The four
 panels within each stage are successive states of one example, not four
 independently sampled candidates.
 
@@ -120,6 +122,21 @@ the raw endpoint; its displacement-to-reference metrics are deliberately not
 published as crystal RMSD. No new docking inference or confidence selection
 was performed.
 
+## Selected-pose reference overlay
+
+The output panel compares the frozen selected candidate (index 41) with the exact
+crystal ligand used by its Astex repeat-0 refined evaluation. The reference SDF
+hash agrees between the trajectory provenance and that run's refinement inputs.
+Its saved symmetry-aware heavy-atom RMSD is 0.9585406947604571 Å (displayed as
+0.96 Å), independently reproduced with RDKit `CalcRMS` without alignment. This is
+an observed reference RMSD, not the confidence model's predicted RMSD. Reference
+coordinates, source hashes and the verified value are stored in
+`selected_reference.json`; its capture is `views/overview/selected_overlay.png`.
+Existing selected coordinates, confidence scores and candidate choice are unchanged.
+The crystal ligand is used only for retrospective visualization and evaluation;
+it is not provided to the confidence selector. This illustration is a single
+case and does not establish a success rate.
+
 ## Caption
 
 **Fragment-based pose generation, post-generation refinement and confidence selection.**
@@ -135,10 +152,12 @@ Method subtitles appear beneath the stage headings; η-based guidance is omitted
 The confidence stage displays four distinct refined candidates from the existing
 N100 bank for the same 1T46–STI complex, at eligible predicted-RMSD ranks 1, 25, 50
 and 100. The best-ranked candidate carries an overlaid ✓ and is shown as the
-selected output;
+selected output, overlaid with the crystal ligand in the unchanged receptor
+coordinate frame (symmetry-aware heavy-atom RMSD 0.96 Å);
 × marks the three unselected candidates, not physical invalidity. All molecular
-panels share camera, crop and scale. Carbon colors identify fragments and
-heteroatoms retain element colors. The generation/refinement trajectory is the
+panels share camera, crop and scale. Carbon colors identify fragments in the trajectory and candidate panels;
+the final overlay instead uses blue for selected-pose carbons and peach for
+crystal carbons. Heteroatoms retain element colors. The generation/refinement trajectory is the
 saved N1/S10 illustration; the confidence examples are from the separate primary
 N100/S10 Astex repeat-0 run. Thus the overview combines complementary records
 for one complex, rather than depicting a single end-to-end sampled bank.

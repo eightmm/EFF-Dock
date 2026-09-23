@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Ellipse, FancyArrowPatch, FancyBboxPatch
 
-from benchmarks.figures.structure_views import ELEMENT_COLORS, JS_SHA256, JS_URL
+from benchmarks.figures.structure_views import ELEMENT_COLORS, JS_SHA256, JS_URL, atoms, viewer_html
 from benchmarks.figures.trajectory import COLORS, DATA, ROOT, scene, verify
 
 NAME = "Fig1_representative"
@@ -33,17 +33,19 @@ CANDIDATE_VIEWS = {
     "candidate_median": 2,
     "candidate_worst": 3,
 }
+OUTPUT_VIEWS = {"selected_overlay": 0}
+OUTPUT_COLORS = {"selected": "#79AEC8", "crystal": "#D9A080"}
 FLOW_VIEWS = {f"flow_{i:02d}": i for i in FLOW_INDICES}
 OVERVIEW_DIR = DATA / "views/overview"
 OVERVIEW_ZOOM = 0.70
 DARK = "#3E434A"
 MUTED = "#7B838D"
-CONNECTOR = "#B4BBC4"
+CONNECTOR = "#9AAEBB"
 FRAME_EDGE = "#D6DBE1"
 POSE_EDGE = "#8C96A3"
 
 # Landscape overview; preserve vector labels when scaling for the manuscript.
-WIDTH = 9.4
+WIDTH = 10.35
 
 
 def selection_data():
@@ -74,16 +76,75 @@ def selection_data():
     return record
 
 
+def reference_data():
+    record = json.loads((DATA / "selected_reference.json").read_text())
+    selection = selection_data()
+    if (
+        record["selection_sha256"]
+        != hashlib.sha256((DATA / "selection_example.json").read_bytes()).hexdigest()
+    ):
+        raise ValueError("Stale selected/crystal overlay")
+    if record["selected_index"] != selection["selected_index"]:
+        raise ValueError("Overlay does not show the selected pose")
+    coords = np.asarray(record["reference"]["coordinates"])
+    rmsd = record["symmetry_rmsd_angstrom"]
+    if (
+        coords.shape != (37, 3)
+        or not np.isfinite(coords).all()
+        or not np.isfinite(rmsd)
+        or rmsd < 0
+    ):
+        raise ValueError("Invalid crystal reference or RMSD")
+    if not np.isclose(rmsd, record["verified_rmsd_angstrom"], atol=1e-6, rtol=0):
+        raise ValueError("Overlay RMSD verification differs")
+    return record
+
+
+def output_scene(row, selection, javascript, camera):
+    import py3Dmol
+
+    view = py3Dmol.view(width=900, height=680)
+    view.setBackgroundColor("white")
+    view.addModel(row["protein_display"]["pdb"], "pdb", {"keepH": False})
+    view.setStyle({"model": 0}, {"cartoon": {"color": "#B7C7D8", "opacity": 0.35, "arrows": True}})
+    chosen = dict(
+        coordinates=selection["candidates"][0]["coordinates"],
+        elements=row["elements"],
+        bonds=row["bonds"],
+    )
+    for index, (key, molecule) in enumerate(
+        (("selected", chosen), ("crystal", reference_data()["reference"])), start=1
+    ):
+        view.addModel()
+        view.getModel(index).addAtoms(atoms(molecule))
+        scheme = dict(ELEMENT_COLORS, C=OUTPUT_COLORS[key])
+        view.setStyle(
+            {"model": index},
+            {
+                "stick": {"colorscheme": scheme, "radius": 0.15, "singleBonds": True},
+                "sphere": {"colorscheme": scheme, "scale": 0.16},
+            },
+        )
+    view.setProjection("orthographic")
+    view.setView(camera)
+    view.zoom(OVERVIEW_ZOOM)
+    view.render()
+    return viewer_html(view, javascript)
+
+
 def verify_extra_views():
     captures = json.loads((DATA / "views/manifest.json").read_text())
     candidates = selection_data()
-    for stem, step in (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS).items():
+    for stem, step in (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS | OUTPUT_VIEWS).items():
         metadata = json.loads((OVERVIEW_DIR / f"{stem}.json").read_text())
         sources = [
             ("trace.json", metadata["trace_sha256"]),
             (f"views/overview/{stem}.png", metadata["sha256"]),
         ]
-        if stem in CANDIDATE_VIEWS:
+        if stem in OUTPUT_VIEWS:
+            reference_data()
+            sources.append(("selected_reference.json", metadata["reference_sha256"]))
+        elif stem in CANDIDATE_VIEWS:
             if metadata.get("candidate_index") != candidates["candidates"][step]["index"]:
                 raise ValueError(f"Incorrect confidence candidate: {stem}")
             sources.append(("selection_example.json", metadata["selection_sha256"]))
@@ -118,7 +179,10 @@ async def capture_views(javascript, work, *, stems=None):
     camera = json.loads((DATA / "views/manifest.json").read_text())["records"][0]["camera"]
     verify_refinement(row)
     candidates = selection_data()
-    if stems is not None and set(stems) - (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS).keys():
+    if (
+        stems is not None
+        and set(stems) - (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS | OUTPUT_VIEWS).keys()
+    ):
         raise ValueError("Unknown molecular capture request")
     work.mkdir(parents=True, exist_ok=True)
     OVERVIEW_DIR.mkdir(parents=True, exist_ok=True)
@@ -131,7 +195,7 @@ async def capture_views(javascript, work, *, stems=None):
                 "--disable-dev-shm-usage",
             ]
         )
-        for stem, step in (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS).items():
+        for stem, step in (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS | OUTPUT_VIEWS).items():
             if stems is not None and stem not in stems:
                 continue
             pocket = step is None
@@ -154,7 +218,9 @@ async def capture_views(javascript, work, *, stems=None):
                 )
             html = work / f"{stem}.html"
             html.write_text(
-                scene(
+                output_scene(row, candidates, javascript, camera)
+                if stem in OUTPUT_VIEWS
+                else scene(
                     source,
                     index,
                     javascript,
@@ -197,7 +263,14 @@ async def capture_views(javascript, work, *, stems=None):
                     else "Recorded refinement of the stored N1 endpoint; shared overview camera and original fragment colors."
                 ),
             )
-            if is_candidate:
+            if stem in OUTPUT_VIEWS:
+                metadata["description"] = (
+                    "Selected pose and evaluated crystal reference; receptor frame; no alignment"
+                )
+                metadata["reference_sha256"] = hashlib.sha256(
+                    (DATA / "selected_reference.json").read_bytes()
+                ).hexdigest()
+            elif is_candidate:
                 metadata["description"] = (
                     "Existing N100 refined candidate; matched receptor frame and camera; selected/not-selected marks are not PB validity"
                 )
@@ -373,9 +446,10 @@ def connector(fig, x0, x1, y, width, height):
             (x0 / width, y / height),
             (x1 / width, y / height),
             transform=fig.transFigure,
-            arrowstyle="-|>,head_length=4,head_width=2.2",
+            arrowstyle="-|>",
+            mutation_scale=9,
             color=CONNECTOR,
-            lw=1.0,
+            lw=0.9,
             shrinkA=0,
             shrinkB=0,
         )
@@ -390,11 +464,14 @@ def compose(row):
     ]
     pocket = plt.imread(OVERVIEW_DIR / "supplied_pocket.png")
     candidates = [plt.imread(OVERVIEW_DIR / f"{stem}.png") for stem in CANDIDATE_VIEWS]
+    overlay = plt.imread(OVERVIEW_DIR / "selected_overlay.png")
     selection = selection_data()
-    crop = common_crop([*flow, *refinement, *candidates])
-    height = 5.25
-    fw = 1.30
+    reference = reference_data()
+    crop = common_crop([*flow, *refinement, *candidates, overlay])
+    height, fw, box_width = 5.25, 1.30, 1.75
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
+    positions = (3.80, 2.73, 1.66, 0.59)
+    columns = (0.10, 2.20, 4.30, 6.40, 8.50)
     middle = 2.21 + fh / 2
     fig = plt.figure(figsize=(WIDTH, height))
     arts = []
@@ -437,83 +514,84 @@ def compose(row):
                 (x / WIDTH, bottom / height),
                 transform=fig.transFigure,
                 arrowstyle="-|>",
-                mutation_scale=7,
+                mutation_scale=9,
                 color=CONNECTOR,
                 linewidth=0.9,
+                shrinkA=0,
+                shrinkB=0,
             )
         )
 
-    card(0.025, 0.30, 1.60, 4.80, edge="#BAC7D2", fill="#F8FAFC", lw=0.85)
-    label(0.825, 4.95, "Input preparation", size=9)
-    for y, title, fragmented in ((3.80, "Ligand", False), (2.21, "Rigid fragments", True)):
-        card(0.175, y, fw, fh, fill="#FAFBFC")
-        ligand_diagram(fig.add_axes(rect(0.175, y, fw, fh)), row, fragmented=fragmented)
-        label(0.825, 4.70 if not fragmented else y + fh + 0.16, title, size=8.5)
-    down(0.825, 3.64, 2.21 + fh + 0.35)
-    arts.append(frame(fig, rect(0.175, 0.62, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
-    label(0.825, 0.62 + fh + 0.16, "Given pocket", size=8.5)
-    fig.add_artist(
-        plt.Line2D(
-            [1.52 / WIDTH, 1.76 / WIDTH, 1.76 / WIDTH, 1.52 / WIDTH],
-            [(0.62 + fh / 2) / height, (0.62 + fh / 2) / height, middle / height, middle / height],
-            color=CONNECTOR,
-            linewidth=0.8,
+    def corner(x, y, text):
+        fig.text(
+            (x + 0.07) / WIDTH,
+            (y + fh - 0.095) / height,
+            text,
+            fontsize=7,
+            color=DARK,
+            ha="left",
+            va="center",
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.92, "pad": 1.5},
+            zorder=8,
         )
+
+    palettes = (
+        ("#F3F7FA", "#BDCDD8"),
+        ("#F5F3FA", "#C9C0D9"),
+        ("#FBF5F0", "#DCCBBE"),
+        ("#F1F8F5", "#BBD3C9"),
     )
-    connector(fig, 1.76, 1.90, middle, WIDTH, height)
+    for x, (fill, edge) in zip(columns[:4], palettes, strict=True):
+        card(x, 0.30, box_width, 4.80, edge=edge, fill=fill, lw=0.85)
+    for left, right in zip(columns[:-1], columns[1:], strict=True):
+        connector(fig, left + box_width + 0.065, right - 0.065, middle, WIDTH, height)
+
+    center = columns[0] + box_width / 2
+    px = center - fw / 2
+    label(center, 4.95, "Input preparation", size=9)
+    for y, title, fragmented in ((3.80, "Ligand", False), (2.21, "Rigid fragments", True)):
+        card(px, y, fw, fh, fill="#FCFDFE")
+        ligand_diagram(fig.add_axes(rect(px, y, fw, fh)), row, fragmented=fragmented)
+        label(center, 4.70 if not fragmented else y + fh + 0.16, title, size=8.5)
+    down(center, 3.61, 2.21 + fh + 0.35)
+    arts.append(frame(fig, rect(px, 0.59, fw, fh), pocket, crop, FRAME_EDGE, 0.6))
+    label(center, 0.59 + fh + 0.16, "Given pocket", size=8.5)
 
     def trajectory(box_x, title, method, images, labels):
-        box_width = 1.65
         center = box_x + box_width / 2
         px = center - fw / 2
-        card(box_x, 0.30, box_width, 4.80, edge="#BAC7D2", fill="#F8FAFC", lw=0.85)
         label(center, 4.95, title)
         label(center, 4.70, method, size=8, weight="normal")
-        positions = (3.80, 2.73, 1.66, 0.59)
         for i, (py, pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
             arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.55))
-            fig.text(
-                (px + 0.055) / WIDTH,
-                (py + 0.075) / height,
-                text,
-                fontsize=7,
-                color=DARK,
-                ha="left",
-                va="center",
-                bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.90, "pad": 1.2},
-                zorder=8,
-            )
+            corner(px, py, text)
             if i < 3:
-                down(center, py - 0.05, positions[i + 1] + fh + 0.03)
+                down(center, py - 0.07, positions[i + 1] + fh + 0.07)
 
     trajectory(
-        1.95,
+        columns[1],
         "Pose generation",
         "Fragment SE(3)\nflow matching",
         flow,
         [f"$t$ = {row['times'][i]:.2f}" for i in FLOW_INDICES],
     )
-    connector(fig, 3.65, 3.95, middle, WIDTH, height)
     trajectory(
-        4.00,
+        columns[2],
         "Post-refinement",
         "Physics- and\ninteraction-based",
         refinement,
         [f"Step {step}" for step in REFINEMENT_STEPS],
     )
-    connector(fig, 5.70, 5.87, middle, WIDTH, height)
 
-    card(5.925, 0.30, 1.65, 4.80, edge="#BAC7D2", fill="#F8FAFC", lw=0.85)
-    label(6.75, 4.95, "Confidence selection", size=9)
-    label(6.75, 4.70, "Predicted RMSD\nranking", size=8, weight="normal")
-    for pixels, candidate, y in zip(
-        candidates, selection["candidates"], (3.80, 2.73, 1.66, 0.59), strict=True
-    ):
+    center = columns[3] + box_width / 2
+    px = center - fw / 2
+    label(center, 4.95, "Confidence selection", size=9)
+    label(center, 4.70, "Predicted RMSD\nranking", size=8, weight="normal")
+    for pixels, candidate, y in zip(candidates, selection["candidates"], positions, strict=True):
         selected = candidate["selected"]
-        edge = "#78A797" if selected else FRAME_EDGE
-        arts.append(frame(fig, rect(6.10, y, fw, fh), pixels, crop, edge, 0.9 if selected else 0.6))
-        # Overlay in the padded corner, leaving the molecular sticks visible.
-        cx, cy = 6.10 + fw - 0.11, y + fh - 0.10
+        edge = "#82B7A4" if selected else FRAME_EDGE
+        arts.append(frame(fig, rect(px, y, fw, fh), pixels, crop, edge, 0.9 if selected else 0.6))
+        cx, cy = px + 0.11, y + fh - 0.10
         fig.add_artist(
             Ellipse(
                 (cx / WIDTH, cy / height),
@@ -525,7 +603,7 @@ def compose(row):
                 zorder=8,
             )
         )
-        color = "#568977" if selected else "#B78279"
+        color = "#619D86" if selected else "#C28F8F"
         paths = (
             [[(-0.05, 0), (-0.01, -0.04), (0.055, 0.05)]]
             if selected
@@ -538,14 +616,39 @@ def compose(row):
                     [(cy + dy) / height for _, dy in path],
                     transform=fig.transFigure,
                     color=color,
-                    linewidth=1.6,
+                    linewidth=1.5,
                     solid_capstyle="round",
                     zorder=9,
                 )
             )
-    connector(fig, 7.62, 7.95, 3.80 + fh / 2, WIDTH, height)
-    arts.append(frame(fig, rect(8.00, 3.80, fw, fh), candidates[0], crop, "#78A797", 1.0))
-    label(8.65, 4.95, "Selected pose")
+
+    center = columns[4] + box_width / 2
+    px = center - fw / 2
+    card(columns[4], 1.57, box_width, 2.30, edge="#BBD3C9", fill="#F7FBF9", lw=0.85)
+    label(center, 3.65, "Selected pose")
+    label(center, 3.38, "1T46–STI", size=8, weight="normal", color=MUTED)
+    arts.append(frame(fig, rect(px, 2.21, fw, fh), overlay, crop, "#82B7A4", 0.9))
+    corner(px, 2.21, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")
+    for y, key, text in ((1.98, "selected", "Selected"), (1.76, "crystal", "Crystal")):
+        fig.add_artist(
+            plt.Line2D(
+                [(center - 0.46) / WIDTH, (center - 0.24) / WIDTH],
+                [y / height] * 2,
+                transform=fig.transFigure,
+                color=OUTPUT_COLORS[key],
+                linewidth=2.8,
+                solid_capstyle="round",
+            )
+        )
+        fig.text(
+            (center - 0.15) / WIDTH,
+            y / height,
+            text,
+            fontsize=8,
+            color=DARK,
+            ha="left",
+            va="center",
+        )
     return fig, arts
 
 

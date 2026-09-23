@@ -9,6 +9,7 @@ from pathlib import Path
 
 import numpy as np
 from rdkit import Chem
+from rdkit.Chem import rdMolAlign
 
 from benchmarks.analysis.evidence import selected_indices
 
@@ -120,6 +121,41 @@ def export(source_root):
         json.dumps(output, indent=2, allow_nan=False) + "\n"
     )
     print("Exported existing candidate indices:", [r["index"] for r in candidates])
+    reference_source = next(r for r in trace["sources"] if r["path"].endswith("_ligand.sdf"))
+    inputs = refinement["inputs"]
+    if inputs["ligand_reference_sha256"] != reference_source["sha256"]:
+        raise ValueError("Crystal reference differs between the illustration and evaluation")
+    read(inputs["ligand_reference"], reference_source["sha256"])
+    reference = Chem.SDMolSupplier(str(source_root / inputs["ligand_reference"]), removeHs=True)[0]
+    if reference is None:
+        raise ValueError("Invalid crystal ligand")
+    before = bank[selected].GetConformer().GetPositions().copy()
+    measured = float(rdMolAlign.CalcRMS(bank[selected], reference))
+    if not np.array_equal(before, bank[selected].GetConformer().GetPositions()):
+        raise ValueError("RMSD verification modified the selected pose")
+    if not np.isclose(measured, record["symmetry_rmsd"][selected], atol=1e-6, rtol=0):
+        raise ValueError("Crystal overlay RMSD differs from frozen evaluation")
+    overlay = dict(
+        dataset="astex",
+        id="1t46",
+        repeat=0,
+        selected_index=selected,
+        symmetry_rmsd_angstrom=record["symmetry_rmsd"][selected],
+        verified_rmsd_angstrom=measured,
+        metric="Symmetry-aware heavy-atom RMSD in the receptor frame; no alignment",
+        note="Crystal reference is displayed retrospectively, not used for candidate selection",
+        selection_sha256=hashlib.sha256((DATA / "selection_example.json").read_bytes()).hexdigest(),
+        reference=dict(
+            coordinates=reference.GetConformer().GetPositions().tolist(),
+            elements=[a.GetSymbol() for a in reference.GetAtoms()],
+            bonds=[[b.GetBeginAtomIdx(), b.GetEndAtomIdx()] for b in reference.GetBonds()],
+        ),
+        source_files=sources,
+    )
+    (DATA / "selected_reference.json").write_text(
+        json.dumps(overlay, indent=2, allow_nan=False) + "\n"
+    )
+    print(f"Verified selected-pose crystal RMSD: {measured:.8f} A")
 
 
 def main():
