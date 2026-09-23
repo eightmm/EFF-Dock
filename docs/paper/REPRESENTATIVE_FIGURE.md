@@ -11,7 +11,12 @@ The stages progress from left to right. Method subtitles sit inside each box
 under its heading. Confidence displays four distinct recorded poses in a matching large box, with
 selected/not-selected marks overlaid in the upper-left image corners.
 Time and step labels use that same corner. Stage boxes have equal widths and
-uniform gaps, with aligned connectors and restrained pastel fills. All pose panels
+uniform gaps, with aligned connectors and restrained pastel fills.
+Typography uses Matplotlib-bundled STIX fonts for both text and mathematical
+labels. The final panel omits the PDB identifier; source identity remains here.
+Empty stacked backplates and × N denote candidate multiplicity in the generation
+and refinement stages; confidence ellipses omit intervening candidates, and
+N → 1 denotes selection. Here N = 100 in the primary candidate-bank protocol. All pose panels
 have equal dimensions.
 This draft does not change the existing 21-page reference package.
 
@@ -101,8 +106,10 @@ step 0 reuses the generated t = 1 capture, preserving the exact transition betwe
 stages. The overview gallery uses stored coordinates; no optimization was rerun.
 Generation times and refinement iterations are labeled separately inside the
 upper-left corner of each image. The four
-panels within each stage are successive states of one example, not four
-independently sampled candidates.
+panels within each trajectory stage are successive states of one example, not four
+independently sampled candidates. The empty backplates and × N are schematic
+cues for applying these stages across a candidate bank, not extra captured
+trajectories. Only the front sequence is a recorded trajectory.
 
 Refinement used the original prepared ligand for parameterization, stored
 fragment assignments, a fixed receptor, an 18 Å receptor shell, and 100 maximum
@@ -149,6 +156,10 @@ workflow progresses from left to right. Input preparation groups the ligand,
 fragmentation and supplied pocket. Time and iteration labels are overlaid inside
 the corresponding images. Refinement step 0 equals the generated t = 1 pose.
 Method subtitles appear beneath the stage headings; η-based guidance is omitted.
+Empty backplates and × N schematically indicate parallel candidate processing
+(N = 100 in the primary protocol); the four temporal frames on the front card
+are successive states of one illustrative trajectory. Ellipses between the
+confidence examples denote omitted candidates, and N → 1 indicates selection.
 The confidence stage displays four distinct refined candidates from the existing
 N100 bank for the same 1T46–STI complex, at eligible predicted-RMSD ranks 1, 25, 50
 and 100. The best-ranked candidate carries an overlaid ✓ and is shown as the

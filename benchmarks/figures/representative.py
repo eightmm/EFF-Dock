@@ -479,7 +479,7 @@ def compose(row):
     def rect(x, y, w, h):
         return [x / WIDTH, y / height, w / WIDTH, h / height]
 
-    def label(x, y, text, size=9.5, weight="semibold", color=DARK):
+    def label(x, y, text, size=9.5, weight="bold", color=DARK):
         fig.text(
             x / WIDTH,
             y / height,
@@ -561,7 +561,11 @@ def compose(row):
         center = box_x + box_width / 2
         px = center - fw / 2
         label(center, 4.95, title)
-        label(center, 4.70, method, size=8, weight="normal")
+        label(center, 4.73, method, size=8, weight="normal")
+        # Empty backplates denote parallel candidates, not additional saved traces.
+        for dx, dy in ((0.07, 0.04), (0.025, 0.02), (-0.04, 0.0)):
+            card(px + dx, 0.53 + dy, fw + 0.08, 4.01, edge="#D4D6DE", fill="#FDFDFE", lw=0.55)
+        label(center, 0.415, r"$\times\,N$", size=8.5, weight="normal", color=MUTED)
         for i, (py, pixels, text) in enumerate(zip(positions, images, labels, strict=True)):
             arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.55))
             corner(px, py, text)
@@ -587,6 +591,9 @@ def compose(row):
     px = center - fw / 2
     label(center, 4.95, "Confidence selection", size=9)
     label(center, 4.70, "Predicted RMSD\nranking", size=8, weight="normal")
+    for upper, lower in zip(positions[:-1], positions[1:], strict=True):
+        label(center, (upper + lower + fh) / 2, "…", size=12, weight="normal", color=MUTED)
+    label(center, 0.415, r"$N\,\to\,1$", size=8.5, weight="normal", color=MUTED)
     for pixels, candidate, y in zip(candidates, selection["candidates"], positions, strict=True):
         selected = candidate["selected"]
         edge = "#82B7A4" if selected else FRAME_EDGE
@@ -624,9 +631,8 @@ def compose(row):
 
     center = columns[4] + box_width / 2
     px = center - fw / 2
-    card(columns[4], 1.57, box_width, 2.30, edge="#BBD3C9", fill="#F7FBF9", lw=0.85)
-    label(center, 3.65, "Selected pose")
-    label(center, 3.38, "1T46–STI", size=8, weight="normal", color=MUTED)
+    card(columns[4], 1.57, box_width, 1.90, edge="#BBD3C9", fill="#F7FBF9", lw=0.85)
+    label(center, 3.25, "Selected pose")
     arts.append(frame(fig, rect(px, 2.21, fw, fh), overlay, crop, "#82B7A4", 0.9))
     corner(px, 2.21, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")
     for y, key, text in ((1.98, "selected", "Selected"), (1.76, "crystal", "Crystal")):
@@ -656,9 +662,8 @@ def render(out):
     row = load()
     out.mkdir(parents=True, exist_ok=True)
     style = {
-        "font.family": "sans-serif",
-        "font.sans-serif": ["Arial", "Helvetica", "Liberation Sans", "DejaVu Sans"],
-        "mathtext.fontset": "dejavusans",
+        "font.family": "STIXGeneral",
+        "mathtext.fontset": "stix",
         "pdf.fonttype": 42,
         "svg.fonttype": "none",
         "svg.hashsalt": NAME,
