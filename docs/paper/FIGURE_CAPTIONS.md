@@ -2,7 +2,7 @@
 
 현재 **21페이지 PDF** 기준: 본문용 Figure 1–11, 보충 Figure S1–S10. 최종 논문 번호는 편집 시 변경 가능하다. 각 영문 캡션은 복사해서 사용할 수 있으며, 한국어 메모는 저자 참고용이다.
 
-PDF SHA-256: `804cb2a6f5cb445a8538f4119ed5cc6e22fbc86258b5ad52f0edd181fb769bb1`
+PDF SHA-256: `fe013e7047b5af15a635dbc67ce7b9fa3fa48803954a0552c91f59b9a0df8222`
 
 ## 공통 Methods 메모
 

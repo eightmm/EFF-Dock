@@ -9,7 +9,6 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.lines import Line2D
 
 from benchmarks.figures.evidence import save
 from benchmarks.figures.structure_views import ELEMENT_COLORS, JS_SHA256, JS_URL, atoms, viewer_html
@@ -175,7 +174,7 @@ def render(out):
     row = json.loads((DATA / "trace.json").read_text())
     out.mkdir(parents=True, exist_ok=True)
     with plt.rc_context({"font.size": 10, "pdf.fonttype": 42}):
-        fig, axes = plt.subplots(1, 5, figsize=(18, 4.1))
+        fig, axes = plt.subplots(1, 5, figsize=(18, 3.3))
         for ax, index in zip(axes, row["shown_indices"], strict=True):
             ax.imshow(plt.imread(DATA / f"views/frame_{index:02d}.png"))
             ax.set_axis_off()
@@ -185,13 +184,7 @@ def render(out):
                 weight="bold",
                 fontsize=12,
             )
-        handles = [Line2D([], [], color=c, lw=4, label=f"F{i + 1}") for i, c in enumerate(COLORS)]
-        handles += [
-            Line2D([], [], marker="o", color=ELEMENT_COLORS[e], ls="none", label=e)
-            for e in ("N", "O")
-        ]
-        fig.legend(handles=handles, loc="lower center", ncol=8, frameon=False)
-        fig.subplots_adjust(left=0.01, right=0.99, top=0.88, bottom=0.15, wspace=0.04)
+        fig.subplots_adjust(left=0.01, right=0.99, top=0.88, bottom=0.03, wspace=0.04)
         save(fig, out, "S10_fragment_trajectory", dpi=400)
 
 

@@ -1,6 +1,6 @@
 {
   "pdf": "docs/paper/paper_figures.pdf",
-  "pdf_sha256": "804cb2a6f5cb445a8538f4119ed5cc6e22fbc86258b5ad52f0edd181fb769bb1",
+  "pdf_sha256": "fe013e7047b5af15a635dbc67ce7b9fa3fa48803954a0552c91f59b9a0df8222",
   "figures": [
     {
       "page": 1,
@@ -287,7 +287,7 @@
       "title": "보충 S10: Fragment 생성 경로",
       "section": "supplement",
       "source": "docs/paper/figures/S10_fragment_trajectory.pdf",
-      "sha256": "245d903f8e52491a3f127e45c84037ba565cbcb9c1424c813aa99c61b1e8aa56",
+      "sha256": "94bbe13899ceb323d97e69ae558a5d9bdeda806c90983a012ac475b39848d278",
       "figure_id": "S10",
       "caption_title": "Fragment motion along a saved ODE generation trajectory.",
       "caption": "Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and camera. The five panels show actual saved states at t=0.000, 0.271, 0.488, 0.784 and 1.000; no coordinates are interpolated. These are the available states nearest to five equally spaced target times. Carbon colors track the same six rigid fragments throughout; nitrogen is blue and oxygen red. The pale protein cartoon provides binding-site context. Interfragment bonds are omitted in the first four panels for visibility and shown in grey at the last panel using the known ligand connectivity. This display convention does not represent chemical bond formation. Time t is the dimensionless generative-flow coordinate, not physical time or energy-refinement progress. The stored illustrative run used one sample, ten ODE steps, a late schedule with power 3, positional prior sigma 2 Å, pocket cutoff 10 Å, seed 42 and no guidance or confidence selection. The recorded checkpoint is effdock_docking_early_time_t0p10_50k.pt. This is a separate N1 illustration, not the 7FB7 refinement rescue of Figure S8 or an N100 benchmark-selected pose; no success, PB-validity or representative-trajectory claim is made. All 11 saved frames and the original fragment assignments are retained in the source data.",
