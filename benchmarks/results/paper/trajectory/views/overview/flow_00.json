@@ -1,0 +1,31 @@
+{
+  "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
+  "sha256": "e8b40a11a7f0b05608c9846b672b01e66409cca9253dfacefb8cfd3b5cf4115c",
+  "camera": [
+    -27.49601372383736,
+    -25.89508024679648,
+    -41.17907703502758,
+    106.41742346964408,
+    -0.12607862007251908,
+    0.25660481229257065,
+    0.03378266443126182,
+    0.9576621969425486
+  ],
+  "zoom_factor": 0.7,
+  "scene": {
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "atoms": 2359,
+    "secondary": {
+      "c": 127,
+      "s": 55,
+      "h": 115
+    }
+  },
+  "javascript_url": "https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js",
+  "javascript_sha256": "f7cc78921ae72e7623e89cdd111434f58c2efddd2ffda1cd212644b406fb8016",
+  "chromium_version": "151.0.7922.34",
+  "py3dmol_version": "2.5.5",
+  "playwright_version": "1.62.0",
+  "description": "Stored ODE frame; overview camera; unchanged coordinates",
+  "flow_index": 0
+}

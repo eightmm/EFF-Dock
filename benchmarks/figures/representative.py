@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+from matplotlib.patches import Ellipse, FancyArrowPatch, FancyBboxPatch
 
 from benchmarks.figures.structure_views import ELEMENT_COLORS, JS_SHA256, JS_URL
 from benchmarks.figures.trajectory import COLORS, DATA, ROOT, scene, verify
@@ -27,6 +27,10 @@ EXTRA_VIEWS = {
     "refined_step_025": 25,
     "refined_step_050": 50,
 }
+CANDIDATE_VIEWS = {"candidate_best": 0, "candidate_median": 1, "candidate_worst": 2}
+FLOW_VIEWS = {f"flow_{i:02d}": i for i in FLOW_INDICES}
+OVERVIEW_DIR = DATA / "views/overview"
+OVERVIEW_ZOOM = 0.70
 DARK = "#3E434A"
 MUTED = "#7B838D"
 CONNECTOR = "#B4BBC4"
@@ -34,26 +38,70 @@ FRAME_EDGE = "#D6DBE1"
 POSE_EDGE = "#8C96A3"
 
 # Landscape overview; preserve vector labels when scaling for the manuscript.
-WIDTH = 9.4
+WIDTH = 10.1
+
+
+def selection_data():
+    record = json.loads((DATA / "selection_example.json").read_text())
+    if record["trace_sha256"] != hashlib.sha256((DATA / "trace.json").read_bytes()).hexdigest():
+        raise ValueError("Selection illustration has stale trace identity")
+    predictions = np.asarray(record["predicted_rmsd"])
+    if predictions.shape != (100,) or not np.isfinite(predictions).all():
+        raise ValueError("Invalid stored confidence scores")
+    order = sorted(range(100), key=lambda i: (predictions[i], i))
+    eligible = [i for i in order if record["chirality_valid"][i]]
+    ranks = (0, (len(eligible) - 1) // 2, len(eligible) - 1)
+    if record["selected_index"] != eligible[0] or len(record["candidates"]) != 3:
+        raise ValueError("Stored confidence selection differs")
+    for candidate, rank in zip(record["candidates"], ranks, strict=True):
+        index = eligible[rank]
+        coords = np.asarray(candidate["coordinates"])
+        if (
+            candidate["index"] != index
+            or candidate["rank"] != rank + 1
+            or candidate["selected"] != (rank == 0)
+            or candidate["predicted_rmsd"] != predictions[index]
+            or coords.shape != (37, 3)
+            or not np.isfinite(coords).all()
+            or sorted(candidate["atom_mapping"]) != list(range(37))
+        ):
+            raise ValueError("Invalid confidence candidate record")
+    return record
 
 
 def verify_extra_views():
     captures = json.loads((DATA / "views/manifest.json").read_text())
-    for stem, step in EXTRA_VIEWS.items():
-        metadata = json.loads((DATA / f"views/{stem}.json").read_text())
+    candidates = selection_data()
+    for stem, step in (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS).items():
+        metadata = json.loads((OVERVIEW_DIR / f"{stem}.json").read_text())
         sources = [
             ("trace.json", metadata["trace_sha256"]),
-            (f"views/{stem}.png", metadata["sha256"]),
+            (f"views/overview/{stem}.png", metadata["sha256"]),
         ]
-        if step is not None:
+        if stem in CANDIDATE_VIEWS:
+            if metadata.get("candidate_index") != candidates["candidates"][step]["index"]:
+                raise ValueError(f"Incorrect confidence candidate: {stem}")
+            sources.append(("selection_example.json", metadata["selection_sha256"]))
+        elif stem in FLOW_VIEWS:
+            if metadata.get("flow_index") != step:
+                raise ValueError(f"Incorrect flow frame: {stem}")
+        elif step is not None:
             if stem != "refined_endpoint" and metadata.get("refinement_step") != step:
                 raise ValueError(f"Incorrect refinement step: {stem}")
             sources.append(("representative_refinement.json", metadata["refinement_sha256"]))
         for name, expected in sources:
             if hashlib.sha256((DATA / name).read_bytes()).hexdigest() != expected:
                 raise ValueError(f"Stale molecular capture: {stem}")
-        if not np.allclose(metadata["camera"], captures["records"][0]["camera"], atol=1e-7):
-            raise ValueError(f"Camera differs from the trajectory: {stem}")
+        reference = captures["records"][0]["camera"]
+        camera = metadata["camera"]
+        if not np.allclose(camera[:3] + camera[4:], reference[:3] + reference[4:], atol=1e-7):
+            raise ValueError(f"Overview camera orientation/center changed: {stem}")
+        first = json.loads((OVERVIEW_DIR / "supplied_pocket.json").read_text())
+        if (
+            not np.allclose(camera, first["camera"], atol=1e-7)
+            or metadata.get("zoom_factor") != OVERVIEW_ZOOM
+        ):
+            raise ValueError(f"Overview camera differs between panels: {stem}")
 
 
 async def capture_views(javascript, work, *, stems=None):
@@ -64,9 +112,11 @@ async def capture_views(javascript, work, *, stems=None):
     refined = json.loads((DATA / "representative_refinement.json").read_text())
     camera = json.loads((DATA / "views/manifest.json").read_text())["records"][0]["camera"]
     verify_refinement(row)
-    if stems is not None and set(stems) - EXTRA_VIEWS.keys():
+    candidates = selection_data()
+    if stems is not None and set(stems) - (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS).keys():
         raise ValueError("Unknown molecular capture request")
     work.mkdir(parents=True, exist_ok=True)
+    OVERVIEW_DIR.mkdir(parents=True, exist_ok=True)
     async with async_playwright() as api:
         browser = await api.chromium.launch(
             args=[
@@ -76,20 +126,39 @@ async def capture_views(javascript, work, *, stems=None):
                 "--disable-dev-shm-usage",
             ]
         )
-        for stem, step in EXTRA_VIEWS.items():
+        for stem, step in (EXTRA_VIEWS | CANDIDATE_VIEWS | FLOW_VIEWS).items():
             if stems is not None and stem not in stems:
                 continue
             pocket = step is None
             index = 0 if pocket else POSE_INDEX
             source = row
-            if not pocket:
+            is_flow = stem in FLOW_VIEWS
+            if is_flow:
+                index = step
+            is_candidate = stem in CANDIDATE_VIEWS
+            if is_candidate:
+                source = dict(
+                    row,
+                    coordinates=row["coordinates"][:-1]
+                    + [candidates["candidates"][step]["coordinates"]],
+                )
+            elif not pocket and not is_flow:
                 saved = refined["saved_steps"].index(step)
                 source = dict(
                     row, coordinates=row["coordinates"][:-1] + [refined["coordinates"][saved]]
                 )
             html = work / f"{stem}.html"
-            html.write_text(scene(source, index, javascript, pocket_only=pocket, camera=camera))
-            output = DATA / f"views/{stem}.png"
+            html.write_text(
+                scene(
+                    source,
+                    index,
+                    javascript,
+                    pocket_only=pocket,
+                    camera=camera,
+                    zoom_factor=OVERVIEW_ZOOM,
+                )
+            )
+            output = OVERVIEW_DIR / f"{stem}.png"
             page = await browser.new_page(
                 viewport={"width": 900, "height": 680}, device_scale_factor=2
             )
@@ -102,7 +171,7 @@ async def capture_views(javascript, work, *, stems=None):
             if (
                 errors
                 or "SwiftShader" not in info["renderer"]
-                or not np.allclose(actual, camera, atol=1e-7)
+                or not np.allclose(actual[:3] + actual[4:], camera[:3] + camera[4:], atol=1e-7)
             ):
                 raise ValueError(f"Molecular capture failed: {stem}, {errors}, {info}")
             await page.screenshot(path=str(output), animations="disabled")
@@ -110,6 +179,7 @@ async def capture_views(javascript, work, *, stems=None):
                 trace_sha256=hashlib.sha256((DATA / "trace.json").read_bytes()).hexdigest(),
                 sha256=hashlib.sha256(output.read_bytes()).hexdigest(),
                 camera=actual,
+                zoom_factor=OVERVIEW_ZOOM,
                 scene=info,
                 javascript_url=JS_URL,
                 javascript_sha256=JS_SHA256,
@@ -119,15 +189,26 @@ async def capture_views(javascript, work, *, stems=None):
                 description=(
                     "Stored receptor only; ligand hidden; darker input cartoon. No predicted pocket or cutoff boundary."
                     if pocket
-                    else "CPU refinement of the exact stored N1 endpoint; original camera and fragment colors."
+                    else "Recorded refinement of the stored N1 endpoint; shared overview camera and original fragment colors."
                 ),
             )
-            if not pocket:
+            if is_candidate:
+                metadata["description"] = (
+                    "Existing N100 refined candidate; matched receptor frame and camera; selected/not-selected marks are not PB validity"
+                )
+                metadata["candidate_index"] = candidates["candidates"][step]["index"]
+                metadata["selection_sha256"] = hashlib.sha256(
+                    (DATA / "selection_example.json").read_bytes()
+                ).hexdigest()
+            elif is_flow:
+                metadata["description"] = "Stored ODE frame; overview camera; unchanged coordinates"
+                metadata["flow_index"] = step
+            elif not pocket:
                 metadata["refinement_step"] = step
                 metadata["refinement_sha256"] = hashlib.sha256(
                     (DATA / "representative_refinement.json").read_bytes()
                 ).hexdigest()
-            (DATA / f"views/{stem}.json").write_text(json.dumps(metadata, indent=2) + "\n")
+            (OVERVIEW_DIR / f"{stem}.json").write_text(json.dumps(metadata, indent=2) + "\n")
             await page.close()
         await browser.close()
     verify_extra_views()
@@ -297,13 +378,15 @@ def connector(fig, x0, x1, y, width, height):
 
 
 def compose(row):
-    flow = [plt.imread(DATA / f"views/frame_{i:02d}.png") for i in FLOW_INDICES]
+    flow = [plt.imread(OVERVIEW_DIR / f"flow_{i:02d}.png") for i in FLOW_INDICES]
     refinement = [flow[-1]] + [
-        plt.imread(DATA / f"views/{stem}.png")
+        plt.imread(OVERVIEW_DIR / f"{stem}.png")
         for stem in ("refined_step_025", "refined_step_050", "refined_endpoint")
     ]
-    pocket = plt.imread(DATA / "views/supplied_pocket.png")
-    crop = common_crop([*flow, *refinement])
+    pocket = plt.imread(OVERVIEW_DIR / "supplied_pocket.png")
+    candidates = [plt.imread(OVERVIEW_DIR / f"{stem}.png") for stem in CANDIDATE_VIEWS]
+    selection = selection_data()
+    crop = common_crop([*flow, *refinement, *candidates])
     height = 3.2
     fw = 1.15
     fh = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
@@ -379,33 +462,81 @@ def compose(row):
                     card(px + offset, py + offset, fw, fh, fill="#F4F7F9")
             arts.append(frame(fig, rect(px, py, fw, fh), pixels, crop, FRAME_EDGE, 0.6))
             label(px + fw / 2, py - 0.14, text, size=8, weight="normal")
+        # The bent arrow joins the second state to the third without crossing a panel.
+        bridge_y = 1.76
+        fig.add_artist(
+            plt.Line2D(
+                [(x + 1.32 + fw / 2) / WIDTH, (x + 1.32 + fw / 2) / WIDTH, (x + fw / 2) / WIDTH],
+                [1.84 / height, bridge_y / height, bridge_y / height],
+                color=CONNECTOR,
+                linewidth=0.8,
+            )
+        )
+        fig.add_artist(
+            FancyArrowPatch(
+                ((x + fw / 2) / WIDTH, bridge_y / height),
+                ((x + fw / 2) / WIDTH, (0.98 + fh + 0.04) / height),
+                transform=fig.transFigure,
+                arrowstyle="-|>",
+                mutation_scale=7,
+                color=CONNECTOR,
+                linewidth=0.8,
+            )
+        )
         for py in (2.06, 0.98):
             connector(fig, x + fw + 0.025, x + 1.295, py + fh / 2, WIDTH, height)
 
     trajectory(1.70, flow, [f"$t$ = {row['times'][i]:.2f}" for i in FLOW_INDICES])
     label(2.935, 2.99, "Pose generation")
-    label(2.935, 0.42, "SE(3) flow", size=8.5, weight="normal")
+    label(2.935, 2.77, "Fragment SE(3) flow matching", size=8, weight="normal")
     connector(fig, 4.27, 4.55, middle, WIDTH, height)
 
     trajectory(4.60, refinement, [f"Step {step}" for step in REFINEMENT_STEPS])
     label(5.835, 2.99, "Post-refinement")
-    label(5.835, 0.42, "Physical + interaction energy", size=8.5, weight="normal")
+    label(5.835, 2.77, "Physics- and interaction-based", size=8, weight="normal")
     connector(fig, 7.17, 7.37, middle, WIDTH, height)
 
-    label(7.68, 2.99, "Confidence\nselection", size=9)
-    for y, text, edge, fill in (
-        (middle - 0.10, "1", "#78A797", "#E6F1EA"),
-        (middle - 0.37, "2", FRAME_EDGE, "#F4F6F8"),
-        (middle - 0.64, "⋯", FRAME_EDGE, "#F4F6F8"),
+    label(8.025, 2.99, "Confidence selection", size=9)
+    label(8.025, 2.77, "Predicted RMSD ranking", size=8, weight="normal")
+    for pixels, candidate, y in zip(
+        candidates, selection["candidates"], (2.06, 1.10, 0.14), strict=True
     ):
-        card(7.41, y, 0.54, 0.20, edge=edge, fill=fill)
-        label(7.68, y + 0.10, text, size=8, weight="normal")
-    label(7.68, 0.63, "Lowest predicted\nRMSD", size=7.5, weight="normal")
-    connector(fig, 7.98, 8.10, middle, WIDTH, height)
-    arts.append(
-        frame(fig, rect(8.15, middle - fh / 2, fw, fh), refinement[-1], crop, "#78A797", 1.0)
-    )
-    label(8.725, 2.99, "Selected pose")
+        selected = candidate["selected"]
+        edge = "#78A797" if selected else FRAME_EDGE
+        arts.append(frame(fig, rect(7.45, y, fw, fh), pixels, crop, edge, 0.9 if selected else 0.6))
+        cx, cy = 8.71, y + fh / 2
+        fig.add_artist(
+            Ellipse(
+                (cx / WIDTH, cy / height),
+                0.17 / WIDTH,
+                0.17 / height,
+                transform=fig.transFigure,
+                facecolor="white",
+                edgecolor="none",
+                zorder=8,
+            )
+        )
+        color = "#568977" if selected else "#B78279"
+        paths = (
+            [[(-0.05, 0), (-0.01, -0.04), (0.055, 0.05)]]
+            if selected
+            else [[(-0.04, -0.04), (0.04, 0.04)], [(-0.04, 0.04), (0.04, -0.04)]]
+        )
+        for path in paths:
+            fig.add_artist(
+                plt.Line2D(
+                    [(cx + dx) / WIDTH for dx, _ in path],
+                    [(cy + dy) / height for _, dy in path],
+                    transform=fig.transFigure,
+                    color=color,
+                    linewidth=1.6,
+                    solid_capstyle="round",
+                    zorder=9,
+                )
+            )
+    connector(fig, 8.81, 8.88, 2.06 + fh / 2, WIDTH, height)
+    arts.append(frame(fig, rect(8.91, 2.06, fw, fh), candidates[0], crop, "#78A797", 1.0))
+    label(9.485, 2.99, "Selected pose")
     return fig, arts
 
 
@@ -432,7 +563,7 @@ def render(out):
             art.set_interpolation("antialiased")
         fig.savefig(out / f"{NAME}.png", dpi=400, metadata={"Software": None})
         plt.close(fig)
-    print(f"Rendered {NAME} PDF/SVG/PNG in {out}; saved endpoint and conceptual selection")
+    print(f"Rendered {NAME} PDF/SVG/PNG in {out}; four-state trajectories and recorded confidence selection")
 
 
 def main():

@@ -18,7 +18,7 @@ DATA = ROOT / "benchmarks/results/paper/trajectory"
 COLORS = ["#77AFD1", "#E6AC83", "#85BDA3", "#AF98C5", "#C8BC78", "#D38EAE"]
 
 
-def scene(row, frame_index, javascript, *, pocket_only=False, camera=None):
+def scene(row, frame_index, javascript, *, pocket_only=False, camera=None, zoom_factor=1.0):
     import py3Dmol
 
     view = py3Dmol.view(width=900, height=680)
@@ -83,6 +83,10 @@ def scene(row, frame_index, javascript, *, pocket_only=False, camera=None):
         if values.shape != (8,) or not np.isfinite(values).all():
             raise ValueError("Invalid fixed molecular camera")
         view.setView(values.tolist())
+    if not np.isfinite(zoom_factor) or zoom_factor <= 0:
+        raise ValueError("Invalid camera zoom factor")
+    if zoom_factor != 1.0:
+        view.zoom(float(zoom_factor))
     view.render()
     return viewer_html(view, javascript)
 
