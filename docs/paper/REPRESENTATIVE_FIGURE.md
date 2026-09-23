@@ -23,10 +23,10 @@ labels. The final panel omits the PDB identifier; source identity remains here.
 Empty stacked backplates and × N denote candidate multiplicity in the generation
 and refinement stages; confidence ellipses omit intervening candidates, and
 N → 1 denotes selection. Here N = 100 in the primary candidate-bank protocol.
-Each confidence image has a small two-line pRMSD/RMSD annotation inside its
-upper-left corner, beside the selection glyph,
-with both values in ångströms. All pose panels
-have equal dimensions.
+Each confidence image has a compact white score panel inside its upper-left
+corner, separate from the selection glyph. The pRMSD and RMSD labels are
+left-aligned and their values right-aligned in two consistent rows, with both
+values in ångströms. All pose panels have equal dimensions.
 This draft does not change the existing 21-page reference package.
 
 - [PDF](figures/Fig1_representative.pdf)

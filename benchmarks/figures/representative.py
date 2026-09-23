@@ -781,18 +781,47 @@ def compose(row):
     for pixels, candidate, annotation, y in zip(
         candidates, selection["candidates"], annotations, positions, strict=True
     ):
-        fig.text(
-            (px + 0.245) / WIDTH,
-            (y + fh - 0.05) / height,
-            f"pRMSD {annotation['predicted_rmsd']:.2f} Å\nRMSD {annotation['symmetry_rmsd']:.2f} Å",
-            fontsize=5.8,
-            color=DARK,
-            ha="left",
-            va="top",
-            linespacing=1.15,
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.92, "pad": 1.2},
-            zorder=8,
+        score_x, score_top = px + 0.245, y + fh - 0.035
+        score_width, score_height = 0.63, 0.225
+        fig.add_artist(
+            FancyBboxPatch(
+                ((score_x - 0.02) / WIDTH, (score_top - score_height) / height),
+                score_width / WIDTH,
+                score_height / height,
+                boxstyle="round,pad=0,rounding_size=0.003",
+                transform=fig.transFigure,
+                facecolor="white",
+                edgecolor="#E2E4E6",
+                linewidth=0.35,
+                zorder=8,
+            )
         )
+        for offset, name, value in (
+            (0.064, "pRMSD", annotation["predicted_rmsd"]),
+            (0.161, "RMSD", annotation["symmetry_rmsd"]),
+        ):
+            score_y = (score_top - offset) / height
+            fig.text(
+                score_x / WIDTH,
+                score_y,
+                name,
+                fontsize=5.3,
+                color=MUTED,
+                ha="left",
+                va="center",
+                zorder=9,
+            )
+            fig.text(
+                (score_x + score_width - 0.045) / WIDTH,
+                score_y,
+                f"{value:.2f} Å",
+                fontsize=5.5,
+                fontweight="medium",
+                color=DARK,
+                ha="right",
+                va="center",
+                zorder=9,
+            )
         selected = candidate["selected"]
         edge = "#82B7A4" if selected else FRAME_EDGE
         arts.append(frame(fig, rect(px, y, fw, fh), pixels, crop, edge, 0.9 if selected else 0.6))
