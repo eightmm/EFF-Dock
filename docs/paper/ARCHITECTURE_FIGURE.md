@@ -138,6 +138,25 @@ records dimensions and source/config SHA-256 hashes. Rendering fails if those
 files change, requiring another implementation audit. The renderer checks shape
 arithmetic and text bounds/overlap. PDF/SVG are fully vector, with editable SVG
 text; the preview is 300 dpi. Exports are deterministic. The source width is
-304.8 mm; at 180 mm the 10.5 pt body text becomes 6.20 pt. Place at two-column
+304.8 mm; at 180 mm the 11 pt body text becomes 6.50 pt. Place at two-column
 width and inspect the final journal proof. Existing figures, data and the combined
 benchmark PDF are unchanged; no model execution, training or evaluation is needed.
+
+
+## Visual design reference
+
+The visual organization was checked against Figure 1 of
+[BA-Pred and RMSD-Pred](https://doi.org/10.1021/acs.jcim.5c02591)
+([open-access figure](https://pmc.ncbi.nlm.nih.gov/articles/PMC13080981/figure/fig1/)).
+Only layout principles inform this original drawing: compact functional blocks,
+thin connectors, and a clear separation between graph inputs, internal layers,
+and readout. No panels, molecular images, or model operations were reused.
+EFF-Dock operations are independently audited against the source files above.
+
+Plain panel letters and open whitespace replace enclosing rounded cards.
+Pale colors distinguish geometric inputs, equivariant operations, motion readout,
+and conditioning/pooling; they do not encode quantitative values. Channel widths
+and implementation details remain in this document rather than being repeated
+inside every module. Solid arrows indicate feature or vector flow; the dashed
+atom-head branch denotes auxiliary supervision. Training losses are separated
+from the inference readout in panel C.

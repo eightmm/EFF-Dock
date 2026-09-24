@@ -16,9 +16,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / "benchmarks/results/paper/architecture/spec.json"
 NAME = "Fig2_architecture"
 WIDTH, HEIGHT = 12.0, 9.35
-INK, MUTED, LINE = "#344351", "#637584", "#93A2AC"
-BLUE, MINT, PEACH, VIOLET = "#68AEC8", "#70B4A3", "#E4A477", "#A995CB"
-PALE_BLUE, PALE_MINT, PALE_PEACH, PALE_VIOLET = "#EDF6FA", "#EFF8F4", "#FCF3EC", "#F5F1FA"
+INK, MUTED, LINE = "#252525", "#666666", "#666666"
+BLUE, MINT, PEACH, VIOLET = "#70A9CA", "#71AD9B", "#DCA179", "#A895C4"
+PALE_BLUE, PALE_MINT, PALE_PEACH, PALE_VIOLET = "#E8F1F7", "#EAF3EE", "#F8EEE5", "#F0ECF6"
 
 
 def load():
@@ -42,7 +42,7 @@ class Canvas:
         self.texts = []
         self.box_texts = []
 
-    def text(self, x, y, text, size=10.5, color=INK, bold=False, ha="center", **kwargs):
+    def text(self, x, y, text, size=11, color=INK, bold=False, ha="center", **kwargs):
         artist = self.ax.text(
             x,
             y,
@@ -59,7 +59,7 @@ class Canvas:
         self.texts.append(artist)
         return artist
 
-    def box(self, x, y, w, h, fill="white", edge="#CDD8DE", lw=0.8, radius=0.08):
+    def box(self, x, y, w, h, fill="white", edge="#858585", lw=0.65, radius=0.015):
         self.ax.add_patch(
             FancyBboxPatch(
                 (x, y),
@@ -73,12 +73,12 @@ class Canvas:
             )
         )
 
-    def block(self, x, y, w, h, text, fill="white", edge="#CDD8DE", size=10.5):
+    def block(self, x, y, w, h, text, fill="white", edge="#858585", size=11):
         self.box(x, y, w, h, fill, edge)
         artist = self.text(x + w / 2, y + h / 2, text, size=size)
         self.box_texts.append((artist, (x, y, w, h)))
 
-    def arrow(self, points, color=LINE, lw=1.1, dashed=False):
+    def arrow(self, points, color=LINE, lw=0.85, dashed=False):
         for a, b in zip(points[:-2], points[1:-1]):
             self.ax.plot(*zip(a, b), color=color, lw=lw, ls="--" if dashed else "-", zorder=2)
         self.ax.add_patch(
@@ -124,16 +124,14 @@ class Canvas:
         self.ax.add_patch(patch)
 
     def panel(self, x, y, w, h, letter, title, tint):
-        self.box(x, y, w, h, fill="white", edge="#D3DDE3", lw=0.8, radius=0.12)
-        self.box(x + 0.17, y + h - 0.43, 0.30, 0.28, fill=tint, edge=tint, radius=0.05)
-        self.text(x + 0.32, y + h - 0.29, letter, size=13, bold=True)
-        self.text(x + 0.59, y + h - 0.29, title, size=13, bold=True, ha="left")
+        self.text(x + 0.08, y + h - 0.20, letter, size=15, bold=True, ha="left")
+        self.text(x + 0.45, y + h - 0.20, title, size=13, bold=True, ha="left")
 
 
 def graph_panel(c, s):
-    c.panel(0.20, 4.85, 5.65, 4.30, "A", "Heterogeneous graph and embeddings", PALE_MINT)
+    c.panel(0.20, 4.85, 5.65, 4.30, "A", "Graph construction", PALE_MINT)
     c.text(1.48, 8.50, "Ligand fragments", bold=True)
-    c.text(4.40, 8.50, "Given receptor pocket", bold=True)
+    c.text(4.40, 8.50, "Receptor pocket", bold=True)
     lig = [
         (0.65, 7.75),
         (0.92, 8.06),
@@ -177,30 +175,25 @@ def graph_panel(c, s):
         c.node(x, 6.69, color, kind, r=0.060)
         c.text(x + 0.12, 6.69, label, ha="left")
     c.arrow([(2.98, 6.47), (2.98, 6.39), (1.57, 6.39), (1.57, 6.29)])
-    c.block(0.48, 5.65, 2.18, 0.61, "Chemical / node features\n208 → MLP → 384", PALE_MINT)
+    c.block(0.48, 5.65, 2.18, 0.61, "Node features\nEmbedding MLP", PALE_MINT)
     c.arrow([(2.70, 5.95), (3.03, 5.95)])
-    c.block(3.08, 5.65, 2.48, 0.61, "Equivariant node state\n736 dimensions", PALE_BLUE)
+    c.block(3.08, 5.65, 2.48, 0.61, "Equivariant features", PALE_BLUE)
     c.text(4.32, 6.44, "Coordinates + frames", color=MUTED)
     c.arrow([(4.32, 6.34), (4.32, 6.28)])
-    c.text(
-        3.02,
-        5.40,
-        r"$384\!\times\!0e + 32\!\times\!1o + 32\!\times\!1e + 16\!\times\!2e + 16\!\times\!2o$",
-        size=10.5,
-    )
-    c.text(3.02, 5.08, r"$t,\;\log\sigma$ → sinusoidal embeddings + MLPs → 128", color=MUTED)
+    c.text(3.02, 5.38, r"Scalars ($\ell=0$) · Vectors ($\ell=1$) · Tensors ($\ell=2$)")
+    c.text(3.02, 5.05, r"Conditioning: time $t$ and prior scale $\sigma$", color=MUTED)
 
 
 def interaction_panel(c, s):
-    c.panel(6.15, 4.85, 5.65, 4.30, "B", "Equivariant interaction layer", PALE_BLUE)
-    c.text(11.40, 8.84, "×6", size=13, bold=True, color="#4286A3")
+    c.panel(6.15, 4.85, 5.65, 4.30, "B", "Equivariant message passing", PALE_BLUE)
+    c.text(11.45, 8.95, "×6", size=12, color=MUTED)
     mx, mw = 8.63, 2.04
     c.text(mx + mw / 2, 8.55, r"$h^{(\ell)}$", size=12)
     c.arrow([(mx + mw / 2, 8.43), (mx + mw / 2, 8.32)])
-    c.block(mx, 7.92, mw, 0.40, "Equivariant RMSNorm", PALE_BLUE)
-    c.block(mx, 7.18, mw, 0.49, "Tensor product\nInput / output radial scales", PALE_BLUE)
-    c.block(mx, 6.47, mw, 0.49, "Gated aggregation\nScalars · vectors · tensors", PALE_BLUE)
-    c.block(mx, 5.88, mw, 0.39, "Linear · gate · dropout", PALE_BLUE)
+    c.block(mx, 7.92, mw, 0.40, "RMSNorm")
+    c.block(mx, 7.18, mw, 0.49, "Tensor product\nRadial scaling", PALE_BLUE)
+    c.block(mx, 6.47, mw, 0.49, "Gated aggregation", PALE_BLUE)
+    c.block(mx, 5.88, mw, 0.39, "Linear · gate · dropout")
     for ya, yb in ((7.92, 7.67), (7.18, 6.96), (6.47, 6.27)):
         c.arrow([(mx + mw / 2, ya - 0.025), (mx + mw / 2, yb + 0.025)])
     c.ax.add_patch(
@@ -210,11 +203,11 @@ def interaction_panel(c, s):
     c.arrow([(mx + mw / 2, 5.86), (mx + mw / 2, 5.79)])
     c.arrow([(mx + mw / 2 + 0.20, 8.55), (11.24, 8.55), (11.24, 5.68), (mx + mw / 2 + 0.12, 5.68)])
     c.text(11.44, 7.02, "Residual", color=MUTED, rotation=90)
-    c.block(mx, 5.17, mw, 0.36, "Conditioned norm (AdaLN)", PALE_BLUE)
+    c.block(mx, 5.17, mw, 0.36, "AdaLN", PALE_VIOLET)
     c.arrow([(mx + mw / 2, 5.57), (mx + mw / 2, 5.54)])
     c.text(mx + mw / 2, 4.995, r"$h^{(\ell+1)}$", size=12)
     c.text(7.36, 8.52, "Edge attributes\n+ node scalars", color=MUTED)
-    c.block(6.43, 7.56, 1.83, 0.68, "Edge MLP\n1,020 → 128", PALE_MINT)
+    c.block(6.43, 7.56, 1.83, 0.68, "Edge MLP", PALE_MINT)
     c.arrow([(7.345, 8.32), (7.345, 8.25)])
     c.arrow([(8.29, 7.88), (8.44, 7.88), (8.44, 7.43), (8.60, 7.43)])
     c.block(
@@ -226,24 +219,23 @@ def interaction_panel(c, s):
         PALE_PEACH,
     )
     c.arrow([(8.29, 6.86), (8.49, 6.86), (8.49, 7.27), (8.60, 7.27)])
-    c.text(7.35, 6.20, "One shared tensor product\nacross edge types", color=MUTED)
-    c.block(6.43, 5.15, 1.83, 0.58, "Time + prior condition\n128 dimensions", PALE_VIOLET)
+    c.block(6.43, 5.15, 1.83, 0.58, r"$t$, $\log\sigma$ embeddings", PALE_VIOLET)
     c.arrow([(8.29, 5.35), (8.60, 5.35)])
 
 
 def readout_panel(c, s):
-    c.panel(0.20, 0.20, 5.65, 4.35, "C", "Fragment motion and supervision", PALE_PEACH)
-    c.block(0.43, 3.31, 1.08, 0.49, "Atom states\n736", PALE_BLUE)
+    c.panel(0.20, 0.20, 5.65, 4.35, "C", "Fragment velocity readout", PALE_PEACH)
+    c.block(0.43, 3.31, 1.08, 0.49, "Atom\nfeatures", PALE_BLUE)
     c.arrow([(1.55, 3.555), (1.74, 3.555)])
-    c.block(1.78, 3.31, 1.27, 0.49, "Linear + gate\n736 → 544", PALE_BLUE)
-    c.block(3.39, 3.69, 1.06, 0.35, "Linear → 1o", PALE_PEACH)
-    c.block(3.39, 3.06, 1.06, 0.35, "Self TP → 1o", PALE_PEACH)
+    c.block(1.78, 3.31, 1.27, 0.49, "Linear\n+ gate", PALE_BLUE)
+    c.block(3.39, 3.69, 1.06, 0.35, "Linear", PALE_PEACH)
+    c.block(3.39, 3.15, 1.06, 0.35, "Self TP", PALE_PEACH)
     c.arrow([(3.08, 3.555), (3.23, 3.555), (3.23, 3.865), (3.36, 3.865)])
-    c.arrow([(3.23, 3.555), (3.23, 3.235), (3.36, 3.235)])
+    c.arrow([(3.23, 3.555), (3.23, 3.325), (3.36, 3.325)])
     c.ax.add_patch(Circle((4.80, 3.555), 0.10, facecolor="white", edgecolor=LINE, lw=1, zorder=4))
     c.text(4.80, 3.555, "+", size=13)
     c.arrow([(4.48, 3.865), (4.80, 3.865), (4.80, 3.68)])
-    c.arrow([(4.48, 3.235), (4.80, 3.235), (4.80, 3.43)])
+    c.arrow([(4.48, 3.325), (4.80, 3.325), (4.80, 3.43)])
     c.arrow([(4.93, 3.555), (5.22, 3.555)])
     c.text(5.40, 3.555, r"$f_a$", size=13, bold=True)
     c.text(5.25, 3.92, "Atom field", color=MUTED)
@@ -260,52 +252,52 @@ def readout_panel(c, s):
     c.ax.add_patch(Arc((1.19, 2.35), 1.45, 1.25, theta1=195, theta2=295, color=VIOLET, lw=1.5))
     c.arrow([(1.39, 1.75), (1.53, 1.81)], VIOLET, lw=1.5)
     c.text(0.62, 1.78, r"$\omega_f$", color="#8B71B3", size=12)
-    c.box(2.53, 1.60, 3.02, 1.45, PALE_PEACH)
-    c.text(4.04, 2.86, "Newton–Euler aggregation", bold=True)
-    c.text(4.04, 2.57, r"$v_f=|f|^{-1}\sum_{a\in f} f_a$", size=12)
+    c.box(2.53, 1.60, 3.02, 1.45)
+    c.box(2.53, 2.68, 3.02, 0.37, PALE_PEACH)
+    c.text(4.04, 2.86, "Newton–Euler readout", bold=True)
+    c.text(4.04, 2.46, r"$v_f=\mathrm{mean}_{a\in f}\,f_a$", size=12)
     c.text(4.04, 2.12, r"$\tau_f=\sum_{a\in f}(x_a-T_f)\times f_a$", size=11.5)
     c.text(4.04, 1.79, r"$\omega_f=I_f^{+}\tau_f$", size=12)
     c.arrow([(5.40, 3.41), (5.40, 3.08)])
-    c.text(3.04, 1.46, r"$(v_f,\omega_f)$ → SE(3) update; rigid fragment geometry", size=10.5)
-    c.box(0.43, 0.39, 5.10, 0.82, PALE_VIOLET)
-    c.text(2.98, 1.045, "Flow matching + auxiliary supervision", bold=True)
+    c.text(3.04, 1.40, r"$(v_f,\omega_f)$ → rigid SE(3) update", size=11)
+    c.box(0.43, 0.39, 5.10, 0.74, "#FAFAFA", edge="#BBBBBB")
+    c.text(2.98, 0.95, "Training objective", bold=True)
     c.text(
         2.98,
-        0.78,
+        0.65,
         r"$\mathcal{L}=\mathcal{L}_v+8\mathcal{L}_\omega+0.3\mathcal{L}_{\rm atom}+3\mathcal{L}_{\rm DG}$",
         size=12,
     )
-    c.text(2.98, 0.535, "Atom velocity · Interfragment distance geometry", color=MUTED)
 
 
 def confidence_panel(c, s):
-    c.panel(6.15, 0.20, 5.65, 4.35, "D", "Pose confidence readout", PALE_VIOLET)
-    c.text(8.98, 4.04, "Independent weights · fixed zero condition", color=MUTED)
+    c.panel(6.15, 0.20, 5.65, 4.35, "D", "Confidence prediction", PALE_VIOLET)
+    c.text(8.98, 4.04, "Separate network · one graph per candidate", color=MUTED)
     c.block(6.42, 3.39, 1.30, 0.45, "Candidate\npose graph", PALE_MINT)
     c.arrow([(7.75, 3.615), (7.92, 3.615)])
     c.block(7.96, 3.39, 1.39, 0.45, "4 interaction\nlayers (B)", PALE_BLUE)
     c.arrow([(9.39, 3.615), (9.59, 3.615)])
-    c.block(9.63, 3.39, 1.87, 0.45, "Scalars + irrep norms\n480 invariants", PALE_VIOLET)
+    c.block(9.63, 3.39, 1.87, 0.45, "Invariant features\nScalars + irrep norms", PALE_VIOLET)
     c.arrow([(10.565, 3.36), (10.565, 3.20), (7.545, 3.20), (7.545, 3.06)])
     c.arrow([(10.565, 3.20), (10.275, 3.20), (10.275, 3.06)])
-    c.box(6.42, 2.24, 2.25, 0.79, PALE_VIOLET)
+    c.box(6.42, 2.24, 2.25, 0.79)
+    c.box(6.42, 2.69, 2.25, 0.34, PALE_VIOLET)
     c.text(7.545, 2.87, "Global pooling", bold=True)
-    c.text(7.545, 2.62, "Mean + max × 4 node types")
-    c.text(7.545, 2.38, "4,096 dimensions", color=MUTED)
-    c.box(9.05, 2.24, 2.45, 0.79, PALE_PEACH)
-    c.text(10.275, 2.87, "Contact + atom MLP", bold=True)
-    c.text(10.275, 2.62, "480 + 44 features → 512")
-    c.text(10.275, 2.38, "Four pools → 2,048", color=MUTED)
-    c.text(10.29, 1.96, "Atom heads: error · success", color=MUTED)
+    c.text(7.545, 2.47, "Mean / max\nby node type")
+    c.box(9.05, 2.24, 2.45, 0.79)
+    c.box(9.05, 2.69, 2.45, 0.34, PALE_PEACH)
+    c.text(10.275, 2.87, "Contact-aware pooling", bold=True)
+    c.text(10.275, 2.47, "Contact features + atom MLP\nAttention / mean / max")
+    c.text(10.45, 1.96, "Atom error · success", color=MUTED)
     c.arrow([(11.27, 2.22), (11.27, 2.09)], dashed=True)
-    c.block(6.80, 1.29, 4.30, 0.43, "Concatenate 6,144 → pose MLP (512)", PALE_VIOLET)
-    c.arrow([(7.545, 2.21), (7.545, 1.96), (8.95, 1.96), (8.95, 1.75)])
-    c.arrow([(9.24, 2.21), (9.00, 2.21), (9.00, 1.96)], lw=1.0)
-    c.block(6.42, 0.64, 2.25, 0.40, "Predicted RMSD", PALE_MINT, edge=MINT)
+    c.block(6.80, 1.29, 4.30, 0.43, "Concatenate → pose MLP", PALE_VIOLET)
+    c.arrow([(7.545, 2.21), (7.545, 1.75)])
+    c.arrow([(9.26, 2.21), (9.26, 1.75)])
+    c.block(6.42, 0.64, 2.25, 0.40, "Predicted RMSD", PALE_MINT)
     c.block(9.25, 0.64, 2.25, 0.40, "Pose success logit", PALE_VIOLET)
     c.arrow([(8.95, 1.26), (8.95, 1.15), (7.545, 1.15), (7.545, 1.07)])
     c.arrow([(8.95, 1.15), (10.375, 1.15), (10.375, 1.07)])
-    c.text(7.545, 0.395, "Select minimum pRMSD", color="#438574")
+    c.text(7.545, 0.395, "Select minimum pRMSD", color=INK)
     c.text(10.375, 0.395, "Auxiliary prediction", color=MUTED)
 
 
