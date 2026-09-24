@@ -16,7 +16,7 @@ numbering and placement may change during writing.
 
 - [Representative workflow](REPRESENTATIVE_FIGURE.md): Figure 1 PDF, preview and caption.
 - [Architecture](ARCHITECTURE_FIGURE.md): Figure 2 with model overview, interaction layer,
-  equivariant RMSNorm, AdaLN and activation panels (A–E), with explicit skips
+  RMSNorm/AdaLN and activation panels (A–D), with explicit skips
   and readout branches; vector PDF/SVG and caption.
 
 ## Figures
