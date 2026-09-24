@@ -15,8 +15,8 @@ numbering and placement may change during writing.
 ## Model illustrations
 
 - [Representative workflow](REPRESENTATIVE_FIGURE.md): Figure 1 PDF, preview and caption.
-- [Architecture](ARCHITECTURE_FIGURE.md): Figure 2 with graph, interaction layer,
-  fragment readout and confidence panels (A–D); vector PDF/SVG and caption.
+- [Architecture](ARCHITECTURE_FIGURE.md): Figure 2 with model overview, interaction layer,
+  equivariant RMSNorm and AdaLN panels (A–D); vector PDF/SVG and caption.
 
 ## Figures
 

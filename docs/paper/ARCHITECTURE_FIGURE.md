@@ -4,128 +4,142 @@
 - [Editable vector SVG](figures/Fig2_architecture.svg)
 - [PNG preview](figures/Fig2_architecture.png)
 
-Figure numbering is provisional. This four-panel figure complements the
-[representative workflow](REPRESENTATIVE_FIGURE.md); it describes model operations,
-not a measured trajectory, benchmark result or component-ablation result.
+Figure numbering is provisional. This model-only figure complements the
+[representative workflow](REPRESENTATIVE_FIGURE.md). Graph construction,
+post-refinement and training objectives are outside its scope.
 
 ## Manuscript caption
 
-**EFF-Dock architecture and pose-confidence readout.**
-**A**, Ligand atoms, rigid fragments, receptor atoms and virtual residue nodes form
-one heterogeneous graph. Static chemical and membership edges are augmented with
-protein–ligand contacts within 5 Å at each forward pass. Node features initialize
-scalar, vector and rank-2 channels; time and prior scale condition the docking
-network. **B**, Each of six docking interaction layers applies equivariant
-pre-normalization, a shared tensor product with spherical harmonics through
-ℓ = 2, edge-conditioned radial scaling and gated aggregation. An equivariant
-linear/activation/dropout block precedes residual addition and conditioned
-normalization. **C**, Linear and self-tensor-product heads produce a learned atom
-vector field. Newton–Euler aggregation maps this field to fragment translation
-and angular velocities, preserving intrafragment geometry. The objective combines
-translation and observable-rotation flow matching with atom-velocity and
-interfragment distance-geometry losses. **D**, A separately parameterized
-four-layer confidence network processes each candidate graph independently.
-Invariant features feed global node-type pooling and contact-aware atom pooling;
-their concatenation predicts pose RMSD and a success logit. Atom displacement and
-success heads provide additional supervision. Selection minimizes predicted RMSD
-among eligible candidates. Confidence uses a fixed zero conditioning vector and
-no fragment-frame input to its interaction layers; saved ligand states can enter
-through a learned gate when available. Graphs and motion arrows are schematic.
+**EFF-Dock architecture and equivariant building blocks.**
+**A**, The docking network embeds input features and applies six interaction
+layers. A learned atom-vector head followed by Newton–Euler aggregation produces
+fragment translation and angular velocities. A separately parameterized
+four-layer confidence network maps candidate-pose features to invariants and
+combines global and contact-aware pooling to predict RMSD and a pose-success
+logit. Docking uses additive time and log-prior-scale embeddings; confidence uses
+a fixed zero conditioning vector. **B**, Each interaction layer applies
+blockwise equivariant RMS normalization, an edge-conditioned tensor product with
+spherical harmonics through degree two, message activation, gated aggregation,
+and an equivariant linear/activation/dropout block. The residual is added before
+AdaLN. Scalar activation is elementwise SiLU; non-scalar channels are multiplied
+by sigmoid gates computed from their invariant norms. **C**, Equivariant RMSNorm
+normalizes each irrep block using the channel-mean squared irrep norm and applies
+learned channel gains. The drawing illustrates a vector block; scalar and
+rank-two blocks are normalized separately by the same rule. **D**, AdaLN first
+applies RMSNorm. A linear projection of the condition produces scalar scale and
+shift parameters and bounded multiplicative scales for non-scalar channels.
+The latter act identically on every component of a channel, preserving its
+direction. Bars and arrows are schematic illustrations, not measured activations.
 
 ## Panel definitions and implementation audit
 
-| Panel | Depicted operation | Implementation |
+| Panel | Depicted operation | Source |
 |---|---|---|
-| A | Four node types; scalar embedding; geometric initialization; dynamic contacts | [EFFDockNodeEmbedding / EFFDock](../../src/effdock/models/effdock.py), [graph schema](../methods/01_graph_features.md) |
-| B | Pre-norm → tensor-product messages → gate-normalized aggregation → post block → residual addition → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [GatedEquivariantConv / EquivariantAdaLN](../../src/effdock/models/equivariant.py) |
-| C | 736→544 head, linear + self TP to 1o, Newton–Euler readout, active loss weights | [Docking head](../../src/effdock/models/effdock.py), [loss implementation](../../src/effdock/training/losses.py), [released docking config](../../configs/train_early_time_ft_50k.yaml) |
-| D | Independent four-layer scorer, invariant/contact features, global/contact pooling and heads | [Confidence model](../../src/effdock/confidence/model.py), [released confidence config](../../configs/train_confidence_s50_raw_refined_100k.yaml) |
+| A | Independent docking/confidence models, embedding, readouts | [Docking model](../../src/effdock/models/effdock.py), [confidence model](../../src/effdock/confidence/model.py) |
+| B | Pre-norm → tensor product → message activation → gated aggregation → linear/activation/dropout → residual → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [GatedEquivariantConv / EquivariantBlock](../../src/effdock/models/equivariant.py) |
+| C | RMS reduction per irrep block, learned channel gains | [EquivariantRMSNorm](../../src/effdock/models/equivariant.py) |
+| D | RMSNorm, scalar affine modulation, bounded non-scalar modulation | [EquivariantAdaLN](../../src/effdock/models/equivariant.py) |
 
-### A. Graph and representation
+Released settings are taken from the [docking config](../../configs/train_early_time_ft_50k.yaml)
+and [confidence config](../../configs/train_confidence_s50_raw_refined_100k.yaml).
 
-The seven ligand atoms, two fragments and small receptor graph are schematic,
-not a real complex or a reconstruction of the molecular example in Figure 1.
-Circles denote atoms, diamonds fragment nodes and rounded squares virtual residue
-nodes. Solid lines illustrate chemical/coarse relations; dashed membership and
-cross-interface contact edges are distinguished by context. The picture samples
-relations rather than enumerating all ten directed edge types.
+### A. Model overview
 
-The scalar input embedding is 208→384→384, with SiLU between linear layers.
-The state is 384×0e + 32×1o + 32×1e + 16×2e + 16×2o: 736 components and
-480 invariant channels (scalars plus non-scalar channel norms). The initial 1o
-features combine gated displacements with a learned fragment-orientation mix;
-1e/2e/2o channels initially vanish. Fragment size and conditioning additionally
-enter fragment scalar initialization. The diagram compresses these initialization
-branches into the state block. Time and log-prior-scale embeddings each map to
-128 dimensions and are added, not concatenated to 256.
+Input features include chemistry, coordinates and supplied graph relations.
+The diagram begins after graph construction. Scalar embedding is 208→384→384.
+The equivariant state is 384×0e + 32×1o + 32×1e + 16×2e + 16×2o, giving
+736 components and 480 invariant channels. Initial vector channels combine gated
+coordinate displacements and, for docking fragments, a learned orientation mix.
+Other non-scalar blocks initially vanish. Fragment size and conditioning enter
+fragment scalar initialization. Time and log-prior-scale sinusoidal embeddings
+each pass through a 128-wide MLP and are added, not concatenated.
 
-### B. Interaction layer
+Six independently parameterized interaction layers feed the docking head.
+Ligand-atom states pass through a 736→544 linear/activation head, then linear 1o
+and self-tensor-product 1o paths are summed. The resulting atom field is learned;
+it is not the gradient of a physical energy. Fragment translation is its atom
+mean. Torque is the sum of lever-arm cross products, and angular velocity is
+obtained with the fragment inertia pseudo-inverse. Unit atom weights and a 1%
+relative eigenvalue threshold define observable rotations. These velocities feed
+the rigid SE(3) integrator shown in the separate workflow figure.
 
-The 1,020-dimensional edge input contains 32 RBF values, 16 edge-type channels,
-20 bond-attribute channels, 16 evolving-distance channels, 8 fragment-hop channels,
-16 source-frame channels, 16 chemical-pair channels, two 384-wide endpoint scalar
-states and the 128-wide condition. Edge features feed a 128-wide radial trunk
-and separate gate network. Input/output radial scalings surround a shared-weight
-tensor product with real spherical harmonics of degree 0/1/2. Aggregation uses
-normalized scalar and per-channel gates, edge-type distance decay and non-scalar
-norm rescaling; it is not a ten-network mixture or ordinary softmax attention.
-The edge-MLP and spherical-harmonic arrows indicate inputs to this message block;
-the detailed gate branch is compressed into the aggregation module.
+The confidence network uses four layers with independent parameters. Each
+candidate is processed independently; there is no cross-candidate attention.
+It uses a zero 128-wide condition and no fragment-frame input to the interaction
+layers. Saved ligand/fragment hidden states can enter via a learned gate when
+available; this optional branch is omitted from the overview.
+
+Invariant node features contain scalars and non-scalar channel norms. Global
+mean/max pools over four node types produce 4,096 features. A contact-aware atom
+MLP combines 480 invariant features with 44 contact descriptors, then attention,
+contact-maximum, atom-mean and atom-maximum pools produce 2,048 features. The
+6,144-dimensional concatenation feeds a depth-three pose MLP with hidden width
+512 and two outputs: log1p RMSD and a success logit. Displayed pRMSD is
+`max(0, expm1(clamp(log1p_RMSD, -2, 5)))`; selection minimizes pRMSD among eligible
+poses. The success logit is not the selector or a calibrated probability claim.
+Auxiliary atom-level heads are omitted from this model overview.
+
+### B. Interaction layer and activation
 
 The exact outer order is `AdaLN(h + post_block(conv(pre_norm(h))))`.
-The residual bypasses the pre-norm/message/post block, not AdaLN. AdaLN applies
-RMS normalization followed by conditional scalar affine modulation and non-scalar
-gating. The ×6 annotation denotes six separately parameterized layers, not six
-applications of one tied-weight module. O(3) irrep notation does not establish
-reflection equivariance of the full stereochemical input pipeline; the docking
-contract is joint SE(3) transformation of all geometric inputs.
+The residual bypasses the message/post block, not AdaLN. The six docking layers
+and four confidence layers are separately parameterized; repetition counts do
+not denote tied weights.
 
-### C. Readout and training
+A 1,020-wide edge vector contains 32 RBF values, edge/bond descriptors, distance
+evolution, fragment-hop and local-frame features, contact chemistry, normalized
+endpoint scalar features, and conditioning. Edge MLPs supply input/output radial
+scales and aggregation gates. Tensor-product weights are shared across edge
+types within a layer. Real spherical harmonics include degrees 0, 1 and 2.
+Message activation occurs after output radial scaling, before aggregation.
 
-The 736-dimensional ligand-atom state is projected to 544 channels (192 scalars
-and unchanged non-scalar widths), activated, and read through a linear 1o path
-plus a self-tensor-product 1o path. The self-TP weights are zero initialized.
-The output is a **learned atom vector field**, not a physical force obtained as
-an energy gradient; Newton–Euler is the aggregation geometry.
+Aggregation uses gate-normalized sums, edge-type-dependent distance decay and
+additional non-scalar norm rescaling grouped by degree. It is not ordinary
+softmax attention. These internal reductions are compressed into the gated
+aggregation module. Edge scalar construction is also compressed; coordinates
+and conditioning feed it in addition to the two inputs named in the drawing.
 
-For each fragment, translation is the mean atom field, torque is the sum of
-lever-arm cross products, and angular velocity is the inertia pseudo-inverse
-applied to torque. The inertia uses unit atom weights and an eigenvalue threshold
-of 1% of the fragment maximum; unobservable rotations are removed. The same
-observable-subspace projector is applied to angular flow targets. All vectors
-are in the receptor coordinate frame and flow time is dimensionless.
+Equivariant linear maps mix multiplicity channels within compatible irreps.
+For activation, even scalars receive SiLU. All non-scalar channel norms are
+concatenated and passed through an MLP and sigmoid to produce per-channel gates:
+`u_c' = g_c u_c`. Every component of a vector or tensor receives the same gate.
+The message and post-linear activation modules use this pattern with separate
+parameters. Dropout uses one mask per irrep channel, broadcast over its spatial
+components; it is inactive at inference. Both released configs use dropout 0.1.
 
-The released objective is L_v + 8 L_omega + 0.3 L_atom + 3 L_DG. The atom term
-supervises instantaneous rigid-body velocities, not coordinates. DG supervises
-interfragment distances of the one-step predicted endpoint with a t²-weighted
-per-complex reduction. These are training terms; inference updates fragment
-transforms without reference coordinates. Energy-based post-refinement is a
-separate downstream operation already shown in the representative workflow and
-is not depicted as a neural layer here.
+### C. Equivariant RMSNorm
 
-### D. Confidence readout
+Let b identify one (degree, parity) block, C_b its multiplicity, and h_{b,c}
+its channel vector (one component for a scalar, 2ℓ+1 otherwise). For each node:
 
-Each candidate repeats the receptor graph and rebuilds contacts at 5 Å. There is
-no message passing or attention across different candidate poses. Its four
-interaction layers use independent parameters from docking. They receive a zero
-128-dimensional condition and no fragment rotation matrices, unlike the docking
-layers in panel B. Saved ligand/fragment states, when present, are added through
-a learned scalar gate initialized to 0.25. The scorer also operates without them.
+- `r_b = sqrt(mean_c ||h_{b,c}||² + epsilon)`, with `epsilon = 1e-6`.
+- `hhat_{b,c} = a_{b,c} h_{b,c} / r_b`, with learned channel gains initialized to one.
 
-The 480 invariant channels are concatenated with 44 atom-contact features and
-projected to 512 dimensions. Atom heads predict log1p displacement and a success
-logit. Contact pooling concatenates attention-weighted contact features, maximum
-contact features, mean atom features and maximum atom features: 4×512 = 2,048.
-A separate projection of invariant node states supplies mean/max pools for each
-of four node types: 8×512 = 4,096. Concatenating both routes gives 6,144 dimensions
-for LayerNorm and a depth-3 pose MLP with hidden width 512 and two outputs.
-Internal LayerNorm/activation/dropout operations are compressed in the pooling
-and MLP boxes to keep the panel readable.
+The component norm sums over the irrep dimension; the outer mean is over channels
+within the block. This is not one RMS over the entire 736-component state, a
+batch statistic, or separate normalization of x/y/z. No mean is subtracted.
+All components of a channel receive the same scalar multiplier. The pictured
+arrows illustrate positive gains and a common rescaling; lengths are schematic.
+Learned gains themselves are unconstrained and may change sign.
 
-The pose outputs are log1p RMSD and a success logit. Displayed predicted RMSD is
-`max(0, expm1(clamp(log1p_RMSD, -2, 5)))`. The success output is an auxiliary
-prediction, not the deployed selector score or a claim of calibrated probability.
-Reference RMSD/success labels exist during confidence training, not at inference.
+### D. Equivariant AdaLN
+
+AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
+The condition passes through one linear projection, producing gamma_s, beta_s
+and gamma_u. Normalized features follow two branches:
+
+- Scalars: `s' = (1 + gamma_s) * shat + beta_s`.
+- Non-scalars: `u' = (1 + 0.1 * tanh(gamma_u)) * uhat`.
+
+Non-scalar scales lie between 0.9 and 1.1; no vector/tensor offset is added.
+The scale is shared across the 2ℓ+1 components of each channel. The scalar-bar
+example illustrates a shift; the vector example illustrates a positive scale.
+Zero initialization of the conditioning projection initially leaves the
+RMS-normalized features unchanged, not the raw input unchanged. A zero confidence
+condition need not imply zero modulation after training because the projection
+has a learned bias. Equivariance here is with respect to joint SE(3)
+transformations of the model inputs; the figure does not establish full-pipeline
+reflection equivariance.
 
 ## Reproduction and use
 
@@ -134,29 +148,14 @@ python -m benchmarks.figures.architecture --output outputs/paper_figures
 ```
 
 The [source specification](../../benchmarks/results/paper/architecture/spec.json)
-records dimensions and source/config SHA-256 hashes. Rendering fails if those
-files change, requiring another implementation audit. The renderer checks shape
-arithmetic and text bounds/overlap. PDF/SVG are fully vector, with editable SVG
-text; the preview is 300 dpi. Exports are deterministic. The source width is
-304.8 mm; at 180 mm the 11 pt body text becomes 6.50 pt. Place at two-column
-width and inspect the final journal proof. Existing figures, data and the combined
-benchmark PDF are unchanged; no model execution, training or evaluation is needed.
+records dimensions, normalization operations and source/config SHA-256 hashes.
+Rendering fails if those sources change. It also checks dimension arithmetic,
+text overlap and module padding. PDF/SVG are vector, SVG text is editable and
+the PNG preview is 300 dpi. Exports are deterministic. At 180 mm width the
+11 pt source body text becomes 6.50 pt; inspect the final manuscript scale.
+No model execution or measured activation data are needed for this schematic.
 
-
-## Visual design reference
-
-The visual organization was checked against Figure 1 of
-[BA-Pred and RMSD-Pred](https://doi.org/10.1021/acs.jcim.5c02591)
-([open-access figure](https://pmc.ncbi.nlm.nih.gov/articles/PMC13080981/figure/fig1/)).
-Only layout principles inform this original drawing: compact functional blocks,
-thin connectors, and a clear separation between graph inputs, internal layers,
-and readout. No panels, molecular images, or model operations were reused.
-EFF-Dock operations are independently audited against the source files above.
-
-Plain panel letters and open whitespace replace enclosing rounded cards.
-Pale colors distinguish geometric inputs, equivariant operations, motion readout,
-and conditioning/pooling; they do not encode quantitative values. Channel widths
-and implementation details remain in this document rather than being repeated
-inside every module. Solid arrows indicate feature or vector flow; the dashed
-atom-head branch denotes auxiliary supervision. Training losses are separated
-from the inference readout in panel C.
+The restrained functional-block styling was informed by Figure 1 of
+[BA-Pred and RMSD-Pred](https://doi.org/10.1021/acs.jcim.5c02591).
+This is an original drawing audited against EFF-Dock source code; no reference
+panels, molecular images or model operations are reused.
