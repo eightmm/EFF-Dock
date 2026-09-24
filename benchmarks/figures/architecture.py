@@ -15,7 +15,7 @@ from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch, Polygon
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / "benchmarks/results/paper/architecture/spec.json"
 NAME = "Fig2_architecture"
-WIDTH, HEIGHT = 12.0, 10.5
+WIDTH, HEIGHT = 12.0, 12.2
 INK, MUTED, LINE = "#252525", "#666666", "#666666"
 BLUE, MINT, PEACH, VIOLET = "#70A9CA", "#71AD9B", "#DCA179", "#A895C4"
 PALE_BLUE, PALE_MINT, PALE_PEACH, PALE_VIOLET = "#E8F1F7", "#EAF3EE", "#F8EEE5", "#F0ECF6"
@@ -141,44 +141,65 @@ class Canvas:
 
 
 def overview_panel(c, s):
-    c.panel(0.20, 7.75, 11.6, 2.55, "A", "Model architecture", PALE_BLUE)
-    c.text(0.48, 9.73, "Docking network", bold=True, ha="left")
-    c.text(4.74, 9.73, r"$c=E_t(t)+E_\sigma(\log\sigma)$", color=MUTED)
-    c.text(0.48, 8.76, "Confidence network", bold=True, ha="left")
-    columns = [(0.48, 1.35), (2.07, 1.46), (3.77, 1.94), (5.95, 1.55), (7.74, 1.69), (9.67, 1.83)]
-    rows = [
-        (
-            9.02,
-            [
-                "Node features",
-                "Equivariant\nembedding",
-                "Interaction layer\n×6  (B)",
-                "Atom vector\nhead",
-                "Newton–Euler\nreadout",
-                "Fragment velocities\n" + r"$(v_f,\omega_f)$",
-            ],
-            [PALE_MINT, PALE_BLUE, PALE_BLUE, PALE_PEACH, PALE_PEACH, "white"],
-        ),
-        (
-            8.05,
-            [
-                "Pose features",
-                "Equivariant\nembedding",
-                "Interaction layer\n×4  (B)",
-                "Invariant\nfeatures",
-                "Global + contact\npooling",
-                "Pose head\npRMSD · success",
-            ],
-            [PALE_MINT, PALE_BLUE, PALE_BLUE, PALE_VIOLET, PALE_VIOLET, PALE_MINT],
-        ),
-    ]
-    for y, labels, fills in rows:
-        for i, ((x, w), label, fill) in enumerate(zip(columns, labels, fills)):
-            c.block(x, y, w, 0.51, label, fill)
-            if i:
-                xp, wp = columns[i - 1]
-                c.arrow([(xp + wp + 0.03, y + 0.255), (x - 0.03, y + 0.255)])
-    c.text(4.74, 8.76, "Independent weights; c = 0", color=MUTED)
+    c.panel(0.20, 7.75, 11.6, 4.25, "A", "Model architecture", PALE_BLUE)
+    c.text(0.48, 11.43, "Docking network", bold=True, ha="left")
+    c.text(3.495, 11.43, r"$c=E_t(t)+E_\sigma(\log\sigma)$", color=MUTED)
+    c.arrow([(3.495, 11.27), (3.495, 11.10)], color=VIOLET)
+    y = 10.79
+    for x, w, text, fill in (
+        (0.48, 1.50, "Equivariant\nembedding", PALE_MINT),
+        (2.69, 1.61, f"Interaction layer\n×{s['docking_layers']}  (B)", PALE_BLUE),
+        (4.72, 1.55, "Linear → act.\n(ligand atoms)", PALE_PEACH),
+        (9.06, 1.47, "Newton–Euler\nreadout", PALE_PEACH),
+    ):
+        c.block(x, y - 0.28, w, 0.56, text, fill)
+    c.arrow([(2.01, y), (2.66, y)])
+    c.arrow([(4.33, y), (4.69, y)])
+    c.line((6.30, y), (6.50, y), connector=True)
+    for branch_y, label in ((11.20, "Linear"), (10.38, "Self tensor product")):
+        c.arrow([(6.50, y), (6.50, branch_y), (6.76, branch_y)])
+        c.block(6.79, branch_y - 0.17, 1.55, 0.34, label, PALE_PEACH, size=10.5)
+        end = y + 0.13 if branch_y > y else y - 0.13
+        c.arrow([(8.37, branch_y), (8.68, branch_y), (8.68, end)])
+    c.junction(6.50, y)
+    c.ax.add_patch(Circle((8.68, y), 0.10, facecolor="white", edgecolor=LINE, lw=0.8, zorder=4))
+    c.text(8.68, y, "+", size=13)
+    c.arrow([(8.81, y), (9.03, y)])
+    c.arrow([(10.56, y), (10.83, y)])
+    c.text(11.28, y, r"$v_f,\,\omega_f$", size=13)
+
+    c.text(0.48, 10.01, "Confidence network", bold=True, ha="left")
+    c.text(3.495, 9.49, r"$c=0$", color=MUTED)
+    c.arrow([(3.495, 9.32), (3.495, 9.12)], color=VIOLET)
+    y = 8.81
+    for x, w, text, fill in (
+        (0.48, 1.50, "Equivariant\nembedding", PALE_MINT),
+        (2.69, 1.61, f"Interaction layer\n×{s['confidence_layers']}  (B)", PALE_BLUE),
+        (4.72, 1.55, "Invariant\nfeatures", PALE_VIOLET),
+        (9.35, 1.01, "Pose MLP", PALE_VIOLET),
+        (10.65, 1.17, "pRMSD\nSuccess logit", PALE_MINT),
+    ):
+        c.block(x, y - 0.28, w, 0.56, text, fill)
+    c.block(0.48, 9.27, 1.50, 0.48, "Docking states\nat t = 1", PALE_PEACH)
+    c.arrow([(2.01, 9.51), (2.33, 9.51), (2.33, 8.94)], color=PEACH)
+    c.text(2.33, 9.71, r"$\times g$", size=11, color=MUTED)
+    c.arrow([(2.01, y), (2.20, y)])
+    c.ax.add_patch(Circle((2.33, y), 0.10, facecolor="white", edgecolor=LINE, lw=0.8, zorder=4))
+    c.text(2.33, y, "+", size=13)
+    c.arrow([(2.46, y), (2.66, y)])
+    c.arrow([(4.33, y), (4.69, y)])
+    c.line((6.30, y), (6.50, y), connector=True)
+    for branch_y, label in ((9.30, "Global pooling"), (8.32, "Contact pooling")):
+        c.arrow([(6.50, y), (6.50, branch_y), (6.76, branch_y)])
+        c.block(6.79, branch_y - 0.20, 1.71, 0.40, label, PALE_VIOLET)
+        end = y + 0.15 if branch_y > y else y - 0.15
+        c.arrow([(8.53, branch_y), (8.93, branch_y), (8.93, end)])
+    c.junction(6.50, y)
+    c.ax.add_patch(Circle((8.93, y), 0.12, facecolor="white", edgecolor=LINE, lw=0.8, zorder=4))
+    c.text(8.93, y, "‖", size=12)
+    c.text(9.18, 9.56, "Concat.", size=10.5, color=MUTED)
+    c.arrow([(9.08, y), (9.32, y)])
+    c.arrow([(10.39, y), (10.62, y)])
 
 
 def interaction_panel(c, s):
@@ -193,7 +214,7 @@ def interaction_panel(c, s):
         (4.73, 0.32, "Gated aggregation", PALE_BLUE),
         (4.23, 0.32, "Equivariant linear", "white"),
         (3.73, 0.32, "Activation  (E)", "white"),
-        (3.23, 0.32, "Channel dropout", "white"),
+        (3.25, 0.32, "Channel dropout", "white"),
     ]
     previous = 6.40
     for y, height, label, fill in modules:
@@ -209,22 +230,23 @@ def interaction_panel(c, s):
         PALE_PEACH,
     )
     c.arrow([(2.31, 6.06), (2.91, 6.06)])
-    c.text(1.38, 5.52, "Edge attributes\n+ node scalars", color=MUTED)
+    c.text(1.38, 5.52, "Edge features\nNode scalars, c", color=MUTED)
     c.arrow([(1.38, 5.31), (1.38, 5.17)])
     c.block(0.48, 4.64, 1.80, 0.50, "Radial / gate MLPs", PALE_MINT)
     c.arrow([(2.31, 4.89), (2.91, 4.89)])
     c.arrow([(2.60, 4.89), (2.60, 5.87), (2.91, 5.87)])
     c.junction(2.60, 4.89)
-    c.ax.add_patch(Circle((mid, 2.94), 0.09, facecolor="white", edgecolor=LINE, lw=0.8, zorder=4))
-    c.text(mid, 2.94, "+", size=13)
-    c.arrow([(mid, 3.20), (mid, 3.06)])
-    c.arrow([(mid, 6.86), (5.57, 6.86), (5.57, 2.94), (mid + 0.12, 2.94)])
-    c.junction(mid, 6.86)
-    c.text(5.73, 4.40, "Residual", rotation=90, color=MUTED)
-    c.block(x, 2.32, w, 0.34, "AdaLN  (D)", PALE_VIOLET)
-    c.arrow([(mid, 2.82), (mid, 2.69)])
-    c.text(1.32, 2.49, "Condition c", color=MUTED)
-    c.arrow([(2.13, 2.49), (2.91, 2.49)])
+    c.ax.add_patch(Circle((mid, 2.99), 0.09, facecolor="white", edgecolor=LINE, lw=0.8, zorder=4))
+    c.text(mid, 2.99, "+", size=13)
+    c.arrow([(mid, 3.22), (mid, 3.11)])
+    c.arrow([(mid, 6.86), (5.57, 6.86), (5.57, 2.99), (mid + 0.12, 2.99)], color=BLUE, lw=1.2)
+    c.junction(mid, 6.86, BLUE)
+    c.text(5.73, 4.40, "Identity skip", rotation=90, color=MUTED)
+    c.block(x, 2.40, w, 0.32, "AdaLN  (D)", PALE_VIOLET)
+    c.arrow([(mid, 2.87), (mid, 2.75)])
+    c.arrow([(mid, 2.37), (mid, 2.25)])
+    c.text(1.32, 2.56, "Condition c", color=MUTED)
+    c.arrow([(2.13, 2.56), (2.91, 2.56)], color=VIOLET)
     c.text(mid, 2.10, r"$h^{(k+1)}$", size=12)
 
 

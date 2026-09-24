@@ -12,17 +12,21 @@ post-refinement and training objectives are outside its scope.
 
 **EFF-Dock architecture and equivariant building blocks.**
 **A**, The docking network embeds input features and applies six interaction
-layers. A learned atom-vector head followed by Newton–Euler aggregation produces
-fragment translation and angular velocities. A separately parameterized
-four-layer confidence network maps candidate-pose features to invariants and
+layers. The atom head sums linear and self-tensor-product outputs before
+Newton–Euler aggregation produces fragment translation and angular velocities.
+A separately parameterized four-layer confidence network maps candidate-pose features to invariants and
 combines global and contact-aware pooling to predict RMSD and a pose-success
-logit. Docking uses additive time and log-prior-scale embeddings; confidence uses
-a fixed zero conditioning vector. **B**, Each interaction layer applies
+logit. A learned scalar gate weights ligand hidden states extracted by the
+docking network at t = 1 before their addition to the confidence embedding.
+Docking uses additive time and log-prior-scale embeddings; confidence uses
+a fixed zero conditioning vector. The + symbols indicate addition, ‖ denotes
+concatenation, and × denotes multiplication. **B**, Each interaction layer applies
 blockwise equivariant RMS normalization, an edge-conditioned tensor product with
 spherical harmonics through degree two, message activation, gated aggregation,
-and an equivariant linear/activation/dropout block. The residual is added before
-AdaLN. Both activation calls use the operation detailed in panel E. **C**,
-Equivariant RMSNorm
+and an equivariant linear/activation/dropout block. The blue identity skip
+bypasses pre-normalization and the message/post blocks; the original input is
+added before AdaLN. Both activation calls use the operation detailed in panel E.
+**C**, Equivariant RMSNorm
 normalizes each irrep block using the channel-mean squared irrep norm and applies
 learned channel gains. The drawing illustrates a vector block; scalar and
 rank-two blocks are normalized separately by the same rule. **D**, AdaLN first
@@ -38,7 +42,7 @@ each channel. Panel C arrows are schematic, not measured activations.
 
 | Panel | Depicted operation | Source |
 |---|---|---|
-| A | Independent docking/confidence models, embedding, readouts | [Docking model](../../src/effdock/models/effdock.py), [confidence model](../../src/effdock/confidence/model.py) |
+| A | Separately parameterized docking/confidence models, embedding, readouts | [Docking model](../../src/effdock/models/effdock.py), [confidence model](../../src/effdock/confidence/model.py) |
 | B | Pre-norm → tensor product → message activation → gated aggregation → linear/activation/dropout → residual → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [GatedEquivariantConv / EquivariantBlock](../../src/effdock/models/equivariant.py) |
 | C | RMS reduction per irrep block, learned channel gains | [EquivariantRMSNorm](../../src/effdock/models/equivariant.py) |
 | D | RMSNorm, scalar affine modulation, bounded non-scalar modulation | [EquivariantAdaLN](../../src/effdock/models/equivariant.py) |
@@ -70,15 +74,25 @@ the rigid SE(3) integrator shown in the separate workflow figure.
 The confidence network uses four layers with independent parameters. Each
 candidate is processed independently; there is no cross-candidate attention.
 It uses a zero 128-wide condition and no fragment-frame input to the interaction
-layers. Saved ligand/fragment hidden states can enter via a learned gate when
-available; this optional branch is omitted from the overview.
+layers. The released dataset and inference runtime supply ligand-atom and fragment
+hidden states from a docking-model forward pass at t = 1 for each candidate.
+These states are multiplied by a learned scalar gate (initialized to 0.25) and
+added only at ligand-atom and fragment slots of the confidence embedding. This
+input is shown above the confidence embedding; it is not a direct wire from an
+arbitrary intermediate generation step. The docking network is evaluated on the
+scored pose, including a refined pose when applicable. The model class permits
+omitting this branch when saved states are absent or explicitly disabled, but
+the released scoring path supplies them. See the
+[feature extractor](../../src/effdock/confidence/features.py),
+[inference runtime](../../src/effdock/confidence/runtime.py) and
+[dataset](../../src/effdock/confidence/dataset.py).
 
 Invariant node features contain scalars and non-scalar channel norms. Global
 mean/max pools over four node types produce 4,096 features. A contact-aware atom
 MLP combines 480 invariant features with 44 contact descriptors, then attention,
 contact-maximum, atom-mean and atom-maximum pools produce 2,048 features. The
-6,144-dimensional concatenation feeds a depth-three pose MLP with hidden width
-512 and two outputs: log1p RMSD and a success logit. Displayed pRMSD is
+6,144-dimensional concatenation (‖ in panel A) feeds a depth-three pose MLP
+with hidden width 512 and two outputs: log1p RMSD and a success logit. Displayed pRMSD is
 `max(0, expm1(clamp(log1p_RMSD, -2, 5)))`; selection minimizes pRMSD among eligible
 poses. The success logit is not the selector or a calibrated probability claim.
 Auxiliary atom-level heads are omitted from this model overview.
@@ -86,7 +100,10 @@ Auxiliary atom-level heads are omitted from this model overview.
 ### B. Interaction layer
 
 The exact outer order is `AdaLN(h + post_block(conv(pre_norm(h))))`.
-The residual bypasses the message/post block, not AdaLN. The six docking layers
+The identity skip carries the original h around pre-normalization and the
+message/post block, ending at the + node before AdaLN. There is exactly one
+additive residual per interaction layer; neither the post block nor AdaLN has
+an additional residual. The output arrow follows AdaLN. The six docking layers
 and four confidence layers are separately parameterized; repetition counts do
 not denote tied weights.
 
@@ -100,8 +117,10 @@ Message activation occurs after output radial scaling, before aggregation.
 Aggregation uses gate-normalized sums, edge-type-dependent distance decay and
 additional non-scalar norm rescaling grouped by degree. It is not ordinary
 softmax attention. These internal reductions are compressed into the gated
-aggregation module. Edge scalar construction is also compressed; coordinates
-and conditioning feed it in addition to the two inputs named in the drawing.
+aggregation module. Edge scalar construction is also compressed: “Node scalars, c”
+denotes concatenated normalized source/destination scalar channels and
+conditioning. “Edge features” includes the geometry and descriptors listed above. The radial and gate MLPs are distinct learned functions; the shared
+branch in the drawing summarizes their edge-conditioned outputs.
 
 Equivariant linear maps mix multiplicity channels within compatible irreps.
 The two activation blocks refer to the operation in panel E and have independent
@@ -162,7 +181,8 @@ python -m benchmarks.figures.architecture --output outputs/paper_figures
 ```
 
 The [source specification](../../benchmarks/results/paper/architecture/spec.json)
-records dimensions, normalization operations and source/config SHA-256 hashes.
+records dimensions, normalization operations, the ligand-state input and
+source/config SHA-256 hashes, including feature extraction and scoring code.
 Rendering fails if those sources change. It also checks dimension arithmetic,
 text overlap, module padding and connector routing (unmarked intersections,
 collinear overlaps, text/module intrusion and arrowheads without adequate shafts).
