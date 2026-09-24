@@ -12,6 +12,12 @@ numbering and placement may change during writing.
 - [Numerical source data and reproduction](../../benchmarks/results/paper/README.md)
 - [Source and caption manifest](manifest.json)
 
+## Model illustrations
+
+- [Representative workflow](REPRESENTATIVE_FIGURE.md): Figure 1 PDF, preview and caption.
+- [Architecture](ARCHITECTURE_FIGURE.md): Figure 2 with graph, interaction layer,
+  fragment readout and confidence panels (A–D); vector PDF/SVG and caption.
+
 ## Figures
 
 | Page | Figure | PDF | Preview |

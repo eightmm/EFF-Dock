@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "docking_layers": 6,
+  "confidence_layers": 4,
+  "node_embedding": [
+    208,
+    384,
+    384
+  ],
+  "irreps": {
+    "0e": 384,
+    "1o": 32,
+    "1e": 32,
+    "2e": 16,
+    "2o": 16
+  },
+  "feature_width": 736,
+  "invariant_width": 480,
+  "edge_input_width": 1020,
+  "radial_hidden": 128,
+  "condition_width": 128,
+  "n_rbf": 32,
+  "sh_lmax": 2,
+  "contact_cutoff_angstrom": 5,
+  "head_width": 544,
+  "contact_width": 44,
+  "confidence_hidden": 512,
+  "global_pool_width": 4096,
+  "contact_pool_width": 2048,
+  "pose_readout_width": 6144,
+  "loss_weights": {
+    "translation": 1,
+    "rotation": 8,
+    "atom_velocity": 0.3,
+    "distance_geometry": 3
+  },
+  "source_sha256": {
+    "src/effdock/models/effdock.py": "4aeab13b27853324203a9ed741eb7385b556c526677fdccc72dcf9d20de965e1",
+    "src/effdock/models/equivariant.py": "414fda6a7f91b1ffef77e402442c6185dabfef0582c7381740b47c08c5fd1291",
+    "src/effdock/confidence/model.py": "76d6a50f9edd9f37cc9ae19908d677ad1ffedc8516d1c034b7053617eff32f57",
+    "src/effdock/training/losses.py": "121f285eaabce73478a182f4ffd0d9df7c5429ecc16775fdc76f182700e0fcef",
+    "configs/train_early_time_ft_50k.yaml": "439d95d7b56e49de6239e113ae4b7e4db94be9e10afe5b8c5f0ece48f076a369",
+    "configs/train_confidence_s50_raw_refined_100k.yaml": "ff1351193fe1d6469db9ab1c9f168e5f4e031da4c2b922f5de18edea9d0929ca"
+  }
+}
