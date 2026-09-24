@@ -126,7 +126,10 @@ Learned gains themselves are unconstrained and may change sign.
 
 AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
 The condition passes through one linear projection, producing gamma_s, beta_s
-and gamma_u. Normalized features follow two branches:
+and gamma_u. Feature and conditioning paths occupy separate sides of the stacked
+modulation rows; dots mark branch points. The purple path carries conditioning
+parameters, while the gray path carries normalized features. Normalized features
+follow two branches:
 
 - Scalars: `s' = (1 + gamma_s) * shat + beta_s`.
 - Non-scalars: `u' = (1 + 0.1 * tanh(gamma_u)) * uhat`.
@@ -150,7 +153,9 @@ python -m benchmarks.figures.architecture --output outputs/paper_figures
 The [source specification](../../benchmarks/results/paper/architecture/spec.json)
 records dimensions, normalization operations and source/config SHA-256 hashes.
 Rendering fails if those sources change. It also checks dimension arithmetic,
-text overlap and module padding. PDF/SVG are vector, SVG text is editable and
+text overlap, module padding and connector routing (unmarked intersections,
+collinear overlaps, text/module intrusion and arrowheads without adequate shafts).
+PDF/SVG are vector, SVG text is editable and
 the PNG preview is 300 dpi. Exports are deterministic. At 180 mm width the
 11 pt source body text becomes 6.50 pt; inspect the final manuscript scale.
 No model execution or measured activation data are needed for this schematic.

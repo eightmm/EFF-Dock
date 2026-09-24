@@ -41,6 +41,8 @@ class Canvas:
         self.ax.set_axis_off()
         self.texts = []
         self.box_texts = []
+        self.connectors = []
+        self.junctions = []
 
     def text(self, x, y, text, size=11, color=INK, bold=False, ha="center", **kwargs):
         artist = self.ax.text(
@@ -78,7 +80,11 @@ class Canvas:
         artist = self.text(x + w / 2, y + h / 2, text, size=size)
         self.box_texts.append((artist, (x, y, w, h)))
 
-    def arrow(self, points, color=LINE, lw=0.85, dashed=False):
+    def arrow(self, points, color=LINE, lw=0.85, dashed=False, connector=True):
+        if connector:
+            if np.linalg.norm(np.subtract(points[-1], points[-2])) < 0.10 - 1e-8:
+                raise ValueError(f"Arrowhead without sufficient shaft: {points}")
+            self.connectors.extend(zip(points[:-1], points[1:]))
         for a, b in zip(points[:-2], points[1:-1]):
             self.ax.plot(*zip(a, b), color=color, lw=lw, ls="--" if dashed else "-", zorder=2)
         self.ax.add_patch(
@@ -96,7 +102,9 @@ class Canvas:
             )
         )
 
-    def line(self, a, b, color=LINE, lw=1, dashed=False):
+    def line(self, a, b, color=LINE, lw=1, dashed=False, connector=False):
+        if connector:
+            self.connectors.append((a, b))
         self.ax.plot(*zip(a, b), color=color, lw=lw, ls=(0, (3, 2)) if dashed else "-", zorder=2)
 
     def node(self, x, y, color, kind="atom", r=0.068):
@@ -123,6 +131,10 @@ class Canvas:
             )
         self.ax.add_patch(patch)
 
+    def junction(self, x, y, color=LINE):
+        self.junctions.append((x, y))
+        self.ax.add_patch(Circle((x, y), 0.025, facecolor=color, edgecolor="none", zorder=4))
+
     def panel(self, x, y, w, h, letter, title, tint):
         self.text(x + 0.08, y + h - 0.20, letter, size=15, bold=True, ha="left")
         self.text(x + 0.45, y + h - 0.20, title, size=13, bold=True, ha="left")
@@ -131,7 +143,7 @@ class Canvas:
 def overview_panel(c, s):
     c.panel(0.20, 7.75, 11.6, 2.55, "A", "Model architecture", PALE_BLUE)
     c.text(0.48, 9.73, "Docking network", bold=True, ha="left")
-    c.text(6.08, 9.73, r"$c=E_t(t)+E_\sigma(\log\sigma)$", color=MUTED)
+    c.text(4.74, 9.73, r"$c=E_t(t)+E_\sigma(\log\sigma)$", color=MUTED)
     c.text(0.48, 8.76, "Confidence network", bold=True, ha="left")
     columns = [(0.48, 1.35), (2.07, 1.46), (3.77, 1.94), (5.95, 1.55), (7.74, 1.69), (9.67, 1.83)]
     rows = [
@@ -166,62 +178,61 @@ def overview_panel(c, s):
             if i:
                 xp, wp = columns[i - 1]
                 c.arrow([(xp + wp + 0.03, y + 0.255), (x - 0.03, y + 0.255)])
-    c.text(8.60, 8.76, "Independent weights; zero condition", color=MUTED)
+    c.text(4.74, 8.76, "Independent weights; c = 0", color=MUTED)
 
 
 def interaction_panel(c, s):
     c.panel(0.20, 0.15, 5.65, 7.42, "B", "Interaction layer", PALE_BLUE)
     x, w, mid = 2.94, 2.24, 4.06
-    c.text(mid, 6.99, r"$h^{(k)}$", size=12)
+    c.text(mid, 7.04, r"$h^{(k)}$", size=12)
     c.block(x, 6.29, w, 0.42, "RMSNorm  (C)")
-    c.arrow([(mid, 6.86), (mid, 6.74)])
-    c.block(x, 5.62, w, 0.50, "Shared tensor product\nInput / output radial scaling", PALE_BLUE)
-    c.arrow([(mid, 6.26), (mid, 6.15)])
-    c.block(x, 5.08, w, 0.35, "Equivariant activation")
-    c.arrow([(mid, 5.59), (mid, 5.46)])
-    c.block(x, 4.50, w, 0.40, "Gated aggregation", PALE_BLUE)
-    c.arrow([(mid, 5.05), (mid, 4.93)])
-    c.text(1.38, 6.88, "Edge attributes\n+ node scalars", color=MUTED)
-    c.block(0.48, 5.89, 1.80, 0.50, "Radial / gate MLPs", PALE_MINT)
-    c.arrow([(1.38, 6.59), (1.38, 6.42)])
-    c.arrow([(2.31, 6.14), (2.60, 6.14), (2.60, 5.96), (2.91, 5.96)])
-    c.arrow([(0.45, 6.04), (0.30, 6.04), (0.30, 4.70), (2.91, 4.70)])
+    c.arrow([(mid, 6.91), (mid, 6.74)])
+    c.block(x, 5.57, w, 0.50, "Shared tensor product\nInput / output radial scaling", PALE_BLUE)
+    c.block(x, 5.00, w, 0.35, "Equivariant activation")
+    c.block(x, 4.38, w, 0.40, "Gated aggregation", PALE_BLUE)
+    c.block(x, 3.73, w, 0.43, "Equivariant linear")
+    for top, bottom in ((6.26, 6.10), (5.54, 5.38), (4.97, 4.81), (4.35, 4.19), (3.70, 3.54)):
+        c.arrow([(mid, top), (mid, bottom)])
     c.block(
         0.48,
-        4.89,
+        5.66,
         1.80,
-        0.57,
+        0.50,
         "Spherical harmonics\n" + r"$Y_{\ell\leq2}(\hat r_{ij})$",
         PALE_PEACH,
     )
-    c.arrow([(2.31, 5.25), (2.76, 5.25), (2.76, 5.77), (2.91, 5.77)])
-    c.block(x, 3.94, w, 0.43, "Equivariant linear")
-    c.arrow([(mid, 4.47), (mid, 4.40)])
-    c.box(0.48, 1.97, 4.70, 1.66, fill="#FAFAFA", edge="#AAAAAA")
-    c.text(2.83, 3.42, "Equivariant activation", bold=True)
-    c.arrow([(mid, 3.91), (mid, 3.66)])
-    c.text(0.76, 2.99, "Scalars", ha="left", color=MUTED)
-    c.block(1.95, 2.80, 1.18, 0.39, "SiLU")
-    c.text(4.03, 2.995, r"$s'=\mathrm{SiLU}(s)$")
-    c.arrow([(1.60, 2.995), (1.92, 2.995)])
-    c.arrow([(3.16, 2.995), (3.38, 2.995)])
-    c.text(0.76, 2.42, "Vectors /\ntensors", ha="left", color=MUTED)
-    c.block(1.95, 2.22, 1.18, 0.40, "Norms → MLP\n→ sigmoid")
-    c.text(4.03, 2.42, r"$u_c'=g_c u_c$")
-    c.arrow([(1.60, 2.42), (1.92, 2.42)])
-    c.arrow([(3.16, 2.42), (3.38, 2.42)])
-    c.block(x, 1.29, w, 0.40, "Channel dropout")
-    c.arrow([(mid, 1.94), (mid, 1.72)])
-    c.ax.add_patch(Circle((mid, 1.04), 0.10, facecolor="white", edgecolor=LINE, lw=0.8, zorder=4))
-    c.text(mid, 1.04, "+", size=13)
-    c.arrow([(mid, 1.26), (mid, 1.17)])
-    c.arrow([(mid + 0.23, 6.99), (5.57, 6.99), (5.57, 1.04), (mid + 0.13, 1.04)])
+    c.arrow([(2.31, 5.91), (2.91, 5.91)])
+    c.text(1.38, 5.28, "Edge attributes\n+ node scalars", color=MUTED)
+    c.arrow([(1.38, 5.03), (1.38, 4.86)])
+    c.block(0.48, 4.33, 1.80, 0.50, "Radial / gate MLPs", PALE_MINT)
+    c.arrow([(2.31, 4.58), (2.91, 4.58)])
+    c.arrow([(2.60, 4.58), (2.60, 5.73), (2.91, 5.73)])
+    c.junction(2.60, 4.58)
+    c.box(0.48, 2.11, 4.70, 1.40, fill="#FAFAFA", edge="#AAAAAA")
+    c.text(2.83, 3.31, "Equivariant activation", bold=True)
+    c.text(0.76, 2.96, "Scalars", ha="left", color=MUTED)
+    c.block(1.95, 2.765, 1.18, 0.39, "SiLU")
+    c.text(4.03, 2.96, r"$s'=\mathrm{SiLU}(s)$")
+    c.arrow([(1.60, 2.96), (1.92, 2.96)])
+    c.arrow([(3.16, 2.96), (3.38, 2.96)])
+    c.text(0.76, 2.43, "Vectors /\ntensors", ha="left", color=MUTED)
+    c.block(1.95, 2.23, 1.18, 0.40, "Norms → MLP\n→ sigmoid")
+    c.text(4.03, 2.43, r"$u_c'=g_c u_c$")
+    c.arrow([(1.60, 2.43), (1.92, 2.43)])
+    c.arrow([(3.16, 2.43), (3.38, 2.43)])
+    c.block(x, 1.49, w, 0.40, "Channel dropout")
+    c.arrow([(mid, 2.08), (mid, 1.92)])
+    c.ax.add_patch(Circle((mid, 1.16), 0.10, facecolor="white", edgecolor=LINE, lw=0.8, zorder=4))
+    c.text(mid, 1.16, "+", size=13)
+    c.arrow([(mid, 1.46), (mid, 1.29)])
+    c.arrow([(mid, 6.86), (5.57, 6.86), (5.57, 1.16), (mid + 0.13, 1.16)])
+    c.junction(mid, 6.86)
     c.text(5.73, 4.04, "Residual", rotation=90, color=MUTED)
-    c.block(x, 0.39, w, 0.40, "AdaLN  (D)", PALE_VIOLET)
-    c.arrow([(mid, 0.91), (mid, 0.82)])
-    c.text(1.32, 0.59, "Condition c", color=MUTED)
-    c.arrow([(2.13, 0.59), (2.91, 0.59)])
-    c.text(mid, 0.16, r"$h^{(k+1)}$", size=12)
+    c.block(x, 0.44, w, 0.40, "AdaLN  (D)", PALE_VIOLET)
+    c.arrow([(mid, 1.03), (mid, 0.87)])
+    c.text(1.32, 0.64, "Condition c", color=MUTED)
+    c.arrow([(2.13, 0.64), (2.91, 0.64)])
+    c.text(mid, 0.19, r"$h^{(k+1)}$", size=12)
 
 
 def vector_channels(c, x, y, scales):
@@ -229,7 +240,12 @@ def vector_channels(c, x, y, scales):
     for i, (direction, scale) in enumerate(zip(directions, scales)):
         origin = np.array([x + i * 0.47, y])
         c.node(*origin, "#888888", r=0.023)
-        c.arrow([tuple(origin), tuple(origin + scale * direction)], [BLUE, MINT, VIOLET][i], lw=1.6)
+        c.arrow(
+            [tuple(origin), tuple(origin + scale * direction)],
+            [BLUE, MINT, VIOLET][i],
+            lw=1.6,
+            connector=False,
+        )
 
 
 def norm_panel(c, s):
@@ -241,40 +257,58 @@ def norm_panel(c, s):
     c.block(8.22, 6.09, 1.71, 0.55, "RMS scale\n+ channel gain", PALE_BLUE)
     c.arrow([(7.89, 6.37), (8.19, 6.37)])
     c.arrow([(9.96, 6.37), (10.27, 6.37)])
-    c.text(8.97, 5.65, r"$r_b=\sqrt{\frac{1}{C_b}\sum_c\Vert h_{b,c}\Vert^2+\epsilon}$", size=12)
-    c.text(8.97, 5.12, r"$\hat h_{b,c}=a_{b,c}\,h_{b,c}/r_b$", size=12)
+    c.text(9.075, 5.65, r"$r_b=\sqrt{\frac{1}{C_b}\sum_c\Vert h_{b,c}\Vert^2+\epsilon}$", size=12)
+    c.text(9.075, 5.12, r"$\hat h_{b,c}=a_{b,c}\,h_{b,c}/r_b$", size=12)
 
 
 def adaln_panel(c, s):
     c.panel(6.12, 0.15, 5.68, 4.32, "D", "Equivariant AdaLN", PALE_VIOLET)
-    c.text(6.56, 3.71, r"$h$", size=13)
-    c.arrow([(6.71, 3.71), (7.00, 3.71)])
-    c.block(7.03, 3.48, 1.47, 0.46, "RMSNorm  (C)")
-    c.text(10.37, 3.99, "Condition c", color=MUTED)
-    c.block(9.52, 3.48, 1.71, 0.37, "Linear projection", PALE_VIOLET)
-    c.arrow([(10.37, 3.88), (10.37, 3.86)])
-    c.text(8.12, 2.97, "Scalars", bold=True)
-    c.text(10.40, 2.97, "Vectors / tensors", bold=True)
-    c.block(7.15, 2.20, 1.94, 0.52, "Scale + shift\n" + r"$(\gamma_s,\beta_s)$", PALE_VIOLET)
-    c.block(9.43, 2.20, 1.94, 0.52, "Bounded scale\n" + r"$1+0.1\tanh\gamma_u$", PALE_VIOLET)
-    c.arrow([(7.76, 3.45), (7.76, 3.20), (6.88, 3.20), (6.88, 2.46), (7.12, 2.46)])
-    c.arrow([(7.76, 3.20), (9.25, 3.20), (9.25, 2.46), (9.40, 2.46)])
-    c.arrow([(10.37, 3.45), (11.57, 3.45), (11.57, 2.46), (11.40, 2.46)])
-    c.arrow([(10.37, 3.45), (9.35, 3.45), (9.35, 2.77), (8.90, 2.77), (8.90, 2.74)])
-    c.text(8.12, 1.89, r"$s'=(1+\gamma_s)\hat s+\beta_s$", size=11.5)
-    c.text(10.40, 1.89, r"$u'=(1+0.1\tanh\gamma_u)\hat u$", size=11.5)
-    # Positive modulation scales irrep components together; arrow direction is unchanged.
+    c.text(6.61, 3.72, r"$h$", size=13)
+    c.arrow([(6.76, 3.72), (7.02, 3.72)])
+    c.block(7.05, 3.47, 1.58, 0.50, "RMSNorm  (C)", PALE_BLUE)
+    c.block(9.39, 3.47, 1.99, 0.50, "Condition c\nLinear projection", PALE_VIOLET)
+    # Separate feature and conditioning trunks terminate at the lower row.
+    c.line((7.84, 3.44), (7.84, 3.23), connector=True)
+    c.line((7.84, 3.23), (6.62, 3.23), connector=True)
+    c.line((6.62, 3.23), (6.62, 1.76), connector=True)
+    c.line((10.385, 3.44), (10.385, 3.23), color=VIOLET, connector=True)
+    c.line((10.385, 3.23), (11.62, 3.23), color=VIOLET, connector=True)
+    c.line((11.62, 3.23), (11.62, 1.76), color=VIOLET, connector=True)
+    for y, title, formula, feature, parameters in (
+        (
+            2.71,
+            "Scalar affine modulation",
+            r"$s'=(1+\gamma_s)\hat s+\beta_s$",
+            r"$\hat s$",
+            r"$\gamma_s,\beta_s$",
+        ),
+        (
+            1.76,
+            "Vector / tensor modulation",
+            r"$u'=(1+0.1\tanh\gamma_u)\hat u$",
+            r"$\hat u$",
+            r"$\gamma_u$",
+        ),
+    ):
+        c.block(7.61, y - 0.29, 2.74, 0.58, title + "\n" + formula, PALE_VIOLET)
+        c.arrow([(6.62, y), (7.58, y)])
+        c.arrow([(11.62, y), (10.38, y)], color=VIOLET)
+        c.text(7.12, y + 0.17, feature, size=12)
+        c.text(11.00, y + 0.17, parameters, size=11.5)
+        if y == 2.71:
+            c.junction(6.62, y)
+            c.junction(11.62, y, VIOLET)
     for origin, shift in ((6.99, 0.0), (8.09, 0.10)):
-        c.line((origin - 0.10, 1.14), (origin + 0.63, 1.14), lw=0.6)
+        c.line((origin - 0.10, 0.81), (origin + 0.63, 0.81), lw=0.6)
         for i, value in enumerate((-0.15, 0.20, 0.35)):
             x = origin + i * 0.25
-            c.line((x, 1.14), (x, 1.14 + value + shift), BLUE, lw=5)
-    c.arrow([(7.72, 1.24), (7.93, 1.24)], lw=0.8)
-    c.text(7.89, 0.84, "Scalar affine modulation", color=MUTED)
-    c.arrow([(9.67, 0.98), (9.94, 1.49)], VIOLET, lw=1.6)
-    c.arrow([(10.62, 0.98), (10.92, 1.54)], VIOLET, lw=1.6)
-    c.arrow([(10.10, 1.18), (10.46, 1.18)], color=LINE, lw=0.8)
-    c.text(10.33, 0.74, "Direction preserved", color=MUTED)
+            c.line((x, 0.81), (x, 0.81 + value + shift), BLUE, lw=5)
+    c.arrow([(7.72, 0.91), (7.93, 0.91)], lw=0.8)
+    c.text(7.89, 0.36, "Scale + shift", color=MUTED)
+    c.arrow([(9.67, 0.65), (9.94, 1.16)], VIOLET, lw=1.6, connector=False)
+    c.arrow([(10.62, 0.65), (10.92, 1.21)], VIOLET, lw=1.6, connector=False)
+    c.arrow([(10.10, 0.91), (10.36, 0.91)], lw=0.8)
+    c.text(10.33, 0.36, "Direction preserved", color=MUTED)
 
 
 def compose(spec):
@@ -284,6 +318,52 @@ def compose(spec):
     norm_panel(c, spec)
     adaln_panel(c, spec)
     return c
+
+
+def check_connectors(c, renderer):
+    """Reject routing regressions; illustrative vector arrows are excluded."""
+
+    def cross(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    def hits_box(p, q, bounds):
+        x0, y0, x1, y1 = bounds
+        if abs(p[0] - q[0]) < 1e-8:
+            return x0 < p[0] < x1 and max(p[1], q[1]) > y0 and min(p[1], q[1]) < y1
+        return y0 < p[1] < y1 and max(p[0], q[0]) > x0 and min(p[0], q[0]) < x1
+
+    for i, (start, end) in enumerate(c.connectors):
+        p, q = np.array(start), np.array(end)
+        if min(abs(q - p)) > 1e-8:
+            raise ValueError("Dataflow connector is not orthogonal")
+        for text in c.texts:
+            box = text.get_window_extent(renderer).transformed(c.ax.transData.inverted())
+            if hits_box(p, q, (box.x0, box.y0, box.x1, box.y1)):
+                raise ValueError(f"Connector intersects text: {text.get_text()}")
+        for text, (x, y, w, h) in c.box_texts:
+            if hits_box(p, q, (x, y, x + w, y + h)):
+                raise ValueError(f"Connector enters module: {text.get_text()}")
+        for start2, end2 in c.connectors[i + 1 :]:
+            a, b = np.array(start2), np.array(end2)
+            d, e = q - p, b - a
+            denom = cross(d, e)
+            if abs(denom) < 1e-8:
+                if abs(cross(a - p, d)) < 1e-8:
+                    axis = int(np.argmax(abs(d)))
+                    overlap = min(max(p[axis], q[axis]), max(a[axis], b[axis])) - max(
+                        min(p[axis], q[axis]), min(a[axis], b[axis])
+                    )
+                    if overlap > 1e-8:
+                        raise ValueError("Collinear connectors overlap")
+                continue
+            t, u = cross(a - p, e) / denom, cross(a - p, d) / denom
+            if not (-1e-8 <= t <= 1 + 1e-8 and -1e-8 <= u <= 1 + 1e-8):
+                continue
+            point = p + t * d
+            both_ends = min(abs(t), abs(t - 1)) < 1e-8 and min(abs(u), abs(u - 1)) < 1e-8
+            junction = any(np.linalg.norm(point - j) < 1e-8 for j in c.junctions)
+            if not both_ends and not junction:
+                raise ValueError(f"Unmarked connector intersection at {point}")
 
 
 def check_layout(c):
@@ -296,6 +376,8 @@ def check_layout(c):
         for u in c.texts[i + 1 :]:
             if box.overlaps(u.get_window_extent(renderer)):
                 raise ValueError(f"Overlapping text: {t.get_text()} / {u.get_text()}")
+
+    check_connectors(c, renderer)
 
     for t, (x, y, w, h) in c.box_texts:
         box = t.get_window_extent(renderer).transformed(c.ax.transData.inverted())
@@ -327,7 +409,7 @@ def render(output):
         svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
         c.fig.savefig(output / f"{NAME}.png", dpi=300, metadata={"Software": None})
         plt.close(c.fig)
-    print(f"Rendered {NAME}: source hashes, dimensions and text bounds verified")
+    print(f"Rendered {NAME}: source hashes, dimensions, text bounds and connector routing verified")
 
 
 def main():
