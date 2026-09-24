@@ -46,6 +46,7 @@ CONNECTOR = "#A4A4A4"
 FRAME_EDGE = "#D8D8D8"
 POSE_EDGE = "#8C96A3"
 POCKET_COLOR = "#80C8BC"
+EXTRACTION_POCKET_COLOR = "#3FAE9D"
 POCKET_CENTER_COLOR = "#E59A77"
 
 # Landscape overview; preserve vector labels when scaling for the manuscript.
@@ -178,9 +179,8 @@ def input_scene(row, javascript, camera, *, full=False):
         ],
     }
     if full:
-        view.setStyle({"model": 0}, {"cartoon": {"color": "#9EABB7", "opacity": 1}})
-        view.addSurface("MS", {"color": "#ADB5BD", "opacity": 0.30}, {"model": 0})
-        view.setStyle(pocket_selection, {"cartoon": {"color": "#368F83", "opacity": 1}})
+        view.setStyle({"model": 0}, {"cartoon": {"color": "#C3CDD3", "opacity": 1}})
+        view.setStyle(pocket_selection, {"cartoon": {"color": "#147C70", "opacity": 1}})
     view.addModel(record["cropped_pdb"], "pdb", {"keepH": False})
     view.setStyle({"model": 1}, {})
     if not full:
@@ -188,7 +188,14 @@ def input_scene(row, javascript, camera, *, full=False):
             {"model": 1},
             {"stick": {"colorscheme": dict(ELEMENT_COLORS, C="#58A899"), "radius": 0.12}},
         )
-    view.addSurface("MS", {"color": POCKET_COLOR, "opacity": 0.45}, {"model": 1})
+    view.addSurface(
+        "MS",
+        {
+            "color": EXTRACTION_POCKET_COLOR if full else POCKET_COLOR,
+            "opacity": 0.72 if full else 0.45,
+        },
+        {"model": 1},
+    )
     view.setProjection("orthographic")
     view.setView(camera)
     if full:
@@ -276,7 +283,8 @@ def verify_extra_views():
             if metadata.get("surface_type") != "MS" or metadata.get("surface_complete") is not True:
                 raise ValueError("Input surface metadata missing")
             if (
-                metadata.get("pocket_color") != POCKET_COLOR
+                metadata.get("pocket_color")
+                != (EXTRACTION_POCKET_COLOR if stem == "full_protein" else POCKET_COLOR)
                 or metadata.get("center_marker") != pocket_data()["center"]
                 or metadata.get("pocket_surface_context") != "cropped_pdb"
                 or metadata.get("crop_atom_count") != pocket_data()["cropped_atom_count"]
@@ -437,9 +445,11 @@ async def capture_views(javascript, work, *, stems=None):
                 ).hexdigest()
                 metadata["surface_type"] = "MS"
                 metadata["surface_complete"] = True
-                metadata["pocket_color"] = POCKET_COLOR
-                metadata["receptor_opacity"] = 0.30 if stem == "full_protein" else None
-                metadata["pocket_opacity"] = 0.45
+                metadata["pocket_color"] = (
+                    EXTRACTION_POCKET_COLOR if stem == "full_protein" else POCKET_COLOR
+                )
+                metadata["receptor_opacity"] = 0.0 if stem == "full_protein" else None
+                metadata["pocket_opacity"] = 0.72 if stem == "full_protein" else 0.45
                 metadata["representation"] = (
                     "full-chain ribbons" if stem == "full_protein" else "all-heavy-atom sticks"
                 )
@@ -451,7 +461,7 @@ async def capture_views(javascript, work, *, stems=None):
                 metadata["center_marker_color"] = POCKET_CENTER_COLOR
                 metadata["center_marker_screen"] = await page.evaluate("window.pocketCenterScreen")
                 metadata["description"] = (
-                    "Translucent full receptor and teal crop surfaces with original-chain ribbons and projected supplied-center marker"
+                    "Pale full receptor ribbons with a strong teal pocket surface and projected supplied-center marker"
                     if stem == "full_protein"
                     else "Translucent teal crop surface with all retained heavy atoms as element-colored sticks and projected supplied-center marker"
                 )
