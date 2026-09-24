@@ -10,7 +10,8 @@ dimension arithmetic before exporting one four-panel vector figure.
 
 Panels show the model overview, interaction layer, RMSNorm/AdaLN operations
 and activation. The overview shows the atom-head sum, gated ligand-state input
-and concatenated global/contact pooling. The layer shows its single additive
+and concatenated global/contact pooling, including both contact-descriptor
+injections. The layer expands input/output radial scaling and shows its single additive
 identity skip before AdaLN.
 No model was run. Detailed branches omitted from the drawing are documented in
 the caption companion. Graph construction and training objectives are outside
