@@ -696,10 +696,10 @@ def compose(row):
     reference = reference_data()
     crop = common_crop([*flow, *refinement, *candidates, overlay])
     input_aspect = (crop[3] - crop[2]) / (crop[1] - crop[0])
-    height, fw, box_width = 6.75, 1.55, 1.75
+    height, fw, box_width = 6.55, 1.55, 1.75
     image_height = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
     fh = image_height + 0.34
-    positions = (4.89, 3.44, 1.99, 0.54)
+    positions = (4.69, 3.24, 1.79, 0.34)
     columns = (0.10, 2.20, 4.30, 6.40, 8.50)
     middle = (positions[1] + positions[2] + fh) / 2
     fig = plt.figure(figsize=(WIDTH, height))
@@ -721,8 +721,8 @@ def compose(row):
         )
 
     def header(center, top, title, subtitle):
-        label(center, top - 0.16, title, size=10)
-        label(center, top - 0.38, subtitle, size=8.8, weight="normal", color=MUTED)
+        label(center, top - 0.19, title, size=9.5)
+        label(center, top - 0.405, subtitle, size=8.8, weight="normal", color=MUTED)
 
     def card(x, y, w, h, edge=FRAME_EDGE, fill="white", lw=0.6):
         fig.add_artist(
@@ -762,26 +762,25 @@ def compose(row):
 
     def corner(x, y, text):
         fig.text(
-            (x + 0.07) / WIDTH,
-            (y + fh - 0.095) / height,
+            (x + 0.09) / WIDTH,
+            (y + fh - 0.17) / height,
             text,
             fontsize=8.8,
             color=DARK,
             ha="left",
             va="center",
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.92, "pad": 1.5},
             zorder=8,
         )
 
     stage_fills = ("#F2F8F6", "#F3F7FC", "#FCF7F1", "#F7F4FA")
     for x, fill in zip(columns[:4], stage_fills, strict=True):
-        card(x, 0.30, box_width, 6.30, edge="#C9CFD3", fill=fill, lw=0.75)
+        card(x, 0.10, box_width, 6.30, edge="#C9CFD3", fill=fill, lw=0.75)
     for left, right in zip(columns[1:-1], columns[2:], strict=True):
         connector(fig, left + box_width + 0.065, right - 0.065, middle, WIDTH, height)
 
     center = columns[0] + box_width / 2
     px = center - fw / 2
-    header(center, 6.60, "Input preparation", "Protein + ligand")
+    header(center, 6.40, "Input preparation", "Protein + ligand")
     for y, title, pixels in (
         (positions[0], "Given pocket center", protein),
         (positions[1], "Extracted pocket", pocket),
@@ -827,7 +826,7 @@ def compose(row):
     def trajectory(box_x, title, method, images, labels, ys):
         center = box_x + box_width / 2
         px = center - fw / 2
-        header(center, 6.60, title, method)
+        header(center, 6.40, title, method)
         for i, (py, pixels, text) in enumerate(zip(ys, images, labels, strict=True)):
             molecular_panel(px, py, pixels, crop)
             corner(px, py, text)
@@ -851,30 +850,22 @@ def compose(row):
         (positions[0], (positions[0] + positions[-1]) / 2, positions[-1]),
     )
     for x, text in ((columns[1], "Example (N = 1)"), (columns[2], "Same trajectory")):
-        label(x + box_width / 2, 0.415, text, size=8.8, weight="normal", color=MUTED)
-    label(
-        WIDTH / 2,
-        0.13,
-        "Trajectory and selection: separate runs of the same complex.",
-        size=8.8,
-        weight="normal",
-        color=MUTED,
-    )
+        label(x + box_width / 2, 0.215, text, size=8.8, weight="normal", color=MUTED)
 
     center = columns[3] + box_width / 2
     px = center - fw / 2
-    header(center, 6.60, "Confidence selection", "Predicted RMSD ranking")
+    header(center, 6.40, "Confidence selection", "Predicted RMSD ranking")
     for upper, lower in zip(positions[:-1], positions[1:], strict=True):
         label(center, (upper + lower + fh) / 2, "…", size=10, weight="normal", color=MUTED)
-    label(center, 0.415, r"$N = 100\,\to\,1$", size=8.8, weight="normal", color=MUTED)
+    label(center, 0.215, r"$N = 100\,\to\,1$", size=8.8, weight="normal", color=MUTED)
     for pixels, candidate, annotation, y in zip(
         candidates, selection["candidates"], annotations, positions, strict=True
     ):
-        score_x, score_top = px + 0.245, y + fh - 0.015
+        score_x, score_top = px + 0.245, y + fh
         score_width = 1.08
         for offset, name, value in (
-            (0.080, "pRMSD", annotation["predicted_rmsd"]),
-            (0.235, "RMSD", annotation["symmetry_rmsd"]),
+            (0.100, "pRMSD", annotation["predicted_rmsd"]),
+            (0.240, "RMSD", annotation["symmetry_rmsd"]),
         ):
             score_y = (score_top - offset) / height
             fig.text(

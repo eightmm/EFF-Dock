@@ -47,12 +47,17 @@ borders and no rejection symbol: two have reference RMSD below 2 Å. The compact
 score labels remain inside each panel in a reserved top strip, clear of the
 molecular image. All panels gain the same annotation space, preserving molecular
 image dimensions and avoiding score/structure overlap. Footers identify the N1 example and N100
-selection, and an explicit figure note states that these are separate runs.
+selection. The separate-run disclosure is retained in the manuscript caption;
+the sentence beneath the graphic is omitted.
 
-At the 262.89 mm source width, stage titles are 10 pt and other annotations are
-at least 8.8 pt. At a 180 mm manuscript width these become approximately 6.85 pt
+At the 262.89 mm source width, stage titles are 9.5 pt and other annotations are
+at least 8.8 pt. At a 180 mm manuscript width these become approximately 6.50 pt
 and 6.03 pt. Use the vector PDF at two-column width; narrower placement requires
-another layout pass. The molecular captures are raster images; text and ligand
+another layout pass. Single-line panel labels are centered vertically in the
+annotation strip with a consistent left inset. Two score rows are centered
+symmetrically within that same strip; outer stage headings have more top/side
+breathing room. The bottom canvas margin is trimmed after removing the note.
+The molecular captures are raster images; text and ligand
 diagrams are vector elements. The existing 21-page reference package is unchanged.
 
 ## Recorded states and provenance
