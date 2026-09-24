@@ -21,15 +21,18 @@ a fixed zero conditioning vector. **B**, Each interaction layer applies
 blockwise equivariant RMS normalization, an edge-conditioned tensor product with
 spherical harmonics through degree two, message activation, gated aggregation,
 and an equivariant linear/activation/dropout block. The residual is added before
-AdaLN. Scalar activation is elementwise SiLU; non-scalar channels are multiplied
-by sigmoid gates computed from their invariant norms. **C**, Equivariant RMSNorm
+AdaLN. Both activation calls use the operation detailed in panel E. **C**,
+Equivariant RMSNorm
 normalizes each irrep block using the channel-mean squared irrep norm and applies
 learned channel gains. The drawing illustrates a vector block; scalar and
 rank-two blocks are normalized separately by the same rule. **D**, AdaLN first
 applies RMSNorm. A linear projection of the condition produces scalar scale and
 shift parameters and bounded multiplicative scales for non-scalar channels.
 The latter act identically on every component of a channel, preserving its
-direction. Bars and arrows are schematic illustrations, not measured activations.
+direction. **E**, Even scalars receive SiLU. For vector and tensor channels,
+invariant channel norms pass through an MLP and sigmoid; the resulting gates
+multiply the original input, with one gate broadcast over every component of
+each channel. Panel C arrows are schematic, not measured activations.
 
 ## Panel definitions and implementation audit
 
@@ -39,6 +42,7 @@ direction. Bars and arrows are schematic illustrations, not measured activations
 | B | Pre-norm → tensor product → message activation → gated aggregation → linear/activation/dropout → residual → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [GatedEquivariantConv / EquivariantBlock](../../src/effdock/models/equivariant.py) |
 | C | RMS reduction per irrep block, learned channel gains | [EquivariantRMSNorm](../../src/effdock/models/equivariant.py) |
 | D | RMSNorm, scalar affine modulation, bounded non-scalar modulation | [EquivariantAdaLN](../../src/effdock/models/equivariant.py) |
+| E | Scalar SiLU; norm-derived sigmoid gating of non-scalar input | [EquivariantActivation](../../src/effdock/models/equivariant.py) |
 
 Released settings are taken from the [docking config](../../configs/train_early_time_ft_50k.yaml)
 and [confidence config](../../configs/train_confidence_s50_raw_refined_100k.yaml).
@@ -79,7 +83,7 @@ contact-maximum, atom-mean and atom-maximum pools produce 2,048 features. The
 poses. The success logit is not the selector or a calibrated probability claim.
 Auxiliary atom-level heads are omitted from this model overview.
 
-### B. Interaction layer and activation
+### B. Interaction layer
 
 The exact outer order is `AdaLN(h + post_block(conv(pre_norm(h))))`.
 The residual bypasses the message/post block, not AdaLN. The six docking layers
@@ -100,12 +104,9 @@ aggregation module. Edge scalar construction is also compressed; coordinates
 and conditioning feed it in addition to the two inputs named in the drawing.
 
 Equivariant linear maps mix multiplicity channels within compatible irreps.
-For activation, even scalars receive SiLU. All non-scalar channel norms are
-concatenated and passed through an MLP and sigmoid to produce per-channel gates:
-`u_c' = g_c u_c`. Every component of a vector or tensor receives the same gate.
-The message and post-linear activation modules use this pattern with separate
-parameters. Dropout uses one mask per irrep channel, broadcast over its spatial
-components; it is inactive at inference. Both released configs use dropout 0.1.
+The two activation blocks refer to the operation in panel E and have independent
+parameters. Channel dropout uses one mask per irrep channel, broadcast over its
+spatial components; it is inactive at inference. Both released configs use 0.1.
 
 ### C. Equivariant RMSNorm
 
@@ -135,14 +136,24 @@ follow two branches:
 - Non-scalars: `u' = (1 + 0.1 * tanh(gamma_u)) * uhat`.
 
 Non-scalar scales lie between 0.9 and 1.1; no vector/tensor offset is added.
-The scale is shared across the 2ℓ+1 components of each channel. The scalar-bar
-example illustrates a shift; the vector example illustrates a positive scale.
-Zero initialization of the conditioning projection initially leaves the
+The scale is shared across the 2ℓ+1 components of each channel. Zero initialization
+of the conditioning projection initially leaves the
 RMS-normalized features unchanged, not the raw input unchanged. A zero confidence
 condition need not imply zero modulation after training because the projection
 has a learned bias. Equivariance here is with respect to joint SE(3)
 transformations of the model inputs; the figure does not establish full-pipeline
 reflection equivariance.
+
+### E. Equivariant activation
+
+Even scalars receive elementwise SiLU. All non-scalar channel norms are
+concatenated and passed through an MLP and sigmoid to produce per-channel gates.
+The bypass in panel E carries the original vector/tensor input to the product:
+`u_c' = g_c u_c`. The symbol ⊙ denotes channelwise multiplication, broadcasting
+one gate over all 2ℓ+1 components of each channel. Norms are used to calculate
+the gate, not substituted for the original input. The message activation and
+post-linear activation use separate parameters; their panel-E references denote
+the same operation type, not tied weights.
 
 ## Reproduction and use
 
