@@ -156,7 +156,7 @@ def overview_panel(c, s):
     c.block(10.80, y - 0.60, 0.50, 0.38, r"$I_f^+$", PALE_PEACH)
     c.arrow([(11.33, y - 0.41), (11.48, y - 0.41)])
     c.text(11.70, y - 0.41, r"$\omega_f$", size=13)
-    c.text(3.75, 9.07, "Scalar · Vector · Rank-2", color=MUTED)
+    c.text(3.55, 9.07, r"$\ell=0,1,2$", color=MUTED)
 
     c.text(0.45, 9.10, "Confidence network", bold=True, ha="left")
     c.text(3.55, 8.65, r"$c=0$", color=MUTED)

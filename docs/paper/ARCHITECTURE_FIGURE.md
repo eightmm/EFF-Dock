@@ -15,7 +15,8 @@ post-refinement and training objectives are outside its scope.
 self-tensor-product outputs are added. Newton–Euler readout branches into a
 per-fragment mean for translational velocity and a torque followed by the
 inertia pseudo-inverse for angular velocity. The interaction states contain
-scalar, vector and rank-2 features. The separately parameterized
+irreducible features of degrees ℓ = 0, 1 and 2 (scalar, vector and rank-2
+features, respectively). The separately parameterized
 four-layer confidence network uses scalar features and irrep-channel norms.
 Global pooled features and a contact-aware readout are concatenated before the
 pose MLP predicts RMSD and a pose-success logit. Pose–protein contact descriptors

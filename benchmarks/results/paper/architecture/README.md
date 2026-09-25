@@ -12,7 +12,7 @@ Panels show the model overview, horizontal interaction layer, convolution
 detail and normalization/activation. The overview shows the atom-head sum, gated ligand-state input
 and concatenated global/contact pooling, including both contact-descriptor
 injections. The Newton–Euler readout expands mean and torque/inertia branches;
-scalar/vector/rank-2 states and both AdaLN outputs are explicit. The layer shows its single additive identity skip before AdaLN;
+feature degrees ℓ = 0, 1, 2 and both AdaLN outputs are explicit. The layer shows its single additive identity skip before AdaLN;
 the separate convolution panel expands input/output radial scaling.
 No model was run. Detailed branches omitted from the drawing are documented in
 the caption companion. Graph construction and training objectives are outside

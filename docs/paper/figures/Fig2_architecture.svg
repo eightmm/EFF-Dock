@@ -1433,7 +1433,18 @@ z
     </g>
    </g>
    <g id="text_17">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #666666" x="270" y="142.409219" transform="rotate(-0 270 142.409219)">Scalar · Vector · Rank-2</text>
+    <!-- $\ell=0,1,2$ -->
+    <g style="fill: #666666" transform="translate(226.975 142.409219)">
+     <text>
+      <tspan x="0" y="-0.34375" style="font-style: oblique; font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #666666">ℓ</tspan>
+      <tspan x="7.598877" y="-0.34375" style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #666666">=</tspan>
+      <tspan x="20.507812" y="-0.34375" style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #666666">0</tspan>
+      <tspan x="28.460693" y="-0.34375" style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #666666">,</tspan>
+      <tspan x="34.869385" y="-0.34375" style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #666666">1</tspan>
+      <tspan x="42.822266" y="-0.34375" style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #666666">,</tspan>
+      <tspan x="49.230957" y="-0.34375" style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #666666">2</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_18">
     <text style="font-weight: 700; font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #252525" x="32.4" y="140.249219" transform="rotate(-0 32.4 140.249219)">Confidence network</text>
