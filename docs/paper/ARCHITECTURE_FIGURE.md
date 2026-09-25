@@ -34,11 +34,14 @@ with spherical harmonics through degree two, output radial scaling, activation
 and gate-normalized aggregation. Normalized endpoint scalars, condition and
 edge descriptors feed both the radial MLP and the separate gate MLP. The
 shared edge gate passes through sigmoid and is multiplied by a separately
-computed, edge-type-dependent distance decay before aggregation. **D**, AdaLN applies its
+computed, edge-type-dependent distance decay exp(−dᵢⱼ/σ_type) before aggregation.
+The radial-scale boxes show the residual scale factors 1 + δ_in and 1 + δ_out. **D**, AdaLN applies its
 own RMSNorm and condition-dependent scalar affine modulation or bounded
-non-scalar scaling. The two degree-specific rules share a modulation box;
+non-scalar scaling. The two degree-specific equations share a modulation box;
 feature and conditioning streams enter from above, and the complete feature
-output leaves below.
+output leaves below. The Linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
+The symbol ⊙ denotes channelwise multiplication, with each non-scalar scale
+broadcast over its irrep components.
 RMSNorm acts separately within each (degree, parity) block;
 exact reductions and modulation equations are given below. Activation applies
 SiLU to even scalars; invariant non-scalar norms pass through an MLP and sigmoid,
@@ -203,10 +206,10 @@ AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
 The condition passes through one linear projection, producing gamma_0, beta_0
 and gamma_{>0}. Panel D flows from top to bottom: h passes through RMSNorm,
 c through the conditioning projection, and both enter a common modulation box.
-Its two rows apply to separate degree classes, not sequentially to the same
-channels. The output h′ contains both degree classes. The compact vertical
-layout groups the modulation parameters inside the Linear output rather than
-routing separate parameter wires around each degree-specific operation.
+The two equations show the scale-and-shift rule for ℓ = 0 and the bounded
+1 + 0.1 tanh(γ) scale for ℓ > 0. They apply to separate degree classes,
+not sequentially to the same channels. The output h′ contains both degree
+classes; the projection lists the three modulation-parameter groups explicitly.
 Normalized features follow two branches:
 
 - ℓ = 0: `h'_0 = (1 + gamma_0) * hhat_0 + beta_0`.

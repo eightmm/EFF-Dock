@@ -128,12 +128,13 @@ def overview_panel(c, s):
     for x, w, text, fill in (
         (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
         (2.75, 1.60, f"Interaction layer\n×{s['docking_layers']}  (B)", PALE_BLUE),
-        (4.70, 1.50, "Linear → act.\nLigand atoms", PALE_PEACH),
+        (4.70, 1.50, "Linear →\nActivation (D)", PALE_PEACH),
     ):
         if text.startswith("Interaction layer"):
             for offset in (0.08, 0.04):
                 c.box(x + offset, y - 0.30 + offset, w, 0.60, fill, edge=BLUE)
         c.block(x, y - 0.30, w, 0.60, text, fill)
+    c.text(5.45, 10.10, "Ligand atoms", color=MUTED)
     c.arrow([(2.05, y), (2.75, y)])
     c.arrow([(4.43, y), (4.70, y)])
     c.line((6.20, y), (6.45, y))
@@ -242,9 +243,9 @@ def convolution_panel(c, s):
     c.text(mid, 3.71, r"$\mathbf{h}_{\mathrm{in}}$", size=13)
     c.arrow([(mid, 3.54), (mid, 3.38)])
     modules = [
-        (3.03, 0.35, "Input radial scale"),
+        (3.03, 0.35, r"Input scale: $1+\delta_{\mathrm{in}}$"),
         (2.28, 0.58, "Shared tensor product\n" + r"$\otimes\,Y_{\ell\leq2}(\hat r_{ij})$"),
-        (1.76, 0.35, "Output radial scale"),
+        (1.76, 0.35, r"Output scale: $1+\delta_{\mathrm{out}}$"),
         (1.24, 0.35, "Activation  (D)"),
         (0.55, 0.52, "Gate-normalized\naggregation"),
     ]
@@ -271,32 +272,35 @@ def convolution_panel(c, s):
     c.block(0.48, 1.76, 1.90, 0.38, "Gate MLP", PALE_MINT)
     c.arrow([(1.43, 1.76), (1.43, 1.51)])
     c.block(0.48, 1.16, 1.90, 0.35, "Sigmoid", PALE_MINT)
-    c.arrow([(1.43, 1.16), (1.43, 0.91)])
+    c.arrow([(1.43, 1.16), (1.43, 0.94)])
     c.arrow([(0.25, 0.375), (0.48, 0.375)])
-    c.block(0.48, 0.20, 1.90, 0.35, "Distance decay", PALE_MINT)
-    c.arrow([(1.43, 0.55), (1.43, 0.71)])
-    c.op(1.43, 0.81, "×")
-    c.arrow([(1.53, 0.81), (3.05, 0.81)])
+    c.block(0.48, 0.08, 1.90, 0.52, "Distance decay\n" + r"$e^{-d_{ij}/\sigma_{\mathrm{type}}}$", PALE_MINT)
+    c.arrow([(1.43, 0.60), (1.43, 0.74)])
+    c.op(1.43, 0.84, "×")
+    c.arrow([(1.53, 0.84), (3.05, 0.84)])
 
 
 def operations_panel(c, s):
     c.panel(6.10, 4.15, "D", "Normalization and activation")
     c.text(6.55, 3.53, "AdaLN", bold=True, ha="left")
-    c.text(7.95, 3.55, r"$\mathbf{h}$", size=13)
-    c.text(10.60, 3.55, r"$\mathbf{c}$", size=13)
-    c.arrow([(7.95, 3.39), (7.95, 3.22)])
-    c.arrow([(10.60, 3.39), (10.60, 3.22)], color=VIOLET)
-    c.block(7.15, 2.82, 1.60, 0.40, "RMSNorm", PALE_VIOLET)
-    c.block(9.80, 2.82, 1.60, 0.40, "Linear", PALE_VIOLET)
-    c.arrow([(7.95, 2.82), (7.95, 2.53)])
-    c.arrow([(10.60, 2.82), (10.60, 2.53)], color=VIOLET)
+    c.text(7.95, 3.64, r"$\mathbf{h}$", size=13)
+    c.text(10.60, 3.64, r"$\mathbf{c}$", size=13)
+    c.arrow([(7.95, 3.51), (7.95, 3.40)])
+    c.arrow([(10.60, 3.51), (10.60, 3.40)], color=VIOLET)
+    c.block(7.15, 2.88, 1.60, 0.52, "RMSNorm", PALE_VIOLET)
+    c.block(9.65, 2.88, 1.95, 0.52,
+            "Linear projection\n" + r"$\gamma_0,\,\beta_0,\,\gamma_{>0}$", PALE_VIOLET)
+    c.arrow([(7.95, 2.88), (7.95, 2.56)])
+    c.text(7.63, 2.72, r"$\hat{\mathbf{h}}$", size=13)
+    c.arrow([(10.60, 2.88), (10.60, 2.56)], color=VIOLET)
     c.block(
-        7.15, 1.95, 4.25, 0.58,
-        r"Affine  ($\ell=0$)" + "\n" + r"Bounded scale  ($\ell>0$)",
+        6.80, 1.81, 4.80, 0.75,
+        r"$\mathbf{h}'_0=(1+\gamma_0)\odot\hat{\mathbf{h}}_0+\beta_0$"
+        + "\n" + r"$\mathbf{h}'_{>0}=[1+0.1\tanh(\gamma_{>0})]\odot\hat{\mathbf{h}}_{>0}$",
         PALE_VIOLET,
     )
-    c.arrow([(9.275, 1.95), (9.275, 1.77)])
-    c.text(9.275, 1.61, r"$\mathbf{h}'$", size=13)
+    c.arrow([(9.20, 1.81), (9.20, 1.65)])
+    c.text(9.20, 1.48, r"$\mathbf{h}'$", size=13)
     c.text(6.55, 1.38, "Activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
     c.text(6.53, ya, r"$\mathbf{h}_0$", size=13)
