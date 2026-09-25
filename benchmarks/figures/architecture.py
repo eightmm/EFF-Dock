@@ -138,18 +138,18 @@ def overview_panel(c, s):
     c.arrow([(4.46, y), (4.67, y)])
     c.line((6.23, y), (6.45, y))
     for branch_y, label in ((y + 0.41, "Linear"), (y - 0.41, "Self tensor product")):
-        c.arrow([(6.45, y), (6.45, branch_y), (6.67, branch_y)])
-        c.block(6.70, branch_y - 0.19, 1.80, 0.38, label, PALE_PEACH)
+        c.arrow([(6.45, y), (6.45, branch_y), (6.62, branch_y)])
+        c.block(6.65, branch_y - 0.19, 1.80, 0.38, label, PALE_PEACH)
         end = y + 0.13 if branch_y > y else y - 0.13
-        c.arrow([(8.53, branch_y), (8.74, branch_y), (8.74, end)])
+        c.arrow([(8.48, branch_y), (8.60, branch_y), (8.60, end)])
     c.junction(6.45, y)
-    c.op(8.74, y, "+")
+    c.op(8.60, y, "+")
     c.text(10.45, 10.40, "Newton–Euler readout", bold=True)
-    c.line((8.87, y), (9.00, y))
-    c.junction(9.00, y)
+    c.line((8.73, y), (9.10, y))
+    c.junction(9.10, y)
     for branch_y, label in ((y + 0.41, "Mean"), (y - 0.41, "Torque")):
-        c.arrow([(9.00, y), (9.00, branch_y), (9.17, branch_y)])
-        c.block(9.20, branch_y - 0.19, 1.20, 0.38, label, PALE_PEACH)
+        c.arrow([(9.10, y), (9.10, branch_y), (9.32, branch_y)])
+        c.block(9.35, branch_y - 0.19, 1.05, 0.38, label, PALE_PEACH)
     c.arrow([(10.43, y + 0.41), (11.45, y + 0.41)])
     c.text(11.70, y + 0.41, r"$v_f$", size=13)
     c.arrow([(10.43, y - 0.41), (10.77, y - 0.41)])
@@ -223,8 +223,8 @@ def interaction_panel(c, s):
     c.arrow([(0.96, y), (0.96, 5.55), (8.40, 5.55), (8.40, y + 0.13)], color=BLUE, lw=1.2)
     c.junction(0.96, y, BLUE)
     c.text(5.05, 5.77, "Identity skip", color=MUTED)
-    c.text(9.82, 4.32, r"$c$", color=MUTED)
-    c.arrow([(9.82, 4.48), (9.82, 4.62)], color=VIOLET)
+    c.text(9.82, 5.66, r"$c$", color=MUTED)
+    c.arrow([(9.82, 5.48), (9.82, 5.28)], color=VIOLET)
 
 
 def convolution_panel(c, s):
@@ -266,29 +266,27 @@ def operations_panel(c, s):
     c.text(6.61, 3.13, r"$h$", size=13)
     c.arrow([(6.77, 3.13), (7.12, 3.13)])
     c.block(7.15, 2.93, 1.35, 0.40, "RMSNorm", PALE_VIOLET)
-    c.text(9.82, 3.13, r"$c$", size=13)
-    c.arrow([(9.98, 3.13), (10.27, 3.13)], color=VIOLET)
-    c.block(10.30, 2.93, 1.15, 0.40, "Linear", PALE_VIOLET)
-    c.line((7.825, 2.90), (7.825, 2.75))
-    c.line((7.825, 2.75), (6.70, 2.75))
-    c.line((6.70, 2.75), (6.70, 1.80))
-    c.line((10.875, 2.90), (10.875, 2.75), color=VIOLET)
-    c.line((10.875, 2.75), (11.65, 2.75), color=VIOLET)
-    c.line((11.65, 2.75), (11.65, 1.90), color=VIOLET)
-    for y, label, feature, parameters in (
-        (2.36, "Scalar affine", r"$\hat s$", r"$\gamma_s,\beta_s$"),
-        (1.80, "Bounded non-scalar scale", r"$\hat u$", r"$\gamma_u$"),
+    c.text(10.05, 3.42, r"$c$", size=13)
+    c.arrow([(10.21, 3.42), (10.46, 3.42)], color=VIOLET)
+    c.block(10.49, 3.23, 1.20, 0.38, "Linear", PALE_VIOLET)
+    c.arrow([(11.09, 3.20), (11.09, 3.08)], color=VIOLET)
+    c.text(11.09, 2.92, r"$\gamma_s,\beta_s,\gamma_u$", color=VIOLET)
+    c.line((7.825, 2.90), (7.825, 2.87))
+    c.line((7.825, 2.87), (6.70, 2.87))
+    c.line((6.70, 2.87), (6.70, 1.76))
+    for y, label, feature, parameters, output in (
+        (2.56, "Scalar affine", r"$\hat s$", r"$\gamma_s,\beta_s$", r"$s'$"),
+        (1.76, "Bounded non-scalar scale", r"$\hat u$", r"$\gamma_u$", r"$u'$"),
     ):
         c.block(7.30, y - 0.20, 2.85, 0.40, label, PALE_VIOLET)
         c.arrow([(6.70, y), (7.27, y)])
-        c.arrow([(11.65, y + 0.10), (10.18, y + 0.10)], color=VIOLET)
         c.text(6.98, y + 0.16, feature, size=12.5)
-        c.text(10.95, y + 0.26, parameters, size=12.5)
-        c.arrow([(10.18, y - 0.10), (10.70, y - 0.10)])
-        c.text(10.95, y - 0.10, r"$s'$" if y == 2.36 else r"$u'$", size=13)
-        if y == 2.36:
+        c.text(9.35, y + 0.48, parameters, color=VIOLET)
+        c.arrow([(9.35, y + 0.34), (9.35, y + 0.23)], color=VIOLET)
+        c.arrow([(10.18, y), (10.88, y)])
+        c.text(11.09, y, output, size=13)
+        if y == 2.56:
             c.junction(6.70, y)
-            c.junction(11.65, y + 0.10, VIOLET)
     c.text(6.55, 1.38, "Activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
     c.text(6.62, ya, r"$s$", size=13)

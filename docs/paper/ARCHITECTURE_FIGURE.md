@@ -115,8 +115,9 @@ The exact outer order is `AdaLN(h + post_block(conv(pre_norm(h))))`.
 The identity skip carries the original h around pre-normalization and the
 message/post block, ending at the + node before AdaLN. There is exactly one
 additive residual per interaction layer; neither the post block nor AdaLN has
-an additional residual. The output arrow follows AdaLN. The six docking layers
-and four confidence layers are separately parameterized; repetition counts do
+an additional residual. The output arrow follows AdaLN; its condition enters
+from above. The six docking layers and four confidence layers are separately
+parameterized; repetition counts do
 not denote tied weights.
 
 Equivariant linear maps mix multiplicity channels within compatible irreps.
@@ -164,11 +165,11 @@ All components of a channel receive the same scalar multiplier. Learned gains ar
 
 AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
 The condition passes through one linear projection, producing gamma_s, beta_s
-and gamma_u. Feature and conditioning paths occupy separate sides of the stacked
-modulation rows; dots mark branch points. The purple path carries conditioning
-parameters into the upper right ports.
-Gray arrows carry normalized features from the left and outputs s′/u′ through
-the lower right ports. Normalized features follow two branches:
+and gamma_u. The same parameter symbols label the downward purple inputs to
+the modulation rows; these named ports reference the single projection shown
+above, not independently generated parameters. Gray feature arrows run from
+left to right through both rows, ending at s′/u′. Dots mark feature branches.
+Normalized features follow two branches:
 
 - Scalars: `s' = (1 + gamma_s) * shat + beta_s`.
 - Non-scalars: `u' = (1 + 0.1 * tanh(gamma_u)) * uhat`.
