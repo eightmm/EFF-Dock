@@ -17,7 +17,8 @@ numbering and placement may change during writing.
 - [Representative workflow](REPRESENTATIVE_FIGURE.md): Figure 1 PDF, preview and caption.
 - [Architecture](ARCHITECTURE_FIGURE.md): Figure 2 with model overview, interaction layer,
   convolution detail and normalization/activation panels (A–D). The layer shows
-  its single identity skip; vector PDF/SVG and caption are included.
+  its single identity skip; the readout expands mean and torque/inertia branches.
+  Vector PDF/SVG and caption are included.
 
 ## Figures
 

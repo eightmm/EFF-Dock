@@ -129,7 +129,6 @@ def overview_panel(c, s):
         (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
         (2.75, 1.60, f"Interaction layer\n×{s['docking_layers']}  (B)", PALE_BLUE),
         (4.70, 1.50, "Linear → act.\nLigand atoms", PALE_PEACH),
-        (9.02, 1.45, "Newton–Euler\nreadout", PALE_PEACH),
     ):
         if text.startswith("Interaction layer"):
             for offset in (0.08, 0.04):
@@ -145,9 +144,19 @@ def overview_panel(c, s):
         c.arrow([(8.53, branch_y), (8.74, branch_y), (8.74, end)])
     c.junction(6.45, y)
     c.op(8.74, y, "+")
-    c.arrow([(8.87, y), (8.99, y)])
-    c.arrow([(10.50, y), (10.80, y)])
-    c.text(11.25, y, r"$v_f,\,\omega_f$", size=13)
+    c.text(10.45, 10.40, "Newton–Euler readout", bold=True)
+    c.line((8.87, y), (9.00, y))
+    c.junction(9.00, y)
+    for branch_y, label in ((y + 0.41, "Mean"), (y - 0.41, "Torque")):
+        c.arrow([(9.00, y), (9.00, branch_y), (9.17, branch_y)])
+        c.block(9.20, branch_y - 0.19, 1.20, 0.38, label, PALE_PEACH)
+    c.arrow([(10.43, y + 0.41), (11.45, y + 0.41)])
+    c.text(11.70, y + 0.41, r"$v_f$", size=13)
+    c.arrow([(10.43, y - 0.41), (10.77, y - 0.41)])
+    c.block(10.80, y - 0.60, 0.50, 0.38, r"$I_f^+$", PALE_PEACH)
+    c.arrow([(11.33, y - 0.41), (11.48, y - 0.41)])
+    c.text(11.70, y - 0.41, r"$\omega_f$", size=13)
+    c.text(3.75, 9.07, "Scalar · Vector · Rank-2", color=MUTED)
 
     c.text(0.45, 9.10, "Confidence network", bold=True, ha="left")
     c.text(3.55, 8.65, r"$c=0$", color=MUTED)
@@ -200,7 +209,7 @@ def interaction_panel(c, s):
     for x, w, label, fill in (
         (1.20, 1.43, "RMSNorm\n(D)", PALE_VIOLET),
         (3.00, 2.30, "Equivariant\nconvolution (C)", PALE_BLUE),
-        (5.68, 2.30, "Linear → activation\nChannel dropout", PALE_GRAY),
+        (5.68, 2.30, "Linear → activation (D)\nChannel dropout", PALE_GRAY),
         (9.02, 1.60, "AdaLN\n(D)", PALE_VIOLET),
     ):
         c.block(x, y - 0.30, w, 0.60, label, fill)
@@ -265,19 +274,21 @@ def operations_panel(c, s):
     c.line((6.70, 2.75), (6.70, 1.80))
     c.line((10.875, 2.90), (10.875, 2.75), color=VIOLET)
     c.line((10.875, 2.75), (11.65, 2.75), color=VIOLET)
-    c.line((11.65, 2.75), (11.65, 1.80), color=VIOLET)
+    c.line((11.65, 2.75), (11.65, 1.90), color=VIOLET)
     for y, label, feature, parameters in (
         (2.36, "Scalar affine", r"$\hat s$", r"$\gamma_s,\beta_s$"),
         (1.80, "Bounded non-scalar scale", r"$\hat u$", r"$\gamma_u$"),
     ):
         c.block(7.30, y - 0.20, 2.85, 0.40, label, PALE_VIOLET)
         c.arrow([(6.70, y), (7.27, y)])
-        c.arrow([(11.65, y), (10.18, y)], color=VIOLET)
+        c.arrow([(11.65, y + 0.10), (10.18, y + 0.10)], color=VIOLET)
         c.text(6.98, y + 0.16, feature, size=12.5)
-        c.text(10.95, y + 0.16, parameters, size=12.5)
+        c.text(10.95, y + 0.26, parameters, size=12.5)
+        c.arrow([(10.18, y - 0.10), (10.70, y - 0.10)])
+        c.text(10.95, y - 0.10, r"$s'$" if y == 2.36 else r"$u'$", size=13)
         if y == 2.36:
             c.junction(6.70, y)
-            c.junction(11.65, y, VIOLET)
+            c.junction(11.65, y + 0.10, VIOLET)
     c.text(6.55, 1.38, "Activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
     c.text(6.62, ya, r"$s$", size=13)

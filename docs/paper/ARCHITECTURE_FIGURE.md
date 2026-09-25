@@ -12,8 +12,10 @@ post-refinement and training objectives are outside its scope.
 
 **EFF-Dock architecture and equivariant building blocks.**
 **A**, Six docking interaction layers feed a ligand-atom head whose linear and
-self-tensor-product outputs are added before Newton–Euler aggregation yields
-fragment translational and angular velocities. The separately parameterized
+self-tensor-product outputs are added. Newton–Euler readout branches into a
+per-fragment mean for translational velocity and a torque followed by the
+inertia pseudo-inverse for angular velocity. The interaction states contain
+scalar, vector and rank-2 features. The separately parameterized
 four-layer confidence network uses scalar features and irrep-channel norms.
 Global pooled features and a contact-aware readout are concatenated before the
 pose MLP predicts RMSD and a pose-success logit. Pose–protein contact descriptors
@@ -30,7 +32,8 @@ and gate-normalized aggregation. Normalized endpoint scalars, condition and
 edge descriptors feed both the radial MLP and the separate gate MLP. Sigmoid
 gates include an edge-type-dependent distance decay. **D**, AdaLN applies its
 own RMSNorm and condition-dependent scalar affine modulation or bounded
-non-scalar scaling. RMSNorm acts separately within each (degree, parity) block;
+non-scalar scaling, with scalar and non-scalar outputs shown explicitly.
+RMSNorm acts separately within each (degree, parity) block;
 exact reductions and modulation equations are given below. Activation applies
 SiLU to even scalars; invariant non-scalar norms pass through an MLP and sigmoid,
 and the resulting channel gates g multiply the original vector/tensor input.
@@ -65,7 +68,13 @@ Ligand-atom states pass through a 736→544 linear/activation head, then linear 
 and self-tensor-product 1o paths are summed. The resulting atom field is learned;
 it is not the gradient of a physical energy. Fragment translation is its atom
 mean. Torque is the sum of lever-arm cross products, and angular velocity is
-obtained with the fragment inertia pseudo-inverse. Unit atom weights and a 1%
+obtained with the fragment inertia pseudo-inverse. The two readout branches
+in panel A show `v_f = mean_{i∈f} f_i` and
+`omega_f = I_f^+ sum_{i∈f} (x_i - T_f) × f_i`. Here `f_i` is the learned
+atom-wise vector, `T_f` is the fragment center, and the `I_f^+` box applies
+the thresholded inverse on observable rotation axes. The diagram omits the
+coordinate inputs to this compact readout; torque and inertia both depend
+on the atom-to-fragment-center lever arms. Unit atom weights and a 1%
 relative eigenvalue threshold define observable rotations. These velocities feed
 the rigid SE(3) integrator shown in the separate workflow figure.
 
@@ -157,8 +166,9 @@ AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
 The condition passes through one linear projection, producing gamma_s, beta_s
 and gamma_u. Feature and conditioning paths occupy separate sides of the stacked
 modulation rows; dots mark branch points. The purple path carries conditioning
-parameters, while the gray path carries normalized features. Normalized features
-follow two branches:
+parameters into the upper right ports.
+Gray arrows carry normalized features from the left and outputs s′/u′ through
+the lower right ports. Normalized features follow two branches:
 
 - Scalars: `s' = (1 + gamma_s) * shat + beta_s`.
 - Non-scalars: `u' = (1 + 0.1 * tanh(gamma_u)) * uhat`.
