@@ -86,13 +86,13 @@ class Canvas:
             raise ValueError(f"Arrowhead without sufficient shaft: {points}")
         self.connectors.extend(zip(points[:-1], points[1:]))
         for a, b in zip(points[:-2], points[1:-1]):
-            self.ax.plot(*zip(a, b), color=color, lw=lw, zorder=2)
+            self.ax.plot(*zip(a, b), color=color, lw=lw, solid_capstyle="butt", zorder=2)
         self.ax.add_patch(
             FancyArrowPatch(
                 points[-2],
                 points[-1],
                 arrowstyle="-|>",
-                mutation_scale=10,
+                mutation_scale=9,
                 linewidth=lw,
                 color=color,
                 shrinkA=0,
@@ -103,7 +103,7 @@ class Canvas:
 
     def line(self, a, b, color=LINE, lw=0.85):
         self.connectors.append((a, b))
-        self.ax.plot(*zip(a, b), color=color, lw=lw, zorder=2)
+        self.ax.plot(*zip(a, b), color=color, lw=lw, solid_capstyle="butt", zorder=2)
 
     def junction(self, x, y, color=LINE):
         self.junctions.append((x, y))
@@ -122,8 +122,8 @@ class Canvas:
 def overview_panel(c, s):
     c.panel(0.20, 10.95, "A", "Model architecture")
     c.text(0.45, 10.30, "Docking network", bold=True, ha="left")
-    c.text(3.55, 10.40, r"$c=E_t(t)+E_\sigma(\log\sigma)$", color=MUTED)
-    c.arrow([(3.55, 10.20), (3.55, 10.03)], color=VIOLET)
+    c.text(3.55, 10.40, r"$\mathbf{c}=E_t(t)+E_\sigma(\log\sigma)$", color=MUTED)
+    c.arrow([(3.55, 10.20), (3.55, 10.00)], color=VIOLET)
     y = 9.62
     for x, w, text, fill in (
         (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
@@ -134,33 +134,33 @@ def overview_panel(c, s):
             for offset in (0.08, 0.04):
                 c.box(x + offset, y - 0.30 + offset, w, 0.60, fill, edge=BLUE)
         c.block(x, y - 0.30, w, 0.60, text, fill)
-    c.arrow([(2.08, y), (2.72, y)])
-    c.arrow([(4.46, y), (4.67, y)])
-    c.line((6.23, y), (6.45, y))
+    c.arrow([(2.05, y), (2.75, y)])
+    c.arrow([(4.43, y), (4.70, y)])
+    c.line((6.20, y), (6.45, y))
     for branch_y, label in ((y + 0.41, "Linear"), (y - 0.41, "Self tensor product")):
-        c.arrow([(6.45, y), (6.45, branch_y), (6.62, branch_y)])
+        c.arrow([(6.45, y), (6.45, branch_y), (6.65, branch_y)])
         c.block(6.65, branch_y - 0.19, 1.80, 0.38, label, PALE_PEACH)
-        end = y + 0.13 if branch_y > y else y - 0.13
-        c.arrow([(8.48, branch_y), (8.60, branch_y), (8.60, end)])
+        end = y + 0.10 if branch_y > y else y - 0.10
+        c.arrow([(8.45, branch_y), (8.60, branch_y), (8.60, end)])
     c.junction(6.45, y)
     c.op(8.60, y, "+")
     c.text(10.45, 10.40, "Newton–Euler readout", bold=True)
-    c.line((8.73, y), (9.10, y))
+    c.line((8.70, y), (9.10, y))
     c.junction(9.10, y)
     for branch_y, label in ((y + 0.41, "Mean"), (y - 0.41, "Torque")):
-        c.arrow([(9.10, y), (9.10, branch_y), (9.32, branch_y)])
+        c.arrow([(9.10, y), (9.10, branch_y), (9.35, branch_y)])
         c.block(9.35, branch_y - 0.19, 1.05, 0.38, label, PALE_PEACH)
-    c.arrow([(10.43, y + 0.41), (11.45, y + 0.41)])
+    c.arrow([(10.40, y + 0.41), (11.45, y + 0.41)])
     c.text(11.70, y + 0.41, r"$v_f$", size=13)
-    c.arrow([(10.43, y - 0.41), (10.77, y - 0.41)])
+    c.arrow([(10.40, y - 0.41), (10.80, y - 0.41)])
     c.block(10.80, y - 0.60, 0.50, 0.38, r"$I_f^+$", PALE_PEACH)
-    c.arrow([(11.33, y - 0.41), (11.48, y - 0.41)])
+    c.arrow([(11.30, y - 0.41), (11.48, y - 0.41)])
     c.text(11.70, y - 0.41, r"$\omega_f$", size=13)
     c.text(3.55, 9.07, r"$\ell=0,1,2$", color=MUTED)
 
     c.text(0.45, 9.10, "Confidence network", bold=True, ha="left")
-    c.text(3.55, 8.65, r"$c=0$", color=MUTED)
-    c.arrow([(3.55, 8.46), (3.55, 8.31)], color=VIOLET)
+    c.text(3.55, 8.65, r"$\mathbf{c}=0$", color=MUTED)
+    c.arrow([(3.55, 8.46), (3.55, 8.28)], color=VIOLET)
     y = 7.90
     for x, w, text, fill in (
         (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
@@ -173,74 +173,74 @@ def overview_panel(c, s):
                 c.box(x + offset, y - 0.30 + offset, w, 0.60, fill, edge=BLUE)
         c.block(x, y - 0.30, w, 0.60, text, fill)
     c.block(0.45, 8.38, 1.60, 0.50, "Docking states\nPer pose, t = 1", PALE_PEACH)
-    c.arrow([(2.08, 8.63), (2.27, 8.63)], color=PEACH)
+    c.arrow([(2.05, 8.63), (2.30, 8.63)], color=PEACH)
     c.op(2.40, 8.63, "×")
     c.text(2.40, 8.90, r"$\alpha$", color=MUTED)
-    c.arrow([(2.40, 8.50), (2.40, 8.03)], color=PEACH)
-    c.arrow([(2.08, y), (2.27, y)])
+    c.arrow([(2.40, 8.53), (2.40, 8.00)], color=PEACH)
+    c.arrow([(2.05, y), (2.30, y)])
     c.op(2.40, y, "+")
-    c.arrow([(2.53, y), (2.72, y)])
-    c.arrow([(4.46, y), (4.67, y)])
-    c.line((6.23, y), (6.45, y))
-    c.arrow([(6.45, y), (6.45, 8.35), (6.67, 8.35)])
-    c.arrow([(6.45, y), (6.45, 7.42), (6.67, 7.42)])
+    c.arrow([(2.50, y), (2.75, y)])
+    c.arrow([(4.43, y), (4.70, y)])
+    c.line((6.20, y), (6.45, y))
+    c.arrow([(6.45, y), (6.45, 8.35), (6.70, 8.35)])
+    c.arrow([(6.45, y), (6.45, 7.42), (6.70, 7.42)])
     c.junction(6.45, y)
     c.block(6.70, 8.13, 2.45, 0.44, "Global pooling", PALE_PEACH)
     c.block(6.70, 7.14, 1.10, 0.56, "Atom MLP", PALE_PEACH)
-    c.arrow([(7.83, 7.42), (8.02, 7.42)])
+    c.arrow([(7.80, 7.42), (8.05, 7.42)])
     c.block(8.05, 7.14, 1.10, 0.56, "Contact\nreadout", PALE_PEACH)
-    for branch_y, end in ((8.35, 8.12), (7.42, 7.68)):
-        c.arrow([(9.18, branch_y), (9.70, branch_y), (9.70, end)])
+    for branch_y, end in ((8.35, 8.09), (7.42, 7.71)):
+        c.arrow([(9.15, branch_y), (9.70, branch_y), (9.70, end)])
     c.block(9.35, 7.71, 0.70, 0.38, "concat", PALE_GRAY)
-    c.arrow([(10.08, y), (10.20, y)])
+    c.arrow([(10.05, y), (10.23, y)])
     c.text(7.94, 6.63, "Pose–protein contacts", color=MUTED)
     c.arrow([(7.94, 6.77), (7.94, 6.90)])
     c.line((7.25, 6.90), (8.60, 6.90))
     c.junction(7.94, 6.90)
-    c.arrow([(7.25, 6.90), (7.25, 7.11)])
-    c.arrow([(8.60, 6.90), (8.60, 7.11)])
+    c.arrow([(7.25, 6.90), (7.25, 7.14)])
+    c.arrow([(8.60, 6.90), (8.60, 7.14)])
 
 
 def interaction_panel(c, s):
     c.panel(0.20, 6.10, "B", "Interaction layer")
     y = 4.95
-    c.text(0.25, y, r"$h^{(k)}$", size=13)
-    c.arrow([(0.43, y), (0.77, y)])
+    c.text(0.25, y, r"$\mathbf{h}^{(k)}$", size=13)
+    c.arrow([(0.48, y), (0.75, y)])
     modules = (
-        (0.80, 1.20, "RMSNorm\n(D)", PALE_VIOLET),
-        (2.35, 1.85, "Equivariant\nconvolution (C)", PALE_BLUE),
-        (4.55, 0.85, "Linear", PALE_GRAY),
-        (5.75, 1.20, "Activation\n(D)", PALE_BLUE),
+        (0.75, 1.10, "RMSNorm\n(D)", PALE_VIOLET),
+        (2.50, 1.65, "Equivariant\nconvolution (C)", PALE_BLUE),
+        (4.85, 0.70, "Linear", PALE_GRAY),
+        (5.85, 1.10, "Activation\n(D)", PALE_BLUE),
         (7.30, 1.25, "Channel\ndropout", PALE_GRAY),
     )
     previous = None
     for x, w, label, fill in modules:
         c.block(x, y - 0.30, w, 0.60, label, fill)
         if previous is not None:
-            c.arrow([(previous + 0.03, y), (x - 0.03, y)])
+            c.arrow([(previous, y), (x, y)])
         previous = x + w
-    c.arrow([(8.58, y), (8.80, y)])
+    c.arrow([(8.55, y), (8.83, y)])
     c.op(8.93, y, "+")
-    c.arrow([(9.06, y), (9.47, y)])
+    c.arrow([(9.03, y), (9.50, y)])
     c.block(9.50, y - 0.30, 1.30, 0.60, "AdaLN\n(D)", PALE_VIOLET)
-    c.arrow([(10.83, y), (11.16, y)])
-    c.text(11.50, y, r"$h^{(k+1)}$", size=13)
-    c.arrow([(0.60, y), (0.60, 5.55), (8.93, 5.55), (8.93, y + 0.13)], color=BLUE, lw=1.2)
+    c.arrow([(10.80, y), (11.16, y)])
+    c.text(11.50, y, r"$\mathbf{h}^{(k+1)}$", size=13)
+    c.arrow([(0.60, y), (0.60, 5.55), (8.93, 5.55), (8.93, y + 0.10)], color=BLUE, lw=1.2)
     c.junction(0.60, y, BLUE)
     c.text(4.76, 5.77, "Identity skip", color=MUTED)
-    c.text(6.55, 4.42, "Equivariant block", color=MUTED)
-    c.ax.plot([4.55, 4.55, 8.55, 8.55], [4.62, 4.55, 4.55, 4.62], color=LINE, lw=0.65)
-    c.text(2.175, 4.42, r"$h_{\mathrm{in}}$", color=MUTED)
-    c.text(4.375, 4.42, r"$h_{\mathrm{conv}}$", color=MUTED)
-    c.text(10.15, 5.66, r"$c$", color=MUTED)
-    c.arrow([(10.15, 5.48), (10.15, 5.28)], color=VIOLET)
+    c.text(6.70, 4.42, "Equivariant block", color=MUTED)
+    c.ax.plot([4.85, 4.85, 8.55, 8.55], [4.62, 4.55, 4.55, 4.62], color=LINE, lw=0.65)
+    c.text(2.175, 5.14, r"$\mathbf{h}_{\mathrm{in}}$", color=MUTED)
+    c.text(4.50, 5.14, r"$\mathbf{h}_{\mathrm{conv}}$", color=MUTED)
+    c.text(10.15, 5.66, r"$\mathbf{c}$", color=MUTED)
+    c.arrow([(10.15, 5.48), (10.15, 5.25)], color=VIOLET)
 
 
 def convolution_panel(c, s):
     c.panel(0.20, 4.15, "C", "Equivariant convolution")
     x, w, mid = 3.05, 2.50, 4.30
-    c.text(mid, 3.71, r"$h_{\mathrm{in}}$", size=13)
-    c.arrow([(mid, 3.54), (mid, 3.41)])
+    c.text(mid, 3.71, r"$\mathbf{h}_{\mathrm{in}}$", size=13)
+    c.arrow([(mid, 3.54), (mid, 3.38)])
     modules = [
         (3.03, 0.35, "Input radial scale"),
         (2.28, 0.58, "Shared tensor product\n" + r"$\otimes\,Y_{\ell\leq2}(\hat r_{ij})$"),
@@ -252,41 +252,41 @@ def convolution_panel(c, s):
     for y, height, label in modules:
         c.block(x, y, w, height, label, PALE_BLUE)
         if previous is not None:
-            c.arrow([(mid, previous - 0.03), (mid, y + height + 0.03)])
+            c.arrow([(mid, previous), (mid, y + height)])
         previous = y
-    c.arrow([(mid, 0.52), (mid, 0.38)])
-    c.text(mid, 0.20, r"$h_{\mathrm{conv}}$", size=13)
-    c.text(1.43, 3.43, "Edge descriptors\n" + r"$\hat h_{i,0},\,\hat h_{j,0},\,c$", color=MUTED)
-    c.arrow([(1.43, 3.08), (1.43, 2.88)])
+    c.arrow([(mid, 0.55), (mid, 0.38)])
+    c.text(mid, 0.20, r"$\mathbf{h}_{\mathrm{conv}}$", size=13)
+    c.text(1.43, 3.43, "Edge descriptors\n" + r"$\hat{\mathbf{h}}_{i,0},\,\hat{\mathbf{h}}_{j,0},\,\mathbf{c}$", color=MUTED)
+    c.arrow([(1.43, 3.08), (1.43, 2.85)])
     c.block(0.48, 2.37, 1.90, 0.48, "Radial MLP", PALE_MINT)
-    c.line((2.41, 2.61), (2.65, 2.61))
-    c.arrow([(2.65, 2.61), (2.65, 3.205), (3.02, 3.205)])
-    c.arrow([(2.65, 2.61), (2.65, 1.935), (3.02, 1.935)])
+    c.line((2.38, 2.61), (2.65, 2.61))
+    c.arrow([(2.65, 2.61), (2.65, 3.205), (3.05, 3.205)])
+    c.arrow([(2.65, 2.61), (2.65, 1.935), (3.05, 1.935)])
     c.junction(2.65, 2.61)
     c.line((1.43, 2.98), (0.25, 2.98))
     c.line((0.25, 2.98), (0.25, 0.375))
     c.junction(1.43, 2.98)
     c.junction(0.25, 1.95)
-    c.arrow([(0.25, 1.95), (0.45, 1.95)])
+    c.arrow([(0.25, 1.95), (0.48, 1.95)])
     c.block(0.48, 1.76, 1.90, 0.38, "Gate MLP", PALE_MINT)
-    c.arrow([(1.43, 1.73), (1.43, 1.54)])
+    c.arrow([(1.43, 1.76), (1.43, 1.51)])
     c.block(0.48, 1.16, 1.90, 0.35, "Sigmoid", PALE_MINT)
-    c.arrow([(1.43, 1.13), (1.43, 0.94)])
-    c.arrow([(0.25, 0.375), (0.45, 0.375)])
+    c.arrow([(1.43, 1.16), (1.43, 0.91)])
+    c.arrow([(0.25, 0.375), (0.48, 0.375)])
     c.block(0.48, 0.20, 1.90, 0.35, "Distance decay", PALE_MINT)
-    c.arrow([(1.43, 0.58), (1.43, 0.68)])
+    c.arrow([(1.43, 0.55), (1.43, 0.71)])
     c.op(1.43, 0.81, "×")
-    c.arrow([(1.56, 0.81), (3.02, 0.81)])
+    c.arrow([(1.53, 0.81), (3.05, 0.81)])
 
 
 def operations_panel(c, s):
     c.panel(6.10, 4.15, "D", "Normalization and activation")
     c.text(6.55, 3.53, "AdaLN", bold=True, ha="left")
-    c.text(6.61, 3.13, r"$h$", size=13)
-    c.arrow([(6.77, 3.13), (7.12, 3.13)])
+    c.text(6.61, 3.13, r"$\mathbf{h}$", size=13)
+    c.arrow([(6.77, 3.13), (7.15, 3.13)])
     c.block(7.15, 2.93, 1.35, 0.40, "RMSNorm", PALE_VIOLET)
-    c.text(10.05, 3.42, r"$c$", size=13)
-    c.arrow([(10.21, 3.42), (10.46, 3.42)], color=VIOLET)
+    c.text(10.05, 3.42, r"$\mathbf{c}$", size=13)
+    c.arrow([(10.21, 3.42), (10.49, 3.42)], color=VIOLET)
     c.block(10.49, 3.23, 1.20, 0.38, "Linear", PALE_VIOLET)
     c.line((11.09, 3.23), (11.09, 3.00), color=VIOLET)
     c.line((11.09, 3.00), (11.65, 3.00), color=VIOLET)
@@ -298,34 +298,33 @@ def operations_panel(c, s):
     c.line((7.825, 2.93), (7.825, 2.87))
     c.line((7.825, 2.87), (6.70, 2.87))
     c.line((6.70, 2.87), (6.70, 1.76))
-    for y, label, feature, output in (
-        (2.56, r"Affine  ($\ell=0$)", r"$\hat h_0$", r"$h'_0$"),
-        (1.76, r"Bounded scale  ($\ell>0$)", r"$\hat h_{>0}$", r"$h'_{>0}$"),
+    for y, label, output in (
+        (2.56, r"Affine  ($\ell=0$)", r"$\mathbf{h}'_0$"),
+        (1.76, r"Bounded scale  ($\ell>0$)", r"$\mathbf{h}'_{>0}$"),
     ):
         c.block(7.30, y - 0.20, 2.85, 0.40, label, PALE_VIOLET)
-        c.arrow([(6.70, y), (7.27, y)])
-        c.text(6.89, y + 0.17, feature, size=12.5)
-        c.arrow([(10.18, y), (10.88, y)])
+        c.arrow([(6.70, y), (7.30, y)])
+        c.arrow([(10.15, y), (10.88, y)])
         c.text(11.09, y, output, size=13)
         if y == 2.56:
             c.junction(6.70, y)
     c.text(6.55, 1.38, "Activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
-    c.text(6.53, ya, r"$h_0$", size=13)
-    c.arrow([(6.78, ya), (7.10, ya)])
+    c.text(6.53, ya, r"$\mathbf{h}_0$", size=13)
+    c.arrow([(6.78, ya), (7.13, ya)])
     c.block(7.13, ya - 0.175, 2.60, 0.35, r"SiLU  ($\ell=0$)", PALE_BLUE)
-    c.arrow([(9.76, ya), (10.63, ya)])
-    c.text(10.99, ya, r"$h'_0$", size=13)
-    c.text(6.50, yb, r"$h_{>0}$", size=13)
-    c.arrow([(6.78, yb), (7.10, yb)])
+    c.arrow([(9.73, ya), (10.63, ya)])
+    c.text(10.99, ya, r"$\mathbf{h}'_0$", size=13)
+    c.text(6.50, yb, r"$\mathbf{h}_{>0}$", size=13)
+    c.arrow([(6.78, yb), (7.13, yb)])
     c.junction(6.94, yb)
     c.block(7.13, yb - 0.175, 2.60, 0.35, "Norms → MLP → sigmoid", PALE_BLUE)
-    c.arrow([(9.76, yb), (10.12, yb)])
+    c.arrow([(9.73, yb), (10.15, yb)])
     c.text(9.95, yb + 0.19, r"$g$")
     c.op(10.25, yb, "×")
-    c.arrow([(6.94, yb), (6.94, 0.10), (10.25, 0.10), (10.25, yb - 0.13)])
-    c.arrow([(10.38, yb), (10.63, yb)])
-    c.text(11.02, yb, r"$h'_{>0}$", size=13)
+    c.arrow([(6.94, yb), (6.94, 0.10), (10.25, 0.10), (10.25, yb - 0.10)])
+    c.arrow([(10.35, yb), (10.63, yb)])
+    c.text(11.02, yb, r"$\mathbf{h}'_{>0}$", size=13)
 
 
 def compose(spec):
@@ -345,6 +344,9 @@ def check_connectors(c, renderer):
 
     def hits_box(p, q, bounds):
         x0, y0, x1, y1 = bounds
+        # Exact border ports may differ by floating-point roundoff.
+        eps = 1e-9
+        x0, y0, x1, y1 = x0 + eps, y0 + eps, x1 - eps, y1 - eps
         if abs(p[0] - q[0]) < 1e-8:
             return x0 < p[0] < x1 and max(p[1], q[1]) > y0 and min(p[1], q[1]) < y1
         return y0 < p[1] < y1 and max(p[0], q[0]) > x0 and min(p[0], q[0]) < x1

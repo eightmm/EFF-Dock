@@ -42,7 +42,22 @@ exact reductions and modulation equations are given below. Activation applies
 SiLU to even scalars; invariant non-scalar norms pass through an MLP and sigmoid,
 and the resulting channel gates g multiply the original vector/tensor input.
 T-junctions mark branches, + denotes addition, × denotes multiplication and “concat”
-denotes concatenation. α is a learned scalar parameter; g is feature-dependent.
+denotes concatenation. α is a learned scalar parameter; g is feature-dependent. Bold h denotes
+node features, hats denote normalized features, and subscripts 0 and >0 select
+degree classes. Bold c denotes conditioning. B and C use the same h_in/h_conv
+labels at the convolution interfaces.
+
+## Notation
+
+Bold h consistently denotes a feature tensor. Superscripts (k) and (k+1)
+index full interaction layers; subscripts in and conv identify the normalized
+input and aggregated output of the convolution. Subscripts 0 and >0 select
+ℓ = 0 and ℓ > 0 channels. A hat marks normalization; a prime marks the local
+output of AdaLN or activation in D, rather than a full next-layer state.
+Bold c is the conditioning vector. γ and β are its channelwise modulation
+parameters; g denotes feature-dependent activation gates and α the learned
+coefficient for docking-state input to confidence. Diagram labels use this h
+notation for all degree classes, without separate s/u feature variables.
 
 ## Panel definitions and implementation audit
 
