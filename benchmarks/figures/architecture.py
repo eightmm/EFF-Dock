@@ -107,7 +107,7 @@ class Canvas:
 
     def junction(self, x, y, color=LINE):
         self.junctions.append((x, y))
-        self.ax.add_patch(Circle((x, y), 0.025, facecolor=color, edgecolor="none", zorder=4))
+        # Register intentional branches for routing checks without drawing a marker.
 
     def op(self, x, y, symbol, r=0.10):
         """Operator node: + addition, ‖ concatenation, × multiplication."""
@@ -269,20 +269,23 @@ def operations_panel(c, s):
     c.text(10.05, 3.42, r"$c$", size=13)
     c.arrow([(10.21, 3.42), (10.46, 3.42)], color=VIOLET)
     c.block(10.49, 3.23, 1.20, 0.38, "Linear", PALE_VIOLET)
-    c.arrow([(11.09, 3.20), (11.09, 3.08)], color=VIOLET)
-    c.text(11.09, 2.92, r"$\gamma_s,\beta_s,\gamma_u$", color=VIOLET)
-    c.line((7.825, 2.90), (7.825, 2.87))
+    c.line((11.09, 3.23), (11.09, 3.00), color=VIOLET)
+    c.line((11.09, 3.00), (11.65, 3.00), color=VIOLET)
+    c.junction(11.09, 3.00, VIOLET)
+    c.arrow([(11.09, 3.00), (9.35, 3.00), (9.35, 2.76)], color=VIOLET)
+    c.arrow([(11.65, 3.00), (11.65, 2.13), (9.35, 2.13), (9.35, 1.96)], color=VIOLET)
+    c.text(10.00, 3.16, r"$\gamma_s,\beta_s$", color=VIOLET)
+    c.text(11.02, 2.30, r"$\gamma_u$", color=VIOLET)
+    c.line((7.825, 2.93), (7.825, 2.87))
     c.line((7.825, 2.87), (6.70, 2.87))
     c.line((6.70, 2.87), (6.70, 1.76))
-    for y, label, feature, parameters, output in (
-        (2.56, "Scalar affine", r"$\hat s$", r"$\gamma_s,\beta_s$", r"$s'$"),
-        (1.76, "Bounded non-scalar scale", r"$\hat u$", r"$\gamma_u$", r"$u'$"),
+    for y, label, feature, output in (
+        (2.56, "Scalar affine", r"$\hat s$", r"$s'$"),
+        (1.76, "Bounded non-scalar scale", r"$\hat u$", r"$u'$"),
     ):
         c.block(7.30, y - 0.20, 2.85, 0.40, label, PALE_VIOLET)
         c.arrow([(6.70, y), (7.27, y)])
         c.text(6.98, y + 0.16, feature, size=12.5)
-        c.text(9.35, y + 0.48, parameters, color=VIOLET)
-        c.arrow([(9.35, y + 0.34), (9.35, y + 0.23)], color=VIOLET)
         c.arrow([(10.18, y), (10.88, y)])
         c.text(11.09, y, output, size=13)
         if y == 2.56:

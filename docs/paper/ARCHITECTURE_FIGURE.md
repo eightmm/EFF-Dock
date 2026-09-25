@@ -37,7 +37,7 @@ RMSNorm acts separately within each (degree, parity) block;
 exact reductions and modulation equations are given below. Activation applies
 SiLU to even scalars; invariant non-scalar norms pass through an MLP and sigmoid,
 and the resulting channel gates g multiply the original vector/tensor input.
-Dots mark branches, + denotes addition, × denotes multiplication and “concat”
+T-junctions mark branches, + denotes addition, × denotes multiplication and “concat”
 denotes concatenation. α is a learned scalar parameter; g is feature-dependent.
 
 ## Panel definitions and implementation audit
@@ -165,10 +165,9 @@ All components of a channel receive the same scalar multiplier. Learned gains ar
 
 AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
 The condition passes through one linear projection, producing gamma_s, beta_s
-and gamma_u. The same parameter symbols label the downward purple inputs to
-the modulation rows; these named ports reference the single projection shown
-above, not independently generated parameters. Gray feature arrows run from
-left to right through both rows, ending at s′/u′. Dots mark feature branches.
+and gamma_u. Continuous purple wires connect this single projection to both
+modulation rows from above. Gray feature arrows run left to right through both
+rows, ending at s′/u′. Branches use plain T-junctions without dot markers.
 Normalized features follow two branches:
 
 - Scalars: `s' = (1 + gamma_s) * shat + beta_s`.
@@ -205,7 +204,7 @@ The [source specification](../../benchmarks/results/paper/architecture/spec.json
 records dimensions, normalization operations, the ligand-state input and
 source/config SHA-256 hashes, including feature extraction and scoring code.
 Rendering fails if those sources change. It also checks dimension arithmetic,
-text overlap, module padding and connector routing (unmarked intersections,
+text overlap, module padding and connector routing (undeclared intersections,
 collinear overlaps, text/module intrusion and arrowheads without adequate shafts).
 PDF/SVG are vector, SVG text is editable and
 the PNG preview is 300 dpi. Exports are deterministic. At 180 mm width the
