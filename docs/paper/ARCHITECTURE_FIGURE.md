@@ -21,17 +21,18 @@ enter both the atom MLP and the contact readout. A fresh docking-network forward
 pass at t = 1 on each scored candidate supplies ligand hidden states, weighted
 by a learned scalar coefficient α and added to the confidence embedding.
 Docking conditions on additive time and log-prior-scale embeddings; confidence
-uses c = 0. **B**, Each layer applies pre-message RMSNorm, input radial scaling,
-a shared tensor product with spherical harmonics through degree two, output
-radial scaling, activation and gate-normalized aggregation. Normalized endpoint
-scalars, condition and edge descriptors feed both the radial MLP and the gate
-MLP. Sigmoid gates include an edge-type-dependent distance decay. The ordered
-post-message transform is equivariant linear → activation → channel dropout.
-The original input follows one identity skip, added before AdaLN. **C**,
-RMSNorm acts separately within each (degree, parity) block. AdaLN applies its own
-RMSNorm and condition-dependent scalar affine modulation or bounded non-scalar
-scaling. Exact reductions and modulation equations are given below. **D**, Even
-scalars receive SiLU; invariant non-scalar norms pass through an MLP and sigmoid,
+uses c = 0. **B**, The interaction layer applies pre-message RMSNorm,
+equivariant convolution and an equivariant linear → activation → channel-dropout
+transform. The original input follows one identity skip, added before AdaLN.
+**C**, The convolution applies input radial scaling, a shared tensor product
+with spherical harmonics through degree two, output radial scaling, activation
+and gate-normalized aggregation. Normalized endpoint scalars, condition and
+edge descriptors feed both the radial MLP and the separate gate MLP. Sigmoid
+gates include an edge-type-dependent distance decay. **D**, AdaLN applies its
+own RMSNorm and condition-dependent scalar affine modulation or bounded
+non-scalar scaling. RMSNorm acts separately within each (degree, parity) block;
+exact reductions and modulation equations are given below. Activation applies
+SiLU to even scalars; invariant non-scalar norms pass through an MLP and sigmoid,
 and the resulting channel gates g multiply the original vector/tensor input.
 Dots mark branches, + denotes addition, × denotes multiplication and “concat”
 denotes concatenation. α is a learned scalar parameter; g is feature-dependent.
@@ -41,9 +42,9 @@ denotes concatenation. α is a learned scalar parameter; g is feature-dependent.
 | Panel | Depicted operation | Source |
 |---|---|---|
 | A | Separately parameterized docking/confidence models, embedding, readouts | [Docking model](../../src/effdock/models/effdock.py), [confidence model](../../src/effdock/confidence/model.py) |
-| B | Pre-norm → input scale → tensor product → output scale → activation → aggregation → post transform → residual → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [GatedEquivariantConv / EquivariantBlock](../../src/effdock/models/equivariant.py) |
-| C | RMSNorm per irrep block with learned gains; AdaLN (own RMSNorm, scalar affine, bounded non-scalar scale) | [EquivariantRMSNorm, EquivariantAdaLN](../../src/effdock/models/equivariant.py) |
-| D | Scalar SiLU; norm-derived sigmoid gating of non-scalar input | [EquivariantActivation](../../src/effdock/models/equivariant.py) |
+| B | Pre-norm → convolution → post transform → residual → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [EquivariantBlock](../../src/effdock/models/equivariant.py) |
+| C | Input scale → tensor product → output scale → activation → gated aggregation | [GatedEquivariantConv](../../src/effdock/models/equivariant.py) |
+| D | AdaLN with its own RMSNorm; scalar SiLU and norm-derived non-scalar gates | [EquivariantRMSNorm, EquivariantAdaLN, EquivariantActivation](../../src/effdock/models/equivariant.py) |
 
 Released settings are taken from the [docking config](../../configs/train_early_time_ft_50k.yaml)
 and [confidence config](../../configs/train_confidence_s50_raw_refined_100k.yaml).
@@ -109,6 +110,13 @@ an additional residual. The output arrow follows AdaLN. The six docking layers
 and four confidence layers are separately parameterized; repetition counts do
 not denote tied weights.
 
+Equivariant linear maps mix multiplicity channels within compatible irreps.
+The message activation and the activation inside the combined post-message
+box use the operation in panel D with independent parameters. Channel dropout
+uses one mask per irrep channel, broadcast over its spatial components; it is inactive at inference. Both released configs use 0.1.
+
+### C. Equivariant convolution
+
 A 1,020-wide edge vector contains 32 RBF values, edge/bond descriptors, distance
 evolution, fragment-hop and local-frame features, contact chemistry, normalized
 endpoint scalar features, and conditioning. One radial trunk produces both input and output scales (each 1 + a learned
@@ -127,18 +135,13 @@ harmonic argument appears inside the tensor-product block to avoid a crossing
 external wire. “Shared” refers to tensor-product weights shared across edge
 types within a layer, not weights tied across successive interaction layers.
 
-Equivariant linear maps mix multiplicity channels within compatible irreps.
-The message activation and the activation inside the combined post-message
-box use the operation in panel D with independent parameters. Channel dropout uses one mask per irrep channel, broadcast over its
-spatial components; it is inactive at inference. Both released configs use 0.1.
-
-### C. Equivariant RMSNorm and AdaLN
+### D. Normalization and activation
 
 #### RMSNorm
 
 Let b identify one (degree, parity) block, C_b its multiplicity, and h_{b,c}
-its channel vector (one component for a scalar, 2ℓ+1 otherwise). The schematic
-uses RMS_b(h) = r_b. For each node:
+its channel vector (one component for a scalar, 2ℓ+1 otherwise).
+Write RMS_b(h) = r_b. For each node:
 
 - `r_b = sqrt(mean_c ||h_{b,c}||² + epsilon)`, with `epsilon = 1e-6`.
 - `hhat_{b,c} = a_{b,c} h_{b,c} / r_b`, with learned channel gains initialized to one.
@@ -169,7 +172,7 @@ has a learned bias. Equivariance here is with respect to joint SE(3)
 transformations of the model inputs; the figure does not establish full-pipeline
 reflection equivariance.
 
-### D. Equivariant activation
+#### Equivariant activation
 
 Even scalars receive elementwise SiLU. All non-scalar channel norms are
 concatenated and passed through an MLP and sigmoid to produce per-channel gates.
