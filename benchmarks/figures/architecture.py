@@ -15,7 +15,7 @@ from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / "benchmarks/results/paper/architecture/spec.json"
 NAME = "Fig2_architecture"
-WIDTH, HEIGHT = 12.0, 14.15
+WIDTH, HEIGHT = 12.0, 11.0
 INK, MUTED, LINE = "#252525", "#666666", "#666666"
 BLUE, MINT, PEACH, VIOLET = "#70A9CA", "#71AD9B", "#DCA179", "#A895C4"
 PALE_GRAY = "#F2F3F4"
@@ -38,7 +38,7 @@ class Canvas:
     def __init__(self):
         self.fig = plt.figure(figsize=(WIDTH, HEIGHT))
         self.ax = self.fig.add_axes((0, 0, 1, 1))
-        self.ax.set(xlim=(0, WIDTH), ylim=(-3.15, 11.0), aspect="equal")
+        self.ax.set(xlim=(0, WIDTH), ylim=(0, HEIGHT), aspect="equal")
         self.ax.set_axis_off()
         self.texts = []
         self.box_texts = []
@@ -166,7 +166,7 @@ def overview_panel(c, s):
         (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
         (2.75, 1.60, f"Interaction layer\n×{s['confidence_layers']}  (B)", PALE_BLUE),
         (4.70, 1.50, r"$\ell=0$ features" + "\n" + r"$\ell>0$ norms", PALE_GRAY),
-        (10.23, 1.55, "Pose MLP (E)\npRMSD · logit", PALE_PEACH),
+        (10.23, 1.55, "Pose MLP\npRMSD · logit", PALE_PEACH),
     ):
         if text.startswith("Interaction layer"):
             for offset in (0.08, 0.04):
@@ -186,7 +186,7 @@ def overview_panel(c, s):
     c.arrow([(6.45, y), (6.45, 7.42), (6.67, 7.42)])
     c.junction(6.45, y)
     c.block(6.70, 8.13, 2.45, 0.44, "Global pooling", PALE_PEACH)
-    c.block(6.70, 7.14, 1.10, 0.56, "Atom MLP\n(E)", PALE_PEACH)
+    c.block(6.70, 7.14, 1.10, 0.56, "Atom MLP", PALE_PEACH)
     c.arrow([(7.83, 7.42), (8.02, 7.42)])
     c.block(8.05, 7.14, 1.10, 0.56, "Contact\nreadout", PALE_PEACH)
     for branch_y, end in ((8.35, 8.12), (7.42, 7.68)):
@@ -258,7 +258,7 @@ def convolution_panel(c, s):
     c.text(mid, 0.20, r"$h_{\mathrm{conv}}$", size=13)
     c.text(1.43, 3.43, "Edge descriptors\n" + r"$\hat h_{i,0},\,\hat h_{j,0},\,c$", color=MUTED)
     c.arrow([(1.43, 3.08), (1.43, 2.88)])
-    c.block(0.48, 2.37, 1.90, 0.48, "Radial MLP (E)", PALE_MINT)
+    c.block(0.48, 2.37, 1.90, 0.48, "Radial MLP", PALE_MINT)
     c.line((2.41, 2.61), (2.65, 2.61))
     c.arrow([(2.65, 2.61), (2.65, 3.205), (3.02, 3.205)])
     c.arrow([(2.65, 2.61), (2.65, 1.935), (3.02, 1.935)])
@@ -268,7 +268,7 @@ def convolution_panel(c, s):
     c.junction(1.43, 2.98)
     c.junction(0.25, 1.95)
     c.arrow([(0.25, 1.95), (0.45, 1.95)])
-    c.block(0.48, 1.76, 1.90, 0.38, "Gate MLP (E)", PALE_MINT)
+    c.block(0.48, 1.76, 1.90, 0.38, "Gate MLP", PALE_MINT)
     c.arrow([(1.43, 1.73), (1.43, 1.54)])
     c.block(0.48, 1.16, 1.90, 0.35, "Sigmoid", PALE_MINT)
     c.arrow([(1.43, 1.13), (1.43, 0.94)])
@@ -319,7 +319,7 @@ def operations_panel(c, s):
     c.text(6.50, yb, r"$h_{>0}$", size=13)
     c.arrow([(6.78, yb), (7.10, yb)])
     c.junction(6.94, yb)
-    c.block(7.13, yb - 0.175, 2.60, 0.35, "Norms → MLP (E) → sigmoid", PALE_BLUE)
+    c.block(7.13, yb - 0.175, 2.60, 0.35, "Norms → MLP → sigmoid", PALE_BLUE)
     c.arrow([(9.76, yb), (10.12, yb)])
     c.text(9.95, yb + 0.19, r"$g$")
     c.op(10.25, yb, "×")
@@ -328,53 +328,12 @@ def operations_panel(c, s):
     c.text(11.02, yb, r"$h'_{>0}$", size=13)
 
 
-def mlp_panel(c, s):
-    c.panel(0.20, -0.25, "E", r"MLP internals  ($\ell=0$)")
-    c.text(0.45, -0.85, "Radial MLP", bold=True, ha="left")
-    y = -1.80
-    c.text(0.65, y, r"$e$", size=13)
-    c.arrow([(0.82, y), (1.07, y)])
-    c.block(1.10, y - 0.19, 1.00, 0.38, "Linear", PALE_MINT)
-    c.arrow([(2.13, y), (2.37, y)])
-    c.block(2.40, y - 0.19, 0.85, 0.38, "SiLU", PALE_MINT)
-    c.line((3.28, y), (3.55, y))
-    c.junction(3.55, y)
-    for by, output in ((-1.34, r"$\delta_{\mathrm{in}}$"), (-2.26, r"$\delta_{\mathrm{out}}$")):
-        c.arrow([(3.55, y), (3.55, by), (3.82, by)])
-        c.block(3.85, by - 0.19, 1.05, 0.38, "Linear", PALE_MINT)
-        c.arrow([(4.93, by), (5.24, by)])
-        c.text(5.55, by, output, size=13)
-    c.text(6.55, -0.85, "Gate / norm MLP", bold=True, ha="left")
-    c.text(6.10, -1.25, r"$x$", size=13)
-    c.arrow([(6.27, -1.25), (6.52, -1.25)])
-    for x, w, label in ((6.55, 0.85, "Linear"), (7.65, 0.65, "SiLU"), (8.55, 1.00, "Linear")):
-        c.block(x, -1.44, w, 0.38, label, PALE_MINT)
-    c.arrow([(7.43, -1.25), (7.62, -1.25)])
-    c.arrow([(8.33, -1.25), (8.52, -1.25)])
-    c.arrow([(9.58, -1.25), (10.07, -1.25)])
-    c.text(10.30, -1.25, r"$z$", size=13)
-    c.text(6.55, -1.80, "Confidence MLP", bold=True, ha="left")
-    y = -2.25
-    c.text(6.10, y, r"$x$", size=13)
-    c.arrow([(6.27, y), (6.52, y)])
-    for x, w, label in ((6.55, 0.85, "Linear"), (7.65, 0.65, "SiLU"), (8.55, 1.00, "Dropout"), (10.00, 0.85, "Linear")):
-        c.block(x, y - 0.19, w, 0.38, label, PALE_PEACH)
-    c.arrow([(7.43, y), (7.62, y)])
-    c.arrow([(8.33, y), (8.52, y)])
-    c.arrow([(9.58, y), (9.97, y)])
-    c.arrow([(10.88, y), (11.23, y)])
-    c.text(11.48, y, r"$z$", size=13)
-    c.ax.plot([6.55, 6.55, 9.55, 9.55], [-2.52, -2.62, -2.62, -2.52], color=LINE, lw=0.65)
-    c.text(8.05, -2.85, "×1 atom · ×2 pose", color=MUTED)
-
-
 def compose(spec):
     c = Canvas()
     overview_panel(c, spec)
     interaction_panel(c, spec)
     convolution_panel(c, spec)
     operations_panel(c, spec)
-    mlp_panel(c, spec)
     return c
 
 
