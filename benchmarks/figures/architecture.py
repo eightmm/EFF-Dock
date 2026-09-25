@@ -165,7 +165,7 @@ def overview_panel(c, s):
     for x, w, text, fill in (
         (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
         (2.75, 1.60, f"Interaction layer\n×{s['confidence_layers']}  (B)", PALE_BLUE),
-        (4.70, 1.50, "Scalars and\nirrep norms", PALE_GRAY),
+        (4.70, 1.50, r"$\ell=0$ features" + "\n" + r"$\ell>0$ norms", PALE_GRAY),
         (10.23, 1.55, "Pose MLP\npRMSD · logit", PALE_PEACH),
     ):
         if text.startswith("Interaction layer"):
@@ -228,6 +228,8 @@ def interaction_panel(c, s):
     c.arrow([(0.60, y), (0.60, 5.55), (8.93, 5.55), (8.93, y + 0.13)], color=BLUE, lw=1.2)
     c.junction(0.60, y, BLUE)
     c.text(4.76, 5.77, "Identity skip", color=MUTED)
+    c.text(2.175, 4.42, r"$h_{\mathrm{in}}$", color=MUTED)
+    c.text(4.375, 4.42, r"$h_{\mathrm{conv}}$", color=MUTED)
     c.text(10.15, 5.66, r"$c$", color=MUTED)
     c.arrow([(10.15, 5.48), (10.15, 5.28)], color=VIOLET)
 
@@ -235,7 +237,7 @@ def interaction_panel(c, s):
 def convolution_panel(c, s):
     c.panel(0.20, 4.15, "C", "Equivariant convolution")
     x, w, mid = 3.05, 2.50, 4.30
-    c.text(mid, 3.71, r"$\hat h$", size=13)
+    c.text(mid, 3.71, r"$h_{\mathrm{in}}$", size=13)
     c.arrow([(mid, 3.54), (mid, 3.41)])
     modules = [
         (3.03, 0.35, "Input radial scale"),
@@ -251,8 +253,8 @@ def convolution_panel(c, s):
             c.arrow([(mid, previous - 0.03), (mid, y + height + 0.03)])
         previous = y
     c.arrow([(mid, 0.52), (mid, 0.38)])
-    c.text(mid, 0.20, r"$m$", size=13)
-    c.text(1.43, 3.43, "Edge descriptors\n" + r"$\hat s_i,\,\hat s_j,\,c$", color=MUTED)
+    c.text(mid, 0.20, r"$h_{\mathrm{conv}}$", size=13)
+    c.text(1.43, 3.43, "Edge descriptors\n" + r"$\hat h_{i,0},\,\hat h_{j,0},\,c$", color=MUTED)
     c.arrow([(1.43, 3.08), (1.43, 2.88)])
     c.block(0.48, 2.37, 1.90, 0.48, "Radial MLP", PALE_MINT)
     c.line((2.41, 2.61), (2.65, 2.61))
@@ -289,30 +291,30 @@ def operations_panel(c, s):
     c.junction(11.09, 3.00, VIOLET)
     c.arrow([(11.09, 3.00), (9.35, 3.00), (9.35, 2.76)], color=VIOLET)
     c.arrow([(11.65, 3.00), (11.65, 2.13), (9.35, 2.13), (9.35, 1.96)], color=VIOLET)
-    c.text(10.00, 3.16, r"$\gamma_s,\beta_s$", color=VIOLET)
-    c.text(11.02, 2.30, r"$\gamma_u$", color=VIOLET)
+    c.text(10.00, 3.16, r"$\gamma_0,\beta_0$", color=VIOLET)
+    c.text(11.02, 2.30, r"$\gamma_{>0}$", color=VIOLET)
     c.line((7.825, 2.93), (7.825, 2.87))
     c.line((7.825, 2.87), (6.70, 2.87))
     c.line((6.70, 2.87), (6.70, 1.76))
     for y, label, feature, output in (
-        (2.56, "Scalar affine", r"$\hat s$", r"$s'$"),
-        (1.76, "Bounded non-scalar scale", r"$\hat u$", r"$u'$"),
+        (2.56, r"Affine  ($\ell=0$)", r"$\hat h_0$", r"$h'_0$"),
+        (1.76, r"Bounded scale  ($\ell>0$)", r"$\hat h_{>0}$", r"$h'_{>0}$"),
     ):
         c.block(7.30, y - 0.20, 2.85, 0.40, label, PALE_VIOLET)
         c.arrow([(6.70, y), (7.27, y)])
-        c.text(6.98, y + 0.16, feature, size=12.5)
+        c.text(6.89, y + 0.17, feature, size=12.5)
         c.arrow([(10.18, y), (10.88, y)])
         c.text(11.09, y, output, size=13)
         if y == 2.56:
             c.junction(6.70, y)
     c.text(6.55, 1.38, "Activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
-    c.text(6.62, ya, r"$s$", size=13)
+    c.text(6.53, ya, r"$h_0$", size=13)
     c.arrow([(6.78, ya), (7.10, ya)])
-    c.block(7.13, ya - 0.175, 2.60, 0.35, "SiLU", PALE_BLUE)
+    c.block(7.13, ya - 0.175, 2.60, 0.35, r"SiLU  ($\ell=0$)", PALE_BLUE)
     c.arrow([(9.76, ya), (10.63, ya)])
-    c.text(10.85, ya, r"$s'$", size=13)
-    c.text(6.62, yb, r"$u$", size=13)
+    c.text(10.99, ya, r"$h'_0$", size=13)
+    c.text(6.50, yb, r"$h_{>0}$", size=13)
     c.arrow([(6.78, yb), (7.10, yb)])
     c.junction(6.94, yb)
     c.block(7.13, yb - 0.175, 2.60, 0.35, "Norms → MLP → sigmoid", PALE_BLUE)
@@ -321,7 +323,7 @@ def operations_panel(c, s):
     c.op(10.25, yb, "×")
     c.arrow([(6.94, yb), (6.94, 0.10), (10.25, 0.10), (10.25, yb - 0.13)])
     c.arrow([(10.38, yb), (10.63, yb)])
-    c.text(10.85, yb, r"$u'$", size=13)
+    c.text(11.02, yb, r"$h'_{>0}$", size=13)
 
 
 def compose(spec):

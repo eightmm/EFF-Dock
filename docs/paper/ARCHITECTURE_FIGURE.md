@@ -17,7 +17,8 @@ per-fragment mean for translational velocity and a torque followed by the
 inertia pseudo-inverse for angular velocity. The interaction states contain
 irreducible features of degrees ℓ = 0, 1 and 2 (scalar, vector and rank-2
 features, respectively). The separately parameterized
-four-layer confidence network uses scalar features and irrep-channel norms.
+four-layer confidence network combines ℓ = 0 features with norms of ℓ > 0
+channels.
 Global pooled features and a contact-aware readout are concatenated before the
 pose MLP predicts RMSD and a pose-success logit. Pose–protein contact descriptors
 enter both the atom MLP and the contact readout. A fresh docking-network forward
@@ -27,14 +28,15 @@ Docking conditions on additive time and log-prior-scale embeddings; confidence
 uses c = 0. **B**, The interaction layer applies pre-message RMSNorm,
 equivariant convolution, followed by separate equivariant linear, activation
 and channel-dropout stages. The original input follows one identity skip, added before AdaLN.
-**C**, The convolution applies input radial scaling, a shared tensor product
+**C**, The convolution maps normalized node features h_in to aggregated node
+features h_conv, using input radial scaling, a shared tensor product
 with spherical harmonics through degree two, output radial scaling, activation
 and gate-normalized aggregation. Normalized endpoint scalars, condition and
 edge descriptors feed both the radial MLP and the separate gate MLP. The
 shared edge gate passes through sigmoid and is multiplied by a separately
 computed, edge-type-dependent distance decay before aggregation. **D**, AdaLN applies its
 own RMSNorm and condition-dependent scalar affine modulation or bounded
-non-scalar scaling, with scalar and non-scalar outputs shown explicitly.
+non-scalar scaling, with ℓ = 0 and ℓ > 0 paths shown explicitly.
 RMSNorm acts separately within each (degree, parity) block;
 exact reductions and modulation equations are given below. Activation applies
 SiLU to even scalars; invariant non-scalar norms pass through an MLP and sigmoid,
@@ -104,8 +106,8 @@ contact-maximum, atom-mean and atom-maximum pools produce 2,048 features. The
 with hidden width 512 and two outputs: log1p RMSD and a success logit. Displayed pRMSD is
 `max(0, expm1(clamp(log1p_RMSD, -2, 5)))`; selection minimizes pRMSD among eligible
 poses. The success logit is not the selector or a calibrated probability claim.
-“Scalars and irrep norms” denotes a concatenated invariant feature vector, not
-an elementwise sum. The “Contact readout” box includes contact projection,
+“ℓ = 0 features / ℓ > 0 norms” denotes a concatenated invariant feature
+vector, not an elementwise sum. The “Contact readout” box includes contact projection,
 attention/max pooling and atom mean/max pooling; the arrow into each of the two
 contact-branch boxes marks a separate descriptor concatenation. “Logit” in the
 pose head is the auxiliary pose-success logit. Auxiliary atom-level heads are
@@ -114,6 +116,11 @@ omitted from this model overview.
 ### B. Interaction layer
 
 The exact outer order is `AdaLN(h + post_block(conv(pre_norm(h))))`.
+The labels at the convolution interfaces define `h_in = pre_norm(h)` and
+`h_conv = conv(h_in)`. Both are node-indexed feature tensors with the same
+736-component irrep layout. `h_conv` is the aggregated convolution output,
+not the next layer state; the post-message stages, residual addition and AdaLN
+still follow. Panel C repeats the same interface names.
 The identity skip carries the original h around pre-normalization and the
 message/post block, ending at the + node before AdaLN. There is exactly one
 additive residual per interaction layer; neither the post block nor AdaLN has
@@ -148,7 +155,8 @@ inside the aggregation abstraction.
 Aggregation uses gate-normalized sums, edge-type-dependent distance decay and
 additional non-scalar norm rescaling grouped by degree. It is not ordinary
 softmax attention. These internal reductions are compressed into the gated
-aggregation module. The hats on ŝ_i and ŝ_j mark normalized endpoint scalars;
+aggregation module. The symbols hhat_{i,0} and hhat_{j,0} mark normalized
+ℓ = 0 endpoint features;
 they are concatenated with the condition c and edge descriptors before the two
 MLP branches. The shared input branch supplies those same descriptors to both
 MLPs; it does not feed the gate MLP with the radial MLP's output. The spherical
@@ -175,14 +183,14 @@ All components of a channel receive the same scalar multiplier. Learned gains ar
 #### AdaLN
 
 AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
-The condition passes through one linear projection, producing gamma_s, beta_s
-and gamma_u. Continuous purple wires connect this single projection to both
+The condition passes through one linear projection, producing gamma_0, beta_0
+and gamma_{>0}. Continuous purple wires connect this single projection to both
 modulation rows from above. Gray feature arrows run left to right through both
-rows, ending at s′/u′. Branches use plain T-junctions without dot markers.
+rows, ending at h′_0/h′_{>0}. Branches use plain T-junctions without dot markers.
 Normalized features follow two branches:
 
-- Scalars: `s' = (1 + gamma_s) * shat + beta_s`.
-- Non-scalars: `u' = (1 + 0.1 * tanh(gamma_u)) * uhat`.
+- ℓ = 0: `h'_0 = (1 + gamma_0) * hhat_0 + beta_0`.
+- ℓ > 0: `h'_{>0} = (1 + 0.1 * tanh(gamma_{>0})) * hhat_{>0}`.
 
 Non-scalar scales lie between 0.9 and 1.1; no vector/tensor offset is added.
 The scale is shared across the 2ℓ+1 components of each channel. Zero initialization
@@ -198,8 +206,9 @@ reflection equivariance.
 Even scalars receive elementwise SiLU. All non-scalar channel norms are
 concatenated and passed through an MLP and sigmoid to produce per-channel gates.
 The bypass in panel D carries the original vector/tensor input to the product:
-`u_c' = g_c u_c`; s and u denote even-scalar and vector/tensor channels. The ×
-node denotes channelwise multiplication, broadcasting
+`h'_{>0,c} = g_c h_{>0,c}`. Subscripts 0 and >0 denote degree classes,
+not layer indices; >0 includes degrees 1 and 2 in the released model. The
+ℓ = 0 path contains even scalars (0e). The × node denotes channelwise multiplication, broadcasting
 one gate over all 2ℓ+1 components of each channel. Norms are used to calculate
 the gate, not substituted for the original input. The message activation and
 post-linear activation use separate parameters; their panel-D references denote

@@ -15,7 +15,8 @@ injections. The Newton–Euler readout expands mean and torque/inertia branches;
 feature degrees ℓ = 0, 1, 2 and both AdaLN outputs are explicit. The layer shows its single additive identity skip before AdaLN;
 the separate convolution panel expands input/output radial scaling and the
 gate MLP, sigmoid and distance-decay product. Post-message linear, activation
-and dropout are separate boxes in the interaction layer.
+and dropout are separate boxes in the interaction layer. Matching h_in/h_conv
+labels identify B/C interfaces; degree classes use ℓ = 0 and ℓ > 0.
 No model was run. Detailed branches omitted from the drawing are documented in
 the caption companion. Graph construction and training objectives are outside
 this figure's scope.
