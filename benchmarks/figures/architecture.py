@@ -204,27 +204,32 @@ def overview_panel(c, s):
 def interaction_panel(c, s):
     c.panel(0.20, 6.10, "B", "Interaction layer")
     y = 4.95
-    c.text(0.53, y, r"$h^{(k)}$", size=13)
-    c.arrow([(0.74, y), (1.17, y)])
-    for x, w, label, fill in (
-        (1.20, 1.43, "RMSNorm\n(D)", PALE_VIOLET),
-        (3.00, 2.30, "Equivariant\nconvolution (C)", PALE_BLUE),
-        (5.68, 2.30, "Linear → activation (D)\nChannel dropout", PALE_GRAY),
-        (9.02, 1.60, "AdaLN\n(D)", PALE_VIOLET),
-    ):
+    c.text(0.25, y, r"$h^{(k)}$", size=13)
+    c.arrow([(0.43, y), (0.77, y)])
+    modules = (
+        (0.80, 1.20, "RMSNorm\n(D)", PALE_VIOLET),
+        (2.35, 1.85, "Equivariant\nconvolution (C)", PALE_BLUE),
+        (4.55, 0.85, "Linear", PALE_GRAY),
+        (5.75, 1.20, "Activation\n(D)", PALE_BLUE),
+        (7.30, 1.25, "Channel\ndropout", PALE_GRAY),
+    )
+    previous = None
+    for x, w, label, fill in modules:
         c.block(x, y - 0.30, w, 0.60, label, fill)
-    c.arrow([(2.66, y), (2.97, y)])
-    c.arrow([(5.33, y), (5.65, y)])
-    c.arrow([(8.01, y), (8.27, y)])
-    c.op(8.40, y, "+")
-    c.arrow([(8.53, y), (8.99, y)])
-    c.arrow([(10.65, y), (10.96, y)])
-    c.text(11.32, y, r"$h^{(k+1)}$", size=13)
-    c.arrow([(0.96, y), (0.96, 5.55), (8.40, 5.55), (8.40, y + 0.13)], color=BLUE, lw=1.2)
-    c.junction(0.96, y, BLUE)
-    c.text(5.05, 5.77, "Identity skip", color=MUTED)
-    c.text(9.82, 5.66, r"$c$", color=MUTED)
-    c.arrow([(9.82, 5.48), (9.82, 5.28)], color=VIOLET)
+        if previous is not None:
+            c.arrow([(previous + 0.03, y), (x - 0.03, y)])
+        previous = x + w
+    c.arrow([(8.58, y), (8.80, y)])
+    c.op(8.93, y, "+")
+    c.arrow([(9.06, y), (9.47, y)])
+    c.block(9.50, y - 0.30, 1.30, 0.60, "AdaLN\n(D)", PALE_VIOLET)
+    c.arrow([(10.83, y), (11.16, y)])
+    c.text(11.50, y, r"$h^{(k+1)}$", size=13)
+    c.arrow([(0.60, y), (0.60, 5.55), (8.93, 5.55), (8.93, y + 0.13)], color=BLUE, lw=1.2)
+    c.junction(0.60, y, BLUE)
+    c.text(4.76, 5.77, "Identity skip", color=MUTED)
+    c.text(10.15, 5.66, r"$c$", color=MUTED)
+    c.arrow([(10.15, 5.48), (10.15, 5.28)], color=VIOLET)
 
 
 def convolution_panel(c, s):
@@ -254,10 +259,20 @@ def convolution_panel(c, s):
     c.arrow([(2.65, 2.61), (2.65, 3.205), (3.02, 3.205)])
     c.arrow([(2.65, 2.61), (2.65, 1.935), (3.02, 1.935)])
     c.junction(2.65, 2.61)
-    c.arrow([(1.43, 2.98), (0.25, 2.98), (0.25, 0.81), (0.45, 0.81)])
+    c.line((1.43, 2.98), (0.25, 2.98))
+    c.line((0.25, 2.98), (0.25, 0.375))
     c.junction(1.43, 2.98)
-    c.block(0.48, 0.55, 1.90, 0.52, "Gate MLP → sigmoid\n× distance decay", PALE_MINT)
-    c.arrow([(2.41, 0.81), (3.02, 0.81)])
+    c.junction(0.25, 1.95)
+    c.arrow([(0.25, 1.95), (0.45, 1.95)])
+    c.block(0.48, 1.76, 1.90, 0.38, "Gate MLP", PALE_MINT)
+    c.arrow([(1.43, 1.73), (1.43, 1.54)])
+    c.block(0.48, 1.16, 1.90, 0.35, "Sigmoid", PALE_MINT)
+    c.arrow([(1.43, 1.13), (1.43, 0.94)])
+    c.arrow([(0.25, 0.375), (0.45, 0.375)])
+    c.block(0.48, 0.20, 1.90, 0.35, "Distance decay", PALE_MINT)
+    c.arrow([(1.43, 0.58), (1.43, 0.68)])
+    c.op(1.43, 0.81, "×")
+    c.arrow([(1.56, 0.81), (3.02, 0.81)])
 
 
 def operations_panel(c, s):

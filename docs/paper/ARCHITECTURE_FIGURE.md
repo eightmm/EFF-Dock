@@ -25,13 +25,14 @@ pass at t = 1 on each scored candidate supplies ligand hidden states, weighted
 by a learned scalar coefficient α and added to the confidence embedding.
 Docking conditions on additive time and log-prior-scale embeddings; confidence
 uses c = 0. **B**, The interaction layer applies pre-message RMSNorm,
-equivariant convolution and an equivariant linear → activation → channel-dropout
-transform. The original input follows one identity skip, added before AdaLN.
+equivariant convolution, followed by separate equivariant linear, activation
+and channel-dropout stages. The original input follows one identity skip, added before AdaLN.
 **C**, The convolution applies input radial scaling, a shared tensor product
 with spherical harmonics through degree two, output radial scaling, activation
 and gate-normalized aggregation. Normalized endpoint scalars, condition and
-edge descriptors feed both the radial MLP and the separate gate MLP. Sigmoid
-gates include an edge-type-dependent distance decay. **D**, AdaLN applies its
+edge descriptors feed both the radial MLP and the separate gate MLP. The
+shared edge gate passes through sigmoid and is multiplied by a separately
+computed, edge-type-dependent distance decay before aggregation. **D**, AdaLN applies its
 own RMSNorm and condition-dependent scalar affine modulation or bounded
 non-scalar scaling, with scalar and non-scalar outputs shown explicitly.
 RMSNorm acts separately within each (degree, parity) block;
@@ -122,8 +123,9 @@ parameterized; repetition counts do
 not denote tied weights.
 
 Equivariant linear maps mix multiplicity channels within compatible irreps.
-The message activation and the activation inside the combined post-message
-box use the operation in panel D with independent parameters. Channel dropout
+The three post-message boxes show equivariant linear, activation and channel
+dropout in their execution order. Message activation in C and post-linear
+activation in B use the operation in panel D with independent parameters. Channel dropout
 uses one mask per irrep channel, broadcast over its spatial components; it is inactive at inference. Both released configs use 0.1.
 
 ### C. Equivariant convolution
@@ -134,6 +136,14 @@ endpoint scalar features, and conditioning. One radial trunk produces both input
 delta); a separate gate MLP produces the aggregation gates. Tensor-product weights are shared across edge
 types within a layer. Real spherical harmonics include degrees 0, 1 and 2.
 Message activation occurs after output radial scaling, before aggregation.
+
+The expanded gate branch shows the shared weight for each edge i→j:
+`z_ij = gate_mlp(e_ij)` and
+`g_ij = sigmoid(z_ij[0]) * exp(-d_ij / sigma_edge_type)`.
+Distance and edge type supply the decay directly. Additional sigmoid channel
+gates from the same gate MLP multiply this shared weight for non-scalar
+aggregation. Those channel gates and the degree-grouped norm rescaling remain
+inside the aggregation abstraction.
 
 Aggregation uses gate-normalized sums, edge-type-dependent distance decay and
 additional non-scalar norm rescaling grouped by degree. It is not ordinary
