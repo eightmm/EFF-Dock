@@ -282,32 +282,21 @@ def convolution_panel(c, s):
 def operations_panel(c, s):
     c.panel(6.10, 4.15, "D", "Normalization and activation")
     c.text(6.55, 3.53, "AdaLN", bold=True, ha="left")
-    c.text(6.61, 3.13, r"$\mathbf{h}$", size=13)
-    c.arrow([(6.77, 3.13), (7.15, 3.13)])
-    c.block(7.15, 2.93, 1.35, 0.40, "RMSNorm", PALE_VIOLET)
-    c.text(10.05, 3.42, r"$\mathbf{c}$", size=13)
-    c.arrow([(10.21, 3.42), (10.49, 3.42)], color=VIOLET)
-    c.block(10.49, 3.23, 1.20, 0.38, "Linear", PALE_VIOLET)
-    c.line((11.09, 3.23), (11.09, 3.00), color=VIOLET)
-    c.line((11.09, 3.00), (11.65, 3.00), color=VIOLET)
-    c.junction(11.09, 3.00, VIOLET)
-    c.arrow([(11.09, 3.00), (9.35, 3.00), (9.35, 2.76)], color=VIOLET)
-    c.arrow([(11.65, 3.00), (11.65, 2.13), (9.35, 2.13), (9.35, 1.96)], color=VIOLET)
-    c.text(10.00, 3.16, r"$\gamma_0,\beta_0$", color=VIOLET)
-    c.text(11.02, 2.30, r"$\gamma_{>0}$", color=VIOLET)
-    c.line((7.825, 2.93), (7.825, 2.87))
-    c.line((7.825, 2.87), (6.70, 2.87))
-    c.line((6.70, 2.87), (6.70, 1.76))
-    for y, label, output in (
-        (2.56, r"Affine  ($\ell=0$)", r"$\mathbf{h}'_0$"),
-        (1.76, r"Bounded scale  ($\ell>0$)", r"$\mathbf{h}'_{>0}$"),
-    ):
-        c.block(7.30, y - 0.20, 2.85, 0.40, label, PALE_VIOLET)
-        c.arrow([(6.70, y), (7.30, y)])
-        c.arrow([(10.15, y), (10.88, y)])
-        c.text(11.09, y, output, size=13)
-        if y == 2.56:
-            c.junction(6.70, y)
+    c.text(7.95, 3.55, r"$\mathbf{h}$", size=13)
+    c.text(10.60, 3.55, r"$\mathbf{c}$", size=13)
+    c.arrow([(7.95, 3.39), (7.95, 3.22)])
+    c.arrow([(10.60, 3.39), (10.60, 3.22)], color=VIOLET)
+    c.block(7.15, 2.82, 1.60, 0.40, "RMSNorm", PALE_VIOLET)
+    c.block(9.80, 2.82, 1.60, 0.40, "Linear", PALE_VIOLET)
+    c.arrow([(7.95, 2.82), (7.95, 2.53)])
+    c.arrow([(10.60, 2.82), (10.60, 2.53)], color=VIOLET)
+    c.block(
+        7.15, 1.95, 4.25, 0.58,
+        r"Affine  ($\ell=0$)" + "\n" + r"Bounded scale  ($\ell>0$)",
+        PALE_VIOLET,
+    )
+    c.arrow([(9.275, 1.95), (9.275, 1.77)])
+    c.text(9.275, 1.61, r"$\mathbf{h}'$", size=13)
     c.text(6.55, 1.38, "Activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
     c.text(6.53, ya, r"$\mathbf{h}_0$", size=13)

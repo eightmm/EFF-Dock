@@ -36,7 +36,9 @@ edge descriptors feed both the radial MLP and the separate gate MLP. The
 shared edge gate passes through sigmoid and is multiplied by a separately
 computed, edge-type-dependent distance decay before aggregation. **D**, AdaLN applies its
 own RMSNorm and condition-dependent scalar affine modulation or bounded
-non-scalar scaling, with ℓ = 0 and ℓ > 0 paths shown explicitly.
+non-scalar scaling. The two degree-specific rules share a modulation box;
+feature and conditioning streams enter from above, and the complete feature
+output leaves below.
 RMSNorm acts separately within each (degree, parity) block;
 exact reductions and modulation equations are given below. Activation applies
 SiLU to even scalars; invariant non-scalar norms pass through an MLP and sigmoid,
@@ -199,9 +201,12 @@ All components of a channel receive the same scalar multiplier. Learned gains ar
 
 AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
 The condition passes through one linear projection, producing gamma_0, beta_0
-and gamma_{>0}. Continuous purple wires connect this single projection to both
-modulation rows from above. Gray feature arrows run left to right through both
-rows, ending at h′_0/h′_{>0}. Branches use plain T-junctions without dot markers.
+and gamma_{>0}. Panel D flows from top to bottom: h passes through RMSNorm,
+c through the conditioning projection, and both enter a common modulation box.
+Its two rows apply to separate degree classes, not sequentially to the same
+channels. The output h′ contains both degree classes. The compact vertical
+layout groups the modulation parameters inside the Linear output rather than
+routing separate parameter wires around each degree-specific operation.
 Normalized features follow two branches:
 
 - ℓ = 0: `h'_0 = (1 + gamma_0) * hhat_0 + beta_0`.
