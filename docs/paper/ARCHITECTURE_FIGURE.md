@@ -41,6 +41,12 @@ RMSNorm acts separately within each (degree, parity) block;
 exact reductions and modulation equations are given below. Activation applies
 SiLU to even scalars; invariant non-scalar norms pass through an MLP and sigmoid,
 and the resulting channel gates g multiply the original vector/tensor input.
+**E**, Scalar MLP internals are expanded for the referenced modules. The radial
+MLP shares a Linear–SiLU trunk and has independent input/output scale heads.
+Gate and norm MLPs each use Linear–SiLU–Linear with separate parameters. The
+confidence atom and pose MLPs use one and two Linear–SiLU–Dropout hidden stages,
+respectively, followed by a final linear layer. B brackets the equivariant
+Linear–Activation–Channel-dropout block, whose activation is detailed in D.
 T-junctions mark branches, + denotes addition, × denotes multiplication and “concat”
 denotes concatenation. α is a learned scalar parameter; g is feature-dependent.
 
@@ -52,6 +58,7 @@ denotes concatenation. α is a learned scalar parameter; g is feature-dependent.
 | B | Pre-norm → convolution → post transform → residual → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [EquivariantBlock](../../src/effdock/models/equivariant.py) |
 | C | Input scale → tensor product → output scale → activation → gated aggregation | [GatedEquivariantConv](../../src/effdock/models/equivariant.py) |
 | D | AdaLN with its own RMSNorm; scalar SiLU and norm-derived non-scalar gates | [EquivariantRMSNorm, EquivariantAdaLN, EquivariantActivation](../../src/effdock/models/equivariant.py) |
+| E | Radial shared trunk and two heads; gate/norm MLP; confidence hidden stages and output linear | [Radial/gate/norm modules](../../src/effdock/models/equivariant.py), [confidence _mlp](../../src/effdock/confidence/model.py) |
 
 Released settings are taken from the [docking config](../../configs/train_early_time_ft_50k.yaml)
 and [confidence config](../../configs/train_confidence_s50_raw_refined_100k.yaml).
@@ -213,6 +220,40 @@ one gate over all 2ℓ+1 components of each channel. Norms are used to calculate
 the gate, not substituted for the original input. The message activation and
 post-linear activation use separate parameters; their panel-D references denote
 the same operation type, not tied weights.
+
+### E. MLP internals
+
+The MLP inputs in E are invariant scalar quantities (ℓ = 0): edge features e,
+non-scalar channel norms, or pooled/projected invariant confidence features x.
+Their outputs parameterize equivariant scaling or produce invariant readouts.
+A Linear in E is an ordinary scalar linear layer. B's Linear instead mixes
+multiplicity channels within compatible irreps, followed by the equivariant
+activation in D and channel dropout. The bracket in B identifies the deployed
+`EquivariantBlock` without introducing another internal residual.
+
+The radial MLP uses a shared `Linear(1020,128) → SiLU` trunk and two independent
+`Linear(128,480)` heads. Its outputs are δ_in and δ_out; C's radial scales
+apply 1 + δ to each irrep channel. The gate MLP uses
+`Linear(1020,64) → SiLU → Linear(64,97)`; its sigmoid is shown separately in C.
+The norm MLP in D uses `Linear(n_v,n_v) → SiLU → Linear(n_v,n_v)`, followed by
+the separate sigmoid and multiplication with the original ℓ > 0 features.
+Here n_v counts non-scalar multiplicity channels (96 in both the interaction
+layers and the atom-head activation). Gate and norm MLPs have the same topology,
+not shared weights.
+
+The confidence `_mlp` constructor repeats Linear–SiLU–Dropout `depth−1` times
+before a terminal Linear. The atom trunk uses depth 2; the hybrid pose head
+uses depth 3. The ×1/×2 bracket repeats only the hidden stage, with independent
+weights at each repetition. The terminal linear has no appended activation or
+dropout. Other scalar confidence projections use the same constructor; their
+pooling and normalization remain in the contact/global readout abstraction.
+Dropout is inactive when evaluating the model.
+
+The reusable `EquivariantMLP` class is not instantiated by the released docking
+or confidence models; the deployed equivariant block and scalar MLPs above
+are the operations represented here. Panel E adds implementation detail rather
+than extra model layers. References to E identify module topology; they do not
+indicate cross-module parameter sharing.
 
 ## Reproduction and use
 
