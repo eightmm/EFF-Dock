@@ -134,15 +134,15 @@ def overview_panel(c, s):
                 c.box(x + offset, y - 0.30 + offset, w, 0.60, fill, edge=BLUE)
         c.block(x, y - 0.30, w, 0.60, text, fill)
     c.text(5.45, 10.25, "Ligand atoms", color=MUTED)
-    c.block(4.70, 9.68, 1.50, 0.34, "Linear", PALE_PEACH)
-    c.arrow([(5.45, 9.68), (5.45, 9.50)])
-    c.block(4.70, 9.16, 1.50, 0.34, "Activation (D)", PALE_PEACH)
+    c.block(4.70, 9.60, 1.50, 0.50, "Equivariant\nlinear", PALE_PEACH)
+    c.arrow([(5.45, 9.60), (5.45, 9.36)])
+    c.block(4.70, 9.02, 1.50, 0.34, "Activation (D)", PALE_PEACH)
     c.arrow([(2.05, y), (2.75, y)])
     c.arrow([(4.43, y), (4.55, y), (4.55, 9.85), (4.70, 9.85)])
-    c.line((6.20, 9.33), (6.32, 9.33))
-    c.line((6.32, 9.33), (6.32, y))
+    c.line((6.20, 9.19), (6.32, 9.19))
+    c.line((6.32, 9.19), (6.32, y))
     c.line((6.32, y), (6.45, y))
-    for branch_y, label in ((y + 0.41, "Linear"), (y - 0.41, "Self tensor product")):
+    for branch_y, label in ((y + 0.41, "Equivariant linear"), (y - 0.41, "Self tensor product")):
         c.arrow([(6.45, y), (6.45, branch_y), (6.65, branch_y)])
         c.block(6.65, branch_y - 0.19, 1.80, 0.38, label, PALE_PEACH)
         end = y + 0.10 if branch_y > y else y - 0.10
@@ -214,9 +214,9 @@ def interaction_panel(c, s):
     modules = (
         (0.75, 1.10, "RMSNorm\n(D)", PALE_VIOLET),
         (2.50, 1.65, "Equivariant\nconvolution (C)", PALE_BLUE),
-        (4.85, 0.70, "Linear", PALE_GRAY),
-        (5.85, 1.10, "Activation\n(D)", PALE_BLUE),
-        (7.30, 1.25, "Channel\ndropout", PALE_GRAY),
+        (4.78, 1.22, "Equivariant\nlinear", PALE_GRAY),
+        (6.20, 1.10, "Activation\n(D)", PALE_BLUE),
+        (7.50, 1.05, "Channel\ndropout", PALE_GRAY),
     )
     previous = None
     for x, w, label, fill in modules:
@@ -233,8 +233,8 @@ def interaction_panel(c, s):
     c.arrow([(0.60, y), (0.60, 5.83), (8.93, 5.83), (8.93, y + 0.10)], color=BLUE, lw=1.2)
     c.junction(0.60, y, BLUE)
     c.text(4.76, 6.05, "Identity skip", color=MUTED)
-    c.text(6.70, 4.70, "Equivariant block", color=MUTED)
-    c.ax.plot([4.85, 4.85, 8.55, 8.55], [4.90, 4.83, 4.83, 4.90], color=LINE, lw=0.65)
+    c.text(6.665, 4.70, "Post-convolution transform", color=MUTED)
+    c.ax.plot([4.78, 4.78, 8.55, 8.55], [4.90, 4.83, 4.83, 4.90], color=LINE, lw=0.65)
     c.text(2.175, 5.42, r"$\mathbf{h}_{\mathrm{in}}$", color=MUTED)
     c.text(4.50, 5.42, r"$\mathbf{h}_{\mathrm{conv}}$", color=MUTED)
     c.text(10.15, 5.94, r"$\mathbf{c}$", color=MUTED)
@@ -293,7 +293,7 @@ def operations_panel(c, s):
     c.arrow([(10.60, 3.87), (10.60, 3.72)], color=VIOLET)
     c.block(7.15, 3.20, 1.60, 0.52, "RMSNorm", PALE_VIOLET)
     c.block(9.65, 3.20, 1.95, 0.52,
-            "Linear projection\n" + r"$\gamma_0,\,\beta_0,\,\gamma_{>0}$", PALE_VIOLET)
+            "Scalar linear\n" + r"$\gamma_0,\,\beta_0,\,\gamma_{>0}$", PALE_VIOLET)
     c.arrow([(7.95, 3.20), (7.95, 2.95)])
     c.text(7.63, 3.08, r"$\hat{\mathbf{h}}$", size=13)
     c.arrow([(10.60, 3.20), (10.60, 2.95)], color=VIOLET)
@@ -311,7 +311,7 @@ def operations_panel(c, s):
                             (equation, (7.38, y, 4.37, 0.55))))
     c.arrow([(9.185, 1.85), (9.185, 1.65)])
     c.text(9.185, 1.48, r"$\mathbf{h}'$", size=13)
-    c.text(6.55, 1.38, "Activation", bold=True, ha="left")
+    c.text(6.55, 1.38, "Equivariant activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
     c.text(6.53, ya, r"$\mathbf{h}_0$", size=13)
     c.arrow([(6.78, ya), (7.13, ya)])

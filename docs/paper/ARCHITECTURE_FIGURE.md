@@ -11,8 +11,8 @@ post-refinement and training objectives are outside its scope.
 ## Manuscript caption
 
 **EFF-Dock architecture and equivariant building blocks.**
-**A**, Six docking interaction layers feed a ligand-atom linear stage followed
-by activation. Subsequent linear and self-tensor-product outputs are added. Newton–Euler readout branches into a
+**A**, Six docking interaction layers feed a ligand-atom equivariant linear stage followed
+by activation. Subsequent equivariant linear and self-tensor-product outputs are added. Newton–Euler readout branches into a
 per-fragment mean for translational velocity and a torque followed by the
 inertia pseudo-inverse for angular velocity. The interaction states contain
 irreducible features of degrees ℓ = 0, 1 and 2 (scalar, vector and rank-2
@@ -27,7 +27,9 @@ by a learned scalar coefficient α and added to the confidence embedding.
 Docking conditions on additive time and log-prior-scale embeddings; confidence
 uses c = 0. **B**, The interaction layer applies pre-message RMSNorm,
 equivariant convolution, followed by separate equivariant linear, activation
-and channel-dropout stages. The original input follows one identity skip, added before AdaLN.
+and channel-dropout stages. The bracket labels this post-convolution transform by its role; convolution
+itself is also equivariant. The original input follows one identity skip,
+added before AdaLN.
 **C**, The convolution maps normalized node features h_in to aggregated node
 features h_conv, using input radial scaling, a shared tensor product
 with spherical harmonics through degree two, output radial scaling, activation
@@ -40,7 +42,7 @@ own RMSNorm and condition-dependent scalar affine modulation or bounded
 non-scalar scaling. The two degree-specific equations occupy separately labeled
 ℓ = 0 and ℓ > 0 rows within one modulation box. Feature and conditioning
 streams enter from above, and the complete feature
-output leaves below. The Linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
+output leaves below. The scalar linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
 The symbol ⊙ denotes channelwise multiplication, with each non-scalar scale
 broadcast over its irrep components.
 RMSNorm acts separately within each (degree, parity) block;
@@ -64,6 +66,26 @@ Bold c is the conditioning vector. γ and β are its channelwise modulation
 parameters; g denotes feature-dependent activation gates and α the learned
 coefficient for docking-state input to confidence. Diagram labels use this h
 notation for all degree classes, without separate s/u feature variables.
+
+## Linear and equivariance labels
+
+| Figure location | Label | Implementation and representation |
+|---|---|---|
+| A, ligand-atom preprocessing | Equivariant linear | `atom_head_pre`: `cuet.Linear`; mixes compatible degree/parity channels, retains ℓ = 0, 1, 2 |
+| A, branch beside self tensor product | Equivariant linear | `f_atom_linear`: `cuet.Linear` to one 1o vector; direct linear paths use compatible 1o inputs |
+| B, after convolution | Equivariant linear | `post_block.linear`: `cuet.Linear` over the full mixed-irrep state |
+| D, condition projection | Scalar linear | `cond`: `nn.Linear` on invariant conditioning; outputs γ₀, β₀ and γ_{>0} |
+| A/C/D, MLPs | MLP | Ordinary `nn.Linear` on invariant scalar descriptors, pooled features or channel norms |
+
+“Equivariant linear” here denotes a mixed-irrep linear map with weights shared
+across the spatial components of each irrep. Different degrees/parities do not
+mix through this linear map. The scalar projections also respect the symmetry
+of their invariant inputs; “scalar” does not mean that they break equivariance.
+The self tensor product supplies degree-coupling paths absent from the linear
+vector readout. Channel dropout shares its mask across irrep components and is
+disabled for inference. The panel-D activation reference in A/B/C denotes the
+equivariant scalar-SiLU/non-scalar-gating operation, not scalar-only SiLU on all
+feature components. These labels were checked against the source paths below.
 
 ## Panel definitions and implementation audit
 
@@ -243,10 +265,13 @@ the same operation type, not tied weights.
 MLP inputs are invariant scalar quantities (ℓ = 0): edge features,
 non-scalar channel norms, or pooled/projected invariant confidence features.
 Their outputs parameterize equivariant scaling or produce invariant readouts.
-These MLPs use ordinary scalar linear layers. B's Linear instead mixes
+These MLPs use ordinary scalar linear layers. B's Equivariant linear instead mixes
 multiplicity channels within compatible irreps, followed by the equivariant
-activation in D and channel dropout. The bracket in B identifies the deployed
-`EquivariantBlock` without introducing another internal residual.
+activation in D and channel dropout. The bracket in B is labeled “Post-convolution transform” and corresponds to
+the deployed `EquivariantBlock` class. It describes where those three operations
+occur, not a boundary between equivariant and non-equivariant processing.
+Convolution, the post transform, RMSNorm and AdaLN are all equivariant; there
+is no additional internal residual.
 
 The radial MLP uses a shared `Linear(1020,128) → SiLU` trunk and two independent
 `Linear(128,480)` heads. Its outputs are δ_in and δ_out; C's radial scales
