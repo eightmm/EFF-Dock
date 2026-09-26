@@ -53,7 +53,12 @@ T-junctions mark branches, + denotes addition, × denotes multiplication and “
 denotes concatenation. α is a learned scalar parameter; g is feature-dependent. Bold h denotes
 node features, hats denote normalized features, and subscripts 0 and >0 select
 degree classes. Bold c denotes conditioning. B and C use the same h_in/h_conv
-labels at the convolution interfaces.
+labels at the convolution interfaces. **E**, An equivariant linear map mixes
+channels independently within each degree/parity block (ℓ,p). One weight matrix
+is applied to every irrep component. The illustration uses three input channels,
+two output channels and ℓ = 1 (three components); these counts illustrate the
+operation and are not model widths or measured activations. Columns of matching
+color denote the same component in the input and output.
 
 ## Notation
 
@@ -95,6 +100,7 @@ feature components. These labels were checked against the source paths below.
 | B | Pre-norm → convolution → post transform → residual → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [EquivariantBlock](../../src/effdock/models/equivariant.py) |
 | C | Input scale → tensor product → output scale → activation → gated aggregation | [GatedEquivariantConv](../../src/effdock/models/equivariant.py) |
 | D | AdaLN with its own RMSNorm; scalar SiLU and norm-derived non-scalar gates | [EquivariantRMSNorm, EquivariantAdaLN, EquivariantActivation](../../src/effdock/models/equivariant.py) |
+| E | Channel mixing independently within each degree/parity block | [EquivariantBlock](../../src/effdock/models/equivariant.py), [atom-head maps](../../src/effdock/models/effdock.py) |
 
 Released settings are taken from the [docking config](../../configs/train_early_time_ft_50k.yaml)
 and [confidence config](../../configs/train_confidence_s50_raw_refined_100k.yaml).
@@ -259,6 +265,50 @@ one gate over all 2ℓ+1 components of each channel. Norms are used to calculate
 the gate, not substituted for the original input. The message activation and
 post-linear activation use separate parameters; their panel-D references denote
 the same operation type, not tied weights.
+
+### E. Equivariant linear
+
+For one node and fixed degree/parity (ℓ,p), arrange the feature block as
+`h_{ℓ,p} ∈ R^(C_in × (2ℓ+1))`. The linear map is
+`h'_{ℓ,p} = W_{ℓ,p} h_{ℓ,p}`, with
+`W_{ℓ,p} ∈ R^(C_out × C_in)`. Rows are channels and columns are spatial
+components. The same matrix acts on every component, while different
+(ℓ,p) blocks have independent weights. The effective W includes the library's
+path normalization; it is not necessarily a raw parameter reshape.
+
+The grid is an illustrative ℓ = 1 example (3 input channels → 2 output
+channels); colored columns identify corresponding components, not their values.
+The operation also applies to ℓ = 0 (one component) and ℓ = 2 (five components).
+It neither arbitrarily mixes spatial components nor changes degree or parity.
+The deployed `cuet.Linear` calls use internal shared weights and no additive
+bias. For the atom-vector readout, only compatible 1o input channels have a
+direct linear path to the single 1o output; the parallel self tensor product
+provides additional degree-coupling paths. References to E denote the operation
+type, not weights shared across separate layers or heads.
+
+### Full diagram audit (2026-09-26)
+
+The released source/config hashes were rechecked alongside these paths:
+
+- A: six/four independent interaction layers; atom-head linear/activation,
+  parallel linear/self tensor product, mean and torque/inertia readout;
+  candidate-specific t = 1 confidence features and both contact injections.
+- B: pre-RMSNorm, convolution, post transform, one original-input residual,
+  then AdaLN. The post-transform bracket denotes execution order, not the
+  extent of equivariance.
+- C: 1 + δ radial factors, shared tensor product, activation, separate
+  sigmoid gate and distance decay. Additional channel gates and degree-grouped
+  norm rescaling remain explicitly documented inside aggregation. The current
+  forward returns the aggregate directly; an old class-docstring reference to
+  a self-linear residual is stale and is not depicted as an extra model stage.
+- D: blockwise RMSNorm, scalar condition projection, exact degree-wise
+  modulation, scalar SiLU and norm-derived non-scalar activation gates.
+- E: mixed-irrep channel maps at all three depicted call sites. The installed
+  `cuequivariance_torch.operations.linear.Linear` constructor and its linear
+  descriptor were inspected for component sharing and absence of bias.
+
+This is a source and schematic audit, not a new numerical equivariance test or
+model evaluation. No trained model or benchmark result was changed.
 
 ### MLP implementation details
 

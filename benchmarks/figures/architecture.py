@@ -15,7 +15,8 @@ from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / "benchmarks/results/paper/architecture/spec.json"
 NAME = "Fig2_architecture"
-WIDTH, HEIGHT = 12.0, 11.0
+WIDTH, HEIGHT = 12.0, 14.05
+BOTTOM, TOP = -3.05, 11.0
 INK, MUTED, LINE = "#252525", "#666666", "#666666"
 BLUE, MINT, PEACH, VIOLET = "#70A9CA", "#71AD9B", "#DCA179", "#A895C4"
 PALE_GRAY = "#F2F3F4"
@@ -38,7 +39,7 @@ class Canvas:
     def __init__(self):
         self.fig = plt.figure(figsize=(WIDTH, HEIGHT))
         self.ax = self.fig.add_axes((0, 0, 1, 1))
-        self.ax.set(xlim=(0, WIDTH), ylim=(0, HEIGHT), aspect="equal")
+        self.ax.set(xlim=(0, WIDTH), ylim=(BOTTOM, TOP), aspect="equal")
         self.ax.set_axis_off()
         self.texts = []
         self.box_texts = []
@@ -134,7 +135,7 @@ def overview_panel(c, s):
                 c.box(x + offset, y - 0.30 + offset, w, 0.60, fill, edge=BLUE)
         c.block(x, y - 0.30, w, 0.60, text, fill)
     c.text(5.45, 10.25, "Ligand atoms", color=MUTED)
-    c.block(4.70, 9.60, 1.50, 0.50, "Equivariant\nlinear", PALE_PEACH)
+    c.block(4.70, 9.60, 1.50, 0.50, "Equivariant\nlinear (E)", PALE_PEACH)
     c.arrow([(5.45, 9.60), (5.45, 9.36)])
     c.block(4.70, 9.02, 1.50, 0.34, "Activation (D)", PALE_PEACH)
     c.arrow([(2.05, y), (2.75, y)])
@@ -214,7 +215,7 @@ def interaction_panel(c, s):
     modules = (
         (0.75, 1.10, "RMSNorm\n(D)", PALE_VIOLET),
         (2.50, 1.65, "Equivariant\nconvolution (C)", PALE_BLUE),
-        (4.78, 1.22, "Equivariant\nlinear", PALE_GRAY),
+        (4.78, 1.22, "Equivariant\nlinear (E)", PALE_GRAY),
         (6.20, 1.10, "Activation\n(D)", PALE_BLUE),
         (7.50, 1.05, "Channel\ndropout", PALE_GRAY),
     )
@@ -330,12 +331,38 @@ def operations_panel(c, s):
     c.text(11.02, yb, r"$\mathbf{h}'_{>0}$", size=13)
 
 
+def linear_panel(c):
+    c.panel(0.20, -0.18, "E", "Equivariant linear")
+    c.text(9.55, -0.38, r"Illustrative $\ell=1$ block", color=MUTED)
+    # Schematic dimensions: 3 input channels, 2 output channels, 3 components.
+    cell = 0.36
+    colors = (PALE_BLUE, PALE_MINT, PALE_PEACH)
+    for x, rows, weights in ((1.20, 2, True), (4.20, 3, False), (7.20, 2, False)):
+        top = -1.69 + rows * cell / 2
+        for row in range(rows):
+            for col in range(3):
+                c.box(x + col * cell, top - (row + 1) * cell,
+                      cell, cell, PALE_GRAY if weights else colors[col], radius=0)
+    for x, label in ((1.74, "Channel weights"), (4.74, "Input features"), (7.74, "Output features")):
+        c.text(x, -0.91, label)
+    c.text(3.15, -1.69, r"$\times$", size=18)
+    c.text(6.15, -1.69, r"$=$", size=18)
+    c.text(3.89, -1.69, "Channels", rotation=90)
+    c.text(4.74, -2.40, "Components", color=MUTED)
+    c.text(1.74, -2.31, r"$W_{\ell,p}$", size=13)
+    c.text(7.74, -2.31, r"$\mathbf{h}'_{\ell,p}$", size=13)
+    c.text(10.05, -1.41, "Same weights across\nall components", color=MUTED)
+    c.text(10.05, -2.14, r"Independent weights" + "\n" + r"for each $(\ell,p)$", color=MUTED)
+    c.text(4.74, -2.79, r"$\mathbf{h}'_{\ell,p}=W_{\ell,p}\,\mathbf{h}_{\ell,p}$", size=13)
+
+
 def compose(spec):
     c = Canvas()
     overview_panel(c, spec)
     interaction_panel(c, spec)
     convolution_panel(c, spec)
     operations_panel(c, spec)
+    linear_panel(c)
     return c
 
 
