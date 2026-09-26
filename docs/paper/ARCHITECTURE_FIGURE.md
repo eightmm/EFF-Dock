@@ -11,8 +11,8 @@ post-refinement and training objectives are outside its scope.
 ## Manuscript caption
 
 **EFF-Dock architecture and equivariant building blocks.**
-**A**, Six docking interaction layers feed a ligand-atom head whose linear and
-self-tensor-product outputs are added. Newton–Euler readout branches into a
+**A**, Six docking interaction layers feed a ligand-atom linear stage followed
+by activation. Subsequent linear and self-tensor-product outputs are added. Newton–Euler readout branches into a
 per-fragment mean for translational velocity and a torque followed by the
 inertia pseudo-inverse for angular velocity. The interaction states contain
 irreducible features of degrees ℓ = 0, 1 and 2 (scalar, vector and rank-2
@@ -37,8 +37,9 @@ shared edge gate passes through sigmoid and is multiplied by a separately
 computed, edge-type-dependent distance decay exp(−dᵢⱼ/σ_type) before aggregation.
 The radial-scale boxes show the residual scale factors 1 + δ_in and 1 + δ_out. **D**, AdaLN applies its
 own RMSNorm and condition-dependent scalar affine modulation or bounded
-non-scalar scaling. The two degree-specific equations share a modulation box;
-feature and conditioning streams enter from above, and the complete feature
+non-scalar scaling. The two degree-specific equations occupy separately labeled
+ℓ = 0 and ℓ > 0 rows within one modulation box. Feature and conditioning
+streams enter from above, and the complete feature
 output leaves below. The Linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
 The symbol ⊙ denotes channelwise multiplication, with each non-scalar scale
 broadcast over its irrep components.
@@ -206,7 +207,7 @@ AdaLN has its own RMSNorm, distinct from the pre-message RMSNorm in panel B.
 The condition passes through one linear projection, producing gamma_0, beta_0
 and gamma_{>0}. Panel D flows from top to bottom: h passes through RMSNorm,
 c through the conditioning projection, and both enter a common modulation box.
-The two equations show the scale-and-shift rule for ℓ = 0 and the bounded
+The two labeled rows show the scale-and-shift rule for ℓ = 0 and the bounded
 1 + 0.1 tanh(γ) scale for ℓ > 0. They apply to separate degree classes,
 not sequentially to the same channels. The output h′ contains both degree
 classes; the projection lists the three modulation-parameter groups explicitly.

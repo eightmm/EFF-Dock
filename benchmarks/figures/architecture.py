@@ -128,16 +128,20 @@ def overview_panel(c, s):
     for x, w, text, fill in (
         (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
         (2.75, 1.60, f"Interaction layer\n×{s['docking_layers']}  (B)", PALE_BLUE),
-        (4.70, 1.50, "Linear →\nActivation (D)", PALE_PEACH),
     ):
         if text.startswith("Interaction layer"):
             for offset in (0.08, 0.04):
                 c.box(x + offset, y - 0.30 + offset, w, 0.60, fill, edge=BLUE)
         c.block(x, y - 0.30, w, 0.60, text, fill)
-    c.text(5.45, 10.10, "Ligand atoms", color=MUTED)
+    c.text(5.45, 10.25, "Ligand atoms", color=MUTED)
+    c.block(4.70, 9.68, 1.50, 0.34, "Linear", PALE_PEACH)
+    c.arrow([(5.45, 9.68), (5.45, 9.50)])
+    c.block(4.70, 9.16, 1.50, 0.34, "Activation (D)", PALE_PEACH)
     c.arrow([(2.05, y), (2.75, y)])
-    c.arrow([(4.43, y), (4.70, y)])
-    c.line((6.20, y), (6.45, y))
+    c.arrow([(4.43, y), (4.55, y), (4.55, 9.85), (4.70, 9.85)])
+    c.line((6.20, 9.33), (6.32, 9.33))
+    c.line((6.32, 9.33), (6.32, y))
+    c.line((6.32, y), (6.45, y))
     for branch_y, label in ((y + 0.41, "Linear"), (y - 0.41, "Self tensor product")):
         c.arrow([(6.45, y), (6.45, branch_y), (6.65, branch_y)])
         c.block(6.65, branch_y - 0.19, 1.80, 0.38, label, PALE_PEACH)
@@ -203,8 +207,8 @@ def overview_panel(c, s):
 
 
 def interaction_panel(c, s):
-    c.panel(0.20, 6.10, "B", "Interaction layer")
-    y = 4.95
+    c.panel(0.20, 6.38, "B", "Interaction layer")
+    y = 5.23
     c.text(0.25, y, r"$\mathbf{h}^{(k)}$", size=13)
     c.arrow([(0.48, y), (0.75, y)])
     modules = (
@@ -226,25 +230,25 @@ def interaction_panel(c, s):
     c.block(9.50, y - 0.30, 1.30, 0.60, "AdaLN\n(D)", PALE_VIOLET)
     c.arrow([(10.80, y), (11.16, y)])
     c.text(11.50, y, r"$\mathbf{h}^{(k+1)}$", size=13)
-    c.arrow([(0.60, y), (0.60, 5.55), (8.93, 5.55), (8.93, y + 0.10)], color=BLUE, lw=1.2)
+    c.arrow([(0.60, y), (0.60, 5.83), (8.93, 5.83), (8.93, y + 0.10)], color=BLUE, lw=1.2)
     c.junction(0.60, y, BLUE)
-    c.text(4.76, 5.77, "Identity skip", color=MUTED)
-    c.text(6.70, 4.42, "Equivariant block", color=MUTED)
-    c.ax.plot([4.85, 4.85, 8.55, 8.55], [4.62, 4.55, 4.55, 4.62], color=LINE, lw=0.65)
-    c.text(2.175, 5.14, r"$\mathbf{h}_{\mathrm{in}}$", color=MUTED)
-    c.text(4.50, 5.14, r"$\mathbf{h}_{\mathrm{conv}}$", color=MUTED)
-    c.text(10.15, 5.66, r"$\mathbf{c}$", color=MUTED)
-    c.arrow([(10.15, 5.48), (10.15, 5.25)], color=VIOLET)
+    c.text(4.76, 6.05, "Identity skip", color=MUTED)
+    c.text(6.70, 4.70, "Equivariant block", color=MUTED)
+    c.ax.plot([4.85, 4.85, 8.55, 8.55], [4.90, 4.83, 4.83, 4.90], color=LINE, lw=0.65)
+    c.text(2.175, 5.42, r"$\mathbf{h}_{\mathrm{in}}$", color=MUTED)
+    c.text(4.50, 5.42, r"$\mathbf{h}_{\mathrm{conv}}$", color=MUTED)
+    c.text(10.15, 5.94, r"$\mathbf{c}$", color=MUTED)
+    c.arrow([(10.15, 5.76), (10.15, 5.53)], color=VIOLET)
 
 
 def convolution_panel(c, s):
-    c.panel(0.20, 4.15, "C", "Equivariant convolution")
+    c.panel(0.20, 4.45, "C", "Equivariant convolution")
     x, w, mid = 3.05, 2.50, 4.30
-    c.text(mid, 3.71, r"$\mathbf{h}_{\mathrm{in}}$", size=13)
-    c.arrow([(mid, 3.54), (mid, 3.38)])
+    c.text(mid, 4.01, r"$\mathbf{h}_{\mathrm{in}}$", size=13)
+    c.arrow([(mid, 3.84), (mid, 3.68)])
     modules = [
-        (3.03, 0.35, r"Input scale: $1+\delta_{\mathrm{in}}$"),
-        (2.28, 0.58, "Shared tensor product\n" + r"$\otimes\,Y_{\ell\leq2}(\hat r_{ij})$"),
+        (3.33, 0.35, r"Input scale: $1+\delta_{\mathrm{in}}$"),
+        (2.43, 0.58, "Shared tensor product\n" + r"$\otimes\,Y_{\ell\leq2}(\hat r_{ij})$"),
         (1.76, 0.35, r"Output scale: $1+\delta_{\mathrm{out}}$"),
         (1.24, 0.35, "Activation  (D)"),
         (0.55, 0.52, "Gate-normalized\naggregation"),
@@ -257,16 +261,16 @@ def convolution_panel(c, s):
         previous = y
     c.arrow([(mid, 0.55), (mid, 0.38)])
     c.text(mid, 0.20, r"$\mathbf{h}_{\mathrm{conv}}$", size=13)
-    c.text(1.43, 3.43, "Edge descriptors\n" + r"$\hat{\mathbf{h}}_{i,0},\,\hat{\mathbf{h}}_{j,0},\,\mathbf{c}$", color=MUTED)
-    c.arrow([(1.43, 3.08), (1.43, 2.85)])
-    c.block(0.48, 2.37, 1.90, 0.48, "Radial MLP", PALE_MINT)
-    c.line((2.38, 2.61), (2.65, 2.61))
-    c.arrow([(2.65, 2.61), (2.65, 3.205), (3.05, 3.205)])
-    c.arrow([(2.65, 2.61), (2.65, 1.935), (3.05, 1.935)])
-    c.junction(2.65, 2.61)
-    c.line((1.43, 2.98), (0.25, 2.98))
-    c.line((0.25, 2.98), (0.25, 0.375))
-    c.junction(1.43, 2.98)
+    c.text(1.43, 3.73, "Edge descriptors\n" + r"$\hat{\mathbf{h}}_{i,0},\,\hat{\mathbf{h}}_{j,0},\,\mathbf{c}$", color=MUTED)
+    c.arrow([(1.43, 3.38), (1.43, 3.00)])
+    c.block(0.48, 2.52, 1.90, 0.48, "Radial MLP", PALE_MINT)
+    c.line((2.38, 2.76), (2.65, 2.76))
+    c.arrow([(2.65, 2.76), (2.65, 3.505), (3.05, 3.505)])
+    c.arrow([(2.65, 2.76), (2.65, 1.935), (3.05, 1.935)])
+    c.junction(2.65, 2.76)
+    c.line((1.43, 3.13), (0.25, 3.13))
+    c.line((0.25, 3.13), (0.25, 0.375))
+    c.junction(1.43, 3.13)
     c.junction(0.25, 1.95)
     c.arrow([(0.25, 1.95), (0.48, 1.95)])
     c.block(0.48, 1.76, 1.90, 0.38, "Gate MLP", PALE_MINT)
@@ -281,26 +285,32 @@ def convolution_panel(c, s):
 
 
 def operations_panel(c, s):
-    c.panel(6.10, 4.15, "D", "Normalization and activation")
-    c.text(6.55, 3.53, "AdaLN", bold=True, ha="left")
-    c.text(7.95, 3.64, r"$\mathbf{h}$", size=13)
-    c.text(10.60, 3.64, r"$\mathbf{c}$", size=13)
-    c.arrow([(7.95, 3.51), (7.95, 3.40)])
-    c.arrow([(10.60, 3.51), (10.60, 3.40)], color=VIOLET)
-    c.block(7.15, 2.88, 1.60, 0.52, "RMSNorm", PALE_VIOLET)
-    c.block(9.65, 2.88, 1.95, 0.52,
+    c.panel(6.10, 4.45, "D", "Normalization and activation")
+    c.text(6.55, 3.92, "AdaLN", bold=True, ha="left")
+    c.text(7.95, 4.00, r"$\mathbf{h}$", size=13)
+    c.text(10.60, 4.00, r"$\mathbf{c}$", size=13)
+    c.arrow([(7.95, 3.87), (7.95, 3.72)])
+    c.arrow([(10.60, 3.87), (10.60, 3.72)], color=VIOLET)
+    c.block(7.15, 3.20, 1.60, 0.52, "RMSNorm", PALE_VIOLET)
+    c.block(9.65, 3.20, 1.95, 0.52,
             "Linear projection\n" + r"$\gamma_0,\,\beta_0,\,\gamma_{>0}$", PALE_VIOLET)
-    c.arrow([(7.95, 2.88), (7.95, 2.56)])
-    c.text(7.63, 2.72, r"$\hat{\mathbf{h}}$", size=13)
-    c.arrow([(10.60, 2.88), (10.60, 2.56)], color=VIOLET)
-    c.block(
-        6.80, 1.81, 4.80, 0.75,
-        r"$\mathbf{h}'_0=(1+\gamma_0)\odot\hat{\mathbf{h}}_0+\beta_0$"
-        + "\n" + r"$\mathbf{h}'_{>0}=[1+0.1\tanh(\gamma_{>0})]\odot\hat{\mathbf{h}}_{>0}$",
-        PALE_VIOLET,
-    )
-    c.arrow([(9.20, 1.81), (9.20, 1.65)])
-    c.text(9.20, 1.48, r"$\mathbf{h}'$", size=13)
+    c.arrow([(7.95, 3.20), (7.95, 2.95)])
+    c.text(7.63, 3.08, r"$\hat{\mathbf{h}}$", size=13)
+    c.arrow([(10.60, 3.20), (10.60, 2.95)], color=VIOLET)
+    # A shared boundary groups mutually exclusive degree rules, not serial stages.
+    c.box(6.62, 1.85, 5.13, 1.10, PALE_VIOLET)
+    c.ax.plot([6.62, 11.75], [2.40, 2.40], color="#858585", lw=0.65)
+    c.ax.plot([7.38, 7.38], [1.85, 2.95], color="#858585", lw=0.65)
+    for y, degree, formula in (
+        (2.40, r"$\ell=0$", r"$\mathbf{h}'_0=(1+\gamma_0)\odot\hat{\mathbf{h}}_0+\beta_0$"),
+        (1.85, r"$\ell>0$", r"$\mathbf{h}'_{>0}=[1+0.1\tanh(\gamma_{>0})]\odot\hat{\mathbf{h}}_{>0}$"),
+    ):
+        label = c.text(7.00, y + 0.275, degree)
+        equation = c.text(9.565, y + 0.275, formula, size=13)
+        c.box_texts.extend(((label, (6.62, y, 0.76, 0.55)),
+                            (equation, (7.38, y, 4.37, 0.55))))
+    c.arrow([(9.185, 1.85), (9.185, 1.65)])
+    c.text(9.185, 1.48, r"$\mathbf{h}'$", size=13)
     c.text(6.55, 1.38, "Activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
     c.text(6.53, ya, r"$\mathbf{h}_0$", size=13)
