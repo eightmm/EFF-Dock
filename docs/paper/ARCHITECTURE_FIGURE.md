@@ -47,8 +47,9 @@ The radial-scale boxes show the residual scale factors 1 + δ_in and 1 + δ_out.
 own RMSNorm and condition-dependent scalar affine modulation or bounded
 non-scalar scaling. The two degree-specific equations occupy separately labeled
 ℓ = 0 and ℓ > 0 rows within one modulation box. Feature and conditioning
-streams enter from above, and the complete feature
-output leaves below, labeled beside its arrow. The activation schematic underneath
+streams enter from above. A common bottom row defines the complete output
+h′ = h′₀ ⊕ h′₍>₀₎, retaining both degree subsets in the output representation.
+The activation schematic underneath
 is a separate reusable operation, not a stage appended to AdaLN.
 The RMSNorm box defines h → hhat internally, leaving the connector to modulation
 clear. The scalar linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
@@ -243,7 +244,10 @@ c through the conditioning projection, and both enter a common modulation box.
 The two labeled rows show the scale-and-shift rule for ℓ = 0 and the bounded
 1 + 0.1 tanh(γ) scale for ℓ > 0. They apply to separate degree classes,
 not sequentially to the same channels. The output h′ contains both degree
-classes; the projection lists the three modulation-parameter groups explicitly.
+classes, as shown in the common output row h′ = h′₀ ⊕ h′₍>₀₎. The ⊕ symbol
+denotes assembly of feature blocks in the existing irrep layout, not elementwise
+addition, an extra learned layer, or a sequential application of the two rules.
+The projection lists the three modulation-parameter groups explicitly.
 Normalized features follow two branches:
 
 - ℓ = 0: `h'_0 = (1 + gamma_0) * hhat_0 + beta_0`.
@@ -388,8 +392,9 @@ equivariance test. No model or checkpoint was changed.
 | D | Blockwise RMSNorm; scalar affine rule; bounded non-scalar scaling; scalar SiLU and norm-derived gates | AdaLN and activation are separate operations. ℓ=0 denotes 0e in this model. The two modulation rows act on different feature subsets in parallel. |
 
 Panel D was aligned so both activation input/output labels share the same
-horizontal anchors. The AdaLN output label now sits beside its terminal arrow,
-with separation from the activation heading. The hhat definition was moved
+horizontal anchors. The AdaLN output is defined inside a full-width footer
+below both modulation rows, with no dangling output arrow beside the separate
+activation heading. The hhat definition was moved
 inside the RMSNorm box, and the parallel condition-projection box has matching
 height. Its operations and formulas did not change.
 

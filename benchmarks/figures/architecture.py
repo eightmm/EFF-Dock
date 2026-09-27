@@ -294,22 +294,23 @@ def operations_panel(c, s):
     c.block(7.15, 3.16, 1.60, 0.64, "RMSNorm\n" + r"$\mathbf{h}\;\mapsto\;\hat{\mathbf{h}}$", PALE_VIOLET)
     c.block(9.65, 3.16, 1.95, 0.64,
             "Scalar linear\n" + r"$\gamma_0,\,\beta_0,\,\gamma_{>0}$", PALE_VIOLET)
-    c.arrow([(7.95, 3.16), (7.95, 2.95)])
-    c.arrow([(10.60, 3.16), (10.60, 2.95)], color=VIOLET)
+    c.arrow([(7.95, 3.16), (7.95, 3.05)])
+    c.arrow([(10.60, 3.16), (10.60, 3.05)], color=VIOLET)
     # A shared boundary groups mutually exclusive degree rules, not serial stages.
-    c.box(6.62, 1.85, 5.13, 1.10, PALE_VIOLET)
-    c.ax.plot([6.62, 11.75], [2.40, 2.40], color="#858585", lw=0.65)
-    c.ax.plot([7.38, 7.38], [1.85, 2.95], color="#858585", lw=0.65)
+    c.box(6.62, 1.62, 5.13, 1.43, PALE_VIOLET)
+    c.ax.plot([6.62, 11.75], [2.50, 2.50], color="#858585", lw=0.65)
+    c.ax.plot([6.62, 11.75], [1.95, 1.95], color="#858585", lw=0.65)
+    c.ax.plot([7.38, 7.38], [1.95, 3.05], color="#858585", lw=0.65)
     for y, degree, formula in (
-        (2.40, r"$\ell=0$", r"$\mathbf{h}'_0=(1+\gamma_0)\odot\hat{\mathbf{h}}_0+\beta_0$"),
-        (1.85, r"$\ell>0$", r"$\mathbf{h}'_{>0}=[1+0.1\tanh(\gamma_{>0})]\odot\hat{\mathbf{h}}_{>0}$"),
+        (2.50, r"$\ell=0$", r"$\mathbf{h}'_0=(1+\gamma_0)\odot\hat{\mathbf{h}}_0+\beta_0$"),
+        (1.95, r"$\ell>0$", r"$\mathbf{h}'_{>0}=[1+0.1\tanh(\gamma_{>0})]\odot\hat{\mathbf{h}}_{>0}$"),
     ):
         label = c.text(7.00, y + 0.275, degree)
         equation = c.text(9.565, y + 0.275, formula, size=13)
         c.box_texts.extend(((label, (6.62, y, 0.76, 0.55)),
                             (equation, (7.38, y, 4.37, 0.55))))
-    c.arrow([(9.185, 1.85), (9.185, 1.65)])
-    c.text(9.51, 1.70, r"$\mathbf{h}'$", size=13)
+    output = c.text(9.185, 1.785, r"$\mathbf{h}'=\mathbf{h}'_0\oplus\mathbf{h}'_{>0}$", size=13)
+    c.box_texts.append((output, (6.62, 1.62, 5.13, 0.33)))
     c.text(6.55, 1.38, "Equivariant activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
     c.text(6.50, ya, r"$\mathbf{h}_0$", size=13)
