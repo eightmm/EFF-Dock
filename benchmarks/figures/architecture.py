@@ -15,8 +15,7 @@ from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / "benchmarks/results/paper/architecture/spec.json"
 NAME = "Fig2_architecture"
-WIDTH, HEIGHT = 12.0, 14.05
-BOTTOM, TOP = -3.05, 11.0
+WIDTH, HEIGHT = 12.0, 11.0
 INK, MUTED, LINE = "#252525", "#666666", "#666666"
 BLUE, MINT, PEACH, VIOLET = "#70A9CA", "#71AD9B", "#DCA179", "#A895C4"
 PALE_GRAY = "#F2F3F4"
@@ -39,7 +38,7 @@ class Canvas:
     def __init__(self):
         self.fig = plt.figure(figsize=(WIDTH, HEIGHT))
         self.ax = self.fig.add_axes((0, 0, 1, 1))
-        self.ax.set(xlim=(0, WIDTH), ylim=(BOTTOM, TOP), aspect="equal")
+        self.ax.set(xlim=(0, WIDTH), ylim=(0, HEIGHT), aspect="equal")
         self.ax.set_axis_off()
         self.texts = []
         self.box_texts = []
@@ -135,7 +134,7 @@ def overview_panel(c, s):
                 c.box(x + offset, y - 0.30 + offset, w, 0.60, fill, edge=BLUE)
         c.block(x, y - 0.30, w, 0.60, text, fill)
     c.text(5.45, 10.25, "Ligand atoms", color=MUTED)
-    c.block(4.70, 9.60, 1.50, 0.50, "Equivariant\nlinear (E)", PALE_PEACH)
+    c.block(4.70, 9.60, 1.50, 0.50, "Equivariant\nlinear", PALE_PEACH)
     c.arrow([(5.45, 9.60), (5.45, 9.36)])
     c.block(4.70, 9.02, 1.50, 0.34, "Activation (D)", PALE_PEACH)
     c.arrow([(2.05, y), (2.75, y)])
@@ -215,7 +214,7 @@ def interaction_panel(c, s):
     modules = (
         (0.75, 1.10, "RMSNorm\n(D)", PALE_VIOLET),
         (2.50, 1.65, "Equivariant\nconvolution (C)", PALE_BLUE),
-        (4.78, 1.22, "Equivariant\nlinear (E)", PALE_GRAY),
+        (4.78, 1.22, "Equivariant\nlinear", PALE_GRAY),
         (6.20, 1.10, "Activation\n(D)", PALE_BLUE),
         (7.50, 1.05, "Channel\ndropout", PALE_GRAY),
     )
@@ -331,46 +330,12 @@ def operations_panel(c, s):
     c.text(11.02, yb, r"$\mathbf{h}'_{>0}$", size=13)
 
 
-def linear_panel(c, spec):
-    c.panel(0.20, -0.18, "E", "Equivariant linear")
-    c.text(2.00, -0.87, r"Mixed input $\mathbf{h}$")
-    c.text(6.00, -0.87, "Block-diagonal map")
-    c.text(10.00, -0.87, r"Mixed output $\mathbf{h}'$")
-    irreps = list(spec["irreps"])
-    fills = (PALE_BLUE, PALE_MINT, PALE_PEACH, PALE_VIOLET, "#F6E8D8")
-    cell, cy = 0.32, -1.67
-    # Each feature tile is a whole irrep channel; multiplicities are illustrative.
-    for cx, rows in ((2.00, 2), (10.00, 3)):
-        left, top = cx - len(irreps) * cell / 2, cy + rows * cell / 2
-        for row in range(rows):
-            for col in range(len(irreps)):
-                c.box(left + col * cell, top - (row + 1) * cell,
-                      cell, cell, fills[col], radius=0)
-    weight_cell = 0.21
-    edge = len(irreps) * weight_cell / 2
-    # Each diagonal tile represents W_(ell,p) tensor I_(2ell+1), not one scalar.
-    for row in range(len(irreps)):
-        for col in range(len(irreps)):
-            c.box(6.00 - edge + col * weight_cell,
-                  cy + edge - (row + 1) * weight_cell,
-                  weight_cell, weight_cell,
-                  fills[row] if row == col else "white", radius=0)
-    c.arrow([(2.80, cy), (6.00 - edge, cy)])
-    c.arrow([(6.00 + edge, cy), (9.20, cy)])
-    for col, irrep in enumerate(irreps):
-        x = 3.05 + col * 1.15
-        c.box(x, -2.63, 0.17, 0.17, fills[col], radius=0)
-        c.text(x + 0.35, -2.545, irrep, ha="left")
-    c.text(6.00, -2.87, "Feature square: one irrep channel", color=MUTED)
-
-
 def compose(spec):
     c = Canvas()
     overview_panel(c, spec)
     interaction_panel(c, spec)
     convolution_panel(c, spec)
     operations_panel(c, spec)
-    linear_panel(c, spec)
     return c
 
 

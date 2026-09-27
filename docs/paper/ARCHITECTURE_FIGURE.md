@@ -53,13 +53,9 @@ T-junctions mark branches, + denotes addition, × denotes multiplication and “
 denotes concatenation. α is a learned scalar parameter; g is feature-dependent. Bold h denotes
 node features, hats denote normalized features, and subscripts 0 and >0 select
 degree classes. Bold c denotes conditioning. B and C use the same h_in/h_conv
-labels at the convolution interfaces. **E**, Contiguous square grids depict mixed input and output features,
-with columns colored by 0e, 1o, 1e, 2e and 2o. Each feature square denotes
-one complete irrep channel (one, three or five components for ℓ = 0, 1 or 2).
-The central grid is a symbolic block-diagonal map: each colored diagonal block
-represents W_{ℓ,p} ⊗ I_{2ℓ+1}, and blank off-diagonal blocks are zero.
-The two-input/three-output channel counts per irrep illustrate channel mixing;
-they are not the deployed model widths.
+labels at the convolution interfaces. Equivariant linear maps mix channels
+within matching degree/parity blocks, with the same weights applied to each
+spatial component.
 
 ## Notation
 
@@ -101,7 +97,6 @@ feature components. These labels were checked against the source paths below.
 | B | Pre-norm → convolution → post transform → residual → AdaLN | [EFFDockInteractionLayer](../../src/effdock/models/effdock.py), [EquivariantBlock](../../src/effdock/models/equivariant.py) |
 | C | Input scale → tensor product → output scale → activation → gated aggregation | [GatedEquivariantConv](../../src/effdock/models/equivariant.py) |
 | D | AdaLN with its own RMSNorm; scalar SiLU and norm-derived non-scalar gates | [EquivariantRMSNorm, EquivariantAdaLN, EquivariantActivation](../../src/effdock/models/equivariant.py) |
-| E | Channel mixing independently within each degree/parity block | [EquivariantBlock](../../src/effdock/models/equivariant.py), [atom-head maps](../../src/effdock/models/effdock.py) |
 
 Released settings are taken from the [docking config](../../configs/train_early_time_ft_50k.yaml)
 and [confidence config](../../configs/train_confidence_s50_raw_refined_100k.yaml).
@@ -267,42 +262,22 @@ the gate, not substituted for the original input. The message activation and
 post-linear activation use separate parameters; their panel-D references denote
 the same operation type, not tied weights.
 
-### E. Equivariant linear
+### Equivariant linear implementation
 
-For one node and fixed degree/parity (ℓ,p), arrange the feature block as
-`h_{ℓ,p} ∈ R^(C_in × (2ℓ+1))`. The linear map is
-`h'_{ℓ,p} = W_{ℓ,p} h_{ℓ,p}`, with
-`W_{ℓ,p} ∈ R^(C_out × C_in)`. Rows are channels and columns are spatial
-components. The same matrix acts on every component, while different
-(ℓ,p) blocks have independent weights. The effective W includes the library's
-path normalization; it is not necessarily a raw parameter reshape.
+For one node and fixed degree/parity (ℓ,p), write the feature block as
+`h_{ℓ,p} ∈ R^(C_in × (2ℓ+1))`. Its linear map is
+`h'_{ℓ,p} = W_{ℓ,p} h_{ℓ,p}`, where
+`W_{ℓ,p} ∈ R^(C_out × C_in)`. The same W acts on every spatial component;
+different degree/parity blocks have independent weights. The effective W
+includes library path normalization. The deployed `cuet.Linear` calls use
+internal shared weights and no additive bias. Weights are not tied across
+separate layers or heads.
 
-Panel E shows one contiguous mixed-feature grid on each side of a single
-block-diagonal map. Each column is an irrep type, in 0e/1o/1e/2e/2o order,
-and each feature square is an entire channel containing 2ℓ+1 components.
-The two input rows and three output rows are illustrative multiplicities,
-not the released widths. These tile grids are a packing schematic, not a
-literal matrix of scalar feature entries or measured activations.
-
-The central five-by-five grid is a block matrix, with one block per input/output
-irrep pair. A colored diagonal block stands for W_{ℓ,p} ⊗ I_{2ℓ+1}; a white
-off-diagonal block is zero. Diagonal blocks generally have different physical
-dimensions despite equal schematic squares. In the illustrated 2→3 channel
-case W is 3×2, so the corresponding full diagonal block is
-3(2ℓ+1) × 2(2ℓ+1). The real layer sets its own multiplicities.
-
-Under the deployed channel-major (`mul_ir`) layout, the Kronecker map is
-equivalent to the feature-matrix equation above. This Kronecker product is
-distinct from the Clebsch–Gordan tensor products in A/C. The identity factor
-shares each channel weight across components; it does not preserve feature
-values or vector directions after mixing different channels. The atom-vector
-projection requests only 1o output; the mixed-to-mixed maps shown in E retain
-all five block types. Colors indicate irrep type, not magnitude.
-The deployed `cuet.Linear` calls use internal shared weights and no additive
-bias. For the atom-vector readout, only compatible 1o input channels have a
-direct linear path to the single 1o output; the parallel self tensor product
-provides additional degree-coupling paths. References to E denote the operation
-type, not weights shared across separate layers or heads.
+The atom preprocessing and B post-convolution maps retain the mixed-irrep
+structure. The atom-vector projection requests only 1o output and directly
+uses compatible 1o inputs; its parallel self tensor product supplies additional
+degree-coupling paths. These details explain the Equivariant linear labels in
+A/B without a separate figure panel.
 
 ### Full diagram audit (2026-09-26)
 
@@ -321,7 +296,7 @@ The released source/config hashes were rechecked alongside these paths:
   a self-linear residual is stale and is not depicted as an extra model stage.
 - D: blockwise RMSNorm, scalar condition projection, exact degree-wise
   modulation, scalar SiLU and norm-derived non-scalar activation gates.
-- E: mixed-irrep channel maps at all three depicted call sites. The installed
+- Linear maps: mixed-irrep channel maps at all three depicted call sites. The installed
   `cuequivariance_torch.operations.linear.Linear` constructor and its linear
   descriptor were inspected for component sharing and absence of bias.
 
