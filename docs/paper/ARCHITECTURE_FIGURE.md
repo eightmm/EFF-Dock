@@ -55,10 +55,11 @@ node features, hats denote normalized features, and subscripts 0 and >0 select
 degree classes. Bold c denotes conditioning. B and C use the same h_in/h_conv
 labels at the convolution interfaces. **E**, An equivariant linear map mixes
 channels independently within each degree/parity block (ℓ,p). One weight matrix
-is applied to every irrep component. The illustration uses three input channels,
-two output channels and ℓ = 1 (three components); these counts illustrate the
-operation and are not model widths or measured activations. Columns of matching
-color denote the same component in the input and output.
+is applied to every irrep component. Separate illustrations show ℓ = 0, 1 and 2, with one, three and five
+components per channel, respectively. Each uses three input and two output
+channels for illustration; these are not model widths or measured activations.
+Within each degree/parity block, matching column colors identify the same
+component in the input and output. W₀,p, W₁,p and W₂,p are independent maps.
 
 ## Notation
 
@@ -276,9 +277,15 @@ components. The same matrix acts on every component, while different
 (ℓ,p) blocks have independent weights. The effective W includes the library's
 path normalization; it is not necessarily a raw parameter reshape.
 
-The grid is an illustrative ℓ = 1 example (3 input channels → 2 output
-channels); colored columns identify corresponding components, not their values.
-The operation also applies to ℓ = 0 (one component) and ℓ = 2 (five components).
+The three grids explicitly distinguish ℓ = 0 (one component), ℓ = 1
+(three components) and ℓ = 2 (five components). Each uses illustrative
+3 input channels → 2 output channels; colored columns identify corresponding
+components within a block, not their values. Scalar channel mixing is an
+ordinary linear map; for ℓ > 0 the same channel map acts on each component
+of a complete irrep. Different degree/parity blocks have independent W.
+The 0e block is the only ℓ = 0 block in the released model, while ℓ = 1
+and ℓ = 2 each have both parities. The five ℓ = 2 components form an
+irreducible rank-two representation, not an arbitrary nine-component matrix.
 It neither arbitrarily mixes spatial components nor changes degree or parity.
 The deployed `cuet.Linear` calls use internal shared weights and no additive
 bias. For the atom-vector readout, only compatible 1o input channels have a

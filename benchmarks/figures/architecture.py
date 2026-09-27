@@ -333,27 +333,26 @@ def operations_panel(c, s):
 
 def linear_panel(c):
     c.panel(0.20, -0.18, "E", "Equivariant linear")
-    c.text(9.55, -0.38, r"Illustrative $\ell=1$ block", color=MUTED)
-    # Schematic dimensions: 3 input channels, 2 output channels, 3 components.
-    cell = 0.36
-    colors = (PALE_BLUE, PALE_MINT, PALE_PEACH)
-    for x, rows, weights in ((1.20, 2, True), (4.20, 3, False), (7.20, 2, False)):
-        top = -1.69 + rows * cell / 2
-        for row in range(rows):
-            for col in range(3):
-                c.box(x + col * cell, top - (row + 1) * cell,
-                      cell, cell, PALE_GRAY if weights else colors[col], radius=0)
-    for x, label in ((1.74, "Channel weights"), (4.74, "Input features"), (7.74, "Output features")):
-        c.text(x, -0.91, label)
-    c.text(3.15, -1.69, r"$\times$", size=18)
-    c.text(6.15, -1.69, r"$=$", size=18)
-    c.text(3.89, -1.69, "Channels", rotation=90)
-    c.text(4.74, -2.40, "Components", color=MUTED)
-    c.text(1.74, -2.31, r"$W_{\ell,p}$", size=13)
-    c.text(7.74, -2.31, r"$\mathbf{h}'_{\ell,p}$", size=13)
-    c.text(10.05, -1.41, "Same weights across\nall components", color=MUTED)
-    c.text(10.05, -2.14, r"Independent weights" + "\n" + r"for each $(\ell,p)$", color=MUTED)
-    c.text(4.74, -2.79, r"$\mathbf{h}'_{\ell,p}=W_{\ell,p}\,\mathbf{h}_{\ell,p}$", size=13)
+    c.text(9.55, -0.38, r"Separate $(\ell,p)$ blocks", color=MUTED)
+    # Three input and two output channels are illustrative, not model widths.
+    cell, cy = 0.24, -1.79
+    colors = (PALE_BLUE, PALE_MINT, PALE_PEACH, PALE_VIOLET, PALE_GRAY)
+    for ell in (0, 1, 2):
+        base, components = 4.0 * ell, 2 * ell + 1
+        c.text(base + 2.00, -0.83, rf"$\ell={ell}$", bold=True, size=13)
+        for cx, rows, prime in ((base + 0.85, 3, ""), (base + 3.15, 2, "'")):
+            left, top = cx - components * cell / 2, cy + rows * cell / 2
+            c.text(cx, -1.16, rf"$\mathbf{{h}}{prime}_{{{ell},p}}$", size=13)
+            for row in range(rows):
+                for col in range(components):
+                    c.box(left + col * cell, top - (row + 1) * cell,
+                          cell, cell, colors[col], radius=0)
+        c.arrow([(base + 0.85 + components * cell / 2, cy),
+                 (base + 3.15 - components * cell / 2, cy)])
+        c.text(base + 2.00, -1.50, rf"$W_{{{ell},p}}$", size=13)
+        c.text(base + 2.00, -2.37,
+               f"{components} component" + ("s" if components > 1 else ""), color=MUTED)
+    c.text(6.00, -2.80, "Rows: channels   ·   Columns: components   ·   Same W for all columns within a block", color=MUTED)
 
 
 def compose(spec):
