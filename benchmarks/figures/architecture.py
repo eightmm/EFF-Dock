@@ -333,27 +333,35 @@ def operations_panel(c, s):
 
 def linear_panel(c, spec):
     c.panel(0.20, -0.18, "E", "Equivariant linear")
-    c.text(1.625, -0.78, r"Mixed input $\mathbf{h}$")
-    c.text(6.00, -0.78, "Channel mixing")
-    c.text(10.375, -0.78, r"Mixed output $\mathbf{h}'$")
-    colors = ((PALE_BLUE, BLUE), (PALE_MINT, MINT), (PALE_PEACH, PEACH))
-    for row, irrep in enumerate(spec["irreps"]):
-        ell = int(irrep[0])
-        components = 2 * ell + 1
-        cy = -1.15 - row * 0.38
-        pale, accent = colors[ell]
-        for x, prime in ((0.50, ""), (9.25, "'")):
-            c.box(x, cy - 0.19, 2.25, 0.38, pale, radius=0)
-            label = c.text(x + 0.50, cy, rf"$\mathbf{{h}}{prime}_{{{irrep}}}$", size=13)
-            c.box_texts.append((label, (x, cy - 0.19, 2.25, 0.38)))
-            # Tiles depict components per channel; the block includes all channels.
-            for component in range(components):
-                c.box(x + 1.05 + component * 0.18, cy - 0.10,
-                      0.18, 0.20, accent, edge="white", lw=0.65, radius=0)
-        c.arrow([(2.75, cy), (4.55, cy)])
-        c.block(4.55, cy - 0.15, 2.90, 0.30,
-                rf"$W_{{{irrep}}}\otimes I_{{{components}}}$", pale)
-        c.arrow([(7.45, cy), (9.25, cy)])
+    c.text(2.00, -0.87, r"Mixed input $\mathbf{h}$")
+    c.text(6.00, -0.87, "Block-diagonal map")
+    c.text(10.00, -0.87, r"Mixed output $\mathbf{h}'$")
+    irreps = list(spec["irreps"])
+    fills = (PALE_BLUE, PALE_MINT, PALE_PEACH, PALE_VIOLET, "#F6E8D8")
+    cell, cy = 0.32, -1.67
+    # Each feature tile is a whole irrep channel; multiplicities are illustrative.
+    for cx, rows in ((2.00, 2), (10.00, 3)):
+        left, top = cx - len(irreps) * cell / 2, cy + rows * cell / 2
+        for row in range(rows):
+            for col in range(len(irreps)):
+                c.box(left + col * cell, top - (row + 1) * cell,
+                      cell, cell, fills[col], radius=0)
+    weight_cell = 0.21
+    edge = len(irreps) * weight_cell / 2
+    # Each diagonal tile represents W_(ell,p) tensor I_(2ell+1), not one scalar.
+    for row in range(len(irreps)):
+        for col in range(len(irreps)):
+            c.box(6.00 - edge + col * weight_cell,
+                  cy + edge - (row + 1) * weight_cell,
+                  weight_cell, weight_cell,
+                  fills[row] if row == col else "white", radius=0)
+    c.arrow([(2.80, cy), (6.00 - edge, cy)])
+    c.arrow([(6.00 + edge, cy), (9.20, cy)])
+    for col, irrep in enumerate(irreps):
+        x = 3.05 + col * 1.15
+        c.box(x, -2.63, 0.17, 0.17, fills[col], radius=0)
+        c.text(x + 0.35, -2.545, irrep, ha="left")
+    c.text(6.00, -2.87, "Feature square: one irrep channel", color=MUTED)
 
 
 def compose(spec):

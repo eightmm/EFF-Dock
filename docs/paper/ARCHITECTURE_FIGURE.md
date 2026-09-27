@@ -53,14 +53,13 @@ T-junctions mark branches, + denotes addition, × denotes multiplication and “
 denotes concatenation. α is a learned scalar parameter; g is feature-dependent. Bold h denotes
 node features, hats denote normalized features, and subscripts 0 and >0 select
 degree classes. Bold c denotes conditioning. B and C use the same h_in/h_conv
-labels at the convolution interfaces. **E**, The mixed input contains the released model's
-0e, 1o, 1e, 2e and 2o blocks. Separate matching paths apply
-W_{ℓ,p} ⊗ I_{2ℓ+1} and concatenate the transformed blocks into the mixed
-output. Each weight matrix mixes channels only within its degree/parity block.
-The identity factor applies the same channel map to every spatial component.
-One, three or five tiles depict components per channel; a feature block contains
-all its channels, not just the displayed tiles. Colors distinguish degrees;
-explicit e/o labels distinguish parity.
+labels at the convolution interfaces. **E**, Contiguous square grids depict mixed input and output features,
+with columns colored by 0e, 1o, 1e, 2e and 2o. Each feature square denotes
+one complete irrep channel (one, three or five components for ℓ = 0, 1 or 2).
+The central grid is a symbolic block-diagonal map: each colored diagonal block
+represents W_{ℓ,p} ⊗ I_{2ℓ+1}, and blank off-diagonal blocks are zero.
+The two-input/three-output channel counts per irrep illustrate channel mixing;
+they are not the deployed model widths.
 
 ## Notation
 
@@ -278,21 +277,27 @@ components. The same matrix acts on every component, while different
 (ℓ,p) blocks have independent weights. The effective W includes the library's
 path normalization; it is not necessarily a raw parameter reshape.
 
-Panel E follows a mixed feature tensor through all five deployed irreps:
-0e, 1o, 1e, 2e and 2o. Parallel matching paths apply independent weights and
-reassemble the output in the same block order. Under the deployed channel-major
-(`mul_ir`) layout, the flattened map for each block is W_{ℓ,p} ⊗ I_{2ℓ+1}.
-This is a Kronecker product, distinct from the Clebsch–Gordan tensor products
-in A/C. It is equivalent to the matrix equation above. The identity factor
-means that the same channel map applies to every component; it does not mean
-that feature values or vector directions remain unchanged after channel mixing.
+Panel E shows one contiguous mixed-feature grid on each side of a single
+block-diagonal map. Each column is an irrep type, in 0e/1o/1e/2e/2o order,
+and each feature square is an entire channel containing 2ℓ+1 components.
+The two input rows and three output rows are illustrative multiplicities,
+not the released widths. These tile grids are a packing schematic, not a
+literal matrix of scalar feature entries or measured activations.
 
-The one/three/five colored tiles show components per channel for ℓ = 0/1/2.
-They do not represent channel counts, measured activations or a literal complete
-feature tensor. Input/output multiplicities are governed by each actual linear
-layer; the diagram does not impose equal multiplicities. The atom-vector
-projection retains only the requested 1o output, whereas the mixed-to-mixed
-maps retain all five block types. The ℓ = 2 block has five irreducible components.
+The central five-by-five grid is a block matrix, with one block per input/output
+irrep pair. A colored diagonal block stands for W_{ℓ,p} ⊗ I_{2ℓ+1}; a white
+off-diagonal block is zero. Diagonal blocks generally have different physical
+dimensions despite equal schematic squares. In the illustrated 2→3 channel
+case W is 3×2, so the corresponding full diagonal block is
+3(2ℓ+1) × 2(2ℓ+1). The real layer sets its own multiplicities.
+
+Under the deployed channel-major (`mul_ir`) layout, the Kronecker map is
+equivalent to the feature-matrix equation above. This Kronecker product is
+distinct from the Clebsch–Gordan tensor products in A/C. The identity factor
+shares each channel weight across components; it does not preserve feature
+values or vector directions after mixing different channels. The atom-vector
+projection requests only 1o output; the mixed-to-mixed maps shown in E retain
+all five block types. Colors indicate irrep type, not magnitude.
 The deployed `cuet.Linear` calls use internal shared weights and no additive
 bias. For the atom-vector readout, only compatible 1o input channels have a
 direct linear path to the single 1o output; the parallel self tensor product

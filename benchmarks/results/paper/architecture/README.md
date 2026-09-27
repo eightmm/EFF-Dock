@@ -19,9 +19,10 @@ and dropout are separate boxes in the interaction layer. Matching h_in/h_conv
 labels identify B/C interfaces; degree classes use ℓ = 0 and ℓ > 0. B brackets
 the post-convolution transform; convolution itself is also equivariant. Radial, gate/norm and confidence MLP internals
 are documented in the caption companion. The unused reusable EquivariantMLP class is not a model stage.
-Panel E routes the mixed 0e/1o/1e/2e/2o input through separate matching
-W ⊗ I maps into a mixed output. The tiles denote 1/3/5 components per channel,
-not channel counts; e/o labels preserve parity distinctions. A/B linear maps are equivariant; the D condition
+Panel E shows contiguous mixed-feature square grids around one symbolic
+block-diagonal map. Feature squares denote whole irrep channels; diagonal map
+squares denote W ⊗ I blocks and off-diagonal squares are zero. The 2→3 channel
+multiplicities are illustrative. A/B linear maps are equivariant; the D condition
 projection and MLP internals operate on invariant scalars. No model was run. Detailed branches omitted from the drawing are documented in
 the caption companion. Graph construction and training objectives are outside
 this figure's scope.
