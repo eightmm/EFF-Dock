@@ -310,14 +310,14 @@ def operations_panel(c, s):
         c.box_texts.extend(((label, (6.62, y, 0.76, 0.55)),
                             (equation, (7.38, y, 4.37, 0.55))))
     c.arrow([(9.185, 1.85), (9.185, 1.65)])
-    c.text(9.185, 1.48, r"$\mathbf{h}'$", size=13)
+    c.text(9.51, 1.70, r"$\mathbf{h}'$", size=13)
     c.text(6.55, 1.38, "Equivariant activation", bold=True, ha="left")
     ya, yb = 1.02, 0.47
-    c.text(6.53, ya, r"$\mathbf{h}_0$", size=13)
+    c.text(6.50, ya, r"$\mathbf{h}_0$", size=13)
     c.arrow([(6.78, ya), (7.13, ya)])
     c.block(7.13, ya - 0.175, 2.60, 0.35, r"SiLU  ($\ell=0$)", PALE_BLUE)
     c.arrow([(9.73, ya), (10.63, ya)])
-    c.text(10.99, ya, r"$\mathbf{h}'_0$", size=13)
+    c.text(11.02, ya, r"$\mathbf{h}'_0$", size=13)
     c.text(6.50, yb, r"$\mathbf{h}_{>0}$", size=13)
     c.arrow([(6.78, yb), (7.13, yb)])
     c.junction(6.94, yb)

@@ -8,6 +8,11 @@ Figure numbering is provisional. This model-only figure complements the
 [representative workflow](REPRESENTATIVE_FIGURE.md). Graph construction,
 post-refinement and training objectives are outside its scope.
 
+Source-review status (2026-09-27): the layer/readout topology and panel-D
+equations match the implementation, but a rotation-indexing defect was found
+in docking feature initialization. The figure is not evidence of end-to-end
+equivariance; see the source-audit caveat below before using that claim.
+
 ## Manuscript caption
 
 **EFF-Dock architecture and equivariant building blocks.**
@@ -42,7 +47,9 @@ own RMSNorm and condition-dependent scalar affine modulation or bounded
 non-scalar scaling. The two degree-specific equations occupy separately labeled
 ℓ = 0 and ℓ > 0 rows within one modulation box. Feature and conditioning
 streams enter from above, and the complete feature
-output leaves below. The scalar linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
+output leaves below, labeled beside its arrow. The activation schematic underneath
+is a separate reusable operation, not a stage appended to AdaLN.
+The scalar linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
 The symbol ⊙ denotes channelwise multiplication, with each non-scalar scale
 broadcast over its irrep components.
 RMSNorm acts separately within each (degree, parity) block;
@@ -245,9 +252,9 @@ The scale is shared across the 2ℓ+1 components of each channel. Zero initializ
 of the conditioning projection initially leaves the
 RMS-normalized features unchanged, not the raw input unchanged. A zero confidence
 condition need not imply zero modulation after training because the projection
-has a learned bias. Equivariance here is with respect to joint SE(3)
-transformations of the model inputs; the figure does not establish full-pipeline
-reflection equivariance.
+has a learned bias. These normalization/modulation operations respect rotations
+of their irrep inputs. This does not establish full-pipeline equivariance; see
+the initialization caveat below.
 
 #### Equivariant activation
 
@@ -361,3 +368,60 @@ The restrained functional-block styling was informed by Figure 1 of
 [BA-Pred and RMSD-Pred](https://doi.org/10.1021/acs.jcim.5c02591).
 This is an original drawing audited against EFF-Dock source code; no reference
 panels, molecular images or model operations are reused.
+
+
+## Source audit and unresolved initialization defect (2026-09-27)
+
+The review compared the current A–D graphic with executable forward paths,
+the released configurations, and all eight source/config hashes in spec.json.
+Hash agreement identifies the inspected implementation; it is not a functional
+equivariance test. No model or checkpoint was changed.
+
+| Panel | Verified against implementation | Abstraction or remaining issue |
+|---|---|---|
+| A, docking | Six separate layers; atom preprocessing; sum of linear and self-TP outputs; mean/torque/inertia readout | Initialization has the indexing defect below. Conditioning also enters fragment initialization, although its diagram arrow points only to the layer stack. Readout lever-arm inputs and the thresholded inverse are documented rather than drawn. |
+| A, confidence | Four separate layers; fresh per-pose t=1 ligand states added with learned α; invariant features; global/contact concatenation | α acts only on ligand atom/fragment slots. Global pooling includes LayerNorm and a node MLP. Contact readout includes projection and attention/max/mean reductions. Auxiliary atom heads and the final log1p-to-RMSD conversion are compressed/omitted. |
+| B | AdaLN(h + post_block(conv(pre_norm(h)))); one additive skip; linear → activation → dropout | c also enters convolution edge features (shown in C), not only AdaLN. Dropout is disabled during evaluation. |
+| C | Radial input scale → shared TP → radial output scale → activation → aggregation; shared edge gate times distance decay | The 96 additional non-scalar gates and per-degree Linear–SiLU norm rescaling are inside the aggregation box. This is not a complete scalar/non-scalar reduction diagram. |
+| D | Blockwise RMSNorm; scalar affine rule; bounded non-scalar scaling; scalar SiLU and norm-derived gates | AdaLN and activation are separate operations. ℓ=0 denotes 0e in this model. The two modulation rows act on different feature subsets in parallel. |
+
+Panel D was aligned so both activation input/output labels share the same
+horizontal anchors. The AdaLN output label now sits beside its terminal arrow,
+with separation from the activation heading. Its operations and formulas did
+not change.
+
+### Rotation injection: a verified local counterexample
+
+In [the docking forward](../../src/effdock/models/effdock.py), line 881 uses:
+
+```python
+h_R = torch.einsum("nki,ck->nci", R_t, self.R_frag_mix.weight)
+```
+
+The adjacent comment describes mixing columns of R, but the expression mixes
+rows: for one channel weight w, it computes Rᵀw instead of Rw.
+[The geometry convention](../../src/effdock/geometry/se3.py) and
+[sampler coordinate reconstruction](../../src/effdock/inference/sampler.py)
+use x_global = R @ x_local. A joint world rotation Q therefore changes a
+fragment frame to QR. A vector-valued initialization should satisfy
+F(QR, w) = Q F(R, w).
+
+A CPU float64 counterexample evaluated the einsum string extracted from the
+actual source, with R=I, w=(1,0,0), and Q a 90° rotation around z. The current
+expression produced approximately (0,−1,0), whereas the rotated original
+feature was (0,1,0): maximum absolute component error 2.0. The intended column
+expression nik,ck->nci had zero error on the same example.
+
+This proves that the current injection is not an equivariant map for general
+nonzero weights. It does **not** measure the released checkpoint's output
+error or benchmark impact. The branch is zero-initialized; its trained weights
+and propagation through the full docking/confidence pipeline were not tested
+in this review. Existing tests/test_equivariance.py exercises individual
+building blocks, not this EFFDock initialization path. An end-to-end rotation
+check must exercise a nonzero orientation-injection branch.
+
+Changing these indices would change model computation under existing weights.
+The audit therefore leaves the model and checkpoint intact. The earlier
+source-hash/layout checks must not be presented as proof that the whole model
+is strictly equivariant. The local counterexample is the outstanding issue
+before certifying the label “Equivariant embedding” in panel A.
