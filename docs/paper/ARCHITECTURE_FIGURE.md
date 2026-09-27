@@ -53,13 +53,14 @@ T-junctions mark branches, + denotes addition, × denotes multiplication and “
 denotes concatenation. α is a learned scalar parameter; g is feature-dependent. Bold h denotes
 node features, hats denote normalized features, and subscripts 0 and >0 select
 degree classes. Bold c denotes conditioning. B and C use the same h_in/h_conv
-labels at the convolution interfaces. **E**, An equivariant linear map mixes
-channels independently within each degree/parity block (ℓ,p). One weight matrix
-is applied to every irrep component. Separate illustrations show ℓ = 0, 1 and 2, with one, three and five
-components per channel, respectively. Each uses three input and two output
-channels for illustration; these are not model widths or measured activations.
-Within each degree/parity block, matching column colors identify the same
-component in the input and output. W₀,p, W₁,p and W₂,p are independent maps.
+labels at the convolution interfaces. **E**, The mixed input contains the released model's
+0e, 1o, 1e, 2e and 2o blocks. Separate matching paths apply
+W_{ℓ,p} ⊗ I_{2ℓ+1} and concatenate the transformed blocks into the mixed
+output. Each weight matrix mixes channels only within its degree/parity block.
+The identity factor applies the same channel map to every spatial component.
+One, three or five tiles depict components per channel; a feature block contains
+all its channels, not just the displayed tiles. Colors distinguish degrees;
+explicit e/o labels distinguish parity.
 
 ## Notation
 
@@ -277,16 +278,21 @@ components. The same matrix acts on every component, while different
 (ℓ,p) blocks have independent weights. The effective W includes the library's
 path normalization; it is not necessarily a raw parameter reshape.
 
-The three grids explicitly distinguish ℓ = 0 (one component), ℓ = 1
-(three components) and ℓ = 2 (five components). Each uses illustrative
-3 input channels → 2 output channels; colored columns identify corresponding
-components within a block, not their values. Scalar channel mixing is an
-ordinary linear map; for ℓ > 0 the same channel map acts on each component
-of a complete irrep. Different degree/parity blocks have independent W.
-The 0e block is the only ℓ = 0 block in the released model, while ℓ = 1
-and ℓ = 2 each have both parities. The five ℓ = 2 components form an
-irreducible rank-two representation, not an arbitrary nine-component matrix.
-It neither arbitrarily mixes spatial components nor changes degree or parity.
+Panel E follows a mixed feature tensor through all five deployed irreps:
+0e, 1o, 1e, 2e and 2o. Parallel matching paths apply independent weights and
+reassemble the output in the same block order. Under the deployed channel-major
+(`mul_ir`) layout, the flattened map for each block is W_{ℓ,p} ⊗ I_{2ℓ+1}.
+This is a Kronecker product, distinct from the Clebsch–Gordan tensor products
+in A/C. It is equivalent to the matrix equation above. The identity factor
+means that the same channel map applies to every component; it does not mean
+that feature values or vector directions remain unchanged after channel mixing.
+
+The one/three/five colored tiles show components per channel for ℓ = 0/1/2.
+They do not represent channel counts, measured activations or a literal complete
+feature tensor. Input/output multiplicities are governed by each actual linear
+layer; the diagram does not impose equal multiplicities. The atom-vector
+projection retains only the requested 1o output, whereas the mixed-to-mixed
+maps retain all five block types. The ℓ = 2 block has five irreducible components.
 The deployed `cuet.Linear` calls use internal shared weights and no additive
 bias. For the atom-vector readout, only compatible 1o input channels have a
 direct linear path to the single 1o output; the parallel self tensor product

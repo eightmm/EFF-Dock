@@ -331,28 +331,29 @@ def operations_panel(c, s):
     c.text(11.02, yb, r"$\mathbf{h}'_{>0}$", size=13)
 
 
-def linear_panel(c):
+def linear_panel(c, spec):
     c.panel(0.20, -0.18, "E", "Equivariant linear")
-    c.text(9.55, -0.38, r"Separate $(\ell,p)$ blocks", color=MUTED)
-    # Three input and two output channels are illustrative, not model widths.
-    cell, cy = 0.24, -1.79
-    colors = (PALE_BLUE, PALE_MINT, PALE_PEACH, PALE_VIOLET, PALE_GRAY)
-    for ell in (0, 1, 2):
-        base, components = 4.0 * ell, 2 * ell + 1
-        c.text(base + 2.00, -0.83, rf"$\ell={ell}$", bold=True, size=13)
-        for cx, rows, prime in ((base + 0.85, 3, ""), (base + 3.15, 2, "'")):
-            left, top = cx - components * cell / 2, cy + rows * cell / 2
-            c.text(cx, -1.16, rf"$\mathbf{{h}}{prime}_{{{ell},p}}$", size=13)
-            for row in range(rows):
-                for col in range(components):
-                    c.box(left + col * cell, top - (row + 1) * cell,
-                          cell, cell, colors[col], radius=0)
-        c.arrow([(base + 0.85 + components * cell / 2, cy),
-                 (base + 3.15 - components * cell / 2, cy)])
-        c.text(base + 2.00, -1.50, rf"$W_{{{ell},p}}$", size=13)
-        c.text(base + 2.00, -2.37,
-               f"{components} component" + ("s" if components > 1 else ""), color=MUTED)
-    c.text(6.00, -2.80, "Rows: channels   ·   Columns: components   ·   Same W for all columns within a block", color=MUTED)
+    c.text(1.625, -0.78, r"Mixed input $\mathbf{h}$")
+    c.text(6.00, -0.78, "Channel mixing")
+    c.text(10.375, -0.78, r"Mixed output $\mathbf{h}'$")
+    colors = ((PALE_BLUE, BLUE), (PALE_MINT, MINT), (PALE_PEACH, PEACH))
+    for row, irrep in enumerate(spec["irreps"]):
+        ell = int(irrep[0])
+        components = 2 * ell + 1
+        cy = -1.15 - row * 0.38
+        pale, accent = colors[ell]
+        for x, prime in ((0.50, ""), (9.25, "'")):
+            c.box(x, cy - 0.19, 2.25, 0.38, pale, radius=0)
+            label = c.text(x + 0.50, cy, rf"$\mathbf{{h}}{prime}_{{{irrep}}}$", size=13)
+            c.box_texts.append((label, (x, cy - 0.19, 2.25, 0.38)))
+            # Tiles depict components per channel; the block includes all channels.
+            for component in range(components):
+                c.box(x + 1.05 + component * 0.18, cy - 0.10,
+                      0.18, 0.20, accent, edge="white", lw=0.65, radius=0)
+        c.arrow([(2.75, cy), (4.55, cy)])
+        c.block(4.55, cy - 0.15, 2.90, 0.30,
+                rf"$W_{{{irrep}}}\otimes I_{{{components}}}$", pale)
+        c.arrow([(7.45, cy), (9.25, cy)])
 
 
 def compose(spec):
@@ -361,7 +362,7 @@ def compose(spec):
     interaction_panel(c, spec)
     convolution_panel(c, spec)
     operations_panel(c, spec)
-    linear_panel(c)
+    linear_panel(c, spec)
     return c
 
 
