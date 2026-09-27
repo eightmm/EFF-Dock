@@ -59,8 +59,11 @@ $$
 The angular convention is left multiplication,
 `q_{t+dt}=exp(dt omega) tensor-product q_t`. The implied atom field is
 `v_f + omega_f cross (x_a-T_f)`. Ligand-wide uniform rotational augmentation
-is applied consistently to the target geometry and local frames, preventing a
-fixed laboratory-frame orientation shortcut.
+rotates the fragment-local
+coordinates and compensates with inverse target rotations, preserving the
+target world-space geometry. This randomizes the template frame; it is not
+a joint world-space rotation of the receptor–ligand complex and does not by
+itself establish exact equivariance.
 
 ## 3. Time and prior conditioning
 

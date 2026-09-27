@@ -85,10 +85,14 @@ edge type and attributes, not ten separate full GNNs. Dropout is 0.1.
 
 Geometric messages use relative coordinates, source local-frame coordinates,
 distances and spherical harmonics. Tensor-product channels use O(3) irreps,
-while fragment orientations are proper rotations in SO(3). The docking contract
-and joint-rotation tests concern SE(3): jointly rotating/translating ligand,
-receptor, fragment frames and pocket centre transforms vector outputs and
-leaves scalar predictions invariant. Do not infer complete reflection
+while fragment orientations are proper rotations in SO(3). The intended SE(3)
+action jointly rotates/translates ligand, receptor,
+fragment frames and pocket centre. The building-block rotation tests do not
+certify exact equivariance of the full released model. A checkpoint-specific
+[audit](../paper/ARCHITECTURE_FIGURE.md#released-checkpoint-and-saved-trajectory-recheck)
+found a small nonzero velocity deviation in one saved trajectory, isolated to
+the fragment-orientation initialization. This diagnostic does not measure
+benchmark-wide accuracy or confidence invariance. Do not infer complete reflection
 equivariance of stereochemical inputs from the irrep notation alone.
 Categorical chemistry and graph topology are coordinate independent.
 The pocket centre is supplied; benchmark centres may be frozen from reference

@@ -510,28 +510,28 @@ z
 " clip-path="url(#pdac9a789c6)" style="fill: #eaf3ee; stroke: #858585; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="patch_39">
-    <path d="M 515.88 561.6
-L 628.92 561.6
-Q 630 561.6 630 560.52
-L 630 525.24
-Q 630 524.16 628.92 524.16
-L 515.88 524.16
-Q 514.8 524.16 514.8 525.24
-L 514.8 560.52
-Q 514.8 561.6 515.88 561.6
+    <path d="M 515.88 564.48
+L 628.92 564.48
+Q 630 564.48 630 563.4
+L 630 519.48
+Q 630 518.4 628.92 518.4
+L 515.88 518.4
+Q 514.8 518.4 514.8 519.48
+L 514.8 563.4
+Q 514.8 564.48 515.88 564.48
 z
 " clip-path="url(#pdac9a789c6)" style="fill: #f0ecf6; stroke: #858585; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
    <g id="patch_40">
-    <path d="M 695.88 561.6
-L 834.12 561.6
-Q 835.2 561.6 835.2 560.52
-L 835.2 525.24
-Q 835.2 524.16 834.12 524.16
-L 695.88 524.16
-Q 694.8 524.16 694.8 525.24
-L 694.8 560.52
-Q 694.8 561.6 695.88 561.6
+    <path d="M 695.88 564.48
+L 834.12 564.48
+Q 835.2 564.48 835.2 563.4
+L 835.2 519.48
+Q 835.2 518.4 834.12 518.4
+L 695.88 518.4
+Q 694.8 518.4 694.8 519.48
+L 694.8 563.4
+Q 694.8 564.48 695.88 564.48
 z
 " clip-path="url(#pdac9a789c6)" style="fill: #f0ecf6; stroke: #858585; stroke-width: 0.65; stroke-linejoin: miter"/>
    </g>
@@ -1257,28 +1257,28 @@ z
 " clip-path="url(#pdac9a789c6)" style="fill: #666666; stroke: #666666; stroke-width: 0.85; stroke-linecap: round"/>
    </g>
    <g id="patch_97">
-    <path d="M 572.4 513.36
-Q 572.4 518.76 572.4 523.209671
+    <path d="M 572.4 511.2
+Q 572.4 514.8 572.4 517.449671
 " clip-path="url(#pdac9a789c6)" style="fill: none; stroke: #666666; stroke-width: 0.85; stroke-linecap: round"/>
-    <path d="M 574.2 519.609671
-L 572.4 523.209671
-L 570.6 519.609671
+    <path d="M 574.2 513.849671
+L 572.4 517.449671
+L 570.6 513.849671
 z
 " clip-path="url(#pdac9a789c6)" style="fill: #666666; stroke: #666666; stroke-width: 0.85; stroke-linecap: round"/>
    </g>
    <g id="patch_98">
-    <path d="M 763.2 513.36
-Q 763.2 518.76 763.2 523.209671
+    <path d="M 763.2 511.2
+Q 763.2 514.8 763.2 517.449671
 " clip-path="url(#pdac9a789c6)" style="fill: none; stroke: #a895c4; stroke-width: 0.85; stroke-linecap: round"/>
-    <path d="M 765 519.609671
-L 763.2 523.209671
-L 761.4 519.609671
+    <path d="M 765 513.849671
+L 763.2 517.449671
+L 761.4 513.849671
 z
 " clip-path="url(#pdac9a789c6)" style="fill: #a895c4; stroke: #a895c4; stroke-width: 0.85; stroke-linecap: round"/>
    </g>
    <g id="patch_99">
-    <path d="M 572.4 561.6
-Q 572.4 570.6 572.4 578.649671
+    <path d="M 572.4 564.48
+Q 572.4 572.04 572.4 578.649671
 " clip-path="url(#pdac9a789c6)" style="fill: none; stroke: #666666; stroke-width: 0.85; stroke-linecap: round"/>
     <path d="M 574.2 575.049671
 L 572.4 578.649671
@@ -1287,8 +1287,8 @@ z
 " clip-path="url(#pdac9a789c6)" style="fill: #666666; stroke: #666666; stroke-width: 0.85; stroke-linecap: round"/>
    </g>
    <g id="patch_100">
-    <path d="M 763.2 561.6
-Q 763.2 570.6 763.2 578.649671
+    <path d="M 763.2 564.48
+Q 763.2 572.04 763.2 578.649671
 " clip-path="url(#pdac9a789c6)" style="fill: none; stroke: #a895c4; stroke-width: 0.85; stroke-linecap: round"/>
     <path d="M 765 575.049671
 L 763.2 578.649671
@@ -1477,7 +1477,7 @@ z
     </g>
    </g>
    <g id="text_5">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(54.30957 95.335684)">Equivariant</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(73.686523 95.335684)">Node</text>
     <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(54.652344 110.282754)">embedding</text>
    </g>
    <g id="text_6">
@@ -1568,7 +1568,7 @@ z
     </g>
    </g>
    <g id="text_22">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(54.30957 219.175684)">Equivariant</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(73.686523 219.175684)">Node</text>
     <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(54.652344 234.122754)">embedding</text>
    </g>
    <g id="text_23">
@@ -1908,7 +1908,7 @@ z
    </g>
    <g id="text_69">
     <!-- $\mathbf{h}$ -->
-    <g style="fill: #252525" transform="translate(567.72 507.587188)">
+    <g style="fill: #252525" transform="translate(567.72 503.267188)">
      <text>
       <tspan x="0" y="-0.125" style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; fill: #252525">h</tspan>
      </text>
@@ -1916,19 +1916,28 @@ z
    </g>
    <g id="text_70">
     <!-- $\mathbf{c}$ -->
-    <g style="fill: #252525" transform="translate(759.3 507.587188)">
+    <g style="fill: #252525" transform="translate(759.3 503.267188)">
      <text>
       <tspan x="0" y="-0.71875" style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; fill: #252525">c</tspan>
      </text>
     </g>
    </g>
    <g id="text_71">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #252525" x="572.4" y="546.329219" transform="rotate(-0 572.4 546.329219)">RMSNorm</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(541.649023 536.09791)">RMSNorm</text>
+    <!-- $\mathbf{h}\;\mapsto\;\hat{\mathbf{h}}$ -->
+    <g style="fill: #252525" transform="translate(552.4 553.680527)">
+     <text>
+      <tspan x="0" y="-0.453125" style="font-weight: 700; font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525">h</tspan>
+      <tspan x="31.007948" y="-0.453125" style="font-weight: 700; font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525">h</tspan>
+      <tspan x="14.71662" y="-0.453125" style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525">↦</tspan>
+      <tspan x="39.310804" y="-4.609375" style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525">̂</tspan>
+     </text>
+    </g>
    </g>
    <g id="text_72">
-    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(725.964844 538.760469)">Scalar linear</text>
+    <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525" transform="translate(725.964844 537.320469)">Scalar linear</text>
     <!-- $\gamma_0,\,\beta_0,\,\gamma_{&gt;0}$ -->
-    <g style="fill: #252525" transform="translate(730.9375 553.872578)">
+    <g style="fill: #252525" transform="translate(730.9375 552.432578)">
      <text>
       <tspan x="0" y="-0.046875" style="font-style: oblique; font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525">γ</tspan>
       <tspan x="21.758097" y="-0.046875" style="font-style: oblique; font-size: 12.5px; font-family: 'DejaVu Sans'; fill: #252525">β</tspan>
@@ -1943,15 +1952,6 @@ z
     </g>
    </g>
    <g id="text_73">
-    <!-- $\hat{\mathbf{h}}$ -->
-    <g style="fill: #252525" transform="translate(544.68 574.881406)">
-     <text>
-      <tspan x="8.594971" y="-4.609375" style="font-size: 13px; font-family: 'DejaVu Sans'; fill: #252525">̂</tspan>
-      <tspan x="0" y="-0.390625" style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; fill: #252525">h</tspan>
-     </text>
-    </g>
-   </g>
-   <g id="text_74">
     <!-- $\ell=0$ -->
     <g style="fill: #252525" transform="translate(489.75 602.849219)">
      <text>
@@ -1961,7 +1961,7 @@ z
      </text>
     </g>
    </g>
-   <g id="text_75">
+   <g id="text_74">
     <!-- $\mathbf{h}'_0=(1+\gamma_0)\odot\hat{\mathbf{h}}_0+\beta_0$ -->
     <g style="fill: #252525" transform="translate(616.4 605.38)">
      <text>
@@ -1985,7 +1985,7 @@ z
      </text>
     </g>
    </g>
-   <g id="text_76">
+   <g id="text_75">
     <!-- $\ell&gt;0$ -->
     <g style="fill: #252525" transform="translate(489.75 642.449219)">
      <text>
@@ -1995,7 +1995,7 @@ z
      </text>
     </g>
    </g>
-   <g id="text_77">
+   <g id="text_76">
     <!-- $\mathbf{h}'_{&gt;0}=[1+0.1\tanh(\gamma_{&gt;0})]\odot\hat{\mathbf{h}}_{&gt;0}$ -->
     <g style="fill: #252525" transform="translate(584.615 644.98)">
      <text>
@@ -2028,7 +2028,7 @@ z
      </text>
     </g>
    </g>
-   <g id="text_78">
+   <g id="text_77">
     <!-- $\mathbf{h}'$ -->
     <g style="fill: #252525" transform="translate(678.545 673.187188)">
      <text>
@@ -2037,10 +2037,10 @@ z
      </text>
     </g>
    </g>
-   <g id="text_79">
+   <g id="text_78">
     <text style="font-weight: 700; font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #252525" x="471.6" y="696.089219" transform="rotate(-0 471.6 696.089219)">Equivariant activation</text>
    </g>
-   <g id="text_80">
+   <g id="text_79">
     <!-- $\mathbf{h}_0$ -->
     <g style="fill: #252525" transform="translate(460.2 722.147187)">
      <text>
@@ -2049,7 +2049,7 @@ z
      </text>
     </g>
    </g>
-   <g id="text_81">
+   <g id="text_80">
     <!-- SiLU  ($\ell=0$) -->
     <g style="fill: #252525" transform="translate(570.085 722.009219)">
      <text>
@@ -2067,7 +2067,7 @@ z
      </text>
     </g>
    </g>
-   <g id="text_82">
+   <g id="text_81">
     <!-- $\mathbf{h}'_0$ -->
     <g style="fill: #252525" transform="translate(784.145 722.147187)">
      <text>
@@ -2077,7 +2077,7 @@ z
      </text>
     </g>
    </g>
-   <g id="text_83">
+   <g id="text_82">
     <!-- $\mathbf{h}_{&gt;0}$ -->
     <g style="fill: #252525" transform="translate(454.61 761.747187)">
      <text>
@@ -2087,10 +2087,10 @@ z
      </text>
     </g>
    </g>
-   <g id="text_84">
+   <g id="text_83">
     <text style="font-size: 12.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #252525" x="606.96" y="761.609219" transform="rotate(-0 606.96 761.609219)">Norms → MLP → sigmoid</text>
    </g>
-   <g id="text_85">
+   <g id="text_84">
     <!-- $g$ -->
     <g style="fill: #252525" transform="translate(712.4 747.903828)">
      <text>
@@ -2098,10 +2098,10 @@ z
      </text>
     </g>
    </g>
-   <g id="text_86">
+   <g id="text_85">
     <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #252525" x="738" y="761.747187" transform="rotate(-0 738 761.747187)">×</text>
    </g>
-   <g id="text_87">
+   <g id="text_86">
     <!-- $\mathbf{h}'_{&gt;0}$ -->
     <g style="fill: #252525" transform="translate(778.555 761.747187)">
      <text>

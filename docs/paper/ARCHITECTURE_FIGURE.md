@@ -9,9 +9,10 @@ Figure numbering is provisional. This model-only figure complements the
 post-refinement and training objectives are outside its scope.
 
 Source-review status (2026-09-27): the layer/readout topology and panel-D
-equations match the implementation, but a rotation-indexing defect was found
-in docking feature initialization. The figure is not evidence of end-to-end
-equivariance; see the source-audit caveat below before using that claim.
+equations match the implementation. A rotation-indexing discrepancy in docking
+initialization was tested using the released checkpoint; see the measured
+rotation diagnostic below. This distinguishes exact equivariance from empirical
+docking performance and does not invalidate the existing benchmark measurements.
 
 ## Manuscript caption
 
@@ -49,7 +50,8 @@ non-scalar scaling. The two degree-specific equations occupy separately labeled
 streams enter from above, and the complete feature
 output leaves below, labeled beside its arrow. The activation schematic underneath
 is a separate reusable operation, not a stage appended to AdaLN.
-The scalar linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
+The RMSNorm box defines h → hhat internally, leaving the connector to modulation
+clear. The scalar linear projection explicitly outputs γ₀, β₀ and γ₍>₀₎.
 The symbol ⊙ denotes channelwise multiplication, with each non-scalar scale
 broadcast over its irrep components.
 RMSNorm acts separately within each (degree, parity) block;
@@ -387,8 +389,9 @@ equivariance test. No model or checkpoint was changed.
 
 Panel D was aligned so both activation input/output labels share the same
 horizontal anchors. The AdaLN output label now sits beside its terminal arrow,
-with separation from the activation heading. Its operations and formulas did
-not change.
+with separation from the activation heading. The hhat definition was moved
+inside the RMSNorm box, and the parallel condition-projection box has matching
+height. Its operations and formulas did not change.
 
 ### Rotation injection: a verified local counterexample
 
@@ -412,16 +415,64 @@ expression produced approximately (0,−1,0), whereas the rotated original
 feature was (0,1,0): maximum absolute component error 2.0. The intended column
 expression nik,ck->nci had zero error on the same example.
 
-This proves that the current injection is not an equivariant map for general
-nonzero weights. It does **not** measure the released checkpoint's output
-error or benchmark impact. The branch is zero-initialized; its trained weights
-and propagation through the full docking/confidence pipeline were not tested
-in this review. Existing tests/test_equivariance.py exercises individual
-building blocks, not this EFFDock initialization path. An end-to-end rotation
-check must exercise a nonzero orientation-injection branch.
+This proves that the injection is not an equivariant map for general nonzero
+weights under the stated joint-rotation action. The toy error of 2.0 is **not**
+a measured error of the trained model. The checkpoint-specific follow-up below
+measures the docking output deviation. Existing tests/test_equivariance.py
+exercises individual building blocks, not this EFFDock initialization path.
 
 Changing these indices would change model computation under existing weights.
 The audit therefore leaves the model and checkpoint intact. The earlier
 source-hash/layout checks must not be presented as proof that the whole model
-is strictly equivariant. The local counterexample is the outstanding issue
-before certifying the label “Equivariant embedding” in panel A.
+is strictly equivariant. The input embedding
+contains a measured departure from strict equivariance; the equivariant
+backbone operations and existing docking results are separate claims.
+
+
+### Released checkpoint and saved-trajectory recheck
+
+The released 50,000-step EMA checksum matches the model manifest. Its
+R_frag_mix has 96/96 nonzero entries (Frobenius norm 0.749953, maximum absolute
+entry 0.202768). The row-mixing expression is also present in the initial public
+source commit 3e26f41 (2026-07-21); the figure edits did not introduce it.
+
+The test used the saved 1T46_STI trajectory with 37 ligand atoms, six fragments,
+375 graph nodes and 2,256 static edges, prior sigma 2, and three stored states.
+Fragment-local coordinates and graph topology were fixed. Protein/ligand
+world coordinates and fragment centers were jointly rotated, while fragment
+frames transformed by left multiplication QR. Rotations were z90°, x90°, and
+60° about (1,2,3). This is a test of the prepared model state, not a rerun of
+raw-structure preprocessing or complete ODE sampling.
+
+The checkpoint's learned parameters were loaded into the library's CPU naive
+backend, using the same tensor-product descriptors in float32. No new docking
+poses, training or GPU inference were run. Identical-input repeat errors were
+zero. The reported quantity is 100 × relative Frobenius-norm deviation from
+the expected rotated **instantaneous velocity output**, not RMSD, a docking
+success-rate difference or accumulated trajectory error.
+
+| Saved state | Translation output deviation (%) | Angular output deviation (%) |
+|---|---:|---:|
+| t=0.000 | 0.161–0.196 | 0.613–0.887 |
+| t=0.488 | 0.086–0.143 | 0.166–0.422 |
+| t=1.000 | 0.056–0.087 | 0.147–0.187 |
+
+Ranges are over the three prescribed rotations, not confidence intervals.
+Zeroing only the injection weights or changing only its einsum indices in
+memory reduced relative deviations below 0.00061% across these tests. These
+controls isolate the source of the excess deviation; they are not proposed
+inference settings or evidence that changed-index weights improve docking.
+The released source, weights and existing results remain unchanged.
+
+This establishes a small but nonzero departure from exact equivariance **in
+this case**. It does not establish benchmark-wide robustness, the effect on
+confidence ranking, or the need for retraining. Already measured docking
+scores remain measurements of the existing trained implementation. Changing
+indices after training would define a different computation and cannot be
+silently substituted into those results. Panel A uses the neutral label
+“Node embedding”; the backbone operations retain their explicit equivariant
+labels. The training local-frame augmentation also does not mathematically
+repair the row-mixing operation.
+
+[Full diagnostic values](../../benchmarks/results/paper/architecture/rotation_diagnostic.json)
+include absolute errors, repeat controls, all rotations and artifact hashes.

@@ -126,7 +126,7 @@ def overview_panel(c, s):
     c.arrow([(3.55, 10.20), (3.55, 10.00)], color=VIOLET)
     y = 9.62
     for x, w, text, fill in (
-        (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
+        (0.45, 1.60, "Node\nembedding", PALE_GRAY),
         (2.75, 1.60, f"Interaction layer\n×{s['docking_layers']}  (B)", PALE_BLUE),
     ):
         if text.startswith("Interaction layer"):
@@ -168,7 +168,7 @@ def overview_panel(c, s):
     c.arrow([(3.55, 8.46), (3.55, 8.28)], color=VIOLET)
     y = 7.90
     for x, w, text, fill in (
-        (0.45, 1.60, "Equivariant\nembedding", PALE_GRAY),
+        (0.45, 1.60, "Node\nembedding", PALE_GRAY),
         (2.75, 1.60, f"Interaction layer\n×{s['confidence_layers']}  (B)", PALE_BLUE),
         (4.70, 1.50, r"$\ell=0$ features" + "\n" + r"$\ell>0$ norms", PALE_GRAY),
         (10.23, 1.55, "Pose MLP\npRMSD · logit", PALE_PEACH),
@@ -287,16 +287,15 @@ def convolution_panel(c, s):
 def operations_panel(c, s):
     c.panel(6.10, 4.45, "D", "Normalization and activation")
     c.text(6.55, 3.92, "AdaLN", bold=True, ha="left")
-    c.text(7.95, 4.00, r"$\mathbf{h}$", size=13)
-    c.text(10.60, 4.00, r"$\mathbf{c}$", size=13)
-    c.arrow([(7.95, 3.87), (7.95, 3.72)])
-    c.arrow([(10.60, 3.87), (10.60, 3.72)], color=VIOLET)
-    c.block(7.15, 3.20, 1.60, 0.52, "RMSNorm", PALE_VIOLET)
-    c.block(9.65, 3.20, 1.95, 0.52,
+    c.text(7.95, 4.06, r"$\mathbf{h}$", size=13)
+    c.text(10.60, 4.06, r"$\mathbf{c}$", size=13)
+    c.arrow([(7.95, 3.90), (7.95, 3.80)])
+    c.arrow([(10.60, 3.90), (10.60, 3.80)], color=VIOLET)
+    c.block(7.15, 3.16, 1.60, 0.64, "RMSNorm\n" + r"$\mathbf{h}\;\mapsto\;\hat{\mathbf{h}}$", PALE_VIOLET)
+    c.block(9.65, 3.16, 1.95, 0.64,
             "Scalar linear\n" + r"$\gamma_0,\,\beta_0,\,\gamma_{>0}$", PALE_VIOLET)
-    c.arrow([(7.95, 3.20), (7.95, 2.95)])
-    c.text(7.63, 3.08, r"$\hat{\mathbf{h}}$", size=13)
-    c.arrow([(10.60, 3.20), (10.60, 2.95)], color=VIOLET)
+    c.arrow([(7.95, 3.16), (7.95, 2.95)])
+    c.arrow([(10.60, 3.16), (10.60, 2.95)], color=VIOLET)
     # A shared boundary groups mutually exclusive degree rules, not serial stages.
     c.box(6.62, 1.85, 5.13, 1.10, PALE_VIOLET)
     c.ax.plot([6.62, 11.75], [2.40, 2.40], color="#858585", lw=0.65)
