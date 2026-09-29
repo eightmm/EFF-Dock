@@ -14,6 +14,7 @@ These are manuscript working materials, not a published paper. See the
 ## Model and evaluation
 
 - [Model](MODEL.md)
+- [Rw correction, discussion and checkpoint compatibility](ORIENTATION_INJECTION.md)
 - [Data preparation and splits](DATA.md)
 - [Evaluation](EVALUATION.md)
 - [Reproducibility and checkpoints](REPRODUCIBILITY.md)

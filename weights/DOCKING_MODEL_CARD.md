@@ -1,8 +1,10 @@
 # EFF-Dock early-time/t=0 docking checkpoint
 
+**Operator provenance:** these unchanged weights were trained with `legacy_rt_w` (Rᵀw), which does not make the full model exactly rotation-equivariant. The corrected `rw` inference option changes computation under these weights. See [the correction and limits](../docs/ORIENTATION_INJECTION.md).
+
 - File: `effdock_docking_early_time_t0p10_50k.pt`
 - SHA-256: `65be44d7dc8f0867eb9fc5d22214b80f93971ea4702679a527c665046e91e6b6`
-- Model type: fragment-level SE(3)-equivariant flow-matching docking model
+- Model type: fragment-level flow matching on SE(3), with the historical orientation injection
 - Training endpoint: 50,000-update early-time/t=0 replay fine-tune EMA
 - Paired confidence checkpoint: `effdock_confidence_s50_raw_refined_u70k.pt`
 

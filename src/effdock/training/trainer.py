@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import math
 import os
 import random
@@ -20,6 +21,7 @@ from torch.utils.data import DataLoader, DistributedSampler, Sampler, Subset
 
 from effdock.checkpoint import (
     atomic_torch_save,
+    checkpoint_orientation_injection,
     load_checkpoint_file,
     load_portable_model_state,
 )
@@ -332,6 +334,7 @@ class Trainer:
         self._build_dataloaders()
 
         # Model
+        cfg["model"].setdefault("orientation_injection", "legacy_rt_w")
         model_kwargs = {k: v for k, v in cfg["model"].items() if k != "model_type"}
         self.model = EFFDock(**model_kwargs).to(self.device)
         if self.world_size > 1:
@@ -767,6 +770,11 @@ class Trainer:
         """Fail closed when an exact-resume run no longer has the same config."""
         if not isinstance(saved, dict):
             raise RuntimeError("strict resume requires an embedded checkpoint config")
+        # Missing historical metadata and an explicit legacy mode are equivalent.
+        current = {**current, "model": {**current.get("model", {})}}
+        saved = {**saved, "model": {**saved.get("model", {})}}
+        for config in (current, saved):
+            config["model"].setdefault("orientation_injection", "legacy_rt_w")
         if saved == current:
             return
         sections = sorted(
@@ -779,6 +787,15 @@ class Trainer:
 
     def load_checkpoint(self, path: str) -> None:
         ckpt = load_checkpoint_file(path)
+        self.initialization_provenance = ckpt.get("initialization_provenance")
+        saved_orientation = checkpoint_orientation_injection(ckpt)
+        requested_orientation = self.cfg["model"].get("orientation_injection", "legacy_rt_w")
+        if requested_orientation != saved_orientation:
+            raise RuntimeError(
+                "resume orientation_injection differs from checkpoint: "
+                f"requested={requested_orientation}, saved={saved_orientation}; "
+                "use the saved convention for resume or --init-from for weights-only migration"
+            )
         if self.cfg["training"].get("strict_resume_config", False):
             self._validate_resume_config(self.cfg, ckpt.get("config"))
         raw_model = self.model.module if isinstance(self.model, DDP) else self.model
@@ -855,6 +872,14 @@ class Trainer:
     def load_model_weights(self, path: str) -> None:
         """Initialize model and EMA weights from a checkpoint without optimizer state."""
         ckpt = load_checkpoint_file(path)
+        with Path(path).open("rb") as handle:
+            source_sha = hashlib.file_digest(handle, "sha256").hexdigest()
+        self.initialization_provenance = {
+            "checkpoint_sha256": source_sha,
+            "orientation_injection": checkpoint_orientation_injection(ckpt),
+            "step": ckpt.get("step"),
+            "mode": "weights_only",
+        }
         raw_model = self.model.module if isinstance(self.model, DDP) else self.model
         load_portable_model_state(raw_model, ckpt["model_state_dict"])
         if self.ema_model is not None and "ema_state_dict" in ckpt:
@@ -879,6 +904,7 @@ class Trainer:
         raw_model = self.model.module if isinstance(self.model, DDP) else self.model
         state = {
             "format_version": 1,
+            "initialization_provenance": getattr(self, "initialization_provenance", None),
             "epoch": self._data_pass_epoch,
             "data_pass_epoch": self._data_pass_epoch,
             "sampler_epoch": self._data_pass_epoch,

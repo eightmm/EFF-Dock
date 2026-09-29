@@ -1,5 +1,7 @@
 # Current manuscript methods
 
+**Version boundary:** the existing manuscript benchmark numbers and released weights use `legacy_rt_w`. Corrected `rw` is implemented and separately diagnosed; see [operator equations, evidence and compatibility](ORIENTATION_INJECTION.md). No existing benchmark value has been relabelled as an Rw result.
+
 This overview describes the released docking/confidence pair and the current
 14-figure package. The [detailed methods](methods/README.md) contain equations,
 dimensions, parameter tables and implementation links. [Prism methods](paper/prism/methods.tex)

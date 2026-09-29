@@ -30,6 +30,12 @@ node. Initial scalars are the 384-dimensional graph embedding from
 `01_graph_features.md`. Initial `1o` channels are gated displacements from the
 per-complex graph centre; `1e`, `2e`, and `2o` start at zero. Fragment
 orientation is injected through a zero-initialized rotation-dependent mix.
+For the corrected `rw` operator, each learned local channel vector w is mapped
+as h=Rw; with the active frame action R→QR, this gives h→Qh. Historical
+`legacy_rt_w` instead computes Rᵀw and does not satisfy that identity.
+The source-local edge coordinate Rᵀ(x_j−x_i) below is a different, correct
+world-to-local operation. [Operator provenance and correction](../ORIENTATION_INJECTION.md)
+distinguish the unchanged released weights/results from corrected inference.
 
 ## 2. Conditioning and edge representation
 

@@ -16,6 +16,7 @@ from typing import Any
 import torch
 from torch.utils.data import Dataset
 
+from effdock.checkpoint import validate_orientation_injection
 from effdock.data.dataset import (
     _crop_protein_by_atom_mask,
     crop_to_nearest_residues,
@@ -77,6 +78,7 @@ class LigandPoseConfidenceDataset(Dataset):
         system_ids: dict[str, str] | None = None,
         limit: int | None = None,
         start: int = 0,
+        docking_orientation_injection: str = "legacy_rt_w",
     ) -> None:
         with split_file.open() as handle:
             split_map = json.load(handle)
@@ -87,6 +89,9 @@ class LigandPoseConfidenceDataset(Dataset):
             pids = pids[:limit]
 
         self.pids = pids
+        self.docking_orientation_injection = validate_orientation_injection(
+            docking_orientation_injection
+        )
         self.split = split
         self.processed_dir = Path(processed_dir)
         self.pose_tag = pose_tag or tag or DEFAULT_CONFIDENCE_POSE_TAG
@@ -640,6 +645,14 @@ class LigandPoseConfidenceDataset(Dataset):
         shard = torch.load(shard_path, map_location="cpu", weights_only=True)
         if not isinstance(shard, dict):
             raise ValueError(f"{shard_path}: confidence shard must be a mapping")
+        shard_orientation = validate_orientation_injection(
+            shard.get("docking_orientation_injection", "legacy_rt_w")
+        )
+        if shard_orientation != self.docking_orientation_injection:
+            raise ValueError(
+                f"confidence shard docking orientation mismatch: {shard_orientation} "
+                f"!= requested {self.docking_orientation_injection}"
+            )
         if self.external_pose_targets is not None:
             shard = dict(shard)
             shard[self.pose_target_key] = self._load_external_pose_target(

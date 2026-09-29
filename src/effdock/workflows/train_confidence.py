@@ -25,7 +25,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 
-from effdock.checkpoint import atomic_torch_save, load_portable_model_state
+from effdock.checkpoint import ORIENTATION_INJECTIONS, atomic_torch_save, load_portable_model_state
 from effdock.confidence.dataset import (
     DEFAULT_CONFIDENCE_POSE_TAG,
     LigandPoseConfidenceDataset,
@@ -970,6 +970,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--split_file", type=Path, default=None)
     parser.add_argument("--processed_dir", type=Path, default=None)
     parser.add_argument("--pose_tag", type=str, default=None)
+    parser.add_argument(
+        "--docking-orientation-injection",
+        choices=ORIENTATION_INJECTIONS,
+        default="legacy_rt_w",
+        help="Expected operator of all saved docking features.",
+    )
     parser.add_argument("--tag", type=str, default=None, help="Deprecated alias for --pose_tag.")
     parser.add_argument("--out_dir", type=Path, default=None)
     parser.add_argument("--run_name", type=str, default=None)
@@ -1525,6 +1531,7 @@ def main(argv: list[str] | None = None) -> None:
             train_component_large_graph_max = max(1, train_component_large_graph_max // 2)
 
     primary_train_ds = LigandPoseConfidenceDataset(
+        docking_orientation_injection=args.docking_orientation_injection,
         split_file=args.split_file,
         split="train",
         processed_dir=args.processed_dir,
@@ -1552,6 +1559,7 @@ def main(argv: list[str] | None = None) -> None:
     train_ds: LigandPoseConfidenceDataset | PairedLigandPoseConfidenceDataset
     if paired_training:
         auxiliary_train_ds = LigandPoseConfidenceDataset(
+            docking_orientation_injection=args.docking_orientation_injection,
             split_file=args.split_file,
             split="train",
             processed_dir=args.processed_dir,
@@ -1583,6 +1591,7 @@ def main(argv: list[str] | None = None) -> None:
     else:
         train_ds = primary_train_ds
     val_ds = LigandPoseConfidenceDataset(
+        docking_orientation_injection=args.docking_orientation_injection,
         split_file=args.split_file,
         split="val",
         processed_dir=args.processed_dir,
@@ -1652,6 +1661,13 @@ def main(argv: list[str] | None = None) -> None:
     resume_step = 0
     if args.resume is not None:
         ckpt = _load_checkpoint(args.resume, device)
+        if (
+            ckpt.get("docking_orientation_injection", "legacy_rt_w")
+            != args.docking_orientation_injection
+        ):
+            raise ValueError(
+                "resume confidence docking orientation does not match requested features"
+            )
         resumed_bank = ckpt.get("bank_provenance")
         if resumed_bank is not None:
             if bank_provenance is None:
@@ -1879,6 +1895,7 @@ def main(argv: list[str] | None = None) -> None:
                 "update": step,
                 "state_dict": raw_model.state_dict(),
                 "model_cfg": model_cfg,
+                "docking_orientation_injection": args.docking_orientation_injection,
                 "args": vars(args),
                 "model_type": "docking_graph_pose_confidence",
                 "wandb_run_id": getattr(wandb_run, "id", None)

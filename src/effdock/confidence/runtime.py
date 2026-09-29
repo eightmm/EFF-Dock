@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Any
 
 import torch
 
-from effdock.checkpoint import load_portable_model_state
+from effdock.checkpoint import load_portable_model_state, validate_orientation_injection
 from effdock.confidence.features import extract_t1_ligand_irreps
 from effdock.confidence.model import DockingGraphPoseConfidence
 
@@ -43,6 +44,9 @@ def load_pose_confidence_model(
         pose_readout=str(_arg(train_args, "pose_readout", "global_pool")),
     ).to(device)
     load_portable_model_state(model, ckpt["state_dict"])
+    model.docking_orientation_injection = validate_orientation_injection(
+        ckpt.get("docking_orientation_injection", "legacy_rt_w")
+    )
     model.eval()
     return model, ckpt
 
@@ -65,6 +69,15 @@ def score_poses_with_confidence(
     device: torch.device,
     hidden_dtype: torch.dtype = torch.float32,
 ) -> list[dict[str, float]]:
+    feature_mode = getattr(docking_model, "orientation_injection", "legacy_rt_w")
+    trained_mode = getattr(confidence_model, "docking_orientation_injection", "legacy_rt_w")
+    if feature_mode != trained_mode:
+        warnings.warn(
+            f"Confidence was trained on {trained_mode} docking features, but is scoring "
+            f"{feature_mode} features. This is a cross-operator frozen-weight evaluation.",
+            UserWarning,
+            stacklevel=2,
+        )
     pose_tensor = torch.stack([pose.detach().cpu().to(torch.float32) for pose in poses], dim=0)
     feats = extract_t1_ligand_irreps(
         docking_model,

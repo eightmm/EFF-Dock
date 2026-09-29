@@ -400,13 +400,13 @@ height. Its operations and formulas did not change.
 
 ### Rotation injection: a verified local counterexample
 
-In [the docking forward](../../src/effdock/models/effdock.py), line 881 uses:
+At the historical source revision `9a548de`, the docking forward used:
 
 ```python
 h_R = torch.einsum("nki,ck->nci", R_t, self.R_frag_mix.weight)
 ```
 
-The adjacent comment describes mixing columns of R, but the expression mixes
+The historical adjacent comment described mixing columns of R, but that expression mixes
 rows: for one channel weight w, it computes Rᵀw instead of Rw.
 [The geometry convention](../../src/effdock/geometry/se3.py) and
 [sampler coordinate reconstruction](../../src/effdock/inference/sampler.py)
@@ -415,7 +415,7 @@ fragment frame to QR. A vector-valued initialization should satisfy
 F(QR, w) = Q F(R, w).
 
 A CPU float64 counterexample evaluated the einsum string extracted from the
-actual source, with R=I, w=(1,0,0), and Q a 90° rotation around z. The current
+actual source, with R=I, w=(1,0,0), and Q a 90° rotation around z. The historical
 expression produced approximately (0,−1,0), whereas the rotated original
 feature was (0,1,0): maximum absolute component error 2.0. The intended column
 expression nik,ck->nci had zero error on the same example.
@@ -426,10 +426,14 @@ a measured error of the trained model. The checkpoint-specific follow-up below
 measures the docking output deviation. Existing tests/test_equivariance.py
 exercises individual building blocks, not this EFFDock initialization path.
 
-Changing these indices would change model computation under existing weights.
-The audit therefore leaves the model and checkpoint intact. The earlier
+Changing these indices changes model computation under existing weights.
+The original audit preserved that implementation. The subsequent
+[versioned correction](../ORIENTATION_INJECTION.md) adds corrected `rw` while
+retaining `legacy_rt_w` for historical checkpoints and results. The source
+specification was re-audited for both modes; the shared diagram does not expand
+this initialization term. The historical diagnostic values below are unchanged. The earlier
 source-hash/layout checks must not be presented as proof that the whole model
-is strictly equivariant. The input embedding
+is strictly equivariant. The historical input embedding
 contains a measured departure from strict equivariance; the equivariant
 backbone operations and existing docking results are separate claims.
 

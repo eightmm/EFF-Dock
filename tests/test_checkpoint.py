@@ -163,7 +163,8 @@ def test_export_ema_inference_checkpoint_is_atomic_and_inference_only(tmp_path) 
             "scheduler_state_dicts": [{"last_epoch": 17}],
             "rng_state": {"torch": torch.random.get_rng_state()},
             "metrics": {"rollout/rmsd_median": 4.0},
-            "config": {"model": {"hidden_dim": 8}},
+            "config": {"model": {"hidden_dim": 8, "orientation_injection": "rw"}},
+            "initialization_provenance": {"orientation_injection": "legacy_rt_w"},
             "best_rmsd": 4.5,
         },
         source,
@@ -176,6 +177,8 @@ def test_export_ema_inference_checkpoint_is_atomic_and_inference_only(tmp_path) 
     exported = load_checkpoint_file(output)
     assert exported["artifact_type"] == "effdock_ema_inference_checkpoint"
     assert exported["inference_only"] is True
+    assert exported["config"]["model"]["orientation_injection"] == "rw"
+    assert exported["initialization_provenance"]["orientation_injection"] == "legacy_rt_w"
     assert exported["weight_source"] == "ema"
     assert exported["source_checkpoint_sha256"] == source_sha256
     assert exported["source_checkpoint_step"] == 17

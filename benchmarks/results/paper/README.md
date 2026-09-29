@@ -1,5 +1,7 @@
 # Numerical source data for the manuscript figures
 
+These manuscript numerical data describe the historical `legacy_rt_w` operator. The separate [orientation diagnostic](orientation/summary.json) is a one-seed incomplete PB comparison; see [the correction note](../../../docs/ORIENTATION_INJECTION.md).
+
 These files reproduce the current 21 figures in
 [docs/paper](../../../docs/paper/README.md) using a public checkout, without
 raw structures, checkpoints, private pose banks or cluster directories.

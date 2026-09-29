@@ -187,6 +187,7 @@ def main(argv: list[str] | None = None) -> None:
                     "protein_features_saved": False,
                     "checkpoint": str(args.checkpoint),
                     "checkpoint_step": checkpoint_step,
+                    "docking_orientation_injection": model.orientation_injection,
                     "config": str(args.config),
                     "split": args.split,
                     "seed": sample_seed,

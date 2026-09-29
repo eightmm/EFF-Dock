@@ -1,7 +1,8 @@
 # Model contract
 
-EFF-Dock is a fragment-level SE(3)-equivariant flow-matching docking model. A
-single heterogeneous graph contains ligand atoms, ligand fragments, protein
+Operator version: fresh `configs/train_rw.yaml` training uses corrected `rw`; released checkpoints and their benchmark figures use `legacy_rt_w`. Checkpoint loading preserves the saved convention unless explicitly overridden. See [orientation correction and compatibility](ORIENTATION_INJECTION.md).
+
+EFF-Dock performs fragment-level flow matching on SE(3). A single heterogeneous graph contains ligand atoms, ligand fragments, protein
 atoms, and residue virtual nodes. Edge-typed equivariant message passing
 predicts atom forces, which Newton-Euler aggregation maps to per-fragment
 translation velocity in R3 and observable angular velocity in SO(3).

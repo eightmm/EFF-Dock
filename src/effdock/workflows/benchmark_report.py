@@ -12,6 +12,7 @@ from pathlib import Path
 import torch
 from rdkit.Chem import rdMolDescriptors
 
+from effdock.checkpoint import validate_orientation_injection
 from effdock.evaluation.benchmark import load_ligand
 from effdock.preprocess.fragments import decompose_fragments
 from effdock.preprocess.ligand import featurize_ligand
@@ -26,6 +27,7 @@ from effdock.workflows.evaluate import summarize_rows
 
 EXPECTED_COUNTS = {"astex": 85, "posebusters": 308}
 CONSISTENCY_KEYS = (
+    "orientation_injection",
     "checkpoint_sha256",
     "confidence_checkpoint_sha256",
     "config_sha256",
@@ -177,6 +179,10 @@ def aggregate_dataset(
     if not summaries:
         raise FileNotFoundError(f"no summaries for {run_name} in {input_dir}")
     metadata = [json.loads(path.read_text()) for path in summaries]
+    for shard in metadata:
+        shard["orientation_injection"] = validate_orientation_injection(
+            shard.get("orientation_injection", "legacy_rt_w")
+        )
     reference = metadata[0]
     for current in metadata[1:]:
         mismatches = [key for key in CONSISTENCY_KEYS if current.get(key) != reference.get(key)]
@@ -228,6 +234,7 @@ def aggregate_dataset(
         "shard_summaries": [str(path) for path in summaries],
         "runtime": [shard.get("runtime", {}) for shard in metadata],
         "checkpoint_sha256": reference["checkpoint_sha256"],
+        "orientation_injection": reference["orientation_injection"],
         "confidence_checkpoint_sha256": reference.get("confidence_checkpoint_sha256"),
         "config_sha256": reference["config_sha256"],
         "pocket_centers_sha256": reference["pocket_centers_sha256"],

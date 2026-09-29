@@ -1,7 +1,7 @@
 # EFF-Dock
 
-EFF-Dock is a fragment-level SE(3)-equivariant flow-matching model for
-protein-ligand docking. The repository contains the Python implementation,
+EFF-Dock performs fragment-level flow matching on SE(3) for protein-ligand
+docking, using an equivariant graph backbone. The repository contains the Python implementation,
 training and evaluation workflows, released docking/confidence weights,
 and benchmark figures prepared for manuscript drafting.
 
@@ -10,6 +10,8 @@ It does not perform blind pocket discovery, binding-affinity prediction, or
 binder/non-binder classification.
 
 ## Released model
+
+**Orientation correction:** [Rw versus historical Rᵀw](docs/ORIENTATION_INJECTION.md) documents the mathematical fix, checkpoint compatibility and one-seed diagnostic. Fresh training with `configs/train_rw.yaml` uses Rw; loading released weights preserves their historical operator unless `--orientation-injection rw` is requested. Existing benchmark figures are historical-operator results.
 
 The public model is one paired deployment stack:
 

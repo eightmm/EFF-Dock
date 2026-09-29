@@ -1,5 +1,7 @@
 # EFF-Dock S50 raw+refined pose-confidence checkpoint
 
+**Feature provenance:** this unchanged checkpoint was trained on docking features from `legacy_rt_w`. Scoring corrected `rw` features is a cross-operator frozen-weight evaluation, reported separately; it is not a retrained confidence model. See [orientation compatibility](../docs/ORIENTATION_INJECTION.md).
+
 - File: `effdock_confidence_s50_raw_refined_u70k.pt`
 - SHA-256: `ce59be42f0ca613871ca079127c3296f5ca9a4ec72e44a9e5cf61878351c2638`
 - Model type: `docking_graph_pose_confidence`

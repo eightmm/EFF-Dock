@@ -16,6 +16,7 @@ import numpy as np
 import torch
 from rdkit import Chem
 
+from effdock.checkpoint import ORIENTATION_INJECTIONS, checkpoint_orientation_injection
 from effdock.evaluation.benchmark import (
     apply_refinement,
     compute_pose_rmsd_with_method,
@@ -1595,6 +1596,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument(
+        "--orientation-injection",
+        choices=ORIENTATION_INJECTIONS,
+        default=None,
+        help="Override the checkpoint operator; unversioned checkpoints default to legacy_rt_w.",
+    )
+    parser.add_argument(
         "--output-dir", dest="out_dir", type=Path, default=Path("outputs/external_benchmarks")
     )
     parser.add_argument("--num-samples", type=int, default=DEFAULT_NUM_SAMPLES)
@@ -1963,7 +1970,9 @@ def main(argv: list[str] | None = None) -> None:
         raise SystemExit(f"No complexes found in {args.data_dir}")
 
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
-    model, cfg, ckpt = load_model(args.config, args.checkpoint, device)
+    model, cfg, ckpt = load_model(
+        args.config, args.checkpoint, device, orientation_injection=args.orientation_injection
+    )
     confidence_model = None
     confidence_ckpt = None
     if args.confidence_checkpoint is not None and args.selector_profile != "candidate_only":
@@ -2232,6 +2241,16 @@ def main(argv: list[str] | None = None) -> None:
             else None
         ),
         "checkpoint_sha256": file_sha256(args.checkpoint),
+        "orientation_injection": model.orientation_injection,
+        "orientation_injection_requested": args.orientation_injection or "checkpoint",
+        "checkpoint_orientation_injection": checkpoint_orientation_injection(ckpt),
+        "confidence_docking_orientation_injection": (
+            confidence_model.docking_orientation_injection if confidence_model is not None else None
+        ),
+        "confidence_cross_orientation": (
+            confidence_model.docking_orientation_injection != model.orientation_injection
+            if confidence_model is not None else None
+        ),
         "confidence_checkpoint_sha256": (
             file_sha256(args.confidence_checkpoint) if confidence_model is not None else None
         ),

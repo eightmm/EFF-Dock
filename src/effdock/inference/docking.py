@@ -16,7 +16,13 @@ import torch
 import yaml
 from rdkit.Chem import rdMolDescriptors
 
-from effdock.checkpoint import load_checkpoint_file, load_portable_model_state
+from effdock.checkpoint import (
+    ORIENTATION_INJECTIONS,
+    checkpoint_orientation_injection,
+    load_checkpoint_file,
+    load_portable_model_state,
+    validate_orientation_injection,
+)
 from effdock.inference.defaults import (
     DEFAULT_CONFIDENCE_CHECKPOINT,
     DEFAULT_CONFIG,
@@ -72,6 +78,7 @@ class DockingOptions:
     vina_guidance_protein_shell: float = 18.0
     confidence_checkpoint: Path | None = DEFAULT_CONFIDENCE_CHECKPOINT
     rank_by: str = "auto"
+    orientation_injection: str | None = None
 
 
 def parse_center(value: str | None) -> torch.Tensor | None:
@@ -99,18 +106,37 @@ def _ligand_source_identity(value: str) -> dict[str, str]:
     return {"kind": "literal", "sha256": digest.hexdigest()}
 
 
-def load_model(config_path: Path, checkpoint_path: Path, device: torch.device):
+def load_model(
+    config_path: Path,
+    checkpoint_path: Path,
+    device: torch.device,
+    *,
+    orientation_injection: str | None = None,
+):
     with open(config_path) as f:
         cfg = yaml.safe_load(f)
 
     from effdock.models.effdock import EFFDock
 
+    if "orientation_injection" in cfg["model"]:
+        validate_orientation_injection(cfg["model"]["orientation_injection"])
+    ckpt = load_checkpoint_file(checkpoint_path)
+    trained_orientation = checkpoint_orientation_injection(ckpt)
+    effective_orientation = validate_orientation_injection(
+        trained_orientation if orientation_injection is None else orientation_injection
+    )
+    # Architecture dimensions still come from YAML; this semantic operator is
+    # checkpoint-owned unless the caller explicitly requests a frozen-weight change.
+    cfg["model"]["orientation_injection"] = effective_orientation
     model_cfg = {k: v for k, v in cfg["model"].items() if k != "model_type"}
     model = EFFDock(**model_cfg)
-    ckpt = load_checkpoint_file(checkpoint_path)
     load_portable_model_state(model, ckpt["model_state_dict"])
     model.to(device)
     model.train(False)
+    print(
+        f"Orientation injection: {effective_orientation} "
+        f"(checkpoint: {trained_orientation}; override: {orientation_injection or 'none'})"
+    )
     return model, cfg, ckpt
 
 
@@ -179,6 +205,9 @@ def write_docking_outputs(
     opts: DockingOptions,
     scores=None,
     effective_rank_by: str | None = None,
+    effective_orientation_injection: str | None = None,
+    checkpoint_orientation: str | None = None,
+    confidence_training_orientation: str | None = None,
 ) -> None:
     opts.out_dir.mkdir(parents=True, exist_ok=True)
     pocket_center = meta["pocket_center"]
@@ -209,6 +238,15 @@ def write_docking_outputs(
         "confidence_checkpoint": str(opts.confidence_checkpoint or ""),
         "rank_by": opts.rank_by,
         "effective_rank_by": effective_rank_by or opts.rank_by,
+        "orientation_injection": effective_orientation_injection or opts.orientation_injection,
+        "orientation_injection_requested": opts.orientation_injection or "checkpoint",
+        "checkpoint_orientation_injection": checkpoint_orientation,
+        "confidence_docking_orientation_injection": confidence_training_orientation,
+        "confidence_cross_orientation": (
+            effective_orientation_injection != confidence_training_orientation
+            if confidence_training_orientation is not None
+            else None
+        ),
     }
     if opts.num_samples == 1:
         out_path = opts.out_dir / "docked.sdf"
@@ -269,7 +307,9 @@ def dock(opts: DockingOptions) -> None:
         raise FileNotFoundError(f"Protein PDB not found: {opts.protein}")
 
     device = resolve_device(opts.device)
-    model, cfg, ckpt = load_model(opts.config, opts.checkpoint, device)
+    model, cfg, ckpt = load_model(
+        opts.config, opts.checkpoint, device, orientation_injection=opts.orientation_injection
+    )
     print(f"Model loaded: {opts.checkpoint} (step {ckpt.get('step', '?')})")
 
     print(f"Loading ligand: {opts.ligand}")
@@ -358,6 +398,7 @@ def dock(opts: DockingOptions) -> None:
         )
 
     confidence_indices: dict[str, int] = {}
+    confidence_training_orientation = None
     if opts.confidence_checkpoint is not None:
         from effdock.confidence.runtime import (
             load_pose_confidence_model,
@@ -370,6 +411,7 @@ def dock(opts: DockingOptions) -> None:
         confidence_model, confidence_ckpt = load_pose_confidence_model(
             opts.confidence_checkpoint, device
         )
+        confidence_training_orientation = confidence_model.docking_orientation_injection
         default_sigma = float(
             opts.sigma if opts.sigma is not None else cfg["data"].get("prior_sigma", 1.0)
         )
@@ -464,6 +506,9 @@ def dock(opts: DockingOptions) -> None:
         opts,
         scores=scores,
         effective_rank_by=rank_by,
+        effective_orientation_injection=model.orientation_injection,
+        checkpoint_orientation=checkpoint_orientation_injection(ckpt),
+        confidence_training_orientation=confidence_training_orientation,
     )
 
 
@@ -475,6 +520,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ligand", type=str, required=True)
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_DOCKING_CHECKPOINT)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument(
+        "--orientation-injection",
+        choices=ORIENTATION_INJECTIONS,
+        default=None,
+        help="Override the checkpoint operator: rw is corrected; legacy_rt_w reproduces historical runs. Default follows checkpoint metadata (unversioned = legacy_rt_w).",
+    )
     parser.add_argument(
         "--pocket-center", type=parse_center, required=True, help="Binding site x,y,z"
     )
@@ -499,7 +550,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=None,
         help='Multi-sigma inference. "2,3,4,5" splits --num_samples '
         'across values; explicit counts such as "2:25,3:25,4:50" must '
-        'sum to --num-samples.',
+        "sum to --num-samples.",
     )
     parser.add_argument("--num-samples", type=int, default=DEFAULT_NUM_SAMPLES)
     parser.add_argument("--seed", type=int, default=None)
@@ -597,6 +648,7 @@ def options_from_args(args: argparse.Namespace) -> DockingOptions:
         vina_guidance_protein_shell=args.vina_guidance_protein_shell,
         confidence_checkpoint=args.confidence_checkpoint,
         rank_by=args.rank_by,
+        orientation_injection=args.orientation_injection,
     )
 
 

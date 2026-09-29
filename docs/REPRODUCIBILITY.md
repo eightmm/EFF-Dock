@@ -1,5 +1,7 @@
 # Reproducibility
 
+The [orientation operator contract](ORIENTATION_INJECTION.md) distinguishes corrected `rw` from historical `legacy_rt_w`. Specify the operator when changing frozen-weight inference; use the recorded source revision for hash-pinned historical experiments. Checkpoint resume cannot silently switch operators.
+
 The environment is locked by `pyproject.toml` and `uv.lock`, including PyTorch
 2.10.0 CUDA 13.0 wheels and matching PyG extension wheels.
 
@@ -28,6 +30,10 @@ uv run eff-dock confidence prepare \
 uv run eff-dock confidence train \
   --config configs/train_confidence_s50_raw_refined_100k.yaml
 ```
+
+For fresh corrected-Rw training, use `configs/train_rw.yaml`. The historical
+`configs/train.yaml` and its pinned hash are unchanged. This changes the operator,
+not the training architecture or hyperparameters.
 
 The public inference pair is
 `effdock_docking_early_time_t0p10_50k.pt` (SHA-256

@@ -29,14 +29,14 @@
   "contact_pool_width": 2048,
   "pose_readout_width": 6144,
   "source_sha256": {
-    "src/effdock/models/effdock.py": "4aeab13b27853324203a9ed741eb7385b556c526677fdccc72dcf9d20de965e1",
+    "src/effdock/models/effdock.py": "4d8305c4a89effe6138a38c4536bbd7f298924ed3d96d702527992d8faf4f505",
     "src/effdock/models/equivariant.py": "414fda6a7f91b1ffef77e402442c6185dabfef0582c7381740b47c08c5fd1291",
     "src/effdock/confidence/model.py": "76d6a50f9edd9f37cc9ae19908d677ad1ffedc8516d1c034b7053617eff32f57",
     "configs/train_early_time_ft_50k.yaml": "439d95d7b56e49de6239e113ae4b7e4db94be9e10afe5b8c5f0ece48f076a369",
     "configs/train_confidence_s50_raw_refined_100k.yaml": "ff1351193fe1d6469db9ab1c9f168e5f4e031da4c2b922f5de18edea9d0929ca",
     "src/effdock/confidence/features.py": "5ed5891d7c249ed81fadd29ad9ee9d7a041043c51bd627f520d677a579019380",
-    "src/effdock/confidence/runtime.py": "10117dfdf7351d90ef0c2dd28833e441d2f5f462a2ac3f95b0dc6e54818979ab",
-    "src/effdock/confidence/dataset.py": "6a2844bb0242958b6fc5ed01b7ee2e3ecfd906fe55466c811b628f483d1361ca"
+    "src/effdock/confidence/runtime.py": "2d1f9e21a24e9f2975c0b34087405b74850e7476d935373745234debaf0e6952",
+    "src/effdock/confidence/dataset.py": "983cd08923c4da642443adeca4b896ad370a4206a8cc8d8853d01bf47a2713a4"
   },
   "normalization": {
     "eps": 1e-06,
@@ -53,5 +53,11 @@
     "operation": "h_ligand += g * h_saved",
     "gate_initial_value": 0.25,
     "scope": "ligand atom and fragment nodes"
+  },
+  "orientation_injection": {
+    "released_checkpoint": "legacy_rt_w",
+    "scope": "Shared layers depicted; initialization operator is detailed in docs/ORIENTATION_INJECTION.md",
+    "corrected_training_config": "configs/train_rw.yaml",
+    "corrected_training_operator": "rw"
   }
 }

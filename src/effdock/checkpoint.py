@@ -11,6 +11,26 @@ from typing import Any
 import torch
 from torch import nn
 
+ORIENTATION_INJECTIONS = ("legacy_rt_w", "rw")
+
+
+def validate_orientation_injection(value: str) -> str:
+    if value not in ORIENTATION_INJECTIONS:
+        raise ValueError(
+            f"unknown orientation_injection={value!r}; expected {ORIENTATION_INJECTIONS}"
+        )
+    return value
+
+
+def checkpoint_orientation_injection(checkpoint: dict[str, Any]) -> str:
+    """Unversioned checkpoints used the historical row-mixing operator."""
+    config = checkpoint.get("config", {})
+    if not isinstance(config, dict) or not isinstance(config.get("model", {}), dict):
+        raise ValueError("checkpoint config/model must be a mapping")
+    return validate_orientation_injection(
+        config.get("model", {}).get("orientation_injection", "legacy_rt_w")
+    )
+
 
 def atomic_torch_save(value: Any, path: str | Path) -> Path:
     """Durably replace a Torch artifact without exposing a partial checkpoint."""
@@ -150,7 +170,7 @@ def export_ema_inference_checkpoint(
         "model_state_dict": promoted,
         "ema_state_dict": checkpoint["ema_state_dict"],
     }
-    for key in ("epoch", "data_pass_epoch", "metrics", "config"):
+    for key in ("epoch", "data_pass_epoch", "metrics", "config", "initialization_provenance"):
         if key in checkpoint:
             exported[key] = checkpoint[key]
     if "best_rmsd" in checkpoint:

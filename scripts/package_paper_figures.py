@@ -48,7 +48,22 @@ def bundle_captions(metadata):
     for row in metadata["figures"]:
         relative = (ROOT / row["source"]).relative_to(BASE).as_posix()
         text = text.replace(f"]({relative})", f"]({row['bundle_file']})")
-    return text.replace("manifest.json", "captions.json")
+    return text.replace("manifest.json", "captions.json").replace(
+        "../ORIENTATION_INJECTION.md", "ORIENTATION_INJECTION.md"
+    )
+
+
+def orientation_note():
+    return (
+        (ROOT / "docs/ORIENTATION_INJECTION.md")
+        .read_text()
+        .replace("paper/diagnostics/", "diagnostics/")
+        .replace("../benchmarks/results/paper/orientation/summary.json", "orientation_summary.json")
+        .replace(
+            "../benchmarks/results/paper/orientation/verification.json",
+            "orientation_verification.json",
+        )
+    )
 
 
 def bundle_manifest(metadata):
@@ -72,6 +87,8 @@ Working materials for writing the EFF-Dock manuscript, not a published paper.
 
 - [Combined PDF](paper_figures.pdf)
 - [English captions and author notes](FIGURE_CAPTIONS.md)
+- [Orientation correction and result provenance](ORIENTATION_INJECTION.md)
+- `diagnostics/`: separate incomplete one-seed Rw comparison, not part of the 21-page legacy collection.
 - `methods.tex`: editable equations and current methods.
 - `main.tex` and `figure_captions.tex`: reference LaTeX document and figure blocks.
 - `figures/`: {len(metadata["figures"])} individual PDFs in manuscript page order.
@@ -85,6 +102,17 @@ the repository methods and parameter tables provide implementation detail.
     with ZipFile(temporary, "w", ZIP_DEFLATED) as archive:
         archive.writestr("README.md", readme)
         archive.writestr("FIGURE_CAPTIONS.md", bundle_captions(metadata))
+        archive.writestr("ORIENTATION_INJECTION.md", orientation_note())
+        archive.write(
+            ROOT / "benchmarks/results/paper/orientation/verification.json",
+            "orientation_verification.json",
+        )
+        archive.write(
+            ROOT / "benchmarks/results/paper/orientation/summary.json", "orientation_summary.json"
+        )
+        for suffix in ("pdf", "png"):
+            name = f"Rw_comparison.{suffix}"
+            archive.write(BASE / "diagnostics" / name, f"diagnostics/{name}")
         archive.writestr(
             "captions.json",
             json.dumps(bundle_manifest(metadata), ensure_ascii=False, indent=2) + "\n",
@@ -112,6 +140,18 @@ def verify(metadata):
         row["latex_label"] for row in metadata["figures"]
     ]
     with ZipFile(PRISM / "prism_figure_reference.zip") as archive:
+        assert archive.read("ORIENTATION_INJECTION.md").decode() == orientation_note()
+        assert (
+            archive.read("orientation_verification.json")
+            == (ROOT / "benchmarks/results/paper/orientation/verification.json").read_bytes()
+        )
+        assert (
+            archive.read("orientation_summary.json")
+            == (ROOT / "benchmarks/results/paper/orientation/summary.json").read_bytes()
+        )
+        for suffix in ("pdf", "png"):
+            name = f"Rw_comparison.{suffix}"
+            assert archive.read(f"diagnostics/{name}") == (BASE / "diagnostics" / name).read_bytes()
         assert archive.testzip() is None
         assert json.loads(archive.read("captions.json")) == bundle_manifest(metadata)
         assert archive.read("FIGURE_CAPTIONS.md").decode() == bundle_captions(metadata)
@@ -120,7 +160,7 @@ def verify(metadata):
             assert archive.read(name) == (PRISM / name).read_bytes()
         for row, path in zip(metadata["figures"], paths, strict=True):
             assert archive.read(row["bundle_file"]) == path.read_bytes()
-        for text_name in ("README.md", "FIGURE_CAPTIONS.md"):
+        for text_name in ("README.md", "FIGURE_CAPTIONS.md", "ORIENTATION_INJECTION.md"):
             for link in re.findall(r"\]\(([^)]+)\)", archive.read(text_name).decode()):
                 if "://" not in link and not link.startswith("#"):
                     assert link.split("#")[0] in archive.namelist(), link

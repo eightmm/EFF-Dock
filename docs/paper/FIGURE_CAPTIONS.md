@@ -1,5 +1,7 @@
 # Current manuscript figure captions — Prism reference
 
+**Operator provenance:** all EFF-Dock benchmark values in this 21-page collection use historical `legacy_rt_w` (Rᵀw). They are not corrected-Rw reevaluations. See [the separate correction diagnostic](../ORIENTATION_INJECTION.md).
+
 현재 **21페이지 PDF** 기준: 본문용 Figure 1–11, 보충 Figure S1–S10. 최종 논문 번호는 편집 시 변경 가능하다. 각 영문 캡션은 복사해서 사용할 수 있으며, 한국어 메모는 저자 참고용이다.
 
 PDF SHA-256: `056e97f28ec1d33f57eed45032d71a46599287a350bef0d62aa0478487bc6414`

@@ -1,0 +1,63 @@
+{
+  "cpu_regression": {
+    "passed": 90,
+    "skipped": 3,
+    "skip_reason": "CUDA-only layer tests on CPU allocation",
+    "command": "python -m pytest -q tests/test_orientation_injection.py tests/test_checkpoint.py tests/test_equivariance.py tests/test_guidance_provenance.py tests/test_inference_defaults.py tests/test_inference_io.py tests/test_benchmark_workflows.py tests/test_confidence.py tests/test_confidence_bank_training.py tests/test_prepare_confidence.py tests/test_cli.py"
+  },
+  "full_model_corrected_gate_passed": true,
+  "full_model_scope": {
+    "cases": [
+      "1w1p",
+      "1w2g",
+      "1gm8",
+      "1s19",
+      "1ygc"
+    ],
+    "times_per_case": 3,
+    "transforms_per_time": 4,
+    "gate": "error_l2 <= 1e-4 + 1e-4 * expected_l2",
+    "weights": "unchanged released50k EMA, nonzero orientation mixing"
+  },
+  "full_model_errors": {
+    "released_Rt_w": {
+      "v_pred": {
+        "max_relative_l2": 0.02143363741707655,
+        "max_absolute_l2": 0.06738593429327011,
+        "passed": 15,
+        "tested": 60
+      },
+      "omega_pred": {
+        "max_relative_l2": 0.027046360139590733,
+        "max_absolute_l2": 0.027803810313344002,
+        "passed": 15,
+        "tested": 60
+      }
+    },
+    "corrected_Rw": {
+      "v_pred": {
+        "max_relative_l2": 9.193471500777281e-06,
+        "max_absolute_l2": 0.00012599739420693368,
+        "passed": 60,
+        "tested": 60
+      },
+      "omega_pred": {
+        "max_relative_l2": 1.8146621669240573e-05,
+        "max_absolute_l2": 7.983070099726319e-05,
+        "passed": 60,
+        "tested": 60
+      }
+    }
+  },
+  "limitations": [
+    "Finite core-network test; not a proof of whole-pipeline invariance",
+    "No new benchmark sweep or training",
+    "PB comparative cohort remains307/308"
+  ],
+  "source_sha256": {
+    "src/effdock/models/effdock.py": "4d8305c4a89effe6138a38c4536bbd7f298924ed3d96d702527992d8faf4f505",
+    "src/effdock/checkpoint.py": "979406be359c891fc1cd6f24d2d7fbfd688a861368a789bc3d6cfb575526e833",
+    "src/effdock/inference/docking.py": "ec2bd57cbeb35c4da517abe1bafda4888393dbdc9ca8f8daae348275b9bc5ee6",
+    "src/effdock/confidence/runtime.py": "2d1f9e21a24e9f2975c0b34087405b74850e7476d935373745234debaf0e6952"
+  }
+}

@@ -13,6 +13,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
+from ..checkpoint import validate_orientation_injection
 from ..geometry.se3 import quaternion_to_matrix
 from ..preprocess.protein import NUM_ATOM_TOKENS, NUM_RES_TYPES
 from .equivariant import (
@@ -23,6 +24,14 @@ from .equivariant import (
     GatedEquivariantConv,
 )
 from .nn_utils import rbf_encode, scatter_mean, sinusoidal_embedding
+
+
+def mix_fragment_orientation(R: Tensor, weight: Tensor, convention: str) -> Tensor:
+    """Map local channel weights to world vectors; retain the legacy replay operator."""
+    validate_orientation_injection(convention)
+    if convention == "rw":
+        return torch.einsum("nik,ck->nci", R, weight)
+    return torch.einsum("nki,ck->nci", R, weight)
 
 
 def _graph_bool(
@@ -213,17 +222,13 @@ def newton_euler_aggregate(
     eigenvalues = torch.zeros(n_frag, 3, device=device, dtype=torch.float64)
     eigenvectors = torch.eye(3, device=device, dtype=torch.float64).expand(n_frag, -1, -1).clone()
     if active_idx.numel() > 0:
-        active_values, active_vectors = _stable_symmetric_eigh(
-            I_tensor.index_select(0, active_idx)
-        )
+        active_values, active_vectors = _stable_symmetric_eigh(I_tensor.index_select(0, active_idx))
         eigenvalues.index_copy_(0, active_idx, active_values)
         eigenvectors.index_copy_(0, active_idx, active_vectors)
 
     # Observable mask: eigenvalue > threshold * max_eigenvalue_per_fragment
     max_eig = eigenvalues.max(dim=-1, keepdim=True).values.clamp(min=1e-8)
-    observable = (eigenvalues > eig_threshold * max_eig).to(
-        dtype=eigenvalues.dtype
-    )  # [N_frag, 3]
+    observable = (eigenvalues > eig_threshold * max_eig).to(dtype=eigenvalues.dtype)  # [N_frag, 3]
 
     # Single-atom fragments: all axes unobservable
     single_mask = (~active).unsqueeze(-1)  # [N_frag, 1]
@@ -640,6 +645,8 @@ class EFFDock(nn.Module):
         max_frag_size: Maximum fragment size for size embedding.
         dropout: Dropout probability.
         contact_cutoff: Dynamic protein-ligand contact edge cutoff (0 = disabled).
+        orientation_injection: ``rw`` mixes columns of the active local-to-world
+            rotation. ``legacy_rt_w`` reproduces historical weights' operator.
     """
 
     def __init__(
@@ -655,6 +662,7 @@ class EFFDock(nn.Module):
         max_frag_size: int = 50,
         dropout: float = 0.0,
         contact_cutoff: float = 0.0,
+        orientation_injection: str = "legacy_rt_w",
     ) -> None:
         super().__init__()
         self.hidden_dim = hidden_dim
@@ -663,6 +671,7 @@ class EFFDock(nn.Module):
         self.l2o_dim = l2o_dim
         self.n_rbf = n_rbf
         self.contact_cutoff = contact_cutoff
+        self.orientation_injection = validate_orientation_injection(orientation_injection)
 
         # Node embedding (scalar)
         self.node_emb = EFFDockNodeEmbedding(hidden_dim)
@@ -702,8 +711,8 @@ class EFFDock(nn.Module):
             nn.Tanh(),
         )
 
-        # R_frag injection: mix 3 R_t columns (1o vectors) into vec_dim
-        # channels via a scalar linear combination (preserves equivariance).
+        # The corrected injection mixes columns of the active rotation into
+        # world-vector channels; legacy replay instead uses its transpose.
         # The earlier `R_frag_gate` (per-channel t-conditional Tanh) was
         # removed — EquivariantAdaLN inside every interaction layer already
         # provides t-conditional scaling on all features, so an additional
@@ -870,15 +879,11 @@ class EFFDock(nn.Module):
         gate = self.vec_gate(h_scalar)
         h_1o = (gate.unsqueeze(-1) * r.unsqueeze(1)).reshape(n_nodes, vec_dim * 3)
 
-        # R_frag injection: mix R_t columns into fragment nodes' 1o channels.
-        # R_t columns are 1o vectors; scalar linear combination preserves
-        # equivariance. AdaLN inside the layers handles the time-dependent
-        # scaling of this contribution; no separate init-time gate needed.
+        # Rw transforms as Q(Rw) when the frame transforms as R -> QR.
+        # Historical R^T w does not; retain it only for explicit compatibility.
         if "q_frag" in batch:
             R_t = quaternion_to_matrix(batch["q_frag"])  # [N_frag, 3, 3]
-            # einsum: R_t[:, :, k] = k-th column (1o), mix weight[c, k]
-            #   → [N_frag, vec_dim, 3]
-            h_R = torch.einsum("nki,ck->nci", R_t, self.R_frag_mix.weight)
+            h_R = mix_fragment_orientation(R_t, self.R_frag_mix.weight, self.orientation_injection)
             h_R = h_R.reshape(-1, vec_dim * 3)
             h_1o = h_1o.clone()
             h_1o[frag_idx] = h_1o[frag_idx] + h_R
