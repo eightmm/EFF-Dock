@@ -146,6 +146,7 @@ def main() -> None:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--docking-checkpoint", type=Path, required=True)
     parser.add_argument("--confidence-checkpoint", type=Path, required=True)
+    parser.add_argument("--orientation-injection", choices=("rw", "legacy_rt_w"))
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--sigma", type=float, default=0.5)
     parser.add_argument("--pocket-cutoff", type=float)
@@ -218,7 +219,10 @@ def main() -> None:
     input_preparation_seconds = time.perf_counter() - pipeline_started
     _synchronize(device)
     model_load_started = time.perf_counter()
-    model, _, docking_ckpt = load_model(args.config, args.docking_checkpoint, device)
+    model, _, docking_ckpt = load_model(
+        args.config, args.docking_checkpoint, device,
+        orientation_injection=args.orientation_injection,
+    )
     confidence_model, confidence_ckpt = load_pose_confidence_model(
         args.confidence_checkpoint, device
     )
@@ -334,6 +338,11 @@ def main() -> None:
         "pose_count": EXPECTED_POSES,
         "sigma": args.sigma,
         "pose_batch_size": args.pose_batch_size,
+        "orientation_injection": model.orientation_injection,
+        "confidence_docking_orientation_injection": confidence_model.docking_orientation_injection,
+        "confidence_cross_orientation": (
+            model.orientation_injection != confidence_model.docking_orientation_injection
+        ),
         "pocket_cutoff_angstrom": pocket_cutoff,
         "selected": selected,
         "selector_changed": selected["step_000"]["pose_index"]

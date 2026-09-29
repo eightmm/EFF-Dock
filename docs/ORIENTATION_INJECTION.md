@@ -175,6 +175,12 @@ presented as Rw must use corrected outputs; Astex/PB alone cannot relabel result
 for PhiBench, FoldBench or OpenBind. No new GPU inference or training was launched
 for this 308-case report update.
 
+A subsequent [registered three-seed evaluation](RW_THREE_SEED_PROTOCOL.md)
+covers all five manuscript benchmarks with corrected generation and fresh
+confidence features, plus matched legacy Astex/PoseBusters controls. Its base
+seeds are 42, 100042 and 200042. Results are pending; the single-seed diagnostic
+and historical manuscript estimates above remain separate.
+
 ## Discussion and decision
 
 A two-round read-only review with Claude Opus 5.5 independently confirmed the
