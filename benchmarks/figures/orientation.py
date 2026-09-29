@@ -1,4 +1,4 @@
-"""Render the separate, incomplete-cohort orientation diagnostic from aggregate data."""
+"""Render the separate, full-cohort orientation diagnostic from aggregate data."""
 
 import argparse
 import json
@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def render(P):
     summary = json.loads((ROOT / "benchmarks/results/paper/orientation/summary.json").read_text())
-    assert summary["status"] == "partial" and summary["completed_pb_n"] == 307
+    assert summary["status"] == "complete_with_supplement" and summary["completed_pb_n"] == 308
     P.mkdir(parents=True, exist_ok=True)
     cohorts = [
         (key, summary["cohorts"][key]["title"], None, None) for key in ("astex", "posebusters")
@@ -34,7 +34,7 @@ def render(P):
     fig, axs = plt.subplots(1, 2, figsize=(10, 4.3), layout="constrained", sharey=True)
     for ax, (key, title, _, _) in zip(axs, cohorts):
         c = summary["cohorts"][key]
-        subtitle = "n = 85" if key == "astex" else "307 / 308 evaluated"
+        subtitle = f"n = {c['n']}"
         ax.set_title(
             ("A" if key == "astex" else "B") + "  " + title + "\n" + subtitle,
             loc="left",

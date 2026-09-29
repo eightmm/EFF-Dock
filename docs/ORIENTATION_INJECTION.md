@@ -108,8 +108,8 @@ minimum-pRMSD selection. The table is **refined** performance:
 |---|---|---:|---:|
 | Astex Diverse Set (85/85) | RMSD<2Å | 71/85 (83.53%) | 69/85 (81.18%) |
 | Astex Diverse Set (85/85) | RMSD<2Å and PB-valid | 69/85 (81.18%) | 67/85 (78.82%) |
-| PoseBusters v2 (307/308 evaluated) | RMSD<2Å | 255/307 (83.06%) | 257/307 (83.71%) |
-| PoseBusters v2 (307/308 evaluated) | RMSD<2Å and PB-valid | 246/307 (80.13%) | 247/307 (80.46%) |
+| PoseBusters v2 (308/308) | RMSD<2Å | 256/308 (83.12%) | 258/308 (83.77%) |
+| PoseBusters v2 (308/308) | RMSD<2Å and PB-valid | 247/308 (80.19%) | 248/308 (80.52%) |
 
 PB uses all 27 non-RMSD PoseBusters 0.6.5 validity checks. RMSD uses all-heavy-atom
 receptor-frame comparison, symmetry-aware where representation permits. Two PB
@@ -117,24 +117,63 @@ cases use the established calculator's full atom-map fallback for input/referenc
 representation mismatch; there is no subset RMSD. Raw, unfiltered, oracle and
 paired complex-bootstrap results are retained in the numerical data.
 
-**PB is incomplete.** 7UJ5_DGL stopped before scoring/refinement and before the
-corrected arm, at a prespecified repeated-generation difference guard of 0.01 Å.
-One same-condition diagnostic replay also failed: one of 10 original-model poses
-differed by 0.0218446 Å; the other nine differed by roughly 1e-6 Å. This is a numerical
-repeatability failure, not a measured docking failure. The case was not dropped
-from the planned 308-member cohort or imputed as a failure. No favorable replay
-was substituted. Its original difference magnitude was not recorded.
+**PB now includes all 308 cases: 307 original cases plus one disclosed supplement.**
+7UJ5_DGL originally stopped before scoring/refinement and the corrected arm at
+a repeated-generation difference guard of 0.01 Å. A bounded replay also failed
+(maximum difference 0.0218446 Å); both failed attempts are preserved. These were
+repeatability failures, not measured unsuccessful docking outcomes.
 
-Among 307 evaluated cases, PB-valid success improved in 3 and worsened in 2.
-Regardless of the one missing binary paired outcome, the possible 308-case
-PB-valid-success difference is **0 to +0.649 percentage points**. This is an
-arithmetic missing-outcome bound, not a confidence interval or completed result.
+A separately authorized, predeclared supplementary run retained the same weights,
+seed, explicit priors, N100/S10 generation, refinement and confidence selector,
+but made the repeat check diagnostic-only. Its first realization was used
+regardless of outcome. This run happened to pass the original repeat threshold
+(maximum difference 0.00000705 Å); that does not establish numerical stability.
+Both arms selected candidate 12 after refinement (zero-based):
+
+| 7UJ5_DGL refined selection | pRMSD (Å) | RMSD (Å) | PB-valid |
+|---|---:|---:|---|
+| Historical Rᵀw | 0.5751 | 0.4025 | Yes |
+| Corrected Rw | 0.5761 | 0.4054 | Yes |
+
+The 308-case table and figure include this measured supplement, without imputing
+an outcome. They do not represent an uninterrupted execution under the original
+strict repeatability gate. The previous 307-case report remains in Git history
+and the local audit archive. PB-valid success improves in 3 cases and worsens in
+2, yielding **+0.325 percentage points**. There is no longer a missing outcome;
+paired case-bootstrap intervals were recomputed on all 308 cases. The 95% interval
+for the PB-valid-success difference is −0.974 to +1.623 percentage points; it
+includes zero and excludes seed/execution variability.
 
 The original Astex 85 run is retained. One of its two corrected-arm losses
 recovered in a same-seed replay. Both this observation and the PB repeat guard
 limit attribution of small differences to the operator. Paired case-bootstrap
 intervals exclude seed/execution variability. These repeatedly inspected external
 sets do not provide independent model-selection or generalization evidence.
+
+## Are three inference seeds needed?
+
+The correction is justified by the active-frame algebra and numerical checks;
+three seeds are not needed to decide which contraction is mathematically correct.
+They are recommended before replacing the manuscript's primary performance
+results with corrected-Rw results. The present PB advantage is one complex, and
+the Astex and same-seed replay observations show that execution variation matters.
+Three inference seeds do not mean three model-training runs, and do not by
+themselves establish statistical significance.
+
+For the final comparison, first run Astex and PB with both operators, three
+predeclared sampling seeds, and identical explicit priors for each paired
+complex/seed. Freeze source, weights, hardware policy, refinement and selection;
+record numerical repeat controls separately from docking success. Report each
+seed and paired differences, plus mean and sample SD. Do not select the best seed
+or mix old-operator values into corrected-Rw averages. Retain the present seed-42
+comparison as a disclosed diagnostic; a fresh uniform three-seed run is the
+preferred final estimate. Historical baselines can be reused only when their
+inputs, priors and full protocol match the paired comparison.
+
+If the paper adopts Rw as its main method, every benchmark table and analysis
+presented as Rw must use corrected outputs; Astex/PB alone cannot relabel results
+for PhiBench, FoldBench or OpenBind. No new GPU inference or training was launched
+for this 308-case report update.
 
 ## Discussion and decision
 
@@ -173,10 +212,11 @@ three CUDA-only layer tests were skipped on CPU. See the
 [verification record](../benchmarks/results/paper/orientation/verification.json).
 
 **Figure caption.** Frozen-weight orientation-injection comparison on (A) Astex
-Diverse Set (n=85) and (B) evaluated PoseBusters v2 cases (n=307 of 308 planned).
+Diverse Set (n=85) and (B) PoseBusters v2 (n=308).
 Bar totals show chirality-filtered confidence Top-1 RMSD <2 Å success before and
 after fixed refinement. Solid regions additionally pass all 27 non-RMSD
 PoseBusters checks; hatched regions are RMSD-successful but PB-invalid. The
-missing PB case failed a generation-repeatability guard before outcomes were
-available. Results use one paired seed and are separate from the three-repeat
+308-case PB cohort contains 307 original cases and one predeclared supplementary
+run with diagnostic-only repeat control, unchanged selection and first-realization
+outputs. Results use one paired seed and are separate from the three-repeat
 legacy manuscript figures.

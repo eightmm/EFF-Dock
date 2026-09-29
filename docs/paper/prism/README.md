@@ -1,6 +1,6 @@
 # Prism manuscript reference package
 
-**Operator provenance:** the included legacy benchmark figures retain Rᵀw initialization. The methods and captions now distinguish the corrected Rw option; the separate incomplete one-seed comparison is documented [in the repository](../../ORIENTATION_INJECTION.md).
+**Operator provenance:** the included legacy benchmark figures retain Rᵀw initialization. The methods and captions now distinguish the corrected Rw option; the separate 308-case one-seed comparison with one disclosed supplement is documented [in the repository](../../ORIENTATION_INJECTION.md).
 
 [Download the ZIP](prism_figure_reference.zip) for the combined 21-page figure
 PDF, individual PDFs, English captions, source mapping and editable LaTeX.

@@ -52,12 +52,23 @@
   "limitations": [
     "Finite core-network test; not a proof of whole-pipeline invariance",
     "No new benchmark sweep or training",
-    "PB comparative cohort remains307/308"
+    "308-case comparison includes one explicitly amended-procedure supplement; not an uninterrupted strict-gate execution"
   ],
   "source_sha256": {
     "src/effdock/models/effdock.py": "4d8305c4a89effe6138a38c4536bbd7f298924ed3d96d702527992d8faf4f505",
     "src/effdock/checkpoint.py": "979406be359c891fc1cd6f24d2d7fbfd688a861368a789bc3d6cfb575526e833",
     "src/effdock/inference/docking.py": "ec2bd57cbeb35c4da517abe1bafda4888393dbdc9ca8f8daae348275b9bc5ee6",
     "src/effdock/confidence/runtime.py": "2d1f9e21a24e9f2975c0b34087405b74850e7476d935373745234debaf0e6952"
+  },
+  "cohort_update": {
+    "status": "verified_308_with_supplement",
+    "planned": 308,
+    "evaluated": 308,
+    "selected_pb_rows": 2464,
+    "prior_307_counts_reconciled": true,
+    "supplement_artifact_hashes_verified": true,
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20260928,
+    "seed_execution_variance_included": false
   }
 }

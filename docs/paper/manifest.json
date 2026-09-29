@@ -389,5 +389,5 @@
   ],
   "render_command": "uv run python -m benchmarks.figures.paper --output outputs/paper_figures",
   "docking_orientation_injection": "legacy_rt_w",
-  "orientation_note": "These historical figures are not corrected-Rw reevaluations. See docs/ORIENTATION_INJECTION.md for the separate one-seed incomplete diagnostic."
+  "orientation_note": "These historical figures are not corrected-Rw reevaluations. See docs/ORIENTATION_INJECTION.md for the separate one-seed diagnostic (PB n=308, including one disclosed supplement)."
 }

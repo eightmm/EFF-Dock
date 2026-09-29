@@ -1,6 +1,6 @@
 # Manuscript figures
 
-**Operator provenance:** the 21-page manuscript benchmark figures use historical `legacy_rt_w`. The separate [Rw comparison PDF](diagnostics/Rw_comparison.pdf) covers one seed and 307/308 evaluated PB cases; it does not replace those figures. [Mathematics, discussion and compatibility](../ORIENTATION_INJECTION.md).
+**Operator provenance:** the 21-page manuscript benchmark figures use historical `legacy_rt_w`. The separate [Rw comparison PDF](diagnostics/Rw_comparison.pdf) covers one seed and all 308 PB cases, including one disclosed supplementary execution; it does not replace those figures. [Mathematics, discussion and compatibility](../ORIENTATION_INJECTION.md).
 
 Working figures and captions for writing the EFF-Dock manuscript. Figure
 numbering and placement may change during writing.

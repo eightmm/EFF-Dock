@@ -1,13 +1,14 @@
 # Frozen-weight orientation diagnostic
 
 `summary.json` contains the one-seed paired comparison: Astex 85/85 and
-PoseBusters v2 **307/308 evaluated**. `verification.json` records code regression
+PoseBusters v2 **308/308 evaluated** (307 original cases plus one disclosed supplement). `verification.json` records code regression
 and finite full-model rotation checks. These are separate from the legacy
 three-repeat manuscript benchmark data.
 
 [Equations, discussion, compatibility and limitations](../../../../docs/ORIENTATION_INJECTION.md)
-include the unresolved original-model repeatability guard for 7UJ5_DGL,
-missing-outcome bounds and the Astex replay sensitivity. Uncertainty intervals
+describe the earlier repeatability failures, the predeclared 7UJ5_DGL supplement,
+and the Astex replay sensitivity. Paired case-bootstrap intervals were recomputed
+on 308 cases. Uncertainty intervals
 resample complexes from one execution; they exclude seed/execution variance.
 No missing-case failure imputation or corrected-model accuracy claim is made.
 

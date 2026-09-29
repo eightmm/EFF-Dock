@@ -88,7 +88,7 @@ Working materials for writing the EFF-Dock manuscript, not a published paper.
 - [Combined PDF](paper_figures.pdf)
 - [English captions and author notes](FIGURE_CAPTIONS.md)
 - [Orientation correction and result provenance](ORIENTATION_INJECTION.md)
-- `diagnostics/`: separate incomplete one-seed Rw comparison, not part of the 21-page legacy collection.
+- `diagnostics/`: separate one-seed Rw comparison (PB n=308, including one disclosed supplement), not part of the 21-page legacy collection.
 - `methods.tex`: editable equations and current methods.
 - `main.tex` and `figure_captions.tex`: reference LaTeX document and figure blocks.
 - `figures/`: {len(metadata["figures"])} individual PDFs in manuscript page order.
