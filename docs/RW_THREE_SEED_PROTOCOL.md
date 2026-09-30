@@ -42,9 +42,21 @@ documented full-atom mapped fallback for representation mismatches. No atom
 subset scoring or failed-case exclusion. Retain PhiBench reconstruction flags
 and OpenBind's noncovalent approximation flags.
 
-Use PoseBusters 0.6.5 with the previously audited InChI energy-reference roundtrip
-compatibility adapter, declared for every arm from the outset. This adapter
+Use PoseBusters 0.6.5 through the historical cohort-specific paths: native
+official redock for Astex/PoseBusters, and the previously audited InChI
+energy-reference roundtrip compatibility adapter for the three temporal cohorts.
+Use the same path for both operators and all repeats within a cohort. The adapter
 does not edit candidate coordinates or relax molecular identity checks.
+
+Execution amendment before full-cohort launch: the initial universal adapter
+passed nine PB smoke cases but rejected a stereo identity change for the
+8F4J_PHO energy-reference roundtrip. Preserve that failed attempt. Restore the
+historical cohort-specific paths using the already saved candidates and selectors;
+do not weaken the identity guard, alter ligand chemistry, drop the case, or
+regenerate poses. Verify native selected-pose PB checks and freeze the recovery
+sources before admitting the full study. Initial generation smoke outputs remain
+unchanged. This amendment repairs evaluation compatibility, without selecting a
+method or seed based on docking success.
 
 Freeze source, inputs, cohort IDs, checkpoint hashes, and commands before launch.
 Require representative and largest-ligand smoke tests, finite complete 100-pose
