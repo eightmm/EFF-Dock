@@ -58,6 +58,17 @@ sources before admitting the full study. Initial generation smoke outputs remain
 unchanged. This amendment repairs evaluation compatibility, without selecting a
 method or seed based on docking success.
 
+Execution backends are recorded per shard. The queued study can use validated
+RTX 6000 Ada and RTX A5000 GPUs with identical software, precision, candidate
+chunks, and scientific settings. A5000 admission requires the fixed largest
+ligand from each cohort to complete generation, refinement, and confidence
+scoring with finite outputs and memory headroom. These separate resource probes
+do not enter manuscript estimates. Pending tasks with index modulo 3 equal to
+1 or 2 are assigned to A5000; completed and running tasks retain their device.
+Operator pairs always share one GPU and identical priors. The global concurrency
+cap is six GPUs. Hardware-dependent numerical variation remains part of execution
+uncertainty; do not claim identical results across devices.
+
 Freeze source, inputs, cohort IDs, checkpoint hashes, and commands before launch.
 Require representative and largest-ligand smoke tests, finite complete 100-pose
 banks, operator provenance, exact paired prior hashes, and full selected-pose PB
