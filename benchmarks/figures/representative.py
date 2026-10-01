@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import Ellipse, FancyArrowPatch, FancyBboxPatch
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 from benchmarks.figures.structure_views import ELEMENT_COLORS, JS_SHA256, JS_URL, atoms, viewer_html
 from benchmarks.figures.trajectory import DATA, ROOT, scene, verify
@@ -49,8 +49,8 @@ POCKET_COLOR = "#80C8BC"
 EXTRACTION_POCKET_COLOR = "#3FAE9D"
 POCKET_CENTER_COLOR = "#E59A77"
 
-# Landscape overview; preserve vector labels when scaling for the manuscript.
-WIDTH = 10.35
+# Compose at manuscript size so the exported point sizes are the print sizes.
+WIDTH_MM, HEIGHT_MM = 180, 115
 
 
 def selection_data():
@@ -645,7 +645,7 @@ def ligand_diagram(ax, row, fragmented=False):
                 ax.plot(
                     *zip(start, end),
                     color=color,
-                    linewidth=1.25,
+                    linewidth=0.95,
                     linestyle=style,
                     solid_capstyle="round",
                     zorder=2,
@@ -655,10 +655,10 @@ def ligand_diagram(ax, row, fragmented=False):
             ax.plot(
                 *zip(mid - 2.7 * normal, mid + 2.7 * normal),
                 color="#C58A73",
-                linewidth=1.3,
+                linewidth=0.95,
                 zorder=4,
             )
-    ax.scatter(*xy.T, s=8, c=colors, linewidths=0, zorder=3)
+    ax.scatter(*xy.T, s=5, c=colors, linewidths=0, zorder=3)
     ax.set_xlim(xy[:, 0].min() - 0.7, xy[:, 0].max() + 0.7)
     ax.set_ylim(xy[:, 1].min() - 0.7, xy[:, 1].max() + 0.7)
     ax.set_aspect("equal")
@@ -672,9 +672,9 @@ def connector(fig, x0, x1, y, width, height):
             (x1 / width, y / height),
             transform=fig.transFigure,
             arrowstyle="-|>",
-            mutation_scale=9,
+            mutation_scale=5,
             color=CONNECTOR,
-            lw=0.9,
+            lw=0.6,
             shrinkA=0,
             shrinkB=0,
         )
@@ -696,21 +696,22 @@ def compose(row):
     reference = reference_data()
     crop = common_crop([*flow, *refinement, *candidates, overlay])
     input_aspect = (crop[3] - crop[2]) / (crop[1] - crop[0])
-    height, fw, box_width = 6.55, 1.55, 1.75
+    width, height = WIDTH_MM, HEIGHT_MM
+    fw, box_width, annotation_height = 30, 32, 6
     image_height = fw * (crop[1] - crop[0]) / (crop[3] - crop[2])
-    fh = image_height + 0.34
-    positions = (4.69, 3.24, 1.79, 0.34)
-    columns = (0.10, 2.20, 4.30, 6.40, 8.50)
+    fh = image_height + annotation_height
+    positions = np.linspace(103.5 - fh, 5.8, 4)
+    columns = (1.5, 36.5, 71.5, 106.5, 141.5)
     middle = (positions[1] + positions[2] + fh) / 2
-    fig = plt.figure(figsize=(WIDTH, height))
+    fig = plt.figure(figsize=(width / 25.4, height / 25.4))
     arts = []
 
     def rect(x, y, w, h):
-        return [x / WIDTH, y / height, w / WIDTH, h / height]
+        return [x / width, y / height, w / width, h / height]
 
-    def label(x, y, text, size=9.5, weight="bold", color=DARK):
+    def label(x, y, text, size=8, weight="bold", color=DARK):
         fig.text(
-            x / WIDTH,
+            x / width,
             y / height,
             text,
             fontsize=size,
@@ -721,21 +722,21 @@ def compose(row):
         )
 
     def header(center, top, title, subtitle):
-        label(center, top - 0.19, title, size=9.5)
-        label(center, top - 0.405, subtitle, size=8.8, weight="normal", color=MUTED)
+        label(center, top - 3.0, title)
+        label(center, top - 6.8, subtitle, size=7, weight="normal", color=MUTED)
 
-    def card(x, y, w, h, edge=FRAME_EDGE, fill="white", lw=0.6):
+    def card(x, y, w, h, edge="none", fill="white", lw=0.5):
         fig.add_artist(
             FancyBboxPatch(
-                (x / WIDTH, y / height),
-                w / WIDTH,
+                (x / width, y / height),
+                w / width,
                 h / height,
-                boxstyle="round,pad=0,rounding_size=0.008",
+                boxstyle="round,pad=0,rounding_size=0.005",
                 transform=fig.transFigure,
                 facecolor=fill,
                 edgecolor=edge,
                 linewidth=lw,
-                mutation_aspect=WIDTH / height,
+                mutation_aspect=width / height,
                 zorder=-1,
             )
         )
@@ -743,29 +744,30 @@ def compose(row):
     def down(x, top, bottom):
         fig.add_artist(
             FancyArrowPatch(
-                (x / WIDTH, top / height),
-                (x / WIDTH, bottom / height),
+                (x / width, top / height),
+                (x / width, bottom / height),
                 transform=fig.transFigure,
                 arrowstyle="-|>",
-                mutation_scale=9,
+                mutation_scale=4,
                 color=CONNECTOR,
-                linewidth=0.9,
+                linewidth=0.6,
                 shrinkA=0,
                 shrinkB=0,
             )
         )
 
-    def molecular_panel(x, y, pixels, viewport, edge=FRAME_EDGE, lw=0.6):
-        # Reserve an annotation strip without changing the molecular display scale.
-        card(x, y, fw, fh, edge=edge, lw=lw)
-        arts.append(frame(fig, rect(x, y, fw, image_height), pixels, viewport, "none", 0))
+    def molecular_panel(x, y, pixels, viewport, edge="none", panel_width=fw):
+        # Keep one shared crop/scale for all poses; enlarge only the final overlay.
+        ih = panel_width * image_height / fw
+        card(x, y, panel_width, ih + annotation_height, edge=edge, lw=0.65)
+        arts.append(frame(fig, rect(x, y, panel_width, ih), pixels, viewport, "none", 0))
 
-    def corner(x, y, text):
+    def corner(x, y, text, panel_height=fh):
         fig.text(
-            (x + 0.09) / WIDTH,
-            (y + fh - 0.17) / height,
+            (x + 1.0) / width,
+            (y + panel_height - annotation_height / 2) / height,
             text,
-            fontsize=8.8,
+            fontsize=7,
             color=DARK,
             ha="left",
             va="center",
@@ -774,13 +776,13 @@ def compose(row):
 
     stage_fills = ("#F2F8F6", "#F3F7FC", "#FCF7F1", "#F7F4FA")
     for x, fill in zip(columns[:4], stage_fills, strict=True):
-        card(x, 0.10, box_width, 6.30, edge="#C9CFD3", fill=fill, lw=0.75)
+        card(x, 1.5, box_width, 112, edge="#C9CFD3", fill=fill)
     for left, right in zip(columns[1:-1], columns[2:], strict=True):
-        connector(fig, left + box_width + 0.065, right - 0.065, middle, WIDTH, height)
+        connector(fig, left + box_width + 0.5, right - 0.5, middle, width, height)
 
     center = columns[0] + box_width / 2
     px = center - fw / 2
-    header(center, 6.40, "Input preparation", "Protein + ligand")
+    header(center, 113.5, "Input preparation", "Protein + ligand")
     for y, title, pixels in (
         (positions[0], "Given pocket center", protein),
         (positions[1], "Extracted pocket", pocket),
@@ -788,7 +790,7 @@ def compose(row):
         input_crop = surface_crop(pixels, input_aspect)
         molecular_panel(px, y, pixels, input_crop)
         corner(px, y, title)
-    down(center, positions[0] - 0.045, positions[1] + fh + 0.045)
+    down(center, positions[0] - 0.4, positions[1] + fh + 0.4)
     for y, title, fragmented in (
         (positions[2], "Rigid fragments", True),
         (positions[3], "Ligand", False),
@@ -797,41 +799,31 @@ def compose(row):
         ligand_diagram(fig.add_axes(rect(px, y, fw, image_height)), row, fragmented=fragmented)
         corner(px, y, title)
     # The same connector points upward for the ligand-to-fragment branch.
-    down(center, positions[3] + fh + 0.045, positions[2] - 0.045)
-    junction = columns[0] + box_width + 0.12
+    down(center, positions[3] + fh + 0.4, positions[2] - 0.4)
+    junction = columns[0] + box_width + 0.8
     for y in (positions[1], positions[2]):
         fig.add_artist(
             plt.Line2D(
-                [(px + fw + 0.025) / WIDTH, junction / WIDTH, junction / WIDTH],
+                [(px + fw + 0.4) / width, junction / width, junction / width],
                 [(y + fh / 2) / height, (y + fh / 2) / height, middle / height],
                 transform=fig.transFigure,
                 color=CONNECTOR,
-                linewidth=0.9,
+                linewidth=0.6,
                 solid_capstyle="round",
                 solid_joinstyle="round",
             )
         )
-    fig.add_artist(
-        Ellipse(
-            (junction / WIDTH, middle / height),
-            0.032 / WIDTH,
-            0.032 / height,
-            transform=fig.transFigure,
-            facecolor=CONNECTOR,
-            edgecolor="none",
-        )
-    )
-    connector(fig, junction, columns[1] - 0.055, middle, WIDTH, height)
+    connector(fig, junction, columns[1] - 0.5, middle, width, height)
 
     def trajectory(box_x, title, method, images, labels, ys):
         center = box_x + box_width / 2
         px = center - fw / 2
-        header(center, 6.40, title, method)
+        header(center, 113.5, title, method)
         for i, (py, pixels, text) in enumerate(zip(ys, images, labels, strict=True)):
             molecular_panel(px, py, pixels, crop)
             corner(px, py, text)
             if i + 1 < len(ys):
-                down(center, py - 0.045, ys[i + 1] + fh + 0.045)
+                down(center, py - 0.4, ys[i + 1] + fh + 0.4)
 
     trajectory(
         columns[1],
@@ -850,109 +842,134 @@ def compose(row):
         (positions[0], (positions[0] + positions[-1]) / 2, positions[-1]),
     )
     for x, text in ((columns[1], "Example (N = 1)"), (columns[2], "Same trajectory")):
-        label(x + box_width / 2, 0.215, text, size=8.8, weight="normal", color=MUTED)
+        label(x + box_width / 2, 3.5, text, size=7, weight="normal", color=MUTED)
 
     center = columns[3] + box_width / 2
     px = center - fw / 2
-    header(center, 6.40, "Confidence selection", "Predicted RMSD ranking")
-    for upper, lower in zip(positions[:-1], positions[1:], strict=True):
-        label(center, (upper + lower + fh) / 2, "…", size=10, weight="normal", color=MUTED)
-    label(center, 0.215, r"$N = 100\,\to\,1$", size=8.8, weight="normal", color=MUTED)
+    header(center, 113.5, "Confidence ranking", "pRMSD / RMSD (Å)")
+    label(center, 3.5, "Separate N = 100 bank", size=7, weight="normal", color=MUTED)
     for pixels, candidate, annotation, y in zip(
         candidates, selection["candidates"], annotations, positions, strict=True
     ):
-        score_x, score_top = px + 0.245, y + fh
-        score_width = 1.08
-        for offset, name, value in (
-            (0.100, "pRMSD", annotation["predicted_rmsd"]),
-            (0.240, "RMSD", annotation["symmetry_rmsd"]),
+        selected = candidate["selected"]
+        molecular_panel(px, y, pixels, crop, "#78B9A5" if selected else "none")
+        score_top = y + fh
+        fig.text(
+            (px + (3.2 if selected else 0.9)) / width,
+            (score_top - annotation_height / 2) / height,
+            f"Rank {candidate['rank']}",
+            fontsize=7,
+            color=DARK,
+            ha="left",
+            va="center",
+            zorder=9,
+        )
+        for offset, name, value, color, weight in (
+            (1.6, "pRMSD", annotation["predicted_rmsd"], DARK, "bold"),
+            (4.2, "RMSD", annotation["symmetry_rmsd"], MUTED, "normal"),
         ):
             score_y = (score_top - offset) / height
             fig.text(
-                score_x / WIDTH,
+                (px + 13.2) / width,
                 score_y,
                 name,
-                fontsize=8.8,
-                color=MUTED,
+                fontsize=7,
+                color=color,
                 ha="left",
                 va="center",
                 zorder=9,
             )
             fig.text(
-                (score_x + score_width - 0.045) / WIDTH,
+                (px + fw - 0.7) / width,
                 score_y,
-                f"{value:.2f} Å",
-                fontsize=8.8,
-                fontweight="medium",
-                color=DARK,
+                f"{value:.2f}",
+                fontsize=7,
+                fontweight=weight,
+                color=color,
                 ha="right",
                 va="center",
                 zorder=9,
             )
-        selected = candidate["selected"]
-        edge = "#78B9A5" if selected else FRAME_EDGE
-        molecular_panel(px, y, pixels, crop, edge, 0.9 if selected else 0.6)
         if not selected:
             continue
-        cx, cy = px + 0.11, y + fh - 0.10
-        fig.add_artist(
-            Ellipse(
-                (cx / WIDTH, cy / height),
-                0.18 / WIDTH,
-                0.18 / height,
-                transform=fig.transFigure,
-                facecolor="white",
-                edgecolor="none",
-                zorder=8,
-            )
-        )
+        cx, cy = px + 1.8, score_top - annotation_height / 2
         color = "#519E83"
-        paths = [[(-0.05, 0), (-0.01, -0.04), (0.055, 0.05)]]
+        paths = [[(-0.7, 0), (-0.15, -0.55), (0.8, 0.7)]]
         for path in paths:
             fig.add_artist(
                 plt.Line2D(
-                    [(cx + dx) / WIDTH for dx, _ in path],
+                    [(cx + dx) / width for dx, _ in path],
                     [(cy + dy) / height for _, dy in path],
                     transform=fig.transFigure,
                     color=color,
-                    linewidth=1.5,
+                    linewidth=1.0,
                     solid_capstyle="round",
                     zorder=9,
                 )
             )
 
-    center = columns[4] + box_width / 2
-    px = center - fw / 2
-    output_y = middle - fh / 2
-    output_top = output_y + fh + 0.60
-    card(columns[4], output_y - 0.58, box_width, fh + 1.18, edge="#BED2CB", fill="#F2F8F6", lw=0.75)
+    output_width, output_image_width = 37, 35
+    output_height = output_image_width * image_height / fw + annotation_height
+    center = columns[4] + output_width / 2
+    px = center - output_image_width / 2
+    output_y = middle - output_height / 2
+    output_top = output_y + output_height + 9.5
+    card(
+        columns[4],
+        output_y - 6,
+        output_width,
+        output_height + 15.5,
+        edge="#BED2CB",
+        fill="#F2F8F6",
+    )
     header(center, output_top, "Selected pose", "Crystal comparison")
-    molecular_panel(px, output_y, overlay, crop, "#78B9A5", 0.9)
-    corner(px, output_y, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å")
-    for y, key, text in (
-        (output_y - 0.17, "selected", "Selected"),
-        (output_y - 0.39, "crystal", "Crystal"),
+    molecular_panel(px, output_y, overlay, crop, "#78B9A5", output_image_width)
+    corner(px, output_y, f"RMSD {reference['symmetry_rmsd_angstrom']:.2f} Å", output_height)
+    for x, key, text in (
+        (px + 1.0, "selected", "Selected"),
+        (px + 18.5, "crystal", "Crystal"),
     ):
         fig.add_artist(
             plt.Line2D(
-                [(center - 0.46) / WIDTH, (center - 0.24) / WIDTH],
-                [y / height] * 2,
+                [x / width, (x + 2.5) / width],
+                [(output_y - 3.0) / height] * 2,
                 transform=fig.transFigure,
                 color=OUTPUT_COLORS[key],
-                linewidth=2.8,
+                linewidth=2,
                 solid_capstyle="round",
             )
         )
         fig.text(
-            (center - 0.15) / WIDTH,
-            y / height,
+            (x + 3.5) / width,
+            (output_y - 3.0) / height,
             text,
-            fontsize=8.8,
+            fontsize=7,
             color=DARK,
             ha="left",
             va="center",
         )
     return fig, arts
+
+
+def verify_layout(fig):
+    """Reject unreadable print text, clipping and score/structure overlap."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    text_bounds = []
+    for text in fig.texts:
+        bounds = text.get_window_extent(renderer)
+        if (
+            text.get_fontsize() < 7
+            or not fig.bbox.contains(*bounds.min)
+            or not fig.bbox.contains(*bounds.max)
+        ):
+            raise ValueError(f"Unprintable or clipped label: {text.get_text()}")
+        if any(bounds.overlaps(ax.bbox) for ax in fig.axes):
+            raise ValueError(f"Label overlaps molecular image: {text.get_text()}")
+        for other, other_bounds in text_bounds:
+            if bounds.overlaps(other_bounds):
+                raise ValueError(f"Overlapping labels: {text.get_text()} / {other.get_text()}")
+        text_bounds.append((text, bounds))
 
 
 def render(out):
@@ -968,6 +985,7 @@ def render(out):
     }
     with plt.rc_context(style):
         fig, arts = compose(row)
+        verify_layout(fig)
         # Vector outputs embed the source capture pixels unresampled.
         fig.savefig(out / f"{NAME}.pdf", metadata={"CreationDate": None, "ModDate": None})
         fig.savefig(out / f"{NAME}.svg", metadata={"Date": None})

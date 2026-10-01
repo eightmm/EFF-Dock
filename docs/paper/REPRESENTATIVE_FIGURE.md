@@ -20,7 +20,9 @@ Only the selected candidate carries a check mark and green border; unmarked pose
 are not necessarily incorrect or physically invalid. pRMSD is the model prediction
 used for ranking; RMSD is the retrospective symmetry-aware heavy-atom error against
 the crystal ligand, in Å, and is not a selection input. The selected pose (blue)
-is overlaid with the crystal reference (peach; RMSD 0.96 Å). Fragment carbon colors
+is overlaid with the crystal reference (peach; RMSD 0.96 Å). Generation, refinement
+and ranked candidates share the same camera and display scale; the final overlay
+is enlarged for readability. Fragment carbon colors
 remain consistent before this overlay. This single-case illustration does not
 establish refinement convergence, improved RMSD or physical validity.
 
@@ -37,28 +39,34 @@ for visibility, not a molecular atom.
 Generation has four saved states; refinement has three (0/50/100), reducing
 visually redundant snapshots without exaggerating structural changes. The saved
 step-25 capture is retained for reproducibility but omitted from the figure.
-All pose panels retain their common camera, crop, scale and dimensions; the
-common crop still includes the step-25 image so removing it does not alter framing.
+Generation, refinement and ranked candidates retain the same camera, common
+crop and 30 mm molecular-image width. The final selected/crystal overlay uses
+that same camera and crop at a 35 mm image width (7/6 of the display scale),
+solely for readability. The common crop still includes the step-25 image so
+omitting it does not alter framing.
 Input views use different camera scales to show the complete receptor and pocket.
 The same receptor appears behind downstream poses with wider chain context.
 
-Only the selected candidate has a check. The three other candidates have neutral
-borders and no rejection symbol: two have reference RMSD below 2 Å. The compact
-score labels remain inside each panel in a reserved top strip, clear of the
-molecular image. All panels gain the same annotation space, preserving molecular
-image dimensions and avoiding score/structure overlap. Footers identify the N1 example and N100
-selection. The separate-run disclosure is retained in the manuscript caption;
-the sentence beneath the graphic is omitted.
+Only the selected candidate has a check and green border. The three other
+candidates have no outline or rejection symbol: two have reference RMSD below
+2 Å. The **Confidence ranking** panel explicitly labels ranks 1, 25, 50 and 100;
+pRMSD uses dark text and bold values, while retrospective RMSD uses muted text.
+Each rank label is centered vertically beside its two score rows.
+The stage subtitle gives their common unit (Å). Scores remain in a reserved
+6 mm top strip, clear of molecular geometry. Footers identify the N1 example,
+its refinement and the separate N100 bank. The manuscript caption explains
+their provenance; there is no sentence beneath the graphic.
 
-At the 262.89 mm source width, stage titles are 9.5 pt and other annotations are
-at least 8.8 pt. At a 180 mm manuscript width these become approximately 6.50 pt
-and 6.03 pt. Use the vector PDF at two-column width; narrower placement requires
-another layout pass. Single-line panel labels are centered vertically in the
-annotation strip with a consistent left inset. Two score rows are centered
-symmetrically within that same strip; outer stage headings have more top/side
-breathing room. The bottom canvas margin is trimmed after removing the note.
-The molecular captures are raster images; text and ligand
-diagrams are vector elements. The existing 21-page reference package is unchanged.
+The exported canvas is **180 × 115 mm**: stage titles print at 8 pt and every
+other label at 7 pt without further scaling. The first four stages are 32 mm
+wide, with 3 mm gutters; the selected-pose stage is 37 mm wide. Molecular panels
+use white backgrounds without repeated outlines, beneath pale stage fills.
+The selected/crystal legend occupies one row. Input branches meet without a
+junction dot, and short arrows keep the existing directions explicit.
+Use the vector PDF at 180 mm two-column width; narrower placement requires
+another layout pass. Molecular captures are raster images; text and ligand
+diagrams remain vector elements. The separate benchmark reference package and
+architecture figure are unchanged.
 
 ## Recorded states and provenance
 
@@ -136,7 +144,9 @@ python -m benchmarks.figures.representative --output outputs/paper_figures
 
 The renderer checks source hashes, cameras, raw-endpoint identity, rigid-fragment
 geometry, energy-group accounting, receptor coordinate containment and stored
-candidate labels. PDF/SVG/PNG exports are checked for deterministic reproduction.
+candidate labels. Print-size label bounds, text intersections and overlap with
+molecular images are checked before export. PDF/SVG/PNG exports are checked
+for deterministic reproduction.
 This layout revision performs no inference, optimization, scoring or evaluation.
 
 Optional recapture uses the pinned JavaScript and py3Dmol/Playwright stack
