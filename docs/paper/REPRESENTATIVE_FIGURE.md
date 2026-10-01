@@ -8,7 +8,7 @@
 
 **Fragment-based pose generation, post-generation refinement and confidence selection.**
 This known-pocket redocking overview combines an illustrative N1 generation/refinement
-trajectory and a separate N100 candidate bank for the same Astex 1T46–STI complex;
+trajectory and a separate historical Rᵀw N100 candidate bank for the same Astex 1T46–STI complex;
 it does not depict a single end-to-end run. A supplied pocket center defines the
 receptor crop, while the ligand is decomposed into rigid fragments. Fragment-level
 SE(3) flow generates a pose (t = 0, 0.488, 0.784 and 1), followed by energy
@@ -77,7 +77,7 @@ architecture figure are unchanged.
 | Extracted pocket | 295 retained heavy atoms in 37 residues as sticks under a translucent molecular surface; unchanged production 10 Å crop |
 | Pose generation | Saved N1/S10 frames 0, 2, 4 and 10, at t = 0, 0.488, 0.784 and 1 |
 | Pose refinement | Recorded CPU refinement of that exact endpoint, steps 0, 50 and 100; step 0 reuses the generated endpoint image |
-| Confidence candidates | Separate primary N100/S10 Astex repeat-0 refined bank, same complex; eligible predicted-RMSD ranks 1, 25, 50 and 100 |
+| Confidence candidates | Separate historical Rᵀw N100/S10 Astex repeat-0 refined bank, same complex; eligible predicted-RMSD ranks 1, 25, 50 and 100 |
 | Selected pose | Actual selected bank index 41 (zero-based), crystal overlay in unchanged receptor coordinates; symmetry-aware heavy-atom RMSD 0.9585406947604571 Å |
 
 The four candidates were chosen by predicted rank before inspecting geometry.

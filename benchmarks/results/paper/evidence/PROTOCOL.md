@@ -94,3 +94,19 @@ empty, or change selection based on visual appearance. Record eligible counts
 and complete IDs in the report. One 5-row by 3-column pocket-only figure, with
 ID/RMSD inside each image. No new inference/PB evaluation; CPU-only 2 CPUs/8G,
 10min collection/capture. Preserve other PDF pages and all aggregate metrics.
+
+## Rw saved-data refresh (2026-10-02)
+
+Apply the fixed analyses and dataset-specific example rule above to the complete
+corrected Rw study, without generating poses or fitting new weights. Preserve
+all cohorts, three seeds, input chemistry, selectors and strict RMSD threshold.
+Historical guidance, cost and pocket/prior records retain legacy provenance.
+The added operator-contrast diagnostic uses three-seed average differences
+within complex and 2,000 paired-complex bootstrap draws (seed 20261002);
+Astex/PoseBusters use fresh matched-prior controls, temporal cohorts use
+historical banks and include execution variation. The effective-selector
+diagnostic splits full-bank generation failure, chirality exclusion, eligible
+ranking failure, selected PB failure and success. It follows the real unfiltered
+fallback if no pose passes chirality, and measures regret against the oracle in
+that same effective set. These are descriptive post-hoc diagnostics, not a new
+prospective validation or tuned selection policy.

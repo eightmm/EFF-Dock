@@ -34,6 +34,88 @@ def close(left, right):
         require(left == right, "Summary value differs")
 
 
+def verify_rw_diagnostics(directory, cases):
+    report_path = DATA / "rw_report.json"
+    if not report_path.is_file():
+        return
+    report = json.loads(report_path.read_text())
+    require(report["status"] == "complete", "Incomplete Rw report")
+    rows = json.loads((directory / "selector_bottleneck.json").read_text())["rows"]
+    require(
+        len(rows) == len({(r["dataset"], r["stage"]) for r in rows}) == 10,
+        "Incomplete effective-selector diagnostics",
+    )
+    for r in rows:
+        count = COUNTS[r["dataset"]]
+        require(r["n"] == count, "Effective-selector denominator drift")
+        a = np.asarray(r["per_repeat"])
+        require(
+            a.shape == (3, 5) and np.isfinite(a).all() and (a >= 0).all(),
+            "Invalid effective-selector fractions",
+        )
+        close(a.mean(axis=0).tolist(), r["mean"])
+        close(a.std(axis=0, ddof=1).tolist(), r["sd"])
+        for rep in range(3):
+            group = [
+                c
+                for c in cases
+                if (c["dataset"], c["stage"], c["repeat"]) == (r["dataset"], r["stage"], rep)
+            ]
+            require(len(group) == count, "Missing effective-selector case join")
+            close(
+                [float(a[rep, 0]), float(a[rep, 1:3].sum()), float(a[rep, 3]), float(a[rep, 4])],
+                [
+                    100 * sum(not c["oracle_success"] for c in group) / count,
+                    100
+                    * sum(c["oracle_success"] and not c["filtered_success"] for c in group)
+                    / count,
+                    100
+                    * sum(c["filtered_success"] and not c["filtered_joint"] for c in group)
+                    / count,
+                    100 * sum(c["filtered_joint"] for c in group) / count,
+                ],
+            )
+        cdf = r["cdf"]
+        x, y = np.asarray(cdf["rmsd_regret_angstrom"]), np.asarray(cdf["per_repeat"])
+        require(
+            y.shape == (3, len(x))
+            and np.isfinite(x).all()
+            and np.isfinite(y).all()
+            and x[0] == 0
+            and (np.diff(x) > 0).all()
+            and (np.diff(y, axis=1) >= 0).all()
+            and (y >= 0).all()
+            and (y <= 100).all()
+            and np.allclose(y[:, -1], 100),
+            "Invalid effective-regret CDF",
+        )
+        close(y.mean(axis=0).tolist(), cdf["mean"])
+        close(y.std(axis=0, ddof=1).tolist(), cdf["sd"])
+    changes = json.loads((directory / "rw_operator_change.json").read_text())["comparisons"]
+    require(
+        len(changes) == len({(r["dataset"], r["metric"]) for r in changes}) == 10,
+        "Incomplete operator contrasts",
+    )
+    for r in changes:
+        key = "rmsd_success" if r["metric"] == "rmsd_lt2" else "pb_valid_success"
+        close(
+            report["results"]["rw_" + r["dataset"]]["refined_filtered"][key]["mean_percent"],
+            r["rw_mean"],
+        )
+        if r["reference"] == "paired_rerun":
+            close(
+                report["results"]["legacy_rt_w_" + r["dataset"]]["refined_filtered"][key][
+                    "mean_percent"
+                ],
+                r["previous_mean"],
+            )
+        est = r["estimate"]
+        close(float(r["rw_mean"] - r["previous_mean"]), est["delta_pp"])
+        require(est["complexes"] == est["groups"] == COUNTS[r["dataset"]], "Contrast denominator")
+        lo, hi = est["ci95_pp"]
+        require(np.isfinite([lo, hi]).all() and lo <= hi, "Invalid operator interval")
+
+
 def verify():
     directory = DATA / "evidence"
     data = json.loads((directory / "results.json").read_text())
@@ -73,6 +155,7 @@ def verify():
     confidence, density = aggregate_confidence(cases)
     close(confidence, data["confidence"])
     close(density, data["density"])
+    verify_rw_diagnostics(directory, cases)
     pb = {}
     for row in read_csv(directory / "pb_checks.csv"):
         key = row["dataset"], int(row["repeat"]), row["id"], row["stage"], row["policy"]

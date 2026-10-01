@@ -378,6 +378,11 @@ panels, molecular images or model operations are reused.
 
 ## Source audit and unresolved initialization defect (2026-09-27)
 
+This dated audit records the historical defect. The explicit corrected Rw path
+and five-benchmark three-seed evaluation are now complete; see the
+[current orientation note](../ORIENTATION_INJECTION.md). The diagram's shared
+layer/readout topology is unchanged.
+
 The review compared the current A–D graphic with executable forward paths,
 the released configurations, and all eight source/config hashes in spec.json.
 Hash agreement identifies the inspected implementation; it is not a functional

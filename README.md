@@ -11,7 +11,7 @@ binder/non-binder classification.
 
 ## Released model
 
-**Orientation correction:** [Rw versus historical Rᵀw](docs/ORIENTATION_INJECTION.md) documents the mathematical fix, checkpoint compatibility and one-seed diagnostic. Fresh training with `configs/train_rw.yaml` uses Rw; loading released weights preserves their historical operator unless `--orientation-injection rw` is requested. Existing benchmark figures are historical-operator results.
+**Orientation correction:** [Rw versus historical Rᵀw](docs/ORIENTATION_INJECTION.md) documents the mathematical fix, checkpoint compatibility and completed three-seed evaluation. Fresh training with `configs/train_rw.yaml` uses Rw; loading released weights preserves their historical operator unless `--orientation-injection rw` is requested. Primary benchmark figures now use the completed corrected Rw three-seed results. Historical ablations retain their explicit operator provenance.
 
 The public model is one paired deployment stack:
 
@@ -109,20 +109,22 @@ checkpoint selection, and exact evaluation definitions are documented in:
 
 ## Main results
 
-The current reporting baseline is **three seeds, unguided N100/S10/sigma2**, using the
-released docking/U70k pair, explicit physical refinement and input-chirality
+The current reporting baseline uses **corrected Rw, three seeds, unguided N100/S10/sigma2**, using the
+frozen released docking/U70k pair, explicit physical refinement and input-chirality
 selection. These postprocessing steps are not silently applied by `dock()`.
 RMSD is symmetry-aware heavy-atom RMSD without alignment. PB-valid success
 requires the same pose to have RMSD <2 Angstrom and pass PoseBusters. Values
-are percent mean ± sample SD.
+are percent mean ± sample SD. Released weights retain legacy-trained features;
+these Rw results are a cross-operator frozen-weight evaluation, using an explicit
+operator override documented in the [protocol](docs/RW_THREE_SEED_PROTOCOL.md).
 
 | Dataset | N per seed | RMSD <2 Å | PB-valid poses | PB-valid success |
 |---|---:|---:|---:|---:|
-| Astex Diverse Set | 85 | 82.35 ± 2.04 | 95.69 ± 0.68 | 79.22 ± 2.72 |
-| PoseBusters v2 | 308 | 81.60 ± 0.94 | 95.56 ± 0.50 | 79.22 ± 1.42 |
-| PhiBench reconstructed full | 206 | 62.62 ± 3.79 | 94.01 ± 0.28 | 60.19 ± 3.36 |
-| FoldBench-Pocket full | 558 | 74.49 ± 0.37 | 96.36 ± 0.37 | 72.82 ± 0.63 |
-| OpenBind full | 925 | 52.58 ± 0.61 | 99.64 ± 0.17 | 52.58 ± 0.61 |
+| Astex Diverse Set | 85 | 83.14 ± 1.80 | 95.69 ± 0.68 | 80.00 ± 2.04 |
+| PoseBusters v2 | 308 | 81.82 ± 0.56 | 95.02 ± 0.50 | 79.00 ± 0.82 |
+| PhiBench reconstructed full | 206 | 62.94 ± 3.23 | 93.69 ± 0.00 | 60.36 ± 3.08 |
+| FoldBench-Pocket full | 558 | 75.27 ± 0.54 | 96.54 ± 0.10 | 73.78 ± 0.63 |
+| OpenBind full | 925 | 53.19 ± 0.56 | 99.68 ± 0.19 | 53.19 ± 0.56 |
 
 Postprocessing and metric definitions are in the
 [figure captions](docs/paper/FIGURE_CAPTIONS.md).
@@ -140,7 +142,7 @@ are documented in [the benchmark report](docs/BENCHMARK_RESULTS.md).
 
 ## Manuscript figures
 
-[Paper materials](docs/paper/README.md) contain a 14-page figure PDF,
+[Paper materials](docs/paper/README.md) contain a 23-page result PDF,
 individual PDF/PNG files, captions and a Prism reference package. They are
 working materials for writing the manuscript; figure numbering and placement
 can change. Their presence here does not indicate a published paper.

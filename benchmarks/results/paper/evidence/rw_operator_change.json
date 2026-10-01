@@ -1,0 +1,185 @@
+{
+  "comparisons": [
+    {
+      "dataset": "astex",
+      "metric": "rmsd_lt2",
+      "reference": "paired_rerun",
+      "estimate": {
+        "delta_pp": 1.5686274509803921,
+        "ci95_pp": [
+          -0.392156862745098,
+          3.9215686274509802
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 81.56862745098039,
+      "rw_mean": 83.13725490196079
+    },
+    {
+      "dataset": "astex",
+      "metric": "joint",
+      "reference": "paired_rerun",
+      "estimate": {
+        "delta_pp": 1.5686274509803921,
+        "ci95_pp": [
+          -0.392156862745098,
+          3.9215686274509802
+        ],
+        "complexes": 85,
+        "groups": 85,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 78.43137254901961,
+      "rw_mean": 80.0
+    },
+    {
+      "dataset": "posebusters",
+      "metric": "rmsd_lt2",
+      "reference": "paired_rerun",
+      "estimate": {
+        "delta_pp": -0.10822510822510822,
+        "ci95_pp": [
+          -0.974025974025974,
+          0.7575757575757576
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 81.92640692640693,
+      "rw_mean": 81.81818181818183
+    },
+    {
+      "dataset": "posebusters",
+      "metric": "joint",
+      "reference": "paired_rerun",
+      "estimate": {
+        "delta_pp": -0.4329004329004329,
+        "ci95_pp": [
+          -1.2987012987012987,
+          0.43290043290043295
+        ],
+        "complexes": 308,
+        "groups": 308,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 79.43722943722943,
+      "rw_mean": 79.004329004329
+    },
+    {
+      "dataset": "phibench",
+      "metric": "rmsd_lt2",
+      "reference": "historical_bank",
+      "estimate": {
+        "delta_pp": 0.3236245954692557,
+        "ci95_pp": [
+          -0.8090614886731392,
+          1.4603559870549943
+        ],
+        "complexes": 206,
+        "groups": 206,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 62.62135922330098,
+      "rw_mean": 62.944983818770226
+    },
+    {
+      "dataset": "phibench",
+      "metric": "joint",
+      "reference": "historical_bank",
+      "estimate": {
+        "delta_pp": 0.16181229773462788,
+        "ci95_pp": [
+          -1.1326860841423947,
+          1.4563106796116503
+        ],
+        "complexes": 206,
+        "groups": 206,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 60.19417475728155,
+      "rw_mean": 60.35598705501618
+    },
+    {
+      "dataset": "foldbench",
+      "metric": "rmsd_lt2",
+      "reference": "historical_bank",
+      "estimate": {
+        "delta_pp": 0.7765830346475507,
+        "ci95_pp": [
+          -9.948234987680614e-18,
+          1.5531660692951015
+        ],
+        "complexes": 558,
+        "groups": 558,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 74.49223416965353,
+      "rw_mean": 75.26881720430107
+    },
+    {
+      "dataset": "foldbench",
+      "metric": "joint",
+      "reference": "historical_bank",
+      "estimate": {
+        "delta_pp": 0.9557945041816011,
+        "ci95_pp": [
+          0.17921146953405015,
+          1.7921146953405018
+        ],
+        "complexes": 558,
+        "groups": 558,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 72.81959378733572,
+      "rw_mean": 73.77538829151732
+    },
+    {
+      "dataset": "openbind",
+      "metric": "rmsd_lt2",
+      "reference": "historical_bank",
+      "estimate": {
+        "delta_pp": 0.6126126126126125,
+        "ci95_pp": [
+          0.07207207207207206,
+          1.153153153153153
+        ],
+        "complexes": 925,
+        "groups": 925,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 52.57657657657657,
+      "rw_mean": 53.18918918918919
+    },
+    {
+      "dataset": "openbind",
+      "metric": "joint",
+      "reference": "historical_bank",
+      "estimate": {
+        "delta_pp": 0.6126126126126125,
+        "ci95_pp": [
+          0.07207207207207206,
+          1.153153153153153
+        ],
+        "complexes": 925,
+        "groups": 925,
+        "draws": 2000,
+        "seed": 20261002
+      },
+      "previous_mean": 52.57657657657657,
+      "rw_mean": 53.18918918918919
+    }
+  ],
+  "scope": "Paired complex bootstrap of three-seed average differences; fixed cohort, seeds kept together; fresh matched priors only for Astex/PoseBusters; temporal differences include historical execution variation; no multiple-testing adjustment."
+}

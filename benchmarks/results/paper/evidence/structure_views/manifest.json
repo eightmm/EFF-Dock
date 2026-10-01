@@ -1,6 +1,6 @@
 {
-  "settings_sha256": "843524833380d5fae9e583a99809580db4baa080ec3180a4134657a286e3f5e4",
-  "structures_sha256": "c678e6780de6def465a6d2f609c3f58ab57418c775b4bff1c7eb1ea2987cb68e",
+  "settings_sha256": "2f4f4a3ed2574a27b4f4a34152f9f7b99e76d8d3d2d726466a974b75c2017d0d",
+  "structures_sha256": "cc49cb8aa3c2db5f192fe2b39a397e6ea7dc94bcc0372b576807aab71410eb65",
   "javascript_url": "https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js",
   "javascript_sha256": "f7cc78921ae72e7623e89cdd111434f58c2efddd2ffda1cd212644b406fb8016",
   "py3dmol_version": "2.5.5",
@@ -23,38 +23,38 @@
   },
   "records": [
     {
-      "id": "1n1m",
-      "view_key": "astex_2_1n1m_successful_pose",
+      "id": "2br1",
+      "view_key": "astex_2_2br1_successful_pose",
       "mode": "pocket",
-      "file": "astex_2_1n1m_successful_pose_pocket.png",
-      "sha256": "43c7c767a4274819f7f03b1788ddb225ce37af8e12a920da1f2e850d553e4f31",
+      "file": "astex_2_2br1_successful_pose_pocket.png",
+      "sha256": "dc56591ba71ea5c1af8b95de6c5a2037293925b10ebc280eb9252b4ae4b9356d",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 5948,
+        "atoms": 2208,
         "secondary": {
-          "c": 335,
-          "h": 112,
-          "s": 279
+          "c": 122,
+          "s": 58,
+          "h": 92
         }
       },
       "camera_view": [
-        -81.61315233333333,
-        -74.92901170833335,
-        -98.03209037499998,
-        124.22144627446497,
-        0.6498031709435274,
-        0.13803353934290016,
-        -0.17805402796872538,
-        0.7259472048105987
+        -17.73879986206896,
+        3.05350374137931,
+        -10.235844327586209,
+        110.61374908864329,
+        0.16098305985145953,
+        0.23672250207333526,
+        0.9569103244138694,
+        0.04867794657896329
       ],
-      "nonwhite_fraction": 0.03318709150326797
+      "nonwhite_fraction": 0.03463766339869281
     },
     {
       "id": "1hvy",
       "view_key": "astex_0_1hvy_refinement_rescue",
       "mode": "pocket",
       "file": "astex_0_1hvy_refinement_rescue_pocket.png",
-      "sha256": "e022d972e8c923a4662564a0391884c1a55443618f43913208a7c54ce766c682",
+      "sha256": "df5279e35e8d2874ce12a8fffb454c29b472f3624a9eb07c8d875cfbfa6c2538",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
         "atoms": 2349,
@@ -65,77 +65,77 @@
         }
       },
       "camera_view": [
-        -69.04042863541669,
-        -44.8296925,
-        -25.7181685,
-        104.12062272473709,
-        -0.32489269551899425,
-        0.013426489578078293,
-        -0.41077827938104905,
-        0.8517779469819331
+        -69.030765875,
+        -44.83462207291666,
+        -25.72597676041666,
+        104.10986602278237,
+        -0.338746115211466,
+        -0.5407652653880193,
+        0.19998134690728533,
+        0.7435263667605295
       ],
-      "nonwhite_fraction": 0.036012254901960784
+      "nonwhite_fraction": 0.03710457516339869
     },
     {
-      "id": "1tz8",
-      "view_key": "astex_0_1tz8_selection_failure",
+      "id": "1hp0",
+      "view_key": "astex_2_1hp0_selection_failure",
       "mode": "pocket",
-      "file": "astex_0_1tz8_selection_failure_pocket.png",
-      "sha256": "d92f0082a05228f3b52151359359e9160c9234d2e68fe07afac649f0c024986b",
+      "file": "astex_2_1hp0_selection_failure_pocket.png",
+      "sha256": "a7d8be9aaa7b8e199f561e3ac700fcb4f46e9ff746a5bb8ff907e7fcf609652d",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 1711,
+        "atoms": 2460,
         "secondary": {
-          "c": 90,
-          "s": 126,
-          "h": 14
+          "c": 124,
+          "s": 66,
+          "h": 129
         }
       },
       "camera_view": [
-        -16.451682450000003,
-        -61.61542916666668,
-        -34.945076199999995,
-        117.89615236815749,
-        -0.7487302469220858,
-        0.16110758454431806,
-        -0.18921720581824658,
-        0.6145276336899937
+        -16.718755526315793,
+        -25.319433456140352,
+        -13.199599701754382,
+        123.54798681823257,
+        0.7947996928743115,
+        -0.14979375665636965,
+        0.5787047601765903,
+        0.10467129130104122
       ],
-      "nonwhite_fraction": 0.04603349673202614
+      "nonwhite_fraction": 0.07868709150326797
     },
     {
-      "id": "7dua_hj0",
-      "view_key": "posebusters_2_7dua_hj0_successful_pose",
+      "id": "7p5t_5yg",
+      "view_key": "posebusters_0_7p5t_5yg_successful_pose",
       "mode": "pocket",
-      "file": "posebusters_2_7dua_hj0_successful_pose_pocket.png",
-      "sha256": "ac9c54c22731341c0e638dcc8290f046c4dc0afabaaf5d8c52817341ec029ae1",
+      "file": "posebusters_0_7p5t_5yg_successful_pose_pocket.png",
+      "sha256": "0362e0bcdf5698528d77df719f5c304137103db6279271ffc1c226d6a1667c8c",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 2194,
+        "atoms": 3091,
         "secondary": {
-          "h": 117,
-          "c": 98,
-          "s": 59
+          "c": 131,
+          "h": 213,
+          "s": 52
         }
       },
       "camera_view": [
-        -25.186605891304342,
-        -13.18251863043478,
-        25.53883652173913,
-        114.56688442909883,
-        0.31672432825016,
-        0.0514939877358831,
-        0.27118078605104645,
-        0.9074662805847269
+        21.95365730434782,
+        -3.927158652173912,
+        13.743549021739126,
+        106.05319584768387,
+        0.20002822583013383,
+        -0.27412632855574914,
+        -0.4340916168673976,
+        0.8345105949173102
       ],
-      "nonwhite_fraction": 0.02934640522875817
+      "nonwhite_fraction": 0.0273484477124183
     },
     {
       "id": "7fb7_8nf",
       "view_key": "posebusters_0_7fb7_8nf_refinement_rescue",
       "mode": "pocket",
       "file": "posebusters_0_7fb7_8nf_refinement_rescue_pocket.png",
-      "sha256": "7bed622c573e2ebf5113e9c4989bf064d38de04cf488193e99fc324f2580bae2",
+      "sha256": "ded9b8bf4c156a199d0ae2055f4eb4c14650e48ee75a7c2f1be58910a8172ebe",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
         "atoms": 1284,
@@ -145,77 +145,77 @@
         }
       },
       "camera_view": [
-        -15.016322444444443,
-        -21.301499222222223,
-        -41.520942000000005,
+        -15.00950422222222,
+        -21.30059737037037,
+        -41.520882407407406,
         124.22144627446497,
-        0.5252556423629573,
-        0.14528509950476234,
-        0.08947547941382386,
-        0.8336623348883136
+        0.971471056574669,
+        -0.026439589128884552,
+        0.1678447514791404,
+        -0.16544809991443724
       ],
-      "nonwhite_fraction": 0.031525735294117646
+      "nonwhite_fraction": 0.031691993464052284
     },
     {
-      "id": "8ay3_oe3",
-      "view_key": "posebusters_1_8ay3_oe3_selection_failure",
+      "id": "8eye_x4i",
+      "view_key": "posebusters_2_8eye_x4i_selection_failure",
       "mode": "pocket",
-      "file": "posebusters_1_8ay3_oe3_selection_failure_pocket.png",
-      "sha256": "c835fc45545d62def44aa6d703e2867165921812ea7cd8a7e881b75d5fb54f18",
+      "file": "posebusters_2_8eye_x4i_selection_failure_pocket.png",
+      "sha256": "30ddb4c6ec446f33cc027aac9eb75b49c6c45c5de642976f0687290835eca1d1",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 3809,
+        "atoms": 7219,
         "secondary": {
-          "c": 167,
-          "s": 172,
-          "h": 150
+          "c": 319,
+          "s": 192,
+          "h": 378
         }
       },
       "camera_view": [
-        -1.5177567199999993,
-        -6.113959853333331,
-        -31.965934186666665,
-        122.19565189755403,
-        0.3073911338048487,
-        -0.8422621773430664,
-        0.263148797781227,
-        -0.3561710624149322
+        -14.095751414141409,
+        -9.691422363636363,
+        -14.858062545454539,
+        102.53522193060581,
+        0.5346696665100266,
+        0.29269331241394475,
+        0.7789601697430695,
+        -0.14724138866520625
       ],
-      "nonwhite_fraction": 0.0902875816993464
+      "nonwhite_fraction": 0.030540849673202614
     },
     {
-      "id": "9dhh_a1a4o_a_1",
-      "view_key": "phibench_2_9dhh_a1a4o_a_1_successful_pose",
+      "id": "9e8k_adp_b_1",
+      "view_key": "phibench_2_9e8k_adp_b_1_successful_pose",
       "mode": "pocket",
-      "file": "phibench_2_9dhh_a1a4o_a_1_successful_pose_pocket.png",
-      "sha256": "92b663f2e5a72958db01ccf72048a79429634ce159d4074c68238637be86fd61",
+      "file": "phibench_2_9e8k_adp_b_1_successful_pose_pocket.png",
+      "sha256": "e4e59ae580c0d551701904136c7c752e82a0890609c6a2efc97bd32fe82fd6e7",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 2810,
+        "atoms": 2544,
         "secondary": {
-          "h": 166,
-          "c": 137,
-          "s": 65
+          "c": 149,
+          "h": 118,
+          "s": 59
         }
       },
       "camera_view": [
-        -26.841123515624986,
-        22.996722140625,
-        -22.73754487500001,
-        109.85323840932509,
-        -0.5435247129944494,
-        -0.06776176230654644,
-        0.07739302217993317,
-        -0.8330663539306272
+        -204.35109012962965,
+        -151.8299302222222,
+        -212.951505388889,
+        115.34828020286793,
+        -0.3173483097637362,
+        0.519379239146768,
+        -0.3196912568215553,
+        0.7261768080469648
       ],
-      "nonwhite_fraction": 0.04283169934640523
+      "nonwhite_fraction": 0.04486029411764706
     },
     {
       "id": "9fyb_nmn_a_1_b",
       "view_key": "phibench_0_9fyb_nmn_a_1_b_refinement_rescue",
       "mode": "pocket",
       "file": "phibench_0_9fyb_nmn_a_1_b_refinement_rescue_pocket.png",
-      "sha256": "b268eebe3d12dcd6fa21a433737859f1494a7c6e1511985fef62f20152bc3377",
+      "sha256": "cb15cf45d9bfbfe427313490fa9f707cac9eb408d3889f1610523a4babdf84f1",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
         "atoms": 2982,
@@ -226,158 +226,131 @@
         }
       },
       "camera_view": [
-        -18.77821212121212,
-        -9.105693242424243,
-        -5.4209833484848495,
-        118.40515015313153,
-        0.21746450129841566,
-        0.5842657120478459,
-        0.649582202407507,
-        0.435184708733737
+        -18.77671004545455,
+        -9.109560045454545,
+        -5.412947000000001,
+        118.37652745290058,
+        0.22002026809101544,
+        0.5805745669097413,
+        0.6513593564056256,
+        0.4361825795576587
       ],
-      "nonwhite_fraction": 0.05631495098039216
+      "nonwhite_fraction": 0.056050245098039214
     },
     {
-      "id": "7hhm_uwd_c_1",
-      "view_key": "phibench_0_7hhm_uwd_c_1_selection_failure",
+      "id": "9e8n_adp_d_1_e",
+      "view_key": "phibench_2_9e8n_adp_d_1_e_selection_failure",
       "mode": "pocket",
-      "file": "phibench_0_7hhm_uwd_c_1_selection_failure_pocket.png",
-      "sha256": "3742aa0272bec01838eb3b27608a857bd0200045ae1ecfdaa3086ae840abf276",
+      "file": "phibench_2_9e8n_adp_d_1_e_selection_failure_pocket.png",
+      "sha256": "ee1b7b13158f8d5c1a87d68aad0d6158a6c83851515c8c219f7c06c6c7a314bc",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 666,
+        "atoms": 5884,
         "secondary": {
-          "c": 41,
-          "s": 25,
-          "h": 18
+          "h": 336,
+          "c": 294,
+          "s": 110
         }
       },
       "camera_view": [
-        -16.05569980555556,
-        38.10478602777776,
-        -17.368667888888886,
+        -162.67662671604938,
+        -159.33928127160496,
+        -165.66707539506177,
+        110.07353531620703,
+        -0.23479411436180236,
+        0.4670486984855179,
+        0.8519460584360472,
+        0.030416288717136662
+      ],
+      "nonwhite_fraction": 0.047928513071895426
+    },
+    {
+      "id": "7vf6-assembly1__protein-a__ligand-e__ccd-gdp",
+      "view_key": "foldbench_1_7vf6-assembly1__protein-a__ligand-e__ccd-gdp_successful_pose",
+      "mode": "pocket",
+      "file": "foldbench_1_7vf6-assembly1__protein-a__ligand-e__ccd-gdp_successful_pose_pocket.png",
+      "sha256": "5f0a0a3b97e1b3c36d2217b141cf216200479654173be533bda37fc115732c82",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 2812,
+        "secondary": {
+          "c": 149,
+          "s": 97,
+          "h": 120
+        }
+      },
+      "camera_view": [
+        -2.2754323214285717,
+        -23.463743303571423,
+        -13.084067642857145,
+        112.83714386204299,
+        0.36467871342490477,
+        0.1255080386625474,
+        0.9210222678218489,
+        0.0545449391065305
+      ],
+      "nonwhite_fraction": 0.03780433006535948
+    },
+    {
+      "id": "8bmv-assembly1__protein-a__ligand-c__ccd-urc",
+      "view_key": "foldbench_0_8bmv-assembly1__protein-a__ligand-c__ccd-urc_refinement_rescue",
+      "mode": "pocket",
+      "file": "foldbench_0_8bmv-assembly1__protein-a__ligand-c__ccd-urc_refinement_rescue_pocket.png",
+      "sha256": "8d685c987b56c375e1929425a91dc39ceb9476c31d125b8c265c2e11a4475360",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1909,
+        "secondary": {
+          "c": 90,
+          "h": 90,
+          "s": 65
+        }
+      },
+      "camera_view": [
+        11.407655305555554,
+        11.940839944444447,
+        -23.234169361111114,
         124.22144627446497,
-        0.8033868525872622,
-        0.5111214651654352,
-        0.12705247174557993,
-        -0.27781663441991783
+        -0.35643846211782365,
+        0.7746688402535512,
+        -0.5153062164629042,
+        -0.08543602248457784
       ],
-      "nonwhite_fraction": 0.051336192810457516
+      "nonwhite_fraction": 0.04883578431372549
     },
     {
-      "id": "9bbh-assembly1__protein-a__ligand-e__ccd-vvp",
-      "view_key": "foldbench_2_9bbh-assembly1__protein-a__ligand-e__ccd-vvp_successful_pose",
+      "id": "8ihg-assembly1__protein-c__ligand-g__ccd-2af",
+      "view_key": "foldbench_1_8ihg-assembly1__protein-c__ligand-g__ccd-2af_selection_failure",
       "mode": "pocket",
-      "file": "foldbench_2_9bbh-assembly1__protein-a__ligand-e__ccd-vvp_successful_pose_pocket.png",
-      "sha256": "dac2d48dc80d40d8979cb806d2f2178736b8c6898a443cf221548cee5db6f068",
+      "file": "foldbench_1_8ihg-assembly1__protein-c__ligand-g__ccd-2af_selection_failure_pocket.png",
+      "sha256": "26ed4d25f2b9b44fc236f39bf7aa5fd43049cc769206f82f9898d27d4ce37265",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 8497,
+        "atoms": 2386,
         "secondary": {
-          "c": 429,
-          "s": 623,
-          "h": 52
+          "c": 116,
+          "s": 78,
+          "h": 105
         }
       },
       "camera_view": [
-        -49.750204772727265,
-        -1.8359477272727274,
-        21.90237081818182,
+        -48.62901887499999,
+        -19.08093341666667,
+        19.67341091666667,
         124.22144627446497,
-        -0.40577525159083067,
-        0.6577913765761292,
-        0.09928519106660975,
-        0.6267371067148855
+        -0.48043514406807636,
+        -0.19930995512403002,
+        0.12467057331081727,
+        0.8449348272400043
       ],
-      "nonwhite_fraction": 0.03918096405228758
+      "nonwhite_fraction": 0.025855392156862746
     },
     {
-      "id": "8ug3-assembly1__protein-a__ligand-c__ccd-wre",
-      "view_key": "foldbench_2_8ug3-assembly1__protein-a__ligand-c__ccd-wre_refinement_rescue",
+      "id": "a71ev2a-x5608b",
+      "view_key": "openbind_1_a71ev2a-x5608b_successful_pose",
       "mode": "pocket",
-      "file": "foldbench_2_8ug3-assembly1__protein-a__ligand-c__ccd-wre_refinement_rescue_pocket.png",
-      "sha256": "0d22a3a8987772f38c6f6920cb72d643ad3b5a300a36267654a2e15656a81db5",
-      "scene": {
-        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 2223,
-        "secondary": {
-          "c": 119,
-          "s": 80,
-          "h": 99
-        }
-      },
-      "camera_view": [
-        6.116171643678158,
-        1.0304734827586208,
-        -49.62669024137931,
-        106.40546144742456,
-        0.7017101186375274,
-        0.23065497135178928,
-        0.25556202743532025,
-        -0.62377018502455
-      ],
-      "nonwhite_fraction": 0.04161356209150327
-    },
-    {
-      "id": "8g7f-assembly1__protein-b__ligand-h__ccd-1jj",
-      "view_key": "foldbench_0_8g7f-assembly1__protein-b__ligand-h__ccd-1jj_selection_failure",
-      "mode": "pocket",
-      "file": "foldbench_0_8g7f-assembly1__protein-b__ligand-h__ccd-1jj_selection_failure_pocket.png",
-      "sha256": "86066cb35558fe06dd340c8cdfcfcd6872e5d031f1e878a3d20763d86a1c789b",
-      "scene": {
-        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 1162,
-        "secondary": {
-          "c": 59,
-          "s": 42,
-          "h": 37
-        }
-      },
-      "camera_view": [
-        4.698560083333334,
-        -25.215264374999993,
-        -9.568383916666665,
-        124.22144627446497,
-        -0.4529156042208435,
-        -0.17825992380875233,
-        0.06679983672856009,
-        -0.8709929028585732
-      ],
-      "nonwhite_fraction": 0.02911764705882353
-    },
-    {
-      "id": "a71ev2a-x3177a",
-      "view_key": "openbind_1_a71ev2a-x3177a_successful_pose",
-      "mode": "pocket",
-      "file": "openbind_1_a71ev2a-x3177a_successful_pose_pocket.png",
-      "sha256": "c5c7a6417029e6bb839e4e2237e7b247bc6b9685ed3bf6bf87aa23e6fd472a1a",
-      "scene": {
-        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-        "atoms": 1083,
-        "secondary": {
-          "c": 61,
-          "s": 75,
-          "h": 4
-        }
-      },
-      "camera_view": [
-        -8.734241194444444,
-        -12.621361361111115,
-        -23.97639372222222,
-        122.97143739475379,
-        -0.12356521341869464,
-        -0.33022067335147637,
-        -0.3742187248419644,
-        0.857698251660655
-      ],
-      "nonwhite_fraction": 0.052444444444444446
-    },
-    {
-      "id": "a71ev2a-x7379a",
-      "view_key": "openbind_1_a71ev2a-x7379a_refinement_rescue",
-      "mode": "pocket",
-      "file": "openbind_1_a71ev2a-x7379a_refinement_rescue_pocket.png",
-      "sha256": "29c97decbd044fb110b648be67641945f53aa9324ca7cf7727a4ebb721a60c92",
+      "file": "openbind_1_a71ev2a-x5608b_successful_pose_pocket.png",
+      "sha256": "087188e1a4801c79f7c8697d6bde09f48f7f1e39cb43e84d91fe5134b27baa44",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
         "atoms": 1074,
@@ -388,43 +361,70 @@
         }
       },
       "camera_view": [
-        -7.908911487179487,
-        -12.97591294871795,
-        -23.657754564102564,
-        111.73032127726535,
-        0.056295401143130766,
-        -0.26913242686638733,
-        -0.340414401612408,
-        0.899175511117829
+        -9.82860340625,
+        -13.967229499999998,
+        -22.8049120625,
+        124.22144627446497,
+        0.6870883334155231,
+        0.1340493398553048,
+        -0.5512725415723714,
+        0.4539151699128087
       ],
-      "nonwhite_fraction": 0.05196486928104575
+      "nonwhite_fraction": 0.04297671568627451
     },
     {
-      "id": "a71ev2a-x3858b",
-      "view_key": "openbind_2_a71ev2a-x3858b_selection_failure",
+      "id": "a71ev2a-x7379a",
+      "view_key": "openbind_1_a71ev2a-x7379a_refinement_rescue",
       "mode": "pocket",
-      "file": "openbind_2_a71ev2a-x3858b_selection_failure_pocket.png",
-      "sha256": "02b13c86428bd41fd0e783c81718bb5a7cbb36814e64b67c59d8e21f127b3dc8",
+      "file": "openbind_1_a71ev2a-x7379a_refinement_rescue_pocket.png",
+      "sha256": "635de3463d0406a08cf808b7b3cf7a23b862d1a350bcfda883e63f32fa222e29",
       "scene": {
         "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
         "atoms": 1074,
         "secondary": {
-          "c": 59,
+          "c": 57,
           "s": 73,
-          "h": 7
+          "h": 9
         }
       },
       "camera_view": [
-        -9.144836396825397,
-        -13.544116619047616,
-        -23.546524380952384,
-        119.19296744950887,
-        0.48304430020562406,
-        -0.24208079872041097,
-        0.8065580484840715,
-        0.23985246581036676
+        -7.913621307692308,
+        -12.971016423076927,
+        -23.65523550000001,
+        111.71150845014154,
+        -0.3406648452926315,
+        0.8988772228110095,
+        -0.056516981652834475,
+        0.2697647721222461
       ],
-      "nonwhite_fraction": 0.06158455882352941
+      "nonwhite_fraction": 0.05208006535947712
+    },
+    {
+      "id": "a71ev2a-x3977a",
+      "view_key": "openbind_1_a71ev2a-x3977a_selection_failure",
+      "mode": "pocket",
+      "file": "openbind_1_a71ev2a-x3977a_selection_failure_pocket.png",
+      "sha256": "446b09f9fccddc23fe74953aee606b72c41c9e29dc4aa2a082060d539672b037",
+      "scene": {
+        "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+        "atoms": 1083,
+        "secondary": {
+          "c": 58,
+          "s": 73,
+          "h": 9
+        }
+      },
+      "camera_view": [
+        -9.045639277777777,
+        -12.96568574074074,
+        -23.25377881481482,
+        122.3024055849367,
+        0.5134808202810522,
+        -0.26024934677897543,
+        0.7806659365848633,
+        0.24324559638499613
+      ],
+      "nonwhite_fraction": 0.05920343137254902
     }
   ]
 }

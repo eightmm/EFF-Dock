@@ -2,7 +2,7 @@
 
 The corrected fragment-to-world feature is **Rw**. The implementation now supports
 it explicitly without changing learned tensor shapes or overwriting released
-weights. Historical checkpoints and manuscript benchmark figures used **Rᵀw**.
+weights. Historical checkpoints were trained with **Rᵀw**. The current primary manuscript benchmark figures use the completed corrected **Rw** three-seed study; historical ablations and illustrations remain identified separately.
 The correction follows the coordinate convention; the small external comparison
 below does not select a new production model or establish an accuracy gain.
 
@@ -90,10 +90,17 @@ this metadata; do not use them with corrected checkpoints. Use
 
 Retraining is **not mathematically required to execute the corrected operator**.
 It may still improve adaptation or confidence calibration; that remains an
-empirical question. No retraining or new full benchmark sweep accompanies this
-code correction.
+empirical question. No retraining accompanies this correction. The separately authorized full five-benchmark three-seed evaluation is now complete.
 
-## Frozen-weight diagnostic
+## Completed three-seed evaluation
+
+[Operator-change figure](paper/figures/S11_rw_operator_change.pdf) ·
+[Full numerical summary](../benchmarks/results/paper/rw_report.json) ·
+[Protocol](RW_THREE_SEED_PROTOCOL.md)
+
+All five benchmark cohorts completed corrected Rw generation, refinement, fresh confidence scoring, input-chirality selection and selected-pose PB evaluation with the released weights. Seeds are 42, 100042 and 200042, N100/S10, unguided supplied pockets; no retraining or result-driven policy change. All 6,246 corrected and 1,179 fresh control executions retain their frozen IDs. Astex and PoseBusters have matched-prior fresh Rᵀw controls; temporal comparisons use historical banks and also include execution variation. Figures report means and sample SD over three seeds; paired complex-bootstrap intervals preserve the three outcomes together and condition on this seed set. Rw is supported by the equivariance convention, not by an asserted universal accuracy increase.
+
+## Historical single-seed diagnostic
 
 [Comparison PDF](paper/diagnostics/Rw_comparison.pdf) ·
 [Preview](paper/diagnostics/Rw_comparison.png) ·
@@ -178,8 +185,7 @@ for this 308-case report update.
 A subsequent [registered three-seed evaluation](RW_THREE_SEED_PROTOCOL.md)
 covers all five manuscript benchmarks with corrected generation and fresh
 confidence features, plus matched legacy Astex/PoseBusters controls. Its base
-seeds are 42, 100042 and 200042. Results are pending; the single-seed diagnostic
-and historical manuscript estimates above remain separate.
+seeds are 42, 100042 and 200042. The full study is complete; primary manuscript figures now use its Rw results. The single-seed diagnostic and historical estimates remain separate.
 
 ## Discussion and decision
 
@@ -196,8 +202,8 @@ The corrected map is analytically rotation-equivariant. Existing building-block
 tests or a finite full-model rotation check do not prove that the entire sampler,
 frame reconstruction, confidence selector and refinement pipeline is exactly
 SE(3)-equivariant. SO(3) fragment frames also do not establish reflection invariance
-of stereochemical inputs. Existing manuscript numbers remain labelled as legacy;
-they must be reevaluated before being presented as corrected-Rw results.
+of stereochemical inputs. Primary manuscript numbers now come from the completed three-seed Rw study.
+Historical ablations retain legacy labels and cannot be presented as corrected-Rw results.
 
 ## Verification
 
@@ -225,4 +231,4 @@ PoseBusters checks; hatched regions are RMSD-successful but PB-invalid. The
 308-case PB cohort contains 307 original cases and one predeclared supplementary
 run with diagnostic-only repeat control, unchanged selection and first-realization
 outputs. Results use one paired seed and are separate from the three-repeat
-legacy manuscript figures.
+historical legacy manuscript figures.

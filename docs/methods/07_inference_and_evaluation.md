@@ -277,4 +277,4 @@ Opened external cohorts are descriptive. U70k was selected on the fixed
 1,035-complex internal bank. Guidance/budget and pocket/prior figures retain
 their separately captioned guided conditions and cannot be pooled with the
 unguided main condition. PoseX follows a separate protocol and is outside this
-14-figure package.
+23-figure package.

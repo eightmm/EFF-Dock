@@ -1,7 +1,6 @@
 # Rw five-benchmark evaluation
 
-Status: registered, results pending. This evaluation replaces neither published
-legacy estimates nor the separately reported single-seed diagnostic until complete.
+Status: complete. Current primary manuscript figures use the corrected Rw three-seed results. Historical ablations and the earlier single-seed diagnostic retain their provenance. See `benchmarks/results/paper/rw_report.json` for the full frozen-cohort summary.
 
 Evaluate the released docking and confidence weights without retraining on Astex
 Diverse Set (85), PoseBusters v2 (308), PhiBench (206), FoldBench (558), and OpenBind
@@ -58,16 +57,7 @@ sources before admitting the full study. Initial generation smoke outputs remain
 unchanged. This amendment repairs evaluation compatibility, without selecting a
 method or seed based on docking success.
 
-Execution backends are recorded per shard. The queued study can use validated
-RTX 6000 Ada and RTX A5000 GPUs with identical software, precision, candidate
-chunks, and scientific settings. A5000 admission requires the fixed largest
-ligand from each cohort to complete generation, refinement, and confidence
-scoring with finite outputs and memory headroom. These separate resource probes
-do not enter manuscript estimates. Pending tasks with index modulo 3 equal to
-1 or 2 are assigned to A5000; completed and running tasks retain their device.
-Operator pairs always share one GPU and identical priors. The global concurrency
-cap is six GPUs. Hardware-dependent numerical variation remains part of execution
-uncertainty; do not claim identical results across devices.
+Execution backends are recorded per shard. The completed study used validated RTX 6000 Ada, RTX A5000 and RTX PRO 6000 Blackwell Max-Q GPUs with identical software, precision, candidate chunks and scientific settings. Prespecified largest-ligand probes established finite output and memory headroom on each added backend; those probes do not enter estimates. Only pending tasks were reassigned, operator pairs shared one GPU and identical priors, and completed/running tasks were not restarted. User-authorized scheduling amendments removed the initial concurrency cap while retaining scheduler limits and minimum CPU allocations. Hardware-dependent numerical variation remains part of execution uncertainty; these results do not establish hardware-invariant predictions.
 
 Freeze source, inputs, cohort IDs, checkpoint hashes, and commands before launch.
 Require representative and largest-ligand smoke tests, finite complete 100-pose

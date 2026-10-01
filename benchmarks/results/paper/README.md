@@ -1,8 +1,12 @@
+# Current Rw numerical inputs
+
+The primary numerical inputs were refreshed from the complete frozen-weight Rw three-seed study. `rw_report.json` is the campaign summary; `complexity_descriptors.csv` verifies saved fragment counts; `evidence/rw_operator_change.json` and `evidence/selector_bottleneck.json` supply the additional diagnostics. Historical ablations and illustrations remain explicitly identified in captions.
+
 # Numerical source data for the manuscript figures
 
-These manuscript numerical data describe the historical `legacy_rt_w` operator. The separate [orientation diagnostic](orientation/summary.json) is a one-seed 308-case PB comparison with one disclosed supplement; see [the correction note](../../../docs/ORIENTATION_INJECTION.md).
+Primary numerical data describe the completed corrected Rw study; the retained historical ablations are identified individually. The separate [orientation diagnostic](orientation/summary.json) is a one-seed 308-case PB comparison with one disclosed supplement; see [the correction note](../../../docs/ORIENTATION_INJECTION.md).
 
-These files reproduce the current 21 figures in
+These files reproduce the current 23 figures in
 [docs/paper](../../../docs/paper/README.md) using a public checkout, without
 raw structures, checkpoints, private pose banks or cluster directories.
 
@@ -15,7 +19,7 @@ For a figure-only CPU environment, use
 `uv run --locked --only-group dev python -m benchmarks.figures.paper`.
 The development group pins Matplotlib; this form omits the model's CUDA stack.
 
-The renderer produces 21 PDF/PNG pairs with the published names and a
+The renderer produces 23 PDF/PNG pairs with the published names and a
 `source_data.csv` containing the input values in long form. Its columns are
 `json_pointer` and `value_json`: pointers index the named input tables/arrays,
 and JSON scalars retain numbers, strings, booleans and explicit nulls. The
@@ -35,6 +39,8 @@ hierarchical JSON inputs remain the canonical numerical source.
 | S3 | `figure_data.json` → `complexity_failures` |
 | S4–S9 | `evidence/` JSON and case-level CSV files |
 | S10 | `trajectory/trace.json` and checked molecular captures |
+| S11 | `evidence/rw_operator_change.json` |
+| S12 | `evidence/selector_bottleneck.json` |
 
 `selected_outcomes.csv` contains 24,984 rows: 2,082 external complexes × three
 seeds × raw/refined × ordinary/chirality-filtered selection. Boolean RMSD/PB
@@ -69,10 +75,7 @@ rendered pixels outside the pinned environment. Use the captions for which
 conditions are main, guided, auxiliary or literature-reported.
 
 The added Figures S4–S9 use [saved-bank evidence](evidence/README.md), with
-[results and interpretation](../../../docs/paper/EVIDENCE.md). Original 14
-figure files and their numerical sources remain unchanged. New source tables
-are supplied alongside `source_data.csv`; that original CSV covers Figures
-1–11 and S1–S3.
+[results and interpretation](../../../docs/paper/EVIDENCE.md). Primary data-driven figures now use Rw; historical guidance, runtime and pocket/prior inputs remain legacy. The long-form `source_data.csv` covers the main numerical inputs; the evidence JSON/CSV files supply the supplemental diagnostics.
 
 The 20-figure extension was also regenerated in the figure-only CPU environment
 on 2026-09-23; all 20 PNGs matched the packaged previews pixel-for-pixel.

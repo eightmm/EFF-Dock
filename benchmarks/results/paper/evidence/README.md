@@ -1,7 +1,7 @@
 # Saved-bank empirical evidence
 
-Numerical sources for supplementary Figures S4–S9. No new docking inference or
-training was run. The primary protocol and fixed analyses are in
+Numerical sources for supplementary Figures S4–S9 and S11–S12. No new docking inference or
+training was run. Primary results now use the completed frozen-weight Rw study. Historical cost records retain their operator provenance. The primary protocol and fixed analyses are in
 [PROTOCOL.md](PROTOCOL.md); manuscript interpretation is in
 [EVIDENCE.md](../../../../docs/paper/EVIDENCE.md).
 
@@ -11,13 +11,15 @@ training was run. The primary protocol and fixed analyses are in
 | `confidence_cases.csv` | 12,492 complex/repeat/stage banks: within-bank ranking, regret, selection outcomes, density, Brier score |
 | `relatedness.csv` | 2,082 complex identities, maximum ligand similarity, exact-match flag and fixed AND subset membership |
 | `pb_checks.csv` | 24,984 selected-pose evaluations, 27 Boolean PB checks each (0/1), retained candidate indices |
-| `structures.json` | Three illustrative receptor-frame heavy-atom structures, bonds, complete ligand-contacting receptor chains, deterministic selection metadata and input hashes |
+| `structures.json` | Fifteen illustrative receptor-frame heavy-atom structures, bonds, complete ligand-contacting receptor chains, deterministic selection metadata and input hashes |
 | `baseline_cases.csv` | 5,895 local baseline outcomes matched to EFF-Dock by complex and repeat |
 | `baseline_uncertainty.json` | Twenty RMSD/PB-valid contrasts, paired complex and PDB-accession bootstrap intervals and source hashes |
-| `structure_views/` | Six software WebGL captures and their input/renderer hashes; used by the lightweight PDF renderer |
+| `structure_views/` | Fifteen software WebGL captures and their input/renderer hashes; used by the lightweight PDF renderer |
+| `rw_operator_change.json` | Three-seed operator differences and paired-complex bootstrap intervals; fresh controls distinguished from historical banks |
+| `selector_bottleneck.json` | Effective chirality eligibility, exclusive failure attribution and complete regret CDFs |
 | `model_cost.json` | Parameter-object counts from CPU-loaded release models, existing pipeline throughput and explicit training-time availability |
 
-Verify and render the six added figures from these public tables:
+Verify and render the saved-bank evidence figures from these public tables:
 
 ```bash
 uv run python -m benchmarks.analysis.verify_evidence
@@ -25,7 +27,7 @@ uv run python -m benchmarks.figures.evidence --output outputs/paper_figures
 ```
 
 The unified `python -m benchmarks.figures.paper` command verifies and renders
-all 20 figures. Package checks additionally verify the manifest, page order,
+all 23 figures. Package checks additionally verify the manifest, page order,
 English captions and Prism ZIP. Counts, selected outcomes, threshold membership,
 repeat aggregation and calibration denominators are checked against case-level
 records and the original published tables. AUROC uses average ranks for ties;
@@ -57,7 +59,7 @@ elements retain the palette in `structure_views/manifest.json`. Display chains
 are selected by any protein heavy atom within 5 Å of the crystal ligand, then
 retained in full. This is a visualization selection, not a new pocket or metric.
 
-The ordinary 21-figure renderer uses the 15 checked pocket PNG captures, so it needs
+The ordinary 23-figure renderer uses the 15 checked pocket PNG captures, so it needs
 no browser or additional molecular-view dependencies. To regenerate the captures,
 use the optional `py3Dmol==2.5.5` and `playwright==1.62.0` packages with Playwright
 Chromium and its OS libraries. Download the pinned JavaScript file named below;
@@ -72,7 +74,7 @@ uv run --with py3Dmol==2.5.5 --with playwright==1.62.0 python -m benchmarks.figu
 Case-specific camera quaternions are in `structure_views/settings.json`; styles
 are in `benchmarks/figures/structure_views.py`. Each view rotates the entire
 receptor/pose scene together. Orientations were selected for readability from
-six previews (the prior view and five principal-axis-derived views), without
+three principal-axis views, maximizing projected pose separation, without
 changing coordinates, cases or RMSDs. The pale cartoon (opacity 0.25) and thinner
 ligands (stick radius 0.16 Å, sphere scale 0.16) reduce occlusion. The manifest
 records the actual cameras, settings hash, browser/library versions and per-view
@@ -85,7 +87,7 @@ RMSD rescue first; then select lower-median PB-valid success and lower-median
 RMSD selection failure, excluding previously chosen complex IDs. The full table
 in [EVIDENCE.md](../../../../docs/paper/EVIDENCE.md) gives IDs, repeats, RMSDs and
 eligible complex-repeat counts. Rescue examples are extremes, not typical effects.
-`rescue_candidates.json` records all 138 eligible rescues, and
+`rescue_candidates.json` records all 131 eligible rescues, and
 `rescue_search_sources.json` records the 15 source-ledger checksums. Re-running
 `benchmarks.analysis.evidence` exports these audits and all 15 structures. No new
 inference or PB evaluation is needed. Capture filenames include dataset, repeat,

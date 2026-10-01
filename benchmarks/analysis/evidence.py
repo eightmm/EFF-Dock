@@ -208,7 +208,7 @@ def aggregate_physical(pb):
     return result
 
 
-def collect(root, out):
+def collect(root, out, study=None):
     sources = {}
 
     def read(path, expected=None, as_csv=False):
@@ -218,24 +218,40 @@ def collect(root, out):
         blob = path.read_bytes()
         digest = hashlib.sha256(blob).hexdigest()
         require(expected is None or digest == expected, f"Changed input: {path}")
-        sources[str(path.relative_to(root))] = digest
+        origin = study.resolve().parents[2] if study is not None else root
+        relative = path.relative_to(root) if path.is_relative_to(root) else path.relative_to(origin)
+        sources[str(relative)] = digest
         return list(csv.DictReader(io.StringIO(blob.decode()))) if as_csv else json.loads(blob)
 
     paper = "benchmarks/results/paper/"
     public = read(paper + "figure_data.json")
     seq = {(r["dataset"], r["id"]): r for r in public["sequence"]["records"]}
-    ligand = {
-        (r["dataset"], r["id"]): r
-        for r in read("docs/paper/20260919/overlap_metrics.json")["annotations"]
-    }
+    ligand = (
+        {
+            (r["dataset"], r["id"]): r
+            for r in read("docs/paper/20260919/overlap_metrics.json")["annotations"]
+        }
+        if study is None
+        else {
+            (r["dataset"], r["id"]): dict(
+                nearest_train_tanimoto=float(r["ligand_tanimoto"]),
+                observed_train_ligand_identity=r["exact_ligand"] == "True",
+            )
+            for r in read(paper + "evidence/relatedness.csv", as_csv=True)
+        }
+    )
     old = {
         (r["dataset"], int(r["repeat"]), r["id"], r["stage"], r["policy"]): r
         for r in read(paper + "selected_outcomes.csv", as_csv=True)
     }
     manifest = read(paper + "candidate_metrics.json")
     ledger_hash = {r["path"]: r["sha256"] for r in manifest["sources"]}
-    provenance = read(
-        "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/pb_inchi_compat_v1/provenance.json"
+    provenance = (
+        read(
+            "outputs/benchmarks/external_chirality_u70k_temporal_full_r3_v1/pb_inchi_compat_v1/provenance.json"
+        )
+        if study is None
+        else None
     )
     cases, pb, related, private = [], {}, [], {}
     calibration = defaultdict(lambda: np.zeros(4))
@@ -243,14 +259,26 @@ def collect(root, out):
         baseline_ids = None
         for rep in range(3):
             name = f"{ds}_repeat_{rep}"
-            path = f"outputs/benchmarks/{BANKS[ds]}/{name}/records.json"
+            path = (
+                f"outputs/benchmarks/{BANKS[ds]}/{name}/records.json"
+                if study is None
+                else str(study.relative_to(root) / "post/full" / f"rw_{name}" / "records.json")
+            )
             records = read(path, ledger_hash[path])
             ids = {r["id"] for r in records}
             require(len(ids) == count and len(records) == count * 2, "Candidate cohort incomplete")
             require(len({(r["id"], r["stage"]) for r in records}) == count * 2, "Duplicate records")
             require(baseline_ids is None or ids == baseline_ids, "Repeat IDs differ")
             baseline_ids = ids
-            if ds in ("astex", "posebusters"):
+            if study is not None:
+                profile = "pb_full" if ds in ("astex", "posebusters") else "pb_inchi_compat_v1"
+                pbpaths = [
+                    (p, None)
+                    for p in sorted(
+                        (study / "post" / profile / f"rw_{name}").glob("shard-*/results.json")
+                    )
+                ]
+            elif ds in ("astex", "posebusters"):
                 pbpaths = [
                     (p, None)
                     for p in sorted(
@@ -492,7 +520,7 @@ def binding_chain_display(pdb, reference_coordinates, cutoff=5.0):
     )
 
 
-def sample_cases(root, out, cases, private, pb, result):
+def sample_cases(root, out, cases, private, pb, result, study=None):
     """Export deterministic mechanism examples in their original receptor frame."""
     from rdkit import Chem
 
@@ -528,7 +556,13 @@ def sample_cases(root, out, cases, private, pb, result):
             dict(path=path, sha256=result["sources"][path])
             for ds in COUNTS
             for rep in range(3)
-            for path in [f"outputs/benchmarks/{BANKS[ds]}/{ds}_repeat_{rep}/records.json"]
+            for path in [
+                f"outputs/benchmarks/{BANKS[ds]}/{ds}_repeat_{rep}/records.json"
+                if study is None
+                else str(
+                    study.relative_to(root) / "post/full" / f"rw_{ds}_repeat_{rep}" / "records.json"
+                )
+            ]
         ],
         complex_repeats=sum(COUNTS.values()) * 3,
         rule="Maximum same-candidate RMSD improvement; raw >=2 A, refined <2 A, primary refined selection PB-valid; ties by dataset, repeat, ID",

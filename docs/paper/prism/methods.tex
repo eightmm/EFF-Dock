@@ -6,18 +6,23 @@
 
 
 \paragraph{Orientation convention and result version.}
-The existing benchmark figures and released weights use the historical
-fragment initialization $h=R^{\mathsf T}w$. With active local-to-world
+Released weights were trained with the historical
+fragment initialization $h=R^{\mathsf T}w$. Current primary benchmark
+figures use the completed corrected-$Rw$ three-seed evaluation with frozen weights.
+With active local-to-world
 frames $x=R\ell+T$, the corrected initialization is $h=Rw$:
 under $R\mapsto QR$, it obeys $h\mapsto Qh$, whereas the historical
 initialization generally does not. Source-local edge coordinates
 $R^{\mathsf T}(x_j-x_i)$ remain unchanged. The corrected map and finite
 network tests do not prove exact equivariance of the entire docking pipeline.
 The repository provides an explicit corrected inference option and preserves
-historical checkpoint semantics. Its separate frozen-weight one-seed comparison
-now covers all 308 PoseBusters cases: 307 original cases plus one predeclared
-supplement with diagnostic-only repeatability control and unchanged selection.
-It does not replace the legacy benchmark figures or establish an accuracy improvement.
+historical checkpoint semantics. The primary evaluation covers all five cohorts
+with seeds 42, 100042 and 200042, unguided N100/S10, fixed refinement and
+chirality-filtered confidence selection. Astex and PoseBusters have fresh
+matched-prior historical-operator controls; temporal contrasts use historical
+banks and include execution variation. Docking and confidence weights remain
+legacy-trained, so this is a cross-operator frozen-weight evaluation.
+Historical ablations and illustrations retain their provenance.
 
 \subsection{Task, data and information boundary}
 EFF-Dock predicts ligand poses given a receptor, ligand chemistry and a

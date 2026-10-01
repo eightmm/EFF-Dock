@@ -1,28 +1,14 @@
 # Manuscript figures
 
-**Operator provenance:** the 21-page manuscript benchmark figures use historical `legacy_rt_w`. The separate [Rw comparison PDF](diagnostics/Rw_comparison.pdf) covers one seed and all 308 PB cases, including one disclosed supplementary execution; it does not replace those figures. [Mathematics, discussion and compatibility](../ORIENTATION_INJECTION.md).
+Primary benchmark figures now use the complete corrected **Rw**, frozen weights, N100/S10 and three seeds. Historical guidance/budget/runtime/pocket/prior panels and the saved N1 trajectory remain explicitly **Rᵀw**. Training-relatedness inputs are unchanged.
 
-Working figures and captions for writing the EFF-Dock manuscript. Figure
-numbering and placement may change during writing.
-
-- [Combined PDF](paper_figures.pdf): 21 pages.
-- [New empirical evidence and interpretation](EVIDENCE.md)
-- [Figure captions](FIGURE_CAPTIONS.md): English captions and author notes.
-- [Sequence-relatedness definitions](RELATEDNESS.md)
-- [Prism package](prism/prism_figure_reference.zip): PDFs, equations and LaTeX reference blocks.
-- [Editable methods](prism/methods.tex)
-- [Numerical source data and reproduction](../../benchmarks/results/paper/README.md)
-- [Source and caption manifest](manifest.json)
-
-## Model illustrations
-
-- [Representative workflow](REPRESENTATIVE_FIGURE.md): Figure 1 PDF, preview and caption.
-- [Architecture](ARCHITECTURE_FIGURE.md): Figure 2 with model overview, interaction layer,
-  convolution detail and normalization/activation panels (A–D). The layer shows
-  its single identity skip; the readout expands mean and torque/inertia branches.
-  Vector PDF/SVG and caption are included.
-
-## Figures
+- [Combined result PDF](paper_figures.pdf): 23 pages.
+- [Prism ZIP](prism/prism_figure_reference.zip): all figure PDFs, PNG previews, Fig1/2 SVGs, captions and LaTeX.
+- [Captions](FIGURE_CAPTIONS.md)
+- [Rw evidence and numerical comparisons](EVIDENCE.md)
+- [Numerical source data](../../benchmarks/results/paper/README.md)
+- [Representative workflow](REPRESENTATIVE_FIGURE.md)
+- [Architecture](ARCHITECTURE_FIGURE.md)
 
 | Page | Figure | PDF | Preview |
 |---:|---|---|---|
@@ -44,31 +30,18 @@ numbering and placement may change during writing.
 | 16 | 보충 S5: Confidence reliability·후보 밀도 | [PDF](figures/S5_confidence_reliability.pdf) | [PNG](figures/S5_confidence_reliability.png) |
 | 17 | 보충 S6: 서열·리간드 동시 저유사도 subset | [PDF](figures/S6_stringent_subset.pdf) | [PNG](figures/S6_stringent_subset.png) |
 | 18 | 보충 S7: Refinement PB 실패·전이 | [PDF](figures/S7_physical_validity.pdf) | [PNG](figures/S7_physical_validity.png) |
-| 19 | 보충 S8: 5개 셋 × 성공·rescue·선택 실패 | [PDF](figures/S8_structure_examples.pdf) | [PNG](figures/S8_structure_examples.png) |
+| 19 | 보충 S8: 데이터셋별 성공·rescue·선택 실패 구조 | [PDF](figures/S8_structure_examples.pdf) | [PNG](figures/S8_structure_examples.png) |
 | 20 | 보충 S9: 로컬 baseline과 paired 신뢰구간 | [PDF](figures/S9_baseline_uncertainty.pdf) | [PNG](figures/S9_baseline_uncertainty.png) |
 | 21 | 보충 S10: Fragment 생성 경로 | [PDF](figures/S10_fragment_trajectory.pdf) | [PNG](figures/S10_fragment_trajectory.png) |
+| 22 | Rw 변경량과 신뢰구간 | [PDF](figures/S11_rw_operator_change.pdf) | [PNG](figures/S11_rw_operator_change.png) |
+| 23 | Chirality 제외·ranking 병목 | [PDF](figures/S12_selector_bottleneck.pdf) | [PNG](figures/S12_selector_bottleneck.png) |
 
-Pages 1–11 are currently main figures; pages 12–21 are supplementary.
-PB-valid success is solid; only RMSD-passing but PB-invalid portions are hatched.
-
-All 21 selected figures can be rendered using the versioned numerical inputs:
+Solid segments are RMSD <2 Å and PB-valid. Hatched extensions are RMSD <2 Å and PB-invalid.
 
 ```bash
 uv run python -m benchmarks.figures.paper --check
 uv run python -m benchmarks.figures.paper --output outputs/paper_figures
+uv run python scripts/package_paper_figures.py --check
 ```
 
-The renderer produces PDF/PNG pairs and a long-form source-data CSV. It verifies
-hashes, counts, repeat statistics, outcome joins and training-witness membership.
-This rebuild starts from frozen numerical records; it does not rerun docking,
-PB evaluation, sequence alignment or bootstrap sampling. The six empirical-evidence figures additionally use the
-[evidence tables](../../benchmarks/results/paper/evidence/README.md). The saved ODE illustration uses [trajectory source data](../../benchmarks/results/paper/trajectory/README.md). Historical collection
-helpers still require separately supplied pose banks. Older drafts and internal
-verification logs remain local.
-
-Replace the selected figure files with new analysis outputs before running
-`uv run python scripts/package_paper_figures.py` to rebuild the combined PDF,
-manifest and Prism ZIP. Use `--check` to verify the existing package. Packaging
-requires Poppler's `pdfinfo`, `pdftotext` and `pdfunite` on PATH and does not
-rerun scientific analyses. LaTeX blocks need manuscript-specific
-numbering and bibliography keys. See [Prism notes](prism/README.md) for compilation.
+The renderer uses versioned numerical records and reproduces no docking, PB evaluation or training. Saved-bank recollection requires the immutable study outputs and previous input tables; see `benchmarks.analysis.refresh_rw` and `benchmarks.analysis.rw_diagnostics`.

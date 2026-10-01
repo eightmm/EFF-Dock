@@ -1,4 +1,4 @@
-"""Render the 14 manuscript figures using only versioned numerical tables.
+"""Render manuscript figures using only versioned numerical tables.
 
 Run ``uv run python -m benchmarks.figures.paper --output outputs/paper_figures``.
 This does not run docking, refinement, sequence search, or bootstrap sampling.
@@ -316,7 +316,7 @@ def stages_and_pocket(result, out):
             rs = [
                 next(
                     r
-                    for r in result["rows"]
+                    for r in result.get("legacy_ablation_rows", result["rows"])
                     if (r["dataset"], r["n"], r["guidance"], r["stage"], r["policy"])
                     == (dataset, n, g, s, p)
                 )
@@ -345,6 +345,8 @@ def stages_and_pocket(result, out):
     fig.legend(
         *axes[0].get_legend_handles_labels(), ncol=4, loc="outside lower center", frameon=False
     )
+    if result.get("orientation_injection") == "rw":
+        fig.suptitle("Legacy Rᵀw · guidance and budget", fontsize=11)
     save(fig, out, "06_guidance_budget")
 
     fig, axes = plt.subplots(2, 2, figsize=(10, 7), layout="constrained")
@@ -422,6 +424,8 @@ def stages_and_pocket(result, out):
             spine.set_visible(True)
             spine.set_color("black")
             spine.set_linewidth(0.8)
+    if result.get("orientation_injection") == "rw":
+        fig.suptitle("Legacy Rᵀw · pocket and prior sensitivity", fontsize=11)
     save(fig, out, "08_pocket_prior")
 
 
@@ -594,6 +598,7 @@ def runtime(rows, out):
     fig.legend(
         *axes[0].get_legend_handles_labels(), loc="outside lower center", ncol=2, frameon=False
     )
+    fig.suptitle("Legacy Rᵀw · measured runtime and sampling memory", fontsize=11)
     save(fig, out, "07_runtime_memory")
 
 
@@ -829,13 +834,19 @@ def uncertainty(diag, out):
                 low, high = est["ci95_pp"]
                 center = est["delta_pp"]
                 ax.errorbar(
+                    (low + high) / 2,
+                    y + offset,
+                    xerr=(high - low) / 2,
+                    fmt="none",
+                    color=color,
+                    capsize=3,
+                )
+                ax.plot(
                     center,
                     y + offset,
-                    xerr=np.array([[center - low], [high - center]]),
-                    fmt="o" if j == 0 else "s",
+                    "o" if j == 0 else "s",
                     color=color,
                     markersize=4,
-                    capsize=3,
                     label=label if y == 0 else None,
                 )
         ax.axvline(0, color="#B9C3CE", linestyle="--", linewidth=0.8)
@@ -859,7 +870,7 @@ def candidates(data, out):
             for r in rows
             if r["dataset"] == d
             and r["stage"] == "refined"
-            and r["arm"] in ("unguided_n100_s10", "temporal_n100_s10")
+            and r["arm"] in ("unguided_n100_s10", "temporal_n100_s10", "rw_n100_s10")
         )
         for d in NAMES
     ]
@@ -1249,8 +1260,20 @@ def main():
     from benchmarks.figures.trajectory import render as render_trajectory
 
     render_trajectory(args.output)
+    from benchmarks.figures.rw_diagnostics import render as render_rw_diagnostics
+
+    if (DATA / "evidence/rw_operator_change.json").is_file():
+        with plt.rc_context(
+            {
+                "font.size": 10,
+                "pdf.fonttype": 42,
+                "axes.spines.top": False,
+                "axes.spines.right": False,
+            }
+        ):
+            render_rw_diagnostics(args.output)
     export_csv(dict(bundle, **data), args.output / "source_data.csv")
-    print(f"Rendered 21 figures (PDF/PNG) and source_data.csv in {args.output}")
+    print(f"Rendered manuscript figures (PDF/PNG) and source_data.csv in {args.output}")
 
 
 if __name__ == "__main__":

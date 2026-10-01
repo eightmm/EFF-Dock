@@ -1,9 +1,9 @@
 # Current manuscript methods
 
-**Version boundary:** the existing manuscript benchmark numbers and released weights use `legacy_rt_w`. Corrected `rw` is implemented and separately diagnosed; see [operator equations, evidence and compatibility](ORIENTATION_INJECTION.md). No existing benchmark value has been relabelled as an Rw result.
+**Version boundary:** current primary manuscript numbers use the completed corrected `rw` three-seed evaluation with frozen, legacy-trained released weights. Historical guidance/budget/runtime/pocket ablations and illustrations retain `legacy_rt_w` provenance. See [operator equations, evidence and compatibility](ORIENTATION_INJECTION.md); the update uses fresh corrected outputs rather than relabelling historical values.
 
 This overview describes the released docking/confidence pair and the current
-14-figure package. The [detailed methods](methods/README.md) contain equations,
+23-figure package. The [detailed methods](methods/README.md) contain equations,
 dimensions, parameter tables and implementation links. [Prism methods](paper/prism/methods.tex)
 provide editable LaTeX; [figure captions](paper/FIGURE_CAPTIONS.md) define each
 reported condition.
@@ -116,7 +116,7 @@ prospective screening, affinity prediction or cofolding performance.
 ## Figure data and statistical interpretation
 
 The [numerical source package](../benchmarks/results/paper/README.md) renders
-all 14 figures from versioned files. It includes 24,984 selected-outcome rows,
+all 23 figures from versioned files. It includes 24,984 selected-outcome rows,
 3,158 relatedness records across six cohorts and the original aggregate values.
 Figures retain three-seed sample SD; paired differences use 2,000-resample
 95% percentile CIs, comparing complex and exact-PDB-group resampling.

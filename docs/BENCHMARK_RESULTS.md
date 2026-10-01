@@ -1,38 +1,19 @@
 # Benchmark results
 
-The current manuscript analysis uses three seeds with unguided N100/S10,
-translation sigma 2.0, the released docking/U70k confidence pair, explicit
-physical refinement and input-chirality selection. These postprocessing steps
-are separate from the default `dock()` call.
+Completed corrected Rw, frozen released docking/confidence weights, unguided N100/S10, 10 Å supplied pocket, physical/interaction energy refinement, input-chirality-filtered minimum-pRMSD selection. Seeds 42, 100042 and 200042. Every original complex is retained; no new training, pose generation, reference-based selection or tuned thresholds were used for this refresh.
 
-Success uses symmetry-aware heavy-atom RMSD <2 Å without alignment. PB-valid
-success requires both the RMSD cutoff and PoseBusters validity for the same
-selected pose. Values below are percentages, mean ± sample SD over three seeds.
+## Primary selected-pose performance
 
-| Dataset | N per seed | RMSD <2 Å | PB-valid poses | PB-valid success |
+| Dataset | N per seed | RMSD <2 Å (%) | PB-valid (%) | RMSD <2 Å & PB-valid (%) |
 |---|---:|---:|---:|---:|
-| Astex Diverse Set | 85 | 82.35 ± 2.04 | 95.69 ± 0.68 | 79.22 ± 2.72 |
-| PoseBusters v2 | 308 | 81.60 ± 0.94 | 95.56 ± 0.50 | 79.22 ± 1.42 |
-| PhiBench reconstructed full | 206 | 62.62 ± 3.79 | 94.01 ± 0.28 | 60.19 ± 3.36 |
-| FoldBench-Pocket full | 558 | 74.49 ± 0.37 | 96.36 ± 0.37 | 72.82 ± 0.63 |
-| OpenBind full | 925 | 52.58 ± 0.61 | 99.64 ± 0.17 | 52.58 ± 0.61 |
+| Astex Diverse Set | 85 | 83.14 ± 1.80 | 95.69 ± 0.68 | 80.00 ± 2.04 |
+| PoseBusters v2 | 308 | 81.82 ± 0.56 | 95.02 ± 0.50 | 79.00 ± 0.82 |
+| PhiBench | 206 | 62.94 ± 3.23 | 93.69 ± 0.00 | 60.36 ± 3.08 |
+| FoldBench | 558 | 75.27 ± 0.54 | 96.54 ± 0.10 | 73.78 ± 0.63 |
+| OpenBind | 925 | 53.19 ± 0.56 | 99.68 ± 0.19 | 53.19 ± 0.56 |
 
-These supplied-pocket redocking cohorts were inspected during development;
-the results are descriptive. U70k was selected on the fixed 1,035-complex
-PLINDER validation bank. OpenBind is an auxiliary single-protease cohort.
-FoldBench-Pocket is a holo-receptor redocking adaptation, not the native
-cofolding benchmark. PhiBench uses the reconstructed 206-complex cohort.
+Values are three-seed means and sample SD on fixed cohorts. The endpoint uses the same selected pose for RMSD and all 27 non-RMSD PoseBusters 0.6.5 checks. Temporal cohorts retain their audited InChI energy-reference compatibility path; Astex/PoseBusters use native official redock.
 
-The [manuscript captions](paper/FIGURE_CAPTIONS.md) define the conditions,
-coverage and limitations of each figure. Guided/budget and pocket/prior analyses
-are separate ablations, not interchangeable with the table above. FoldBench
-PoseBusters evaluation includes the disclosed energy-reference InChI
-compatibility repair.
+Current primary figures use corrected Rw with unchanged released weights. Historical guided, budget and pocket/prior panels retain separate legacy provenance.
 
-- [Model and environment identities](REPRODUCIBILITY.md)
-- [Manuscript figure PDF](paper/paper_figures.pdf)
-- [External model comparison artifacts](../benchmarks/results/external_models/README.md)
-- [Literature comparison conditions](../benchmarks/results/external_models/TEMPORAL_LITERATURE.md)
-
-Historical single-bank and intermediate experiment reports are not the current
-manuscript baseline.
+[Figure PDF](paper/paper_figures.pdf) · [Captions](paper/FIGURE_CAPTIONS.md) · [Evidence and limitations](paper/EVIDENCE.md)

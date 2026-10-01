@@ -1,29 +1,9 @@
 # Prism manuscript reference package
 
-**Operator provenance:** the included legacy benchmark figures retain Rᵀw initialization. The methods and captions now distinguish the corrected Rw option; the separate 308-case one-seed comparison with one disclosed supplement is documented [in the repository](../../ORIENTATION_INJECTION.md).
+[Download the ZIP](prism_figure_reference.zip): combined 23-page result PDF, 23 individual PDF/PNG pairs, Fig1 workflow and Fig2 architecture PDF/PNG/SVG, English captions, source mapping and editable LaTeX. Primary results use the completed corrected Rw three-seed evaluation. Historical guidance, budget, runtime, pocket/prior panels and stored illustrations retain explicit provenance.
 
-[Download the ZIP](prism_figure_reference.zip) for the combined 21-page figure
-PDF, individual PDFs, English captions, source mapping and editable LaTeX.
-`methods.tex` contains the current model, loss, refinement, selection and
-relatedness equations. `main.tex` includes the methods followed by
-`figure_captions.tex`; the separate `paper_figures.pdf` remains figures only.
-ZIP paths are self-contained for compilation.
+`main.tex` contains methods, model illustrations and the result figure blocks. For an existing Prism manuscript, copy the desired PDFs and captions and adapt numbering, placement and citations. The combined `paper_figures.pdf` contains result figures only.
 
-Use XeLaTeX or LuaLaTeX with `amsmath`, `amssymb`, `graphicx`, `fontspec` and
-the TeX-distributed Latin Modern font files. For an existing Prism manuscript,
-copy `methods.tex` and use `\input{methods.tex}` with `amsmath` and `amssymb`
-rather than replacing the main
-manuscript. Review wording, numbering, placements and bibliography keys.
-Detailed typed-energy gates and parameter tables remain in the repository
-[methods](../../methods/README.md).
+Use XeLaTeX or LuaLaTeX with `amsmath`, `amssymb`, `graphicx`, `fontspec` and TeX-distributed Latin Modern fonts. The package is intended for manuscript drafting. The Prism upload interface is not automated.
 
-Current sources: [captions](../FIGURE_CAPTIONS.md), [manifest](../manifest.json),
-[page index](../README.md), and [numerical reproduction](../../../benchmarks/results/paper/README.md).
-The manifest's numerical inputs refer to the repository; they are not required
-to compile the figure/methods ZIP. These files are manuscript working materials.
-
-The assembled ZIP compiled successfully with Tectonic 0.17.0 (XeTeX) on
-2026-09-23, including all methods and figure blocks, with no TeX warnings.
-The font files are resolved from the TeX distribution rather than a
-system-installed font family. LuaLaTeX and the Prism upload interface were
-not separately exercised.
+[Captions](../FIGURE_CAPTIONS.md) · [Manifest](../manifest.json) · [Page index](../README.md) · [Numerical reproduction](../../../benchmarks/results/paper/README.md)

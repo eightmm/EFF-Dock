@@ -35,7 +35,9 @@ as h=Rw; with the active frame action R→QR, this gives h→Qh. Historical
 `legacy_rt_w` instead computes Rᵀw and does not satisfy that identity.
 The source-local edge coordinate Rᵀ(x_j−x_i) below is a different, correct
 world-to-local operation. [Operator provenance and correction](../ORIENTATION_INJECTION.md)
-distinguish the unchanged released weights/results from corrected inference.
+distinguish the unchanged legacy-trained released weights from corrected inference.
+Current primary figures use the completed corrected-Rw three-seed study;
+historical ablations remain identified separately.
 
 ## 2. Conditioning and edge representation
 
