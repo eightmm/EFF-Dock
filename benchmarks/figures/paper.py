@@ -1151,6 +1151,12 @@ def main():
     from benchmarks.figures.trajectory import verify as verify_trajectory
 
     verify_trajectory()
+    sensitivity = None
+    if (DATA / "rw_robustness.json").exists():
+        from benchmarks.analysis.rw_robustness import verify as verify_sensitivity
+
+        sensitivity = json.loads((DATA / "rw_robustness.json").read_text())
+        verify_sensitivity(sensitivity)
     if args.check:
         print(
             "Verified figure inputs, repeat statistics, 24,984 outcomes, 3,158 relatedness records and training memberships"
@@ -1187,6 +1193,10 @@ def main():
     from benchmarks.figures.trajectory import render as render_trajectory
 
     render_trajectory(args.output)
+    if sensitivity is not None:
+        from benchmarks.figures.robustness import render as render_sensitivity
+
+        render_sensitivity(sensitivity, args.output)
     from benchmarks.figures.rw_diagnostics import render as render_rw_diagnostics
 
     if (DATA / "evidence/rw_operator_change.json").is_file():
@@ -1199,7 +1209,10 @@ def main():
             }
         ):
             render_rw_diagnostics(args.output)
-    export_csv(dict(bundle, **data), args.output / "source_data.csv")
+    export_csv(
+        dict(bundle, **data, **({"rw_robustness": sensitivity} if sensitivity is not None else {})),
+        args.output / "source_data.csv",
+    )
     print(f"Rendered manuscript figures (PDF/PNG) and source_data.csv in {args.output}")
 
 

@@ -3,6 +3,7 @@
 All submitted EFF-Dock measurements and illustrations use corrected **Rw**. Primary results retain the complete N100/S10 three-seed study and frozen weights. Runtime/memory use its saved Rw logs; Fig1 and the trajectory use a fixed-complex Rw N1 illustration plus the separate saved Rw N100 bank. Training-relatedness inputs are unchanged. Legacy guidance/N40, pocket/prior and operator-comparison figures are excluded from this submission package.
 
 - [Combined result PDF](paper_figures.pdf): 20 pages.
+- [Registered Rw sensitivity study](../RW_ROBUSTNESS_PROTOCOL.md): running; pocket/prior and guidance/budget pages will be added after complete-cohort verification.
 - [Prism ZIP](prism/prism_figure_reference.zip): all figure PDFs, PNG previews, Fig1/2 SVGs, captions and LaTeX.
 - [Captions](FIGURE_CAPTIONS.md)
 - [Rw evidence and numerical comparisons](EVIDENCE.md)

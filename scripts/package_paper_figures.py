@@ -138,6 +138,10 @@ Use XeLaTeX or LuaLaTeX for the reference document. Adapt numbering, placement
 and citation keys to the manuscript. Methods are working manuscript text;
 the repository methods and parameter tables provide implementation detail.
 """
+    sensitivity = ROOT / "benchmarks/results/paper/rw_robustness.json"
+    if sensitivity.exists():
+        readme += "\n- [Rw pocket/prior and budget sensitivity data](rw_robustness.json).\n"
+        readme += "- [Sensitivity protocol](RW_ROBUSTNESS_PROTOCOL.md).\n"
     with ZipFile(temporary, "w", ZIP_DEFLATED) as archive:
         archive.writestr("README.md", readme)
         archive.writestr("FIGURE_CAPTIONS.md", bundle_captions(metadata))
@@ -154,6 +158,9 @@ the repository methods and parameter tables provide implementation detail.
         archive.write(ROOT / "benchmarks/results/paper/rw_runtime.json", "rw_runtime.json")
         archive.write(ROOT / "benchmarks/results/paper/evidence/model_cost.json", "model_cost.json")
         archive.write(ROOT / "docs/RW_THREE_SEED_PROTOCOL.md", "RW_THREE_SEED_PROTOCOL.md")
+        if sensitivity.exists():
+            archive.write(sensitivity, "rw_robustness.json")
+            archive.write(ROOT / "docs/RW_ROBUSTNESS_PROTOCOL.md", "RW_ROBUSTNESS_PROTOCOL.md")
         archive.writestr(
             "captions.json",
             json.dumps(bundle_manifest(metadata), ensure_ascii=False, indent=2) + "\n",
@@ -212,6 +219,13 @@ def verify(metadata):
             ("model_cost.json", ROOT / "benchmarks/results/paper/evidence/model_cost.json"),
         ):
             assert archive.read(name) == source.read_bytes()
+        sensitivity = ROOT / "benchmarks/results/paper/rw_robustness.json"
+        if sensitivity.exists():
+            assert archive.read("rw_robustness.json") == sensitivity.read_bytes()
+            assert (
+                archive.read("RW_ROBUSTNESS_PROTOCOL.md")
+                == (ROOT / "docs/RW_ROBUSTNESS_PROTOCOL.md").read_bytes()
+            )
         for number, stem in ((1, "Fig1_representative"), (2, "Fig2_architecture")):
             for suffix in ("pdf", "png", "svg"):
                 assert (
