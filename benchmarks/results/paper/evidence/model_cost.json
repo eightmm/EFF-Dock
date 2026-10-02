@@ -15,54 +15,88 @@
   ],
   "throughput": [
     {
-      "dataset": "foldbench",
-      "seconds_per_complex": 103.92476421809982,
-      "repeat_sd_seconds": 0.34572481772744607,
-      "amortized_poses_per_second": 0.9622345622082606,
-      "devices": [
-        "NVIDIA RTX 6000 Ada Generation"
-      ]
-    },
-    {
-      "dataset": "openbind",
-      "seconds_per_complex": 107.24775779793147,
-      "repeat_sd_seconds": 1.7703458915352726,
-      "amortized_poses_per_second": 0.932420425874197,
-      "devices": [
-        "NVIDIA H100 PCIe",
-        "NVIDIA RTX 6000 Ada Generation"
-      ]
-    },
-    {
-      "dataset": "phibench",
-      "seconds_per_complex": 115.80103984625049,
-      "repeat_sd_seconds": 11.606042259724077,
-      "amortized_poses_per_second": 0.8635501039780852,
-      "devices": [
-        "NVIDIA RTX 6000 Ada Generation"
-      ]
-    },
-    {
       "dataset": "astex",
-      "seconds_per_complex": 103.91453519431879,
-      "repeat_sd_seconds": 0.36884370549562123,
-      "amortized_poses_per_second": 0.9623292815870401,
+      "seconds_per_complex": 141.69197469230596,
+      "repeat_sd_seconds": 25.544037020550192,
+      "amortized_poses_per_second": 0.7057562731915975,
       "devices": [
-        "NVIDIA RTX 6000 Ada Generation"
-      ]
+        "NVIDIA RTX 6000 Ada Generation",
+        "NVIDIA RTX A5000"
+      ],
+      "device_case_counts": {
+        "NVIDIA RTX 6000 Ada Generation": 128,
+        "NVIDIA RTX A5000": 127
+      }
     },
     {
       "dataset": "posebusters",
-      "seconds_per_complex": 103.67037539044999,
-      "repeat_sd_seconds": 1.0232616276097957,
-      "amortized_poses_per_second": 0.9645957162147201,
+      "seconds_per_complex": 136.76376458315897,
+      "repeat_sd_seconds": 1.3832233682175294,
+      "amortized_poses_per_second": 0.7311878281852586,
       "devices": [
-        "NVIDIA RTX 6000 Ada Generation"
-      ]
+        "NVIDIA RTX 6000 Ada Generation",
+        "NVIDIA RTX A5000",
+        "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition"
+      ],
+      "device_case_counts": {
+        "NVIDIA RTX 6000 Ada Generation": 174,
+        "NVIDIA RTX A5000": 616,
+        "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition": 134
+      }
+    },
+    {
+      "dataset": "phibench",
+      "seconds_per_complex": 137.99230531644466,
+      "repeat_sd_seconds": 3.078469747115434,
+      "amortized_poses_per_second": 0.7246780881780291,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation",
+        "NVIDIA RTX A5000",
+        "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition"
+      ],
+      "device_case_counts": {
+        "NVIDIA RTX 6000 Ada Generation": 103,
+        "NVIDIA RTX A5000": 412,
+        "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition": 103
+      }
+    },
+    {
+      "dataset": "foldbench",
+      "seconds_per_complex": 119.85980239004526,
+      "repeat_sd_seconds": 21.967343135774147,
+      "amortized_poses_per_second": 0.8343080666409085,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation",
+        "NVIDIA RTX A5000",
+        "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition"
+      ],
+      "device_case_counts": {
+        "NVIDIA RTX 6000 Ada Generation": 487,
+        "NVIDIA RTX A5000": 803,
+        "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition": 384
+      }
+    },
+    {
+      "dataset": "openbind",
+      "seconds_per_complex": 98.78877903311137,
+      "repeat_sd_seconds": 2.3997424781750434,
+      "amortized_poses_per_second": 1.0122607140076372,
+      "devices": [
+        "NVIDIA RTX 6000 Ada Generation",
+        "NVIDIA RTX A5000",
+        "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition"
+      ],
+      "device_case_counts": {
+        "NVIDIA RTX 6000 Ada Generation": 1387,
+        "NVIDIA RTX A5000": 462,
+        "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition": 926
+      }
     }
   ],
-  "timing_sha256": "853e0409010c83087ceb6a0eedd2e8d71ab219fdecd4d0e9b6b54f78fe37e878",
+  "timing_sha256": "70b306bb5886b460bd01ababa0dcdd4fdfbf3e3057c683952b9e0551716a9447",
   "training_wall_time_seconds": null,
   "training_wall_time_note": "A complete, interruption-aware wall-time ledger for all precursor and fine-tuning runs was not audited. Step counts are not elapsed training time.",
-  "throughput_note": "Inverse of existing mean per-complex pipeline time, multiplied by 100 poses. Includes sampling, refinement and confidence evaluation of both banks; excludes separate official PB assessment. Not a measured saturated service throughput or a new timing experiment."
+  "throughput_note": "Inverse of corrected-Rw N100/S10 three-seed mean per-complex pipeline time, multiplied by 100 poses. Includes setup, sampling, refinement, fresh confidence and I/O; excludes separate official PB assessment. Recorded mixed GPU devices; not a controlled hardware comparison or saturated service throughput.",
+  "timing_source": "benchmarks/results/paper/rw_runtime.json",
+  "orientation_injection": "rw"
 }

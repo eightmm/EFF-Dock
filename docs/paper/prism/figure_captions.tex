@@ -41,30 +41,14 @@
 \begin{figure}[p]
 \centering
 \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_06.pdf}
-\caption{Guidance and pose–step allocation across post-processing conditions. Historical $R^{\mathsf{T}}w$ data; this panel was not rerun under corrected Rw. Performance on Astex Diverse Set and PoseBusters v2 is compared for 100 poses with 10 sampling steps (N100/S10) and 40 poses with 25 steps (N40/S25), with guidance disabled or enabled at $\eta$=2. The four selection conditions are raw, raw with chirality filtering, refined, and refined with chirality filtering. The endpoint is selected-pose RMSD <2 Å together with PoseBusters validity. Points and error bars indicate means and sample SD across three repeats. Guided and unguided runs within a matched budget share the verified initial priors; priors are not assumed nested between the two budgets. Both allocations have the same product N×S, but this does not imply equal wall time because candidate-dependent refinement and confidence evaluation costs differ.}
-\label{fig:paper-6}
-\end{figure}
-\clearpage
-
-\begin{figure}[p]
-\centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_07.pdf}
-\caption{Measured runtime and sampling memory for two unguided budgets. Historical $R^{\mathsf{T}}w$ data; this panel was not rerun under corrected Rw. (A) Aggregate pipeline wall time per complex and (B) peak CUDA allocated memory during sampling for unguided N100/S10 and N40/S25 on Astex Diverse Set and PoseBusters v2. Runtime is the sum of completed shard wall durations divided by the number of complexes within each repeat, averaged across three repeats; whiskers indicate sample SD. It includes recorded pipeline setup, refinement, confidence scoring, and I/O overhead, but excludes separate official PoseBusters evaluation. Because parallel shard durations are summed, this is not user-perceived campaign elapsed time or pure sampling latency. Memory is the maximum recorded sampling allocator peak across shards and repeats, expressed in GiB, and has no SD bar. Measurements use the recorded RTX 6000 Ada runs. Memory is neither whole-pipeline peak usage nor a per-pose quantity.}
+\caption{Measured corrected-Rw runtime and generation-process memory. (A) Pipeline wall time per complex and (B) initial pose-generation-process peak CUDA allocated memory for the corrected-Rw, unguided N100/S10 evaluation on the five external benchmarks. Every cohort retains its full complex inventory across seeds 42, 100042 and 200042. Runtime sums completed shard wall durations within each seed and divides by the cohort size; bars give the three-seed mean and whiskers the sample SD. Timings include setup, generation, energy refinement, confidence scoring and I/O, but exclude separately executed official PoseBusters evaluation. Summed shard durations are not campaign elapsed time or pure sampling latency. Memory is the maximum initial evaluation-process allocator peak across all 16 shards and three seeds, in GiB, with no SD bar. Astex and PoseBusters use generation-only candidate export; PhiBench, FoldBench and OpenBind include raw-confidence scoring in that initial process. Separate refinement and post-refinement confidence processes are not included in this memory peak; it is neither reserved memory nor a whole-pipeline peak. Executions used a recorded mixture of RTX A5000, RTX 6000 Ada and RTX PRO 6000 backends, with per-cohort device counts and process profiles retained in the source data. These descriptive costs are not a controlled hardware/profile comparison or saturated throughput benchmark. Numerical labels give bar values to one decimal; n denotes unique complexes per seed.}
 \label{fig:paper-7}
 \end{figure}
 \clearpage
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_08.pdf}
-\caption{Sensitivity to pocket crop, prior scale, and pocket-center perturbation. Historical $R^{\mathsf{T}}w$ data; this panel was not rerun under corrected Rw. (A) Sampling-pocket cutoff and (B) initial-prior scale are varied for Astex Diverse Set and PoseBusters v2 in the frozen guided ($\eta$=2) robustness campaign. Rows within each heatmap correspond to Gaussian center-jitter standard deviations of 0, 1, or 2 Å per Cartesian axis. Cells show the mean percentage of selected poses satisfying RMSD <2 Å and PoseBusters validity across three repeats, after refinement and ordinary confidence selection without the additional chirality filter. The pocket-cutoff sweep fixes the prior scale at 2 Å, and the prior-scale sweep fixes the sampling cutoff at 10 Å. Only the sampling crop changes in the pocket-cutoff sweep; refinement and scoring retain 10 Å crops. All heatmaps use a shared linear 50–100\% numerical scale, with color contrast emphasized around 70–80\%; the 75\% color anchor is not a statistical threshold. These guided robustness results are distinct from the main unguided evaluation condition.}
-\label{fig:paper-8}
-\end{figure}
-\clearpage
-
-\begin{figure}[p]
-\centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_09.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_07.pdf}
 \caption{Sequence relatedness and joint ligand–protein overlap with docking-training data. All six cohorts are compared with the same 47,277 executed docking-training samples. Eligible ligand-binding chains follow the frozen 6 Å heavy-atom contact definition. (A) Distribution of the maximum binding-chain sequence identity. Here sequence identity is the number of identical known residues, summed over one-to-one binding-chain assignments within a training sample, divided by the total observed query binding-chain length; unaligned residues and unmatched query chains remain in the denominator. (B) Exact canonical heavy-isomeric ligand identity and a sequence score $\geq$70\% are classified by whether they occur in the same training sample, in separate samples only, individually, or neither is observed. All exact-ligand training candidates are searched for the joint condition. (C) The same-sample fraction already contained in B is shown separately with counts and percentages. Cohorts comprise the five external benchmarks and Validation (n=1,076). Sequence bins and the 70\% threshold are descriptive. These results do not establish identical pockets or proven leakage, and no observed match does not certify biological novelty.}
 \label{fig:paper-9}
 \end{figure}
@@ -72,7 +56,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_10.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_08.pdf}
 \caption{Training-ligand relatedness and stratified docking performance. EFF-Dock results use corrected Rw with frozen released weights. (A) Composition of each external benchmark by observed exact ligand identity and nearest training-ligand fingerprint similarity. Exact identity uses canonical heavy-atom isomeric SMILES with explicit-hydrogen normalization and takes precedence over similarity bins. Other ligands are grouped by maximum Tanimoto similarity using radius-2, 2,048-bit Morgan fingerprints without chirality. The reference is the parseable ligand index from the 47,277 executed docking-training samples. (B) Selected-pose RMSD <2 Å and PB-valid success is compared between complexes with and without an observed exact training-ligand match, using the refined, chirality-filtered unguided condition. Bars and whiskers show the mean and sample SD across three repeats; n denotes complexes per stratum. Ligands are not standardized across tautomers or protonation states. No observed exact match is not proof of complete training-data absence, and group differences are confounded by target and ligand composition rather than being causal estimates of memorization. In A, segments of at least 8\% are annotated with their percentage; smaller segments remain visible without numerical labels. In B, labels above the whiskers give mean success (\%) and labels at the base give stratum counts.}
 \label{fig:paper-10}
 \end{figure}
@@ -80,7 +64,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_11.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_09.pdf}
 \caption{Docking performance across training-sequence identity strata. EFF-Dock results use corrected Rw with frozen released weights. The five external benchmarks are stratified by maximum binding-chain sequence identity to the 47,277 executed docking-training samples, using bins <30\%, 30–<70\%, 70–<90\%, and 90–100\%. Sequence identity is query-normalized: identical known residues under one-to-one chain assignments are divided by the total observed query binding-chain length, including unaligned residues and unmatched chains. Results use refined candidates and chirality-filtered confidence selection from unguided 100-pose, 10-step banks. Solid segments show RMSD <2 Å and PB-valid success; hatched extensions show RMSD-successful but PB-invalid poses. Total bar heights show RMSD-only success. Bars and error bars are means and sample SD across three repeats, with uncertainty shown at both endpoint boundaries. Labels give the number of complexes per bin; empty bins have no estimate. Validation is excluded because no equivalent three-repeat evaluation bank is available. Small strata and target-composition differences limit interpretation of apparent trends. Numerical labels inside solid segments give PB-valid success (\%); labels above the error bars give RMSD-only success (\%), rounded to one decimal.}
 \label{fig:paper-11}
 \end{figure}
@@ -88,7 +72,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_12.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_10.pdf}
 \caption{Paired changes in docking success with refinement and chirality filtering. EFF-Dock results use corrected Rw with frozen released weights. Success-rate improvements are absolute differences in the percentage of complexes satisfying RMSD <2 Å and PoseBusters validity. Panels compare (A) refined versus raw poses without the chirality filter, (B) refined versus raw poses with the filter, (C) filter off versus on for raw poses, and (D) filter off versus on for refined poses. Within each complex, paired differences are averaged across three seeds before resampling. Points show the observed mean improvement in percentage points; whiskers show 95\% percentile confidence intervals from 2,000 bootstrap draws. Complex bootstrap resamples individual complexes. PDB-cluster bootstrap resamples exact-PDB groups while keeping their member complexes together and computes a complex-weighted mean. Both methods share the same point estimate. Exact-PDB grouping does not capture protein-family dependence; PDB-cluster estimates are unavailable for OpenBind. Intervals condition on the three seeds and are not adjusted for multiple comparisons. Signed labels to the right give the common point estimate in percentage points, rounded to two decimals; the two bootstrap procedures differ in uncertainty rather than in the estimated mean.}
 \label{fig:paper-s1}
 \end{figure}
@@ -96,7 +80,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_13.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_11.pdf}
 \caption{Confidence selection and near-native candidate density. EFF-Dock results use corrected Rw with frozen released weights. Refined unguided 100-pose, 10-step banks are evaluated on the five external benchmarks. (A) A complex is counted as successful when at least one pose among the unfiltered confidence-ranked Top-1, Top-5, or all 100 candidates has RMSD <2 Å. The Oracle-100 values represent full-bank RMSD coverage. These values summarize the k=1, 5, and 100 positions of the refined confidence-ranked cumulative curves. (B) The percentage of generated candidate poses with RMSD <2 Å quantifies near-native candidate density, not geometric diversity. Bars and whiskers show means and sample SD across three repeats. All endpoints are RMSD-only; no full-bank PB-valid fraction or PB-valid Top-5/oracle is inferred. The panels have different units of success: complexes containing a successful candidate in A, versus individual candidate poses in B.}
 \label{fig:paper-s2}
 \end{figure}
@@ -104,7 +88,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_14.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_12.pdf}
 \caption{Descriptive failure decomposition across ligand-complexity strata. EFF-Dock results use corrected Rw with frozen released weights. Rows stratify refined, chirality-filtered results by (A) heavy-atom count, (B) strict rotatable-bond count, and (C) saved rigid-fragment count for the five external benchmarks. Each complex belongs to one of four mutually exclusive categories: no refined candidate with RMSD <2 Å; an RMSD-successful candidate exists but the selected pose fails the threshold; the selected pose passes RMSD but fails PoseBusters; or the selected pose passes both. Bars show mean fractions over three repeats, using all complexes within each stratum. If O, T, and J denote RMSD oracle coverage, selected Top-1 RMSD success, and selected RMSD-plus-PB success, respectively, the four fractions are 100−O, O−T, T−J, and J. Thus this is a decomposition of the complexity-performance results, not an independent causal experiment. Generation failure refers to the refined bank and does not isolate the sampler from refinement effects; selection failure includes chirality-mask exclusions. Labels give complex counts, and dashes denote empty bins.}
 \label{fig:paper-s3}
 \end{figure}
@@ -112,7 +96,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_15.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_13.pdf}
 \caption{Confidence ranking and remaining selection loss. EFF-Dock results use corrected Rw with frozen released weights. (A) Within-complex Spearman correlation between predicted and symmetry-aware observed RMSD for the 100 raw or refined candidates. (B) Refined-bank AUROC and average precision for strict RMSD <2 Å labels, ranked by negative predicted RMSD. Each complex receives equal weight; single-class banks are excluded from both binary metrics. Eligible complex counts for the three repeats are 83/82/82 (Astex Diverse Set), 292/289/290 (PoseBusters v2), 182/181/184 (PhiBench), 513/510/510 (FoldBench), 817/814/807 (OpenBind). (C) Median selected-minus-oracle RMSD regret within each repeat. (D) Selected Top-1 success conditional on the bank containing at least one near-native candidate. C and D use the primary chirality-filtered selector, so their loss includes mask exclusions. Bars show repeat means and error bars the sample SD across three repeats. The full cohorts contain 85, 308, 206, 558 and 925 complexes, respectively. Binary discrimination and final pose selection are different endpoints; a high AUROC does not imply reliable Top-1 selection. Labels above the whiskers give means, with two decimals for correlation, discrimination and RMSD regret, and one decimal for percentage success.}
 \label{fig:paper-s4}
 \end{figure}
@@ -120,7 +104,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_16.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_14.pdf}
 \caption{Reliability of saved confidence predictions and candidate-density dependence. EFF-Dock results use corrected Rw with frozen released weights. (A) Empirical near-native fraction versus the saved success-head probability, using ten equal-width probability bins. (B) Mean observed RMSD versus mean predicted RMSD in fixed bins [0,1), [1,2), [2,3), [3,4), [4,6), [6,10), and [10,infinity). Dashed diagonals denote agreement. A and B pool all unfiltered refined candidates from three repeats; empty bins are omitted and each point represents a bin mean. No probability recalibration or threshold fitting was performed. Candidate observations within complexes are correlated, so no independent-candidate confidence intervals are shown. (C) Primary chirality-filtered Top-1 success versus the number of near-native refined candidates among 100, in fixed bins 0, 1–5, 6–20, 21–50, and 51–100. Points and dark error bars are repeat means and sample SD; empty repeat strata are omitted from that aggregate. Bin counts and eligible repeats are supplied in the source data. These are descriptive reliability and density associations, not evidence that the auxiliary probability head is the production selector; production selection uses predicted RMSD.}
 \label{fig:paper-s5}
 \end{figure}
@@ -128,7 +112,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_17.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_15.pdf}
 \caption{Performance under simultaneous sequence and ligand relatedness restrictions. EFF-Dock results use corrected Rw with frozen released weights. Each benchmark compares its full cohort with a fixed stringent subset: maximum observed training-relative binding-chain sequence identity <30\%, maximum Morgan fingerprint Tanimoto similarity <0.5, and no observed exact training-ligand match. All conditions must hold for the same complex. Sequence identity retains the query-normalized definition and reference-eligibility limitations described for Figure 9. Surviving counts are 2/85, 4/308, 7/206, 9/558 and 0/925 for Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind, respectively. Refined primary Top-1 success is split into PB-valid solid segments and RMSD-successful but PB-invalid hatched extensions; diamonds indicate the full-bank RMSD oracle. Bars and points show means over three repeats with sample SD. OpenBind has no eligible complex and no imputed performance. Thresholds were not relaxed after observing these counts. Small retained cohorts preclude a strong generalization claim; this is a descriptive restriction of previously evaluated benchmarks, not a newly held-out test or an audit of all precursor training exposure. Numerical labels inside solid segments give PB-valid success (\%); labels above the selected-pose error bars give RMSD-only success (\%), rounded to one decimal. Diamond markers retain the separately plotted RMSD oracle.}
 \label{fig:paper-s6}
 \end{figure}
@@ -136,7 +120,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_18.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_16.pdf}
 \caption{Physical-validity failures before and after refinement. EFF-Dock results use corrected Rw with frozen released weights. (A,B) Failure percentages among primary chirality-filtered selected poses in raw and refined banks. Each stage may select a different candidate; these panels describe the complete pipeline, not a fixed-pose intervention. (C,D) Fail-to-pass and pass-to-fail percentages among candidate indices for which saved official PoseBusters evaluations exist at both stages, deduplicating identical ordinary and chirality-filtered selections. These matched subsets contain 41/26/29, 112/100/104, 72/76/63, 171/173/208, 473/443/435 candidate pairs across three repeats for Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind, respectively. Values are means of repeat-specific percentages, with all evaluated pairs as the denominator, not just initially failing or passing pairs. A grouped check fails if any constituent check fails. Bond geometry combines bond length and angle checks; receptor clash combines protein minimum-distance and volume-overlap checks; stereochemistry combines tetrahedral and double-bond checks; ring planarity combines aromatic-ring and double-bond flatness checks. All PB checks combines all 27 non-RMSD checks, including those not displayed separately. The common color scale is 0–50\%. Categories overlap and do not sum to 100\%. The matched subset is selection-biased and cannot establish full-bank repair rates. This figure reports PB validity irrespective of RMSD success.}
 \label{fig:paper-s7}
 \end{figure}
@@ -144,7 +128,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{figures/page_19.pdf}
+\includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{figures/page_17.pdf}
 \caption{Dataset-specific examples of success, refinement rescue and selection failure. EFF-Dock results use corrected Rw with frozen released weights. Rows A–E show Astex Diverse Set, PoseBusters v2, PhiBench, FoldBench and OpenBind; columns show successful selection, refinement rescue and selection failure. Examples use saved primary refined selections pooled across three repeats. Within each dataset, the rescue is selected first as the largest same-candidate RMSD decrease from $\geq$2 Å raw to <2 Å refined with final PB validity. Successful selection uses the lower-median selected RMSD among PB-valid successes, excluding the rescue complex. Selection failure uses the lower-median selected-minus-oracle RMSD among cases with selected RMSD $\geq$2 Å and an oracle <2 Å, excluding the two previously chosen complex IDs. Ties are broken by repeat and ID. Rescue panels illustrate extremes, not typical improvements; these examples do not estimate prevalence. Eligible rescue counts are 3, 7, 10, 31, 80 complex-repeat records, respectively. Green, blue and orange carbons denote crystal, selected and raw/oracle poses; heteroatoms use element colors. All structures retain the receptor frame without independent ligand alignment. Each panel uses one case-specific viewing rotation shared by the receptor and all poses, chosen for visibility; projected separation is not a quantitative measure. Protein cartoons use stored coordinates of chains contacting the crystal ligand within 5 Å for display only. Oracle denotes minimum saved-bank RMSD, without a PB-validity requirement. Full sample IDs, repeat indices and eligible counts are provided in the accompanying evidence table; FoldBench image labels abbreviate PDB/ligand/chain and OpenBind uses sample IDs.}
 \label{fig:paper-s8}
 \end{figure}
@@ -152,7 +136,7 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_20.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_18.pdf}
 \caption{Paired uncertainty relative to locally executed baselines. EFF-Dock results use corrected Rw with frozen released weights. (A) Astex Diverse Set (n=85) and (B) PoseBusters v2 (n=308). Points show EFF-Dock minus baseline success-rate differences in percentage points for RMSD <2 Å and same-selected-pose RMSD-plus-PB success. Each complex contributes the difference between method-specific three-repeat means. Horizontal intervals are percentile 95\% paired bootstrap intervals from 2,000 resamples (seed 20260923), resampling exact PDB-accession groups and preserving complex-weighted means. Every retained complex has a distinct PDB accession in these two cohorts, so PDB-group and complex resampling coincide; this does not account for protein-family dependence. EFF-Dock uses the primary refined chirality-filtered protocol. The five locally run baselines retain the native budgets and selectors of Figure 1; SurfDock uses its force-optimized variant. Literature-only rows are excluded. Positive differences favor EFF-Dock. Intervals are descriptive, unadjusted for multiple comparisons, and conditional on the three available repeats; they do not establish equal-compute superiority. Signed labels at the right of each interval row give the corresponding observed difference in percentage points, rounded to two decimals.}
 \label{fig:paper-s9}
 \end{figure}
@@ -160,23 +144,15 @@
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_21.pdf}
-\caption{Fragment motion along a saved ODE generation trajectory. Historical $R^{\mathsf{T}}w$ data; this panel was not rerun under corrected Rw. Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and camera. The five panels show actual saved states at t=0.000, 0.271, 0.488, 0.784 and 1.000; no coordinates are interpolated. These are the available states nearest to five equally spaced target times. Carbon colors track the same six rigid fragments throughout; nitrogen is blue and oxygen red. The pale protein cartoon provides binding-site context. Interfragment bonds are omitted in the first four panels for visibility and shown in grey at the last panel using the known ligand connectivity. This display convention does not represent chemical bond formation. Time t is the dimensionless generative-flow coordinate, not physical time or energy-refinement progress. The stored illustrative run used one sample, ten ODE steps, a late schedule with power 3, positional prior sigma 2 Å, pocket cutoff 10 Å, seed 42 and no guidance or confidence selection. The recorded checkpoint is effdock\_docking\_early\_time\_t0p10\_50k.pt. This is a separate N1 illustration, not the 7FB7 refinement rescue of Figure S8 or an N100 benchmark-selected pose; no success, PB-validity or representative-trajectory claim is made. All 11 saved frames and the original fragment assignments are retained in the source data.}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_19.pdf}
+\caption{Fragment motion along a saved ODE generation trajectory. Corrected Rw with the frozen released docking checkpoint. Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and camera. The five panels show actual saved states at t=0.000, 0.271, 0.488, 0.784 and 1.000; no coordinates are interpolated. These are the available states nearest to five equally spaced target times. Carbon colors track the same six rigid fragments throughout; nitrogen is blue and oxygen red. The pale protein cartoon provides binding-site context. Interfragment bonds are omitted in the first four panels for visibility and shown in grey at the last panel using the known ligand connectivity. This display convention does not represent chemical bond formation. Time t is the dimensionless generative-flow coordinate, not physical time or energy-refinement progress. The stored illustrative run used one sample, ten ODE steps, a late schedule with power 3, positional prior sigma 2 Å, pocket cutoff 10 Å, seed 42 and no guidance or confidence selection. The recorded checkpoint is effdock\_docking\_early\_time\_t0p10\_50k.pt. This is a separate N1 illustration, not an N100 benchmark-selected pose; no success, PB-validity or representative-trajectory claim is made. All 11 saved frames and the original fragment assignments are retained in the source data.}
 \label{fig:paper-s10}
 \end{figure}
 \clearpage
 
 \begin{figure}[p]
 \centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_22.pdf}
-\caption{Frozen-weight Rw–$R^{\mathsf{T}}w$ performance differences. EFF-Dock results use corrected Rw with frozen released weights. Corrected Rw and historical $R^{\mathsf{T}}w$ use refined candidates and the same chirality-filtered predicted-RMSD selector. Panels show (A) RMSD <2 Å success and (B) same-pose PB-valid success. Points are differences in three-seed means; whiskers are 95\% percentile intervals from 2,000 paired complex-bootstrap draws, keeping all three seed outcomes for a complex together. Astex and PoseBusters use fresh matched-prior operator reruns (circles); temporal cohorts use historical $R^{\mathsf{T}}w$ banks (diamonds), so their contrasts also include execution variation. These descriptive intervals condition on the observed cohort and three seeds, do not quantify fresh-seed variability, and have no multiplicity adjustment. Signed labels at the right give observed differences in percentage points, rounded to two decimals.}
-\label{fig:paper-s11}
-\end{figure}
-\clearpage
-
-\begin{figure}[p]
-\centering
-\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_23.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figures/page_20.pdf}
 \caption{Eligibility-aware selection bottlenecks and regret. EFF-Dock results use corrected Rw with frozen released weights. All five cohorts use corrected Rw, refined N100/S10 banks and the frozen chirality-filtered confidence selector. (A) Mutually exclusive outcomes are no RMSD <2 Å candidate in the full bank; full-bank success but no success in the effective chirality-eligible set; eligible success but an unsuccessful selected pose; selected RMSD success with PB invalidity; and RMSD success with PB validity. If no pose passes chirality, the effective set follows the actual unfiltered fallback. The PB-invalid segment is hatched. Bars are three-seed mean fractions and retain every complex. (B) Cumulative selected-pose RMSD regret relative to the minimum RMSD in that same effective candidate set, shown through 5 Å; the source table retains the complete distributions and per-seed medians and 90th percentiles. Reference RMSD enters retrospective diagnostics only, never selection. PB validity is known for selected poses, not for every candidate. In A, segments of at least 8\% are annotated with their mean percentage; smaller segments remain visible without numerical labels.}
 \label{fig:paper-s12}
 \end{figure}

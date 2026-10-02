@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import LinearSegmentedColormap, to_rgb
+from matplotlib.colors import to_rgb
 from matplotlib.patches import ConnectionPatch, Patch, Rectangle
 
 from benchmarks.figures.labels import interval_label, mean_label, segment_labels, success_labels
@@ -230,7 +230,7 @@ def comparison(data, out):
     save(fig, out, "01_model_comparison")
 
 
-def stages_and_pocket(result, out):
+def postprocessing(result, out):
     colors = ["#8FB9D8", "#E8B395", "#9AC9B4", "#B8A6CE"]
 
     fig, ax = plt.subplots(figsize=(10, 5.2))
@@ -324,131 +324,6 @@ def stages_and_pocket(result, out):
         frameon=False,
     )
     save(fig, out, "02_refinement_chirality")
-
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True, layout="constrained")
-    for ax, dataset in zip(axes, ("astex", "posebusters"), strict=True):
-        for j, (n, g, label) in enumerate(
-            [
-                (100, "off", "N100/S10 off"),
-                (100, "eta2", "N100/S10 eta2"),
-                (40, "off", "N40/S25 off"),
-                (40, "eta2", "N40/S25 eta2"),
-            ]
-        ):
-            rs = [
-                next(
-                    r
-                    for r in result.get("legacy_ablation_rows", result["rows"])
-                    if (r["dataset"], r["n"], r["guidance"], r["stage"], r["policy"])
-                    == (dataset, n, g, s, p)
-                )
-                for s, p in [
-                    ("raw", "baseline"),
-                    ("raw", "filtered"),
-                    ("refined", "baseline"),
-                    ("refined", "filtered"),
-                ]
-            ]
-            ax.errorbar(
-                range(4),
-                [r["joint"]["mean"] for r in rs],
-                yerr=[r["joint"]["sd"] for r in rs],
-                label=label,
-                marker="o" if n == 100 else "s",
-                linestyle="--" if g == "eta2" else "-",
-                color=colors[j],
-                ecolor=tuple(0.75 * channel for channel in to_rgb(colors[j])),
-                capsize=2,
-            )
-        ax.set_xticks(range(4), ["Raw", "Raw +\nchirality", "Refined", "Refined +\nchirality"])
-        ax.set_title(NAMES[dataset])
-        ax.set_ylim(40, 90)
-    axes[0].set_ylabel("RMSD <2 Å and PB-valid (%)")
-    fig.legend(
-        *axes[0].get_legend_handles_labels(), ncol=4, loc="outside lower center", frameon=False
-    )
-    if result.get("orientation_injection") == "rw":
-        fig.suptitle("Legacy Rᵀw · guidance and budget", fontsize=11)
-    save(fig, out, "06_guidance_budget")
-
-    fig, axes = plt.subplots(2, 2, figsize=(10, 7), layout="constrained")
-    for i, dataset in enumerate(("astex", "posebusters")):
-        for j, (key, field, label) in enumerate(
-            [
-                (
-                    "cutoff_sweep_fixed_sigma_2",
-                    "pocket_cutoff_angstrom",
-                    "Pocket cutoff (Å)",
-                ),
-                (
-                    "prior_sigma_sweep_fixed_cutoff_10",
-                    "prior_sigma_angstrom",
-                    "Prior σ (Å)",
-                ),
-            ]
-        ):
-            entries = result["robustness"]["datasets"][dataset][key]
-            values = np.array(
-                [
-                    [c["aggregate"]["joint_rmsd_lt2_pb_valid"]["mean"] for c in e["jitters"]]
-                    for e in entries
-                ]
-            ).T
-            ax = axes[i, j]
-            im = ax.imshow(
-                values,
-                vmin=50,
-                vmax=100,
-                cmap=LinearSegmentedColormap.from_list(
-                    "pocket_focus_70_80",
-                    [
-                        (0.0, "#364D7A"),
-                        (0.3, "#547FA4"),
-                        (0.4, "#75B5BB"),
-                        (0.5, "#F4E9C8"),
-                        (0.6, "#E49B75"),
-                        (0.7, "#C26863"),
-                        (1.0, "#803E65"),
-                    ],
-                ),
-                aspect="auto",
-            )
-            ax.set_xticks(range(len(entries)), [e[field] for e in entries])
-            ax.set_yticks(range(3), [0, 1, 2])
-            ax.set_xlabel(label)
-            ax.set_ylabel("Center jitter σ (Å)")
-            if i == 0:
-                ax.set_title(("A  Pocket size", "B  Prior scale")[j], loc="left", fontweight="bold")
-            if j == 0:
-                ax.set_ylabel(f"{NAMES[dataset]}\nCenter jitter σ (Å)")
-            for y in range(values.shape[0]):
-                for x in range(values.shape[1]):
-                    rgb = np.array(im.cmap(im.norm(values[y, x]))[:3])
-                    linear = np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
-                    luminance = linear @ np.array([0.2126, 0.7152, 0.0722])
-                    ax.text(
-                        x,
-                        y,
-                        f"{values[y, x]:.1f}",
-                        ha="center",
-                        va="center",
-                        color="black" if luminance > 0.179 else "white",
-                    )
-    fig.colorbar(
-        im,
-        ax=axes,
-        label="RMSD < 2 Å & PB-valid (%)",
-        ticks=[50, 60, 70, 75, 80, 90, 100],
-        shrink=0.8,
-    )
-    for ax in axes.flat:
-        for spine in ax.spines.values():
-            spine.set_visible(True)
-            spine.set_color("black")
-            spine.set_linewidth(0.8)
-    if result.get("orientation_injection") == "rw":
-        fig.suptitle("Legacy Rᵀw · pocket and prior sensitivity", fontsize=11)
-    save(fig, out, "08_pocket_prior")
 
 
 def complexity(data, out):
@@ -584,43 +459,55 @@ def budget(data, out):
         save(fig, out, "05_pose_budget")
 
 
-def runtime(rows, out):
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4.4), layout="constrained")
-    for j, (arm, label, color) in enumerate(
-        [("unguided_n100_s10", "N100/S10", "#8FB9D8"), ("unguided_n40_s25", "N40/S25", "#E8B395")]
+def runtime(data, out):
+    require(data["orientation_injection"] == "rw", "Runtime requires corrected Rw")
+    rows = [next(r for r in data["rows"] if r["dataset"] == ds) for ds in NAMES]
+    fig, axes = plt.subplots(2, 1, figsize=(10, 7.4), layout="constrained")
+    x = np.arange(5)
+    for ax, field, title, ylabel, color in (
+        (axes[0], "pipeline_mean_s", "A  Pipeline runtime", "Time / complex (s)", "#8FB9D8"),
+        (
+            axes[1],
+            "generation_process_allocator_peak_gib",
+            "B  Pose-generation process memory",
+            "CUDA allocated peak (GiB)",
+            "#B8A6CE",
+        ),
     ):
-        rs = [
-            next(r for r in rows if r["arm"] == arm and r["dataset"] == d)
-            for d in ("astex", "posebusters")
-        ]
-        x = np.arange(2) + (j - 0.5) * 0.32
-        bars = axes[0].bar(
-            x,
-            [r["pipeline_mean_s"] for r in rs],
-            width=0.30,
-            yerr=[r["pipeline_repeat_sd_s"] for r in rs],
-            capsize=3,
-            label=label,
-            color=color,
+        ax.bar(x, [r[field] for r in rows], width=0.62, color=color)
+        if field == "pipeline_mean_s":
+            ax.errorbar(
+                x,
+                [r[field] for r in rows],
+                yerr=[r["pipeline_repeat_sd_s"] for r in rows],
+                fmt="none",
+                ecolor="#384656",
+                capsize=3,
+                elinewidth=1,
+            )
+        for i, r in enumerate(rows):
+            top = r[field] + (r["pipeline_repeat_sd_s"] if field == "pipeline_mean_s" else 0)
+            ax.annotate(
+                f"{r[field]:.1f}",
+                (i, top),
+                xytext=(0, 5),
+                textcoords="offset points",
+                ha="center",
+                fontsize=10,
+            )
+        ax.set_xticks(x, [f"{NAMES[d]}\n(n={COUNTS[d]})" for d in NAMES], fontsize=10)
+        ax.set_title(title, loc="left", fontweight="bold")
+        ax.set_ylabel(ylabel)
+        ax.set_ylim(
+            0,
+            max(
+                r[field] + (r["pipeline_repeat_sd_s"] if field == "pipeline_mean_s" else 0)
+                for r in rows
+            )
+            * 1.2,
         )
-        axes[0].bar_label(bars, labels=[f"{r['pipeline_mean_s']:.1f}" for r in rs], padding=5)
-        bars = axes[1].bar(
-            x, [r["sampling_allocator_peak_gib"] for r in rs], width=0.30, label=label, color=color
-        )
-        axes[1].bar_label(
-            bars, labels=[f"{r['sampling_allocator_peak_gib']:.1f}" for r in rs], padding=5
-        )
-    axes[0].set_ylabel("Wall time / complex (s)")
-    axes[0].set_title("A  Runtime", loc="left", fontweight="bold")
-    axes[1].set_ylabel("CUDA allocated peak (GiB)")
-    axes[1].set_title("B  Memory", loc="left", fontweight="bold")
-    for ax in axes:
-        ax.set_xticks([0, 1], ["Astex Diverse Set", "PoseBusters v2"])
-        ax.margins(y=0.2)
-    fig.legend(
-        *axes[0].get_legend_handles_labels(), loc="outside lower center", ncol=2, frameon=False
-    )
-    fig.suptitle("Legacy Rᵀw · measured runtime and sampling memory", fontsize=11)
+        ax.grid(axis="y", color="#E1E5EA", lw=0.7)
+        ax.set_axisbelow(True)
     save(fig, out, "07_runtime_memory")
 
 
@@ -1041,6 +928,9 @@ def validate(data, bundle):
         )
     validate_repeats(data)
     validate_repeats(bundle)
+    from benchmarks.analysis.rw_runtime import verify as verify_runtime
+
+    verify_runtime(bundle["rw_runtime"])
     main = bundle["benchmark_results"]["rows"]
     for row in main:
         require(
@@ -1251,7 +1141,7 @@ def main():
             "benchmark_results",
             "candidate_metrics",
             "overlap_summary",
-            "runtime_comparison",
+            "rw_runtime",
         )
     }
     validate(data, bundle)
@@ -1269,11 +1159,11 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     tasks = [
         (comparison, (data["comparison"],), 10),
-        (stages_and_pocket, (bundle["benchmark_results"],), 10),
+        (postprocessing, (bundle["benchmark_results"],), 10),
         (complexity, (data["complexity_budget"],), 10),
         (cumulative, (data["complexity_budget"],), 10),
         (budget, (data["complexity_budget"],), 10),
-        (runtime, (bundle["runtime_comparison"],), 10),
+        (runtime, (bundle["rw_runtime"],), 10),
         (relatedness, (data["sequence"],), 10),
         (ligand_similarity, (bundle["overlap_summary"],), 10),
         (sequence_similarity, (data["sequence"], data["sequence_performance"]), 11),

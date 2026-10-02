@@ -10,11 +10,13 @@ import numpy as np
 from benchmarks.analysis.evidence import binding_chain_display, require
 
 
-def export(root, output):
+def export(root, output, trace=None):
     import torch
     from rdkit import Chem
 
-    trace = root / "outputs/figures/actual_ode_trace_1t46/results.pt"
+    trace = trace or root / "outputs/figures/rw_actual_ode_trace_1t46/results.pt"
+    if not trace.is_absolute():
+        trace = root / trace
     bundle = torch.load(trace, map_location="cpu", weights_only=True)
     identity = dict(bundle["ligand_identity"])
     source = identity.pop("source")
@@ -22,6 +24,7 @@ def export(root, output):
     canonical = json.dumps(identity, separators=(",", ":"), sort_keys=True).encode()
     require(hashlib.sha256(canonical).hexdigest() == digest, "Ligand graph identity drift")
     options = bundle["options"]
+    require(options["orientation_injection"] == "rw", "Illustration requires corrected Rw")
     ligand_input = Path(options["ligand"])
     require(
         source["kind"] == "file"
@@ -48,6 +51,7 @@ def export(root, output):
         require(np.allclose(distances, distances[0], atol=1e-4), "Non-rigid saved fragment")
     case = root / "data/external_benchmarks/data/astex_diverse_set/1T46_STI"
     receptor = case / "1T46_STI_protein.pdb"
+    require(Path(options["protein"]).resolve() == receptor.resolve(), "Wrong illustration receptor")
     reference = case / "1T46_STI_ligand.sdf"
     reference_mol = Chem.SDMolSupplier(str(reference), removeHs=True)[0]
     require(reference_mol is not None, "Missing crystal ligand")
@@ -60,7 +64,7 @@ def export(root, output):
     result = dict(
         id="1T46_STI",
         dataset="astex",
-        purpose="Existing N1 illustration, not a benchmark-selected pose",
+        purpose="Fixed-complex corrected-Rw N1 illustration, not a benchmark-selected pose",
         times=times.tolist(),
         coordinates=coordinates.tolist(),
         fragment_id=fragments,
@@ -85,6 +89,8 @@ def export(root, output):
                 "pocket_cutoff",
                 "vina_guidance_scale",
                 "rank_by",
+                "orientation_injection",
+                "checkpoint_orientation_injection",
             )
         },
         checkpoint=Path(options["checkpoint"]).name,
@@ -92,7 +98,15 @@ def export(root, output):
         recorded_ligand_source=source,
         sources=[
             dict(path=str(f.relative_to(root)), sha256=hashlib.sha256(f.read_bytes()).hexdigest())
-            for f in (trace, receptor, reference, ligand_input, trace.parent / "docked.sdf")
+            for f in (
+                trace,
+                receptor,
+                reference,
+                ligand_input,
+                trace.parent / "docked.sdf",
+                Path(options["checkpoint"]),
+                Path(options["config"]),
+            )
         ],
     )
     # The public record must not retain machine-specific paths from the bundle.
@@ -110,8 +124,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--trace", type=Path, help="Saved corrected-Rw results.pt")
     args = parser.parse_args()
-    export(args.root.resolve(), args.output)
+    export(args.root.resolve(), args.output, args.trace)
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@ from benchmarks.figures.paper import NAMES, save
 DATA = Path(__file__).resolve().parents[2] / "benchmarks/results/paper/evidence"
 
 
-def render(out):
+def render_operator_change(out):
     changes = json.loads((DATA / "rw_operator_change.json").read_text())["comparisons"]
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.7), sharey=True, layout="constrained")
     for ax, metric, title in zip(
@@ -58,6 +58,9 @@ def render(out):
         frameon=False,
     )
     save(fig, out, "S11_rw_operator_change")
+
+
+def render(out):
     rows = json.loads((DATA / "selector_bottleneck.json").read_text())["rows"]
     colors = ["#B9C3CE", "#D7B5C5", "#E8B395", "#B8A6CE", "#9AC9B4"]
     labels = [

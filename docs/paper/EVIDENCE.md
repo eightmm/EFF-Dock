@@ -1,6 +1,6 @@
 # Rw manuscript evidence
 
-Completed corrected Rw, frozen released docking/confidence weights, unguided N100/S10, 10 Å supplied pocket, physical/interaction energy refinement, input-chirality-filtered minimum-pRMSD selection. Seeds 42, 100042 and 200042. Every original complex is retained; no new training, pose generation, reference-based selection or tuned thresholds were used for this refresh.
+Completed corrected Rw, frozen released docking/confidence weights, unguided N100/S10, 10 Å supplied pocket, physical/interaction energy refinement, input-chirality-filtered minimum-pRMSD selection. Seeds 42, 100042 and 200042. Every original complex is retained. Benchmark statistics are derived from the completed study without new cohort inference, training, reference-based selection or tuned thresholds. One fixed-complex Rw N1 run supplies the separate method illustration.
 
 ## Primary selected-pose performance
 
@@ -14,19 +14,15 @@ Completed corrected Rw, frozen released docking/confidence weights, unguided N10
 
 Values are three-seed means and sample SD on fixed cohorts. The endpoint uses the same selected pose for RMSD and all 27 non-RMSD PoseBusters 0.6.5 checks. Temporal cohorts retain their audited InChI energy-reference compatibility path; Astex/PoseBusters use native official redock.
 
-## Operator-change evidence
+## Frozen-weight provenance
 
-| Dataset | Reference | RMSD delta (pp), 95% CI | PB-valid-success delta (pp), 95% CI |
-|---|---|---|---|
-| Astex Diverse Set | paired_rerun | +1.57 [-0.39, +3.92] | +1.57 [-0.39, +3.92] |
-| PoseBusters v2 | paired_rerun | -0.11 [-0.97, +0.76] | -0.43 [-1.30, +0.43] |
-| PhiBench | historical_bank | +0.32 [-0.81, +1.46] | +0.16 [-1.13, +1.46] |
-| FoldBench | historical_bank | +0.78 [-0.00, +1.55] | +0.96 [+0.18, +1.79] |
-| OpenBind | historical_bank | +0.61 [+0.07, +1.15] | +0.61 [+0.07, +1.15] |
-
-Paired complex bootstrap of three-seed average differences; fixed cohort, seeds kept together; fresh matched priors only for Astex/PoseBusters; temporal differences include historical execution variation; no multiple-testing adjustment.
-
-Rw follows the local-to-world equivariance convention. Small accuracy changes under fixed legacy-trained weights do not establish a universal accuracy gain. Docking and confidence weights remain frozen from legacy-feature training; this is a cross-operator evaluation, not retraining under Rw. OpenBind has one exact-PDB group, so its PDB-cluster interval is unavailable.
+Rw follows the local-to-world equivariance convention. Docking and confidence
+weights remain frozen from legacy-operator training; this is a cross-operator
+evaluation, not retraining under Rw. The current submission does not claim a
+universal accuracy gain from the correction. Operator-control comparisons remain
+in the versioned numerical report and correction documentation, outside the
+submitted figure selection. OpenBind has one exact-PDB group, so its PDB-cluster
+interval is unavailable.
 
 ## Confidence diagnostics
 
@@ -90,7 +86,7 @@ Fifteen Rw examples follow the existing deterministic rule: maximum same-candida
 
 ## Figure provenance and remaining limits
 
-Rw updates the main comparison, postprocessing, complexity, cumulative/prefix success, ligand/sequence-stratified performance, uncertainty, confidence, stringent subset, selected PB transitions, native-baseline pairing and structure examples. Training-relatedness inputs remain identical. Guidance/budget, historical runtime/memory and pocket/prior sensitivity were not rerun under Rw and retain visible legacy Rᵀw labels. The N1 trajectory and Fig1 illustrative candidate bank retain their historical source notes. There is no new component ablation, input-conformer experiment, confidence retraining or primary-protocol pocket robustness measurement in this saved-data refresh.
+Rw updates the main comparison, postprocessing, complexity, cumulative/prefix success, ligand/sequence-stratified performance, uncertainty, confidence, stringent subset, selected PB transitions, native-baseline pairing and structure examples. Training-relatedness inputs remain identical. Legacy guidance/N40 and pocket/prior figures and the operator-comparison figure are excluded from the current 20-page submission. Runtime/memory are reaggregated from complete Rw study logs. Fig1 and the saved trajectory now use one prespecified Rw N1 run of 1T46–STI, seed 42, plus the separately generated Rw N100 repeat-0 candidate bank for confidence selection. No outcome-based case/seed selection or new benchmark generation is involved. There is no new component ablation, input-conformer experiment, confidence retraining or primary-protocol pocket robustness measurement in this saved-data refresh.
 
 No additional all-candidate PB labels, training wall time or equal-compute baseline evidence is inferred. Relatedness strata and repeatedly inspected external results are descriptive; fixed-cohort bootstrap intervals do not resolve all target or seed dependence.
 
@@ -106,11 +102,11 @@ Refined confidence discrimination is high, but eligible near-native poses still 
 
 Raw/refined selected-pose validity and the matched-candidate transitions answer different questions: the former includes a changed selected index; the latter controls index correspondence only in the saved, selection-biased evaluated subset. Both improvements and harm remain in Figure S7. Figure S9 pairs Rw with the five locally executed native baselines using fixed case-level outcomes; its descriptive intervals do not establish equal-compute superiority.
 
-## Model size and historical cost
+## Model size and corrected-Rw cost
 
 | Model | Parameter objects |
 |---|---:|
 | Docking | 5,719,970 |
 | Confidence | 9,403,274 |
 
-Historical Rᵀw cost measurements remain in Figure 7 and `evidence/model_cost.json`; they were not remeasured for Rw. The reported pose throughput is amortized pipeline throughput including setup, refinement, confidence and I/O, excluding separate PB evaluation. A complete interruption-aware training wall-time ledger is unavailable; step counts are not converted to elapsed time.
+Figure 6 (PDF page 6) and `evidence/model_cost.json` now use the complete Rw campaign logs: 6,246 case-seed executions in 240 pipeline shards. Runtime is summed shard wall time divided by the cohort size within each seed, then averaged across three seeds. Memory is the maximum initial generation/evaluation-process CUDA allocated peak across shards and seeds, not whole-pipeline or reserved memory. Astex/PoseBusters use generation-only candidate export; PhiBench/FoldBench/OpenBind include raw-confidence scoring in the initial process. Refinement and subsequent confidence evaluation run in separate processes. Their actual timing overhead is retained; these profiles are not controlled to isolate a single stage. These logs mix RTX A5000, RTX 6000 Ada and RTX PRO 6000 backends; their device counts are retained in `rw_runtime.json`. Costs are descriptive, not a controlled hardware comparison. The reported pose throughput is amortized pipeline throughput including setup, refinement, fresh confidence and I/O, excluding separate PB evaluation. A complete interruption-aware training wall-time ledger is unavailable; step counts are not converted to elapsed time.

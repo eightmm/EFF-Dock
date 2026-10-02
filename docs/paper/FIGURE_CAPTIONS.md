@@ -1,8 +1,8 @@
 # Manuscript figure captions
 
-Primary benchmark figures use the completed corrected Rw three-seed study. Historical Rᵀw ablations and saved illustrations are identified in their captions. PB-valid success is solid; RMSD-successful PB-invalid portions are hatched.
+All submitted EFF-Dock measurements and illustrations use corrected Rw with frozen released weights. Training provenance remains documented in [the orientation note](../ORIENTATION_INJECTION.md). PB-valid success is solid; RMSD-successful PB-invalid portions are hatched. Page/figure IDs below are working reference IDs; manuscript numbering can be adapted.
 
-PDF SHA-256: `44f88e8df3702fd85e54795d3be9c31bccab915437ed2ef6cce7650a6ba67951`
+PDF SHA-256: `a7ac12a74083b42dd9347e41cffc503a3fdec3605c475c2605c3ac8253495b98`
 
 ## PDF page 1 · Figure 1
 
@@ -56,35 +56,15 @@ EFF-Dock results use corrected Rw with frozen released weights. For each of the 
 
 ## PDF page 6 · Figure 6
 
-**Guidance and pose–step allocation across post-processing conditions.**
+**Measured corrected-Rw runtime and generation-process memory.**
 
-Historical Rᵀw data; this panel was not rerun under corrected Rw. Performance on Astex Diverse Set and PoseBusters v2 is compared for 100 poses with 10 sampling steps (N100/S10) and 40 poses with 25 steps (N40/S25), with guidance disabled or enabled at η=2. The four selection conditions are raw, raw with chirality filtering, refined, and refined with chirality filtering. The endpoint is selected-pose RMSD <2 Å together with PoseBusters validity. Points and error bars indicate means and sample SD across three repeats. Guided and unguided runs within a matched budget share the verified initial priors; priors are not assumed nested between the two budgets. Both allocations have the same product N×S, but this does not imply equal wall time because candidate-dependent refinement and confidence evaluation costs differ.
-
-- 원본: [06_guidance_budget.pdf](figures/06_guidance_budget.pdf)
-- LaTeX label: `fig:paper-6`
-- 저자 메모: 동일 N×S는 동일 runtime이 아니다. 비용 그림과 별도로 사용한다.
-
-## PDF page 7 · Figure 7
-
-**Measured runtime and sampling memory for two unguided budgets.**
-
-Historical Rᵀw data; this panel was not rerun under corrected Rw. (A) Aggregate pipeline wall time per complex and (B) peak CUDA allocated memory during sampling for unguided N100/S10 and N40/S25 on Astex Diverse Set and PoseBusters v2. Runtime is the sum of completed shard wall durations divided by the number of complexes within each repeat, averaged across three repeats; whiskers indicate sample SD. It includes recorded pipeline setup, refinement, confidence scoring, and I/O overhead, but excludes separate official PoseBusters evaluation. Because parallel shard durations are summed, this is not user-perceived campaign elapsed time or pure sampling latency. Memory is the maximum recorded sampling allocator peak across shards and repeats, expressed in GiB, and has no SD bar. Measurements use the recorded RTX 6000 Ada runs. Memory is neither whole-pipeline peak usage nor a per-pose quantity.
+(A) Pipeline wall time per complex and (B) initial pose-generation-process peak CUDA allocated memory for the corrected-Rw, unguided N100/S10 evaluation on the five external benchmarks. Every cohort retains its full complex inventory across seeds 42, 100042 and 200042. Runtime sums completed shard wall durations within each seed and divides by the cohort size; bars give the three-seed mean and whiskers the sample SD. Timings include setup, generation, energy refinement, confidence scoring and I/O, but exclude separately executed official PoseBusters evaluation. Summed shard durations are not campaign elapsed time or pure sampling latency. Memory is the maximum initial evaluation-process allocator peak across all 16 shards and three seeds, in GiB, with no SD bar. Astex and PoseBusters use generation-only candidate export; PhiBench, FoldBench and OpenBind include raw-confidence scoring in that initial process. Separate refinement and post-refinement confidence processes are not included in this memory peak; it is neither reserved memory nor a whole-pipeline peak. Executions used a recorded mixture of RTX A5000, RTX 6000 Ada and RTX PRO 6000 backends, with per-cohort device counts and process profiles retained in the source data. These descriptive costs are not a controlled hardware/profile comparison or saturated throughput benchmark. Numerical labels give bar values to one decimal; n denotes unique complexes per seed.
 
 - 원본: [07_runtime_memory.pdf](figures/07_runtime_memory.pdf)
 - LaTeX label: `fig:paper-7`
-- 저자 메모: A는 shard wall의 합을 나눈 비용, B는 sampling allocated peak. Guided나 외부 모델 비용으로 확대 해석하지 않는다.
+- 저자 메모: Rw 저장 로그 집계. SD는 3시드 및 GPU 혼합 변동을 포함. Memory는 초기 생성/evaluation 프로세스 peak이며 temporal 셋에서는 raw confidence도 포함; sampling-only나 whole-pipeline peak로 해석하지 않는다.
 
-## PDF page 8 · Figure 8
-
-**Sensitivity to pocket crop, prior scale, and pocket-center perturbation.**
-
-Historical Rᵀw data; this panel was not rerun under corrected Rw. (A) Sampling-pocket cutoff and (B) initial-prior scale are varied for Astex Diverse Set and PoseBusters v2 in the frozen guided (η=2) robustness campaign. Rows within each heatmap correspond to Gaussian center-jitter standard deviations of 0, 1, or 2 Å per Cartesian axis. Cells show the mean percentage of selected poses satisfying RMSD <2 Å and PoseBusters validity across three repeats, after refinement and ordinary confidence selection without the additional chirality filter. The pocket-cutoff sweep fixes the prior scale at 2 Å, and the prior-scale sweep fixes the sampling cutoff at 10 Å. Only the sampling crop changes in the pocket-cutoff sweep; refinement and scoring retain 10 Å crops. All heatmaps use a shared linear 50–100% numerical scale, with color contrast emphasized around 70–80%; the 75% color anchor is not a statistical threshold. These guided robustness results are distinct from the main unguided evaluation condition.
-
-- 원본: [08_pocket_prior.pdf](figures/08_pocket_prior.pdf)
-- LaTeX label: `fig:paper-8`
-- 저자 메모: Pocket sweep은 prior σ=2 Å, prior sweep은 cutoff=10 Å로 고정. Center jitter와 prior σ는 서로 다르다.
-
-## PDF page 9 · Figure 9
+## PDF page 7 · Figure 7
 
 **Sequence relatedness and joint ligand–protein overlap with docking-training data.**
 
@@ -94,7 +74,7 @@ All six cohorts are compared with the same 47,277 executed docking-training samp
 - LaTeX label: `fig:paper-9`
 - 저자 메모: Train은 47,277개. Confidence subset이나 역사적 PLINDER community 지표와 혼동하지 않는다. 후보 집합·UNK 한계는 Methods에 명시.
 
-## PDF page 10 · Figure 10
+## PDF page 8 · Figure 8
 
 **Training-ligand relatedness and stratified docking performance.**
 
@@ -104,7 +84,7 @@ EFF-Dock results use corrected Rw with frozen released weights. (A) Composition 
 - LaTeX label: `fig:paper-10`
 - 저자 메모: Ligand Tanimoto와 protein identity는 다르다. 예전 문서의 서열 미계산 설명은 현재 분석에 적용되지 않는다.
 
-## PDF page 11 · Figure 11
+## PDF page 9 · Figure 9
 
 **Docking performance across training-sequence identity strata.**
 
@@ -114,7 +94,7 @@ EFF-Dock results use corrected Rw with frozen released weights. The five externa
 - LaTeX label: `fig:paper-11`
 - 저자 메모: OpenBind 925개 모두 90–100 구간이라 이 구간화로 OpenBind 내부의 identity 의존성은 평가할 수 없다.
 
-## PDF page 12 · Figure S1
+## PDF page 10 · Figure S1
 
 **Paired changes in docking success with refinement and chirality filtering.**
 
@@ -124,7 +104,7 @@ EFF-Dock results use corrected Rw with frozen released weights. Success-rate imp
 - LaTeX label: `fig:paper-s1`
 - 저자 메모: 여기는 SD가 아닌 95% CI. Percentage points는 상대 증가율 %가 아니다. OpenBind로 다른 단백질에 대한 일반화를 추정하지 않는다.
 
-## PDF page 13 · Figure S2
+## PDF page 11 · Figure S2
 
 **Confidence selection and near-native candidate density.**
 
@@ -134,7 +114,7 @@ EFF-Dock results use corrected Rw with frozen released weights. Refined unguided
 - LaTeX label: `fig:paper-s2`
 - 저자 메모: A는 ranked curve 요약. B는 포즈가 분모이므로 complex 기준 oracle와 같은 성공률로 취급하지 않는다.
 
-## PDF page 14 · Figure S3
+## PDF page 12 · Figure S3
 
 **Descriptive failure decomposition across ligand-complexity strata.**
 
@@ -144,7 +124,7 @@ EFF-Dock results use corrected Rw with frozen released weights. Rows stratify re
 - LaTeX label: `fig:paper-s3`
 - 저자 메모: 네 범주는 같은 결과의 대수적 분해이며 독립 원인 검증이 아니다. Full-bank PB oracle는 계산하지 않았다.
 
-## PDF page 15 · Figure S4
+## PDF page 13 · Figure S4
 
 **Confidence ranking and remaining selection loss.**
 
@@ -154,7 +134,7 @@ EFF-Dock results use corrected Rw with frozen released weights. (A) Within-compl
 - LaTeX label: `fig:paper-s4`
 - 저자 메모: AUROC/AP는 양·음성 후보가 모두 있는 complex만 집계. 높은 AUROC와 선택 손실이 함께 존재한다.
 
-## PDF page 16 · Figure S5
+## PDF page 14 · Figure S5
 
 **Reliability of saved confidence predictions and candidate-density dependence.**
 
@@ -164,7 +144,7 @@ EFF-Dock results use corrected Rw with frozen released weights. (A) Empirical ne
 - LaTeX label: `fig:paper-s5`
 - 저자 메모: 확률 head를 새로 fitting하지 않았다. OpenBind의 낮은 Brier는 클래스 불균형 영향도 있으므로 calibration 우수성으로 단정하지 않는다.
 
-## PDF page 17 · Figure S6
+## PDF page 15 · Figure S6
 
 **Performance under simultaneous sequence and ligand relatedness restrictions.**
 
@@ -174,7 +154,7 @@ EFF-Dock results use corrected Rw with frozen released weights. Each benchmark c
 - LaTeX label: `fig:paper-s6`
 - 저자 메모: 남는 표본이 총 22개뿐이다. 성능 증명보다 엄격한 비교의 표본 한계를 보고하는 SI로 사용.
 
-## PDF page 18 · Figure S7
+## PDF page 16 · Figure S7
 
 **Physical-validity failures before and after refinement.**
 
@@ -184,7 +164,7 @@ EFF-Dock results use corrected Rw with frozen released weights. (A,B) Failure pe
 - LaTeX label: `fig:paper-s7`
 - 저자 메모: 동일 complex의 재선택과 동일 pose의 refinement를 분리. full-bank PB 평가로 오해하지 않도록 한다.
 
-## PDF page 19 · Figure S8
+## PDF page 17 · Figure S8
 
 **Dataset-specific examples of success, refinement rescue and selection failure.**
 
@@ -194,7 +174,7 @@ EFF-Dock results use corrected Rw with frozen released weights. Rows A–E show 
 - LaTeX label: `fig:paper-s8`
 - 저자 메모: 5개 외부 셋마다 서로 다른 complex 3건. Rescue는 셋 내 최대 개선 사례이며 대표적 평균효과가 아니다. 성공·선택실패는 3회 반복을 합친 적격 기록의 lower median이며 먼저 뽑은 complex ID를 제외한다. n은 complex-repeat 수이다.
 
-## PDF page 20 · Figure S9
+## PDF page 18 · Figure S9
 
 **Paired uncertainty relative to locally executed baselines.**
 
@@ -204,27 +184,17 @@ EFF-Dock results use corrected Rw with frozen released weights. (A) Astex Divers
 - LaTeX label: `fig:paper-s9`
 - 저자 메모: 음수·0을 포함하는 CI도 모두 유지. Exact PDB가 모두 달라서 여기서는 complex/PDB bootstrap이 같다.
 
-## PDF page 21 · Figure S10
+## PDF page 19 · Figure S10
 
 **Fragment motion along a saved ODE generation trajectory.**
 
-Historical Rᵀw data; this panel was not rerun under corrected Rw. Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and camera. The five panels show actual saved states at t=0.000, 0.271, 0.488, 0.784 and 1.000; no coordinates are interpolated. These are the available states nearest to five equally spaced target times. Carbon colors track the same six rigid fragments throughout; nitrogen is blue and oxygen red. The pale protein cartoon provides binding-site context. Interfragment bonds are omitted in the first four panels for visibility and shown in grey at the last panel using the known ligand connectivity. This display convention does not represent chemical bond formation. Time t is the dimensionless generative-flow coordinate, not physical time or energy-refinement progress. The stored illustrative run used one sample, ten ODE steps, a late schedule with power 3, positional prior sigma 2 Å, pocket cutoff 10 Å, seed 42 and no guidance or confidence selection. The recorded checkpoint is effdock_docking_early_time_t0p10_50k.pt. This is a separate N1 illustration, not the 7FB7 refinement rescue of Figure S8 or an N100 benchmark-selected pose; no success, PB-validity or representative-trajectory claim is made. All 11 saved frames and the original fragment assignments are retained in the source data.
+Corrected Rw with the frozen released docking checkpoint. Astex Diverse Set 1T46–STI, shown in a fixed receptor coordinate frame and camera. The five panels show actual saved states at t=0.000, 0.271, 0.488, 0.784 and 1.000; no coordinates are interpolated. These are the available states nearest to five equally spaced target times. Carbon colors track the same six rigid fragments throughout; nitrogen is blue and oxygen red. The pale protein cartoon provides binding-site context. Interfragment bonds are omitted in the first four panels for visibility and shown in grey at the last panel using the known ligand connectivity. This display convention does not represent chemical bond formation. Time t is the dimensionless generative-flow coordinate, not physical time or energy-refinement progress. The stored illustrative run used one sample, ten ODE steps, a late schedule with power 3, positional prior sigma 2 Å, pocket cutoff 10 Å, seed 42 and no guidance or confidence selection. The recorded checkpoint is effdock_docking_early_time_t0p10_50k.pt. This is a separate N1 illustration, not an N100 benchmark-selected pose; no success, PB-validity or representative-trajectory claim is made. All 11 saved frames and the original fragment assignments are retained in the source data.
 
 - 원본: [S10_fragment_trajectory.pdf](figures/S10_fragment_trajectory.pdf)
 - LaTeX label: `fig:paper-s10`
-- 저자 메모: 원고 Figure 1 대표이미지용. A–E 표시는 제거하고 시간만 표시한다. 현재 작업용 묶음에서는 page 21 / S10 식별자를 유지한다. 실제 저장된 1T46 생성 경로다. 7FB7 refinement와 다른 실행이며 t는 ODE 시간이다. 초기·중간 패널에서 fragment 사이 결합을 숨기는 것은 표시 방식이며 화학 반응을 의미하지 않는다.
+- 저자 메모: Fig1과 같은 Rw N1 생성 경로의 시간별 그림. 현재 PDF page 19 / S10. 생성 ODE 시간이며 energy refinement 시간이 아니다. Fragment 사이 결합을 숨기는 것은 표시 방식이며 화학 반응을 의미하지 않는다.
 
-## PDF page 22 · Figure S11
-
-**Frozen-weight Rw–Rᵀw performance differences.**
-
-EFF-Dock results use corrected Rw with frozen released weights. Corrected Rw and historical Rᵀw use refined candidates and the same chirality-filtered predicted-RMSD selector. Panels show (A) RMSD <2 Å success and (B) same-pose PB-valid success. Points are differences in three-seed means; whiskers are 95% percentile intervals from 2,000 paired complex-bootstrap draws, keeping all three seed outcomes for a complex together. Astex and PoseBusters use fresh matched-prior operator reruns (circles); temporal cohorts use historical Rᵀw banks (diamonds), so their contrasts also include execution variation. These descriptive intervals condition on the observed cohort and three seeds, do not quantify fresh-seed variability, and have no multiplicity adjustment. Signed labels at the right give observed differences in percentage points, rounded to two decimals.
-
-- 원본: [S11_rw_operator_change.pdf](figures/S11_rw_operator_change.pdf)
-- LaTeX label: `fig:paper-s11`
-- 저자 메모: 저장된 Rw 결과의 사후 진단. 외부 결과로 selector나 threshold를 튜닝하지 않는다.
-
-## PDF page 23 · Figure S12
+## PDF page 20 · Figure S11
 
 **Eligibility-aware selection bottlenecks and regret.**
 

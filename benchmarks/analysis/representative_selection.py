@@ -15,7 +15,9 @@ from benchmarks.analysis.evidence import selected_indices
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "benchmarks/results/paper/trajectory"
-LEDGER = "outputs/benchmarks/astex_pb_unguided_r3_hostmatched_v2/n100_s10/selection/full/astex_repeat_0/records.json"
+LEDGER = (
+    "outputs/benchmarks/rw_five_benchmarks_r3_20260929/post/full/rw_astex_repeat_0/records.json"
+)
 
 
 def export(source_root):
@@ -40,6 +42,11 @@ def export(source_root):
     record = next(r for r in rows if r["id"] == "1t46" and r["stage"] == "refined")
     _, selected = selected_indices(record)
     confidence = json.loads(read(record["confidence_summary"], record["confidence_summary_sha256"]))
+    if (
+        confidence["orientation_injection"] != "rw"
+        or trace["protocol"]["orientation_injection"] != "rw"
+    ):
+        raise ValueError("Representative workflow requires corrected Rw in both runs")
     artifact = confidence["artifacts"]["scores_csv"]
     if artifact["sha256"] != record["scores_sha256"]:
         raise ValueError("Confidence CSV identity mismatch")
@@ -107,6 +114,7 @@ def export(source_root):
         dataset="astex",
         id="1t46",
         repeat=0,
+        orientation_injection="rw",
         bank_size=100,
         trace_sha256=hashlib.sha256(trace_path.read_bytes()).hexdigest(),
         rule="Best, lower-quartile, lower-median and worst predicted-RMSD ranks among chirality-eligible refined candidates",

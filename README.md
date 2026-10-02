@@ -11,7 +11,7 @@ binder/non-binder classification.
 
 ## Released model
 
-**Orientation correction:** [Rw versus historical Rᵀw](docs/ORIENTATION_INJECTION.md) documents the mathematical fix, checkpoint compatibility and completed three-seed evaluation. Fresh training with `configs/train_rw.yaml` uses Rw; loading released weights preserves their historical operator unless `--orientation-injection rw` is requested. Primary benchmark figures now use the completed corrected Rw three-seed results. Historical ablations retain their explicit operator provenance.
+**Orientation correction:** [Rw versus historical Rᵀw](docs/ORIENTATION_INJECTION.md) documents the mathematical fix, checkpoint compatibility and completed three-seed evaluation. Fresh training with `configs/train_rw.yaml` uses Rw; loading released weights preserves their historical operator unless `--orientation-injection rw` is requested. Primary benchmark figures now use the completed corrected Rw three-seed results. All submitted EFF-Dock measurements and illustrations use Rw; legacy ablations are excluded from the current figure package.
 
 The public model is one paired deployment stack:
 

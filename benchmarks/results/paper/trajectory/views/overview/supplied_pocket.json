@@ -1,11 +1,11 @@
 {
-  "trace_sha256": "ff581d4794b11ea09285107a1f6dd58dacfe46abaef25367d0d2eac85952fc8e",
-  "sha256": "4ac5720028ef75f79442283953cd979ef8f357d8dc20873fc7415f2c984828a3",
+  "trace_sha256": "f4bcb0a5e83d4ea76176558d9d84f3c060d947e0917c4f3024db190b350fc71b",
+  "sha256": "2dd01383f59dae3f87a39a8be62beb2aab8c9c167e286534e91680ae8fc7a30f",
   "camera": [
-    -27.49601372383736,
-    -25.89508024679648,
-    -41.17907703502758,
-    69.71630639144963,
+    -27.49497395077267,
+    -25.892651109437686,
+    -41.17692914395719,
+    69.77633974252697,
     -0.12607862007251908,
     0.25660481229257065,
     0.03378266443126182,
@@ -27,7 +27,7 @@
   "py3dmol_version": "2.5.5",
   "playwright_version": "1.62.0",
   "description": "Translucent teal crop surface with all retained heavy atoms as element-colored sticks and projected supplied-center marker",
-  "input_pocket_sha256": "a1e03e0b0aad2ef2c544853fba9c4762f0b67bd5e41f3dedc438e541f2b95f2e",
+  "input_pocket_sha256": "8da62e0c6f3433d9d24a91b0ad8925543ce855f5d8f12f72a79800489d1bab6f",
   "surface_type": "MS",
   "surface_complete": true,
   "pocket_color": "#80C8BC",
@@ -43,7 +43,7 @@
   ],
   "center_marker_color": "#E59A77",
   "center_marker_screen": {
-    "x": 435.24900113057384,
-    "y": 355.2859246289108
+    "x": 435.2630078707854,
+    "y": 355.2526248066607
   }
 }

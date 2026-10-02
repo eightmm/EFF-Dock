@@ -59,7 +59,6 @@ def orientation_note():
         .read_text()
         .split("## Historical single-seed diagnostic")[0]
         .replace("paper/diagnostics/", "diagnostics/")
-        .replace("paper/figures/S11_rw_operator_change.pdf", "figures/page_22.pdf")
         .replace("../benchmarks/results/paper/rw_report.json", "rw_results.json")
         .replace("../benchmarks/results/paper/orientation/summary.json", "orientation_summary.json")
         .replace(
@@ -125,9 +124,10 @@ Working materials for writing the EFF-Dock manuscript, not a published paper.
 - [English captions and author notes](FIGURE_CAPTIONS.md)
 - [Numerical interpretation and limits](EVIDENCE.md)
 - [Orientation correction and result provenance](ORIENTATION_INJECTION.md)
-- Primary results use the completed corrected Rw three-seed study. Historical ablations and saved illustrations retain explicit operator provenance.
+- All submitted EFF-Dock measurements and illustrations use corrected Rw. Released weights retain their documented historical training provenance.
 - [Representative workflow](illustrations/Fig1.pdf) and [architecture](illustrations/Fig2.pdf), with PNG/SVG exports and their source notes.
 - [Rw numerical summary](rw_results.json).
+- [Measured Rw runtime/memory](rw_runtime.json) and [model cost summary](model_cost.json).
 - `methods.tex`: editable equations and current methods.
 - `main.tex` and `figure_captions.tex`: reference LaTeX document and figure blocks.
 - `figures/`: {len(metadata["figures"])} individual PDFs in manuscript page order.
@@ -151,6 +151,8 @@ the repository methods and parameter tables provide implementation detail.
             ROOT / "benchmarks/results/paper/orientation/summary.json", "orientation_summary.json"
         )
         archive.write(ROOT / "benchmarks/results/paper/rw_report.json", "rw_results.json")
+        archive.write(ROOT / "benchmarks/results/paper/rw_runtime.json", "rw_runtime.json")
+        archive.write(ROOT / "benchmarks/results/paper/evidence/model_cost.json", "model_cost.json")
         archive.write(ROOT / "docs/RW_THREE_SEED_PROTOCOL.md", "RW_THREE_SEED_PROTOCOL.md")
         archive.writestr(
             "captions.json",
@@ -205,6 +207,11 @@ def verify(metadata):
             archive.read("rw_results.json")
             == (ROOT / "benchmarks/results/paper/rw_report.json").read_bytes()
         )
+        for name, source in (
+            ("rw_runtime.json", ROOT / "benchmarks/results/paper/rw_runtime.json"),
+            ("model_cost.json", ROOT / "benchmarks/results/paper/evidence/model_cost.json"),
+        ):
+            assert archive.read(name) == source.read_bytes()
         for number, stem in ((1, "Fig1_representative"), (2, "Fig2_architecture")):
             for suffix in ("pdf", "png", "svg"):
                 assert (

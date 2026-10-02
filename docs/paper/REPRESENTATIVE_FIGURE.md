@@ -7,8 +7,9 @@
 ## Manuscript caption
 
 **Fragment-based pose generation, post-generation refinement and confidence selection.**
+All model evaluations in this figure use corrected Rw with frozen released weights.
 This known-pocket redocking overview combines an illustrative N1 generation/refinement
-trajectory and a separate historical Rᵀw N100 candidate bank for the same Astex 1T46–STI complex;
+trajectory and a separate corrected-Rw N100 candidate bank for the same Astex 1T46–STI complex;
 it does not depict a single end-to-end run. A supplied pocket center defines the
 receptor crop, while the ligand is decomposed into rigid fragments. Fragment-level
 SE(3) flow generates a pose (t = 0, 0.488, 0.784 and 1), followed by energy
@@ -48,7 +49,7 @@ Input views use different camera scales to show the complete receptor and pocket
 The same receptor appears behind downstream poses with wider chain context.
 
 Only the selected candidate has a check and green border. The three other
-candidates have no outline or rejection symbol: two have reference RMSD below
+candidates have no outline or rejection symbol: one has reference RMSD below
 2 Å. The **Confidence ranking** panel explicitly labels ranks 1, 25, 50 and 100;
 pRMSD uses dark text and bold values, while retrospective RMSD uses muted text.
 Each rank label is centered vertically beside its two score rows.
@@ -65,8 +66,8 @@ The selected/crystal legend occupies one row. Input branches meet without a
 junction dot, and short arrows keep the existing directions explicit.
 Use the vector PDF at 180 mm two-column width; narrower placement requires
 another layout pass. Molecular captures are raster images; text and ligand
-diagrams remain vector elements. The separate benchmark reference package and
-architecture figure are unchanged.
+diagrams remain vector elements. The architecture figure is unchanged. The current submission package includes
+this Rw illustration and 20 Rw result figures.
 
 ## Recorded states and provenance
 
@@ -77,8 +78,8 @@ architecture figure are unchanged.
 | Extracted pocket | 295 retained heavy atoms in 37 residues as sticks under a translucent molecular surface; unchanged production 10 Å crop |
 | Pose generation | Saved N1/S10 frames 0, 2, 4 and 10, at t = 0, 0.488, 0.784 and 1 |
 | Pose refinement | Recorded CPU refinement of that exact endpoint, steps 0, 50 and 100; step 0 reuses the generated endpoint image |
-| Confidence candidates | Separate historical Rᵀw N100/S10 Astex repeat-0 refined bank, same complex; eligible predicted-RMSD ranks 1, 25, 50 and 100 |
-| Selected pose | Actual selected bank index 41 (zero-based), crystal overlay in unchanged receptor coordinates; symmetry-aware heavy-atom RMSD 0.9585406947604571 Å |
+| Confidence candidates | Separate corrected-Rw N100/S10 Astex repeat-0 refined bank, same complex; eligible predicted-RMSD ranks 1, 25, 50 and 100 |
+| Selected pose | Actual selected bank index 41 (zero-based), crystal overlay in unchanged receptor coordinates; symmetry-aware heavy-atom RMSD 0.9578690776411111 Å |
 
 The four candidates were chosen by predicted rank before inspecting geometry.
 All 100 candidates are chirality-eligible. Their ranks, scores, eligibility and
@@ -90,9 +91,9 @@ or displaced. These four rank-selected examples do not estimate bank diversity.
 | Eligible rank | Bank index (zero-based) | pRMSD (Å) | RMSD (Å) |
 |---|---|---|---|
 | 1 | 41 | 1.59 | 0.96 |
-| 25 | 98 | 2.33 | 1.84 |
-| 50 | 3 | 2.82 | 1.81 |
-| 100 | 84 | 4.44 | 4.31 |
+| 25 | 23 | 2.34 | 2.06 |
+| 50 | 90 | 2.77 | 1.83 |
+| 100 | 84 | 4.42 | 4.31 |
 
 Reference RMSDs for all four were independently reproduced using RDKit `CalcRMS`
 without alignment, to within 1e-6 Å. They are retrospective labels, never selector
@@ -126,7 +127,7 @@ added. Energy-plateau controls are 0.02 absolute / 0.001 relative, patience 5,
 starting at step 25; remaining controls are in the numerical record.
 
 The run reached its **100-step budget**, not a convergence certificate. Combined
-diagnostic energy decreased from 1473.786 to −34.909 kcal/mol. The finite-shell
+diagnostic energy decreased from 1681.374 to −34.513 kcal/mol. The finite-shell
 envelope flag is **false**: the geometry exceeds the region in which the 18 Å
 shell guarantees complete interactions up to the maximum active cutoff. This
 is an illustration of that recorded finite-shell protocol, not a claim of fully
@@ -147,7 +148,9 @@ geometry, energy-group accounting, receptor coordinate containment and stored
 candidate labels. Print-size label bounds, text intersections and overlap with
 molecular images are checked before export. PDF/SVG/PNG exports are checked
 for deterministic reproduction.
-This layout revision performs no inference, optimization, scoring or evaluation.
+This Rw refresh runs only the fixed N1 illustration (seed 42), then refines its
+exact endpoint. The N100 bank, scores and labels are reused from the completed
+Rw study. Standalone rendering itself performs no inference or evaluation.
 
 Optional recapture uses the pinned JavaScript and py3Dmol/Playwright stack
 documented in the [trajectory record](../../benchmarks/results/paper/trajectory/README.md):
@@ -156,7 +159,13 @@ documented in the [trajectory record](../../benchmarks/results/paper/trajectory/
 python -m benchmarks.figures.representative --javascript /path/to/3Dmol-min.js --work-dir /tmp/representative-views --output outputs/paper_figures
 ```
 
-With original source SDF/PDB files, the data exports are reproducible with:
+With the saved Rw N1 results and original source SDF/PDB files, export first:
+
+```bash
+python -m benchmarks.analysis.trajectory_example --root /path/to/source-checkout --output benchmarks/results/paper/trajectory/trace.json
+```
+
+Then the dependent data exports are reproducible with:
 
 ```bash
 python -m benchmarks.analysis.representative_refinement --source-root /path/to/source-checkout
@@ -171,4 +180,6 @@ production crop. Authoritative records under `benchmarks/results/paper/trajector
 are `trace.json`, `representative_refinement.json`, `ligand_diagram.json`,
 `selection_example.json`, `candidate_annotations.json`, `selected_reference.json`
 and `input_pocket.json`. Captures and source-hash metadata are in `views/overview/`.
-Original captures, numerical records, candidate identities and scores are unchanged.
+The source trace/checkpoint hashes and Rw bank hashes identify the current
+illustration. Historical versions remain in Git history and the private archive.
+No benchmark outcome or selector is changed by this refresh.

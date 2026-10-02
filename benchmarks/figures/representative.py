@@ -55,6 +55,8 @@ WIDTH_MM, HEIGHT_MM = 180, 115
 
 def selection_data():
     record = json.loads((DATA / "selection_example.json").read_text())
+    if record.get("orientation_injection") != "rw":
+        raise ValueError("Submitted candidate views require corrected Rw")
     if record["trace_sha256"] != hashlib.sha256((DATA / "trace.json").read_bytes()).hexdigest():
         raise ValueError("Selection illustration has stale trace identity")
     predictions = np.asarray(record["predicted_rmsd"])

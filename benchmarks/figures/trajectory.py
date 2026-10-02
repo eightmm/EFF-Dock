@@ -172,6 +172,8 @@ async def capture(javascript, work):
 
 def verify():
     row = json.loads((DATA / "trace.json").read_text())
+    if row["protocol"].get("orientation_injection") != "rw":
+        raise ValueError("Submitted trajectory requires corrected Rw")
     xyz = np.asarray(row["coordinates"])
     times = np.asarray(row["times"])
     if xyz.shape != (11, 37, 3) or not np.isfinite(xyz).all():

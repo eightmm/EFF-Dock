@@ -1,14 +1,13 @@
-# Current Rw numerical inputs
-
-The primary numerical inputs were refreshed from the complete frozen-weight Rw three-seed study. `rw_report.json` is the campaign summary; `complexity_descriptors.csv` verifies saved fragment counts; `evidence/rw_operator_change.json` and `evidence/selector_bottleneck.json` supply the additional diagnostics. Historical ablations and illustrations remain explicitly identified in captions.
-
 # Numerical source data for the manuscript figures
 
-Primary numerical data describe the completed corrected Rw study; the retained historical ablations are identified individually. The separate [orientation diagnostic](orientation/summary.json) is a one-seed 308-case PB comparison with one disclosed supplement; see [the correction note](../../../docs/ORIENTATION_INJECTION.md).
+All submitted EFF-Dock measurements and illustrations use corrected Rw.
+Primary results come from the complete frozen-weight N100/S10 three-seed study;
+`rw_report.json` is its campaign summary. Released docking/confidence weights
+retain their documented historical training provenance. Legacy guidance/N40,
+pocket/prior and operator-comparison figures are excluded from this submission.
 
-These files reproduce the current 23 figures in
-[docs/paper](../../../docs/paper/README.md) using a public checkout, without
-raw structures, checkpoints, private pose banks or cluster directories.
+The current 20 figures in [docs/paper](../../../docs/paper/README.md) can be
+rendered from this checkout without checkpoints or private benchmark banks:
 
 ```bash
 uv run python -m benchmarks.figures.paper --check
@@ -17,65 +16,64 @@ uv run python -m benchmarks.figures.paper --output outputs/paper_figures
 
 For a figure-only CPU environment, use
 `uv run --locked --only-group dev python -m benchmarks.figures.paper`.
-The development group pins Matplotlib; this form omits the model's CUDA stack.
+The development group pins Matplotlib and omits the model's CUDA stack.
+The renderer produces 20 PDF/PNG pairs plus `source_data.csv`, whose
+`json_pointer` and `value_json` columns index the canonical JSON inputs.
+Source filenames and LaTeX labels remain stable; PDF page order and working
+figure IDs are defined by the [manifest](../../../docs/paper/manifest.json).
 
-The renderer produces 23 PDF/PNG pairs with the published names and a
-`source_data.csv` containing the input values in long form. Its columns are
-`json_pointer` and `value_json`: pointers index the named input tables/arrays,
-and JSON scalars retain numbers, strings, booleans and explicit nulls. The
-hierarchical JSON inputs remain the canonical numerical source.
-
-| Figures | Inputs |
+| Working figure | Inputs |
 |---|---|
 | 1 | `figure_data.json` → `comparison` |
-| 2, 6, 8 | `benchmark_results.json` |
+| 2 | `benchmark_results.json` → current Rw rows |
 | 3, 4, 5 | `figure_data.json` → `complexity_budget` |
-| 7 | `runtime_comparison.json` |
-| 9 | `figure_data.json` → `sequence` (3,158 query records and training witnesses) |
-| 10 | `overlap_summary.json` |
-| 11 | `figure_data.json` → `sequence_performance`, joined to `sequence` |
+| 6 | `rw_runtime.json` |
+| 7 | `figure_data.json` → `sequence` |
+| 8 | `overlap_summary.json` |
+| 9 | `figure_data.json` → `sequence_performance`, joined to `sequence` |
 | S1 | `figure_data.json` → `uncertainty` |
 | S2 | `candidate_metrics.json` |
 | S3 | `figure_data.json` → `complexity_failures` |
 | S4–S9 | `evidence/` JSON and case-level CSV files |
 | S10 | `trajectory/trace.json` and checked molecular captures |
-| S11 | `evidence/rw_operator_change.json` |
-| S12 | `evidence/selector_bottleneck.json` |
+| S11 | `evidence/selector_bottleneck.json` |
 
 `selected_outcomes.csv` contains 24,984 rows: 2,082 external complexes × three
-seeds × raw/refined × ordinary/chirality-filtered selection. Boolean RMSD/PB
-labels refer to the same selected pose. `repeat` is the paired repeat index
-0, 1 or 2, not the generator's seed integer. `state` is the audited failure
-partition. The CSV preserves full denominators and exact-PDB group IDs;
-RMSD-only candidate-bank oracle labels are not substituted for PB labels.
+seeds × raw/refined × ordinary/chirality-filtered selection. RMSD/PB labels
+refer to the same selected pose. Repeat indices are 0, 1 and 2, not seed
+integers. Full denominators, exact-PDB groups and audited failure partitions
+are retained; RMSD-only oracle labels are never substituted for PB labels.
 
-`runtime_metrics.json` and `runtime_comparison.csv` preserve the existing cost
-aggregates. Public [training membership](../../inputs/training_membership/README.md)
-contains the 47,277-sample docking reference and the separate confidence set.
-The [figure manifest](../../../docs/paper/manifest.json) binds numerical inputs,
-figure pages and captions to hashes. `figure_data.json` retains original
-aggregate hashes and local source identifiers; those paths are provenance,
-not required external files for this renderer.
+`rw_runtime.json` aggregates all 6,246 Rw case-seed executions from 240 complete
+pipeline shards. Runtime sums shard wall durations per complex within each
+seed, then reports mean/sample SD over three seeds. Memory is the maximum initial generation/evaluation-process CUDA allocated
+peak, not reserved or whole-pipeline memory. Astex/PoseBusters export candidates
+without initial confidence scoring; PhiBench/FoldBench/OpenBind include raw
+confidence in that process. Separate refinement/scoring processes are excluded
+from the memory peak. Process profiles are retained and are not controlled
+to isolate sampling-only cost.
+Mixed GPU device counts and 720 source-log hashes are retained. This is not
+a controlled hardware comparison or saturated throughput measurement.
+`benchmarks.analysis.rw_runtime` re-collects these records when the immutable
+private source logs are available. Older cost/ablation records remain historical
+provenance and are not plotted in the current package.
 
-## Verification and limits
+Public [training membership](../../inputs/training_membership/README.md)
+contains the executed 47,277-sample docking reference and separate confidence
+set. The sequence analysis retains 3,158 query records and eligible training
+witnesses. Primary selected outcomes, descriptors and similarity inputs are
+unchanged by the submission consolidation.
 
-The renderer verifies input hashes, repeat means/sample SD, cohort/stratum
-counts, cumulative endpoints, failure partitions, training ID hashes and
-witness eligibility. It reconstructs the headline metrics and sequence-bin
-performance from selected-outcome rows. At the earlier 14-figure release, all regenerated PNGs matched the
-published images pixel-for-pixel in the pinned environment during release
-verification; PDF bytes can differ through creation metadata.
+The renderer verifies hashes, repeat statistics, cohort/stratum counts,
+cumulative endpoints, failure partitions, training membership and witness
+eligibility. It reconstructs headline and sequence-bin performance from
+case-level outcomes. Molecular captures verify their exact source hashes,
+frame times, camera and atom identity. Figure rendering does not run inference,
+refinement, PoseBusters, sequence searches or new bootstrap sampling. The
+separate fixed-complex Rw N1 illustration is documented in
+[trajectory/](trajectory/README.md); it is not a new benchmark evaluation.
 
-This is figure reproduction from frozen numerical records. It does not rerun
-model inference, refinement, official PoseBusters, nearest-neighbor sequence
-search, or bootstrap sampling. Source values remain unchanged. The existing
-collector scripts require separately obtained data/pose banks and are not an
-end-to-end raw-data reproduction promise. Fonts/library versions can change
-rendered pixels outside the pinned environment. Use the captions for which
-conditions are main, guided, auxiliary or literature-reported.
-
-The added Figures S4–S9 use [saved-bank evidence](evidence/README.md), with
-[results and interpretation](../../../docs/paper/EVIDENCE.md). Primary data-driven figures now use Rw; historical guidance, runtime and pocket/prior inputs remain legacy. The long-form `source_data.csv` covers the main numerical inputs; the evidence JSON/CSV files supply the supplemental diagnostics.
-
-The 20-figure extension was also regenerated in the figure-only CPU environment
-on 2026-09-23; all 20 PNGs matched the packaged previews pixel-for-pixel.
+See [evidence and limits](../../../docs/paper/EVIDENCE.md) and
+[figure captions](../../../docs/paper/FIGURE_CAPTIONS.md) for selection rules,
+retrospective diagnostics, applicability domains and literature-only values.
+Fonts/library versions can change pixels outside the pinned environment.

@@ -2,7 +2,7 @@
 
 The corrected fragment-to-world feature is **Rw**. The implementation now supports
 it explicitly without changing learned tensor shapes or overwriting released
-weights. Historical checkpoints were trained with **Rᵀw**. The current primary manuscript benchmark figures use the completed corrected **Rw** three-seed study; historical ablations and illustrations remain identified separately.
+weights. Historical checkpoints were trained with **Rᵀw**. All submitted EFF-Dock measurements and illustrations use corrected **Rw**. Legacy guidance/budget and pocket/prior figures and the operator-comparison panel are excluded from the submission package; their numerical records retain historical provenance.
 The correction follows the coordinate convention; the small external comparison
 below does not select a new production model or establish an accuracy gain.
 
@@ -94,7 +94,6 @@ empirical question. No retraining accompanies this correction. The separately au
 
 ## Completed three-seed evaluation
 
-[Operator-change figure](paper/figures/S11_rw_operator_change.pdf) ·
 [Full numerical summary](../benchmarks/results/paper/rw_report.json) ·
 [Protocol](RW_THREE_SEED_PROTOCOL.md)
 
@@ -203,7 +202,7 @@ tests or a finite full-model rotation check do not prove that the entire sampler
 frame reconstruction, confidence selector and refinement pipeline is exactly
 SE(3)-equivariant. SO(3) fragment frames also do not establish reflection invariance
 of stereochemical inputs. Primary manuscript numbers now come from the completed three-seed Rw study.
-Historical ablations retain legacy labels and cannot be presented as corrected-Rw results.
+Historical ablations cannot be presented as corrected-Rw results and are excluded from the current submission package.
 
 ## Verification
 
