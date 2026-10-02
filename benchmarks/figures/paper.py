@@ -19,6 +19,8 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap, to_rgb
 from matplotlib.patches import ConnectionPatch, Patch, Rectangle
 
+from benchmarks.figures.labels import interval_label, mean_label, segment_labels, success_labels
+
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "benchmarks/results/paper"
 NAMES = dict(
@@ -191,11 +193,22 @@ def comparison(data, out):
                 capthick=0.8,
                 zorder=3,
             )
+        for position, r in zip(y, group, strict=True):
+            success_labels(
+                ax,
+                position,
+                r["rmsd_lt2"]["mean"],
+                r["joint"]["mean"],
+                r["rmsd_lt2"]["sd"] if r["source_type"] == "our_run" else 0,
+                r["joint"]["sd"] if r["source_type"] == "our_run" else 0,
+                horizontal=True,
+            )
         ax.axhline(5.75, color="#B9C3CE", linewidth=0.7, linestyle="--")
         ax.text(100, 6.25, "Literature", ha="right", va="center", fontsize=9, color="#68737D")
         ax.set_yticks(y, [r["method"] for r in group])
         ax.invert_yaxis()
-        ax.set_xlim(0, 100)
+        ax.set_xlim(0, 112)
+        ax.set_xticks([0, 25, 50, 75, 100])
         ax.set_xlabel("Success rate (%)")
         ax.set_title(f"{chr(65 + i)}  {name}", loc="left", fontweight="bold")
         ax.grid(axis="x", color="#E1E5EA", lw=0.6)
@@ -275,6 +288,15 @@ def stages_and_pocket(result, out):
                 capsize=2,
                 capthick=0.8,
                 zorder=3,
+            )
+        for position, r in zip(positions, rs, strict=True):
+            success_labels(
+                ax,
+                position,
+                r["rmsd_lt2"]["mean"],
+                r["joint"]["mean"],
+                r["rmsd_lt2"]["sd"],
+                r["joint"]["sd"],
             )
     ax.set_xticks(x, [f"{NAMES[d]}\n(n={COUNTS[d]})" for d in NAMES])
     ax.set_ylim(0, 100)
@@ -691,6 +713,7 @@ def ligand_similarity(data, out):
     for s, label, color in zip(strata, labels, colors, strict=True):
         values = np.array([100 * counts[d][s] / sum(counts[d].values()) for d in NAMES])
         axes[0].bar(x, values, bottom=bottom, color=color, label=label, width=0.65)
+        segment_labels(axes[0], x, values, bottom)
         bottom += values
     axes[0].set_ylabel("Benchmark complexes (%)")
     axes[0].set_title("A  Ligand similarity", loc="left", fontweight="bold")
@@ -712,8 +735,9 @@ def ligand_similarity(data, out):
             )
             for d in NAMES
         ]
-        bars = axes[1].bar(
-            x + (j - 0.5) * 0.34,
+        positions = x + (j - 0.5) * 0.34
+        axes[1].bar(
+            positions,
             [r["joint"]["mean"] for r in rows],
             width=0.32,
             yerr=[r["joint"]["sd"] for r in rows],
@@ -721,9 +745,17 @@ def ligand_similarity(data, out):
             label=label,
             color=color,
         )
-        axes[1].bar_label(
-            bars, labels=[f"n={r['count_per_repeat']}" for r in rows], fontsize=7, padding=6
-        )
+        for position, r in zip(positions, rows, strict=True):
+            mean_label(axes[1], position, r["joint"]["mean"], r["joint"]["sd"])
+            axes[1].text(
+                position,
+                4,
+                str(r["count_per_repeat"]),
+                fontsize=8,
+                ha="center",
+                va="bottom",
+                color="#333840",
+            )
     axes[1].set_ylabel("RMSD <2 Å and PB-valid (%)")
     axes[1].set_title("B  RMSD < 2 Å & PB-valid", loc="left", fontweight="bold")
     axes[1].legend(loc="upper center", bbox_to_anchor=(0.5, -0.34), fontsize=9, frameon=False)
@@ -734,7 +766,8 @@ def ligand_similarity(data, out):
             rotation=25,
             ha="right",
         )
-        ax.set_ylim(0, 100)
+        ax.set_ylim(0, 110)
+        ax.set_yticks([0, 25, 50, 75, 100])
         ax.spines[["top", "right"]].set_visible(False)
     save(fig, out, "10_ligand_similarity")
 
@@ -771,6 +804,7 @@ def sequence_similarity(result, performance, out):
             ax.bar(b, mean[1], width=0.66, color=color, edgecolor="white", linewidth=0)
             for m, s in zip(mean, sd, strict=True):
                 ax.errorbar(b, m, yerr=s, fmt="none", ecolor="#303030", capsize=3, elinewidth=1.25)
+            success_labels(ax, b, mean[0], mean[1], sd[0], sd[1])
             perf.append(
                 dict(dataset=ds, bin=BINS[b], n=len(ids), mean=mean.tolist(), sd=sd.tolist())
             )
@@ -778,7 +812,8 @@ def sequence_similarity(result, performance, out):
         ax.set_xticks(
             range(4), [f"{b}\nn={n}" for b, n in zip(BINS, counts, strict=True)], fontsize=10
         )
-        ax.set_ylim(0, 105)
+        ax.set_ylim(0, 116)
+        ax.set_yticks([0, 25, 50, 75, 100])
         ax.set_xlabel("Sequence identity (%)")
     axes[0, 0].set_ylabel("Success rate (%)")
     axes[1, 0].set_ylabel("Success rate (%)")
@@ -849,6 +884,8 @@ def uncertainty(diag, out):
                     markersize=4,
                     label=label if y == 0 else None,
                 )
+        for y, r in enumerate(rows):
+            interval_label(ax, y, r["complex_bootstrap"]["delta_pp"])
         ax.axvline(0, color="#B9C3CE", linestyle="--", linewidth=0.8)
         ax.set_yticks(range(5), NAMES.values())
         ax.invert_yaxis()

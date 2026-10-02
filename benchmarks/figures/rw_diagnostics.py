@@ -8,6 +8,7 @@ import numpy as np
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
+from benchmarks.figures.labels import interval_label, segment_labels
 from benchmarks.figures.paper import NAMES, save
 
 DATA = Path(__file__).resolve().parents[2] / "benchmarks/results/paper/evidence"
@@ -40,6 +41,7 @@ def render(out):
                 color="#8FB9D8" if fresh else "#E8B395",
                 ms=6,
             )
+            interval_label(ax, i, v)
         ax.axvline(0, color="#8C98A5", ls="--", lw=0.8)
         ax.set_title(title, loc="left", weight="bold")
         ax.set_xlabel("Rw − Rᵀw (percentage points)")
@@ -82,6 +84,7 @@ def render(out):
             edgecolor="white" if j == 3 else c,
             linewidth=0,
         )
+        segment_labels(axes[0], range(5), h, bottom)
         bottom += h
     axes[0].set(ylim=(0, 100), ylabel="Complexes (%)")
     axes[0].set_xticks(

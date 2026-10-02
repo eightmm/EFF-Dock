@@ -38,6 +38,8 @@ Primary benchmark figures now use the complete corrected **Rw**, frozen weights,
 
 Solid segments are RMSD <2 Å and PB-valid. Hatched extensions are RMSD <2 Å and PB-invalid.
 
+Direct labels on the main success bars give RMSD-only means above vertical bars or to the right of horizontal bars, and PB-valid-success means inside solid segments. Percentage means use one decimal; confidence scores, RMSD regret and signed interval estimates use two. Composition labels are restricted to segments of at least 8%; continuous curves retain their existing clean presentation. Captions specify each panel's label convention.
+
 ```bash
 uv run python -m benchmarks.figures.paper --check
 uv run python -m benchmarks.figures.paper --output outputs/paper_figures

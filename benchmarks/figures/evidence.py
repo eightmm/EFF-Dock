@@ -13,6 +13,8 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
+from benchmarks.figures.labels import interval_label, mean_label, success_labels
+
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "benchmarks/results/paper/evidence"
 NAMES = {
@@ -64,8 +66,9 @@ def ranking(data, out):
             stage = "refined" if key is None else ("raw", "refined")[j]
             metric = ("auroc", "average_precision")[j] if key is None else key
             rows = [lookup[ds, stage][metric] for ds in NAMES]
+            positions = x + (j - 0.5) * 0.34
             ax.bar(
-                x + (j - 0.5) * 0.34,
+                positions,
                 [r["mean"] for r in rows],
                 0.32,
                 color=COLORS[j],
@@ -73,17 +76,27 @@ def ranking(data, out):
                 yerr=[r["sd"] or 0 for r in rows],
                 error_kw={"ecolor": DARK, "capsize": 3, "elinewidth": 1.3},
             )
+            for position, r in zip(positions, rows, strict=True):
+                mean_label(
+                    ax,
+                    position,
+                    r["mean"],
+                    r["sd"],
+                    digits=1 if key == "filtered_conditional_success" else 2,
+                )
         ax.set_xticks(
             x, [n.replace(" Diverse Set", "\nDiverse Set") for n in NAMES.values()], fontsize=9
         )
         ax.set_ylabel(ylabel)
         ax.legend(frameon=False, fontsize=9, ncol=2)
         if key in ("spearman", None):
-            ax.set_ylim(0, 1.07)
+            ax.set_ylim(0, 1.2)
+            ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
         elif key == "filtered_conditional_success":
-            ax.set_ylim(0, 112)
+            ax.set_ylim(0, 125)
+            ax.set_yticks([0, 25, 50, 75, 100])
         else:
-            ax.set_ylim(bottom=0)
+            ax.set_ylim(0, ax.get_ylim()[1] * 1.17)
     fig.subplots_adjust(wspace=0.23, hspace=0.4)
     save(fig, out, "S4_confidence_diagnostics")
 
@@ -177,6 +190,18 @@ def subset(data, out):
                     elinewidth=1.1,
                     fmt="none",
                 )
+            upper = max(total + row["top1"]["sd"], joint + row["joint"]["sd"])
+            oracle, oracle_sd = row["oracle"]["mean"], row["oracle"]["sd"]
+            near_oracle = oracle - oracle_sd - 3 < upper + 8 and oracle + oracle_sd + 3 > upper
+            success_labels(
+                ax,
+                x,
+                total,
+                joint,
+                row["top1"]["sd"],
+                row["joint"]["sd"],
+                outside_dx=16 if near_oracle else 0,
+            )
             ax.errorbar(
                 x,
                 row["oracle"]["mean"],
@@ -188,7 +213,8 @@ def subset(data, out):
                 elinewidth=1.1,
             )
         ax.set_xticks([0, 1], [f"{r['subset']}\n(n={r['n']})" for r in rows])
-        ax.set(xlim=(-0.65, 1.65), ylim=(0, 110))
+        ax.set(xlim=(-0.65, 1.65), ylim=(0, 122))
+        ax.set_yticks([0, 25, 50, 75, 100])
     axes[0].set_ylabel("Success rate (%)")
     fig.legend(
         [
@@ -367,6 +393,8 @@ def baselines(data, out):
                 ms=7,
                 label=("RMSD success", "PB-valid success")[j],
             )
+            for i, value in enumerate(point):
+                interval_label(ax, i + (j - 0.5) * 0.23, value)
         ax.set_yticks(
             range(len(methods)),
             [m.replace("+", "+\n", 1) if len(m) > 20 else m for m in methods],
