@@ -65,3 +65,38 @@ def test_paired_bootstrap_preserves_group_weights():
     assert result["complexes"] == 3
     assert result["delta_pp"] == pytest.approx(100 / 3)
     assert result["ci95_pp"] == pytest.approx([100 / 3, 100 / 3])
+
+
+def test_prior_audit_rejects_unreproduced_pools():
+    from benchmarks.analysis.rw_robustness import verify_prior_audit
+
+    with pytest.raises(ValueError, match="reconstruction is incomplete"):
+        verify_prior_audit(
+            dict(
+                status="complete",
+                observed_pools=28296,
+                reproduced_pools=28295,
+                unique_pools=4716,
+                unreproduced_pools=1,
+            )
+        )
+
+
+@pytest.mark.parametrize("drift", [0.001, float("nan")])
+def test_prior_audit_rejects_material_or_nonfinite_rotation_drift(drift):
+    from benchmarks.analysis.rw_robustness import verify_prior_audit
+
+    with pytest.raises(ValueError, match="floating-point bounds"):
+        verify_prior_audit(
+            dict(
+                status="complete",
+                observed_pools=28296,
+                reproduced_pools=28296,
+                unique_pools=4716,
+                unreproduced_pools=0,
+                reran_generation=False,
+                max_difference=dict(
+                    translation_angstrom=0.0, quaternion_component=0.0, rotation_radians=drift
+                ),
+            )
+        )

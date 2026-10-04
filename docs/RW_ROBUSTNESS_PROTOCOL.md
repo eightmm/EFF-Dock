@@ -40,7 +40,8 @@ features use `rw`; cross-operator confidence provenance remains explicit.
 Keep late-power-3 sampling and generation chunks of 10. The center-jitter RNG
 is independent of the docking prior RNG. Matching seeds use the same normal
 translation and rotation draws across sigma arms; sigma scales translations
-only. Within a budget, guided and unguided prior hashes must match. No nested
+only. Bitwise prior identity was the registered within-budget check; the
+post-execution CPU audit below documents its hardware-related deviation. No nested
 N40/N100 prior claim is made.
 
 Only generation preprocessing receives the tested crop and center perturbation.
@@ -102,3 +103,22 @@ before producing valid outputs. Start full execution on the passed 48 GB Ada
 backend; pending 96 GB resource probes may enable pending-task reassignment
 after integrity and memory checks. No generation chunk reduction or failed-case
 exclusion is permitted. Resource probes remain outside reported measurements.
+
+## Post-execution prior identity audit
+
+Strict aggregation initially stopped at unequal initial-pose hashes. Reconstructing
+all 28,296 observed pools (4,716 unique seed/fragment/budget/sigma combinations)
+on the original two CPU backends exactly reproduced every recorded hash. Within
+877 matched combinations, executed conditions used different backend hashes.
+Translation arrays were identical; quaternion components differed by at most
+1.7881393432617188e-7, corresponding to a maximum rotation difference of
+2.8106261854680336e-7 radians (0.0000161 degrees). Thus random seeds and fragment
+inventories match, while initial rotations are not bitwise identical across CPUs.
+This is a documented deviation from the original exact-hash pairing requirement.
+It does not establish hardware-invariant model predictions.
+
+The amended aggregation checks every original hash against its reproduced pool,
+unchanged sampling CSV hashes, complete IDs/seeds and the bounded tensor comparison.
+No candidate generation was rerun, no outcomes were used to select a realization,
+and all numerical model/refinement/confidence settings remain frozen. The public
+numerical export retains the audit summary and its source-manifest hash.

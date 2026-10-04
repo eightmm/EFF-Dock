@@ -22,6 +22,27 @@ def require(test, message):
         raise ValueError(message)
 
 
+def verify_prior_audit(audit):
+    require(
+        audit["status"] == "complete"
+        and audit["observed_pools"] == audit["reproduced_pools"] == 28296
+        and audit["unique_pools"] == 4716
+        and audit["unreproduced_pools"] == 0,
+        "Initial prior reconstruction is incomplete",
+    )
+    require(audit["reran_generation"] is False, "Prior audit regenerated benchmark poses")
+    for name, limit in [
+        ("translation_angstrom", 1e-4),
+        ("quaternion_component", 1e-5),
+        ("rotation_radians", 1e-4),
+    ]:
+        value = audit["max_difference"][name]
+        require(
+            math.isfinite(value) and 0 <= value < limit,
+            "Prior discrepancy exceeds verified floating-point bounds",
+        )
+
+
 def verify(data):
     require(
         data["status"] == "complete" and data["orientation_injection"] == "rw",
@@ -30,6 +51,7 @@ def verify(data):
     require(data["protocol"] == "EFFDOCK-RW-ROBUSTNESS-R3-V1", "Wrong sensitivity protocol")
     require(data["seeds"] == [42, 100042, 200042], "Seed inventory changed")
     require(data["new_executions"] == 27117, "Execution denominator changed")
+    verify_prior_audit(data["prior_audit"])
     cs = data["conditions"]
     require(len(cs) == len({c["id"] for c in cs}) == 24, "Missing or duplicate conditions")
     actual = {(c["cutoff"], c["sigma"], c["jitter"], c["n"], c["steps"], c["guided"]) for c in cs}
@@ -159,7 +181,12 @@ def collect(source, output):
             "baseline_report_sha256",
         ]
     }
-    for key in ["execution_revision", "recovery_manifest_sha256"]:
+    for key in [
+        "execution_revision",
+        "recovery_manifest_sha256",
+        "prior_audit",
+        "prior_audit_manifest_sha256",
+    ]:
         portable[key] = data[key]
     portable["source_report_sha256"] = digest(source)
     portable["selection_ledger_hashes"] = [
