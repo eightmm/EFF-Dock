@@ -1,6 +1,6 @@
 # Corrected-Rw sensitivity experiments
 
-Status: registered; measurements pending. Frozen before new outcomes are opened.
+Status: complete; all 24 conditions verified. Frozen before new outcomes are opened.
 
 Evaluate supplied-pocket sensitivity and the historical guidance/budget controls
 with the released docking and confidence weights, corrected `rw` inference,

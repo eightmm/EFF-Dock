@@ -3,8 +3,8 @@
 All submitted EFF-Dock measurements and illustrations use corrected Rw.
 Primary results come from the complete frozen-weight N100/S10 three-seed study;
 `rw_report.json` is its campaign summary. Released docking/confidence weights
-retain their documented historical training provenance. Legacy guidance/N40,
-pocket/prior and operator-comparison figures are excluded from this submission.
+retain their documented historical training provenance. Pocket/prior and guidance/N40 figures now use complete Rw sensitivity runs;
+the operator-comparison figure remains outside this submission.
 
 The current 20 figures in [docs/paper](../../../docs/paper/README.md) can be
 rendered from this checkout without checkpoints or private benchmark banks:
@@ -77,3 +77,5 @@ See [evidence and limits](../../../docs/paper/EVIDENCE.md) and
 [figure captions](../../../docs/paper/FIGURE_CAPTIONS.md) for selection rules,
 retrospective diagnostics, applicability domains and literature-only values.
 Fonts/library versions can change pixels outside the pinned environment.
+
+`rw_robustness.json` contains verified 24-condition Rw sensitivity aggregates, all three repeat values, fixed denominators and selection-ledger hashes. Recollect with `benchmarks.analysis.rw_robustness`; render with `benchmarks.figures.robustness`.
