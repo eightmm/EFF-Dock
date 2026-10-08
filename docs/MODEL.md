@@ -1,11 +1,13 @@
 # Model contract
 
-Operator version: fresh `configs/train_rw.yaml` training uses corrected `rw`; released checkpoints and their benchmark figures use `legacy_rt_w`. Checkpoint loading preserves the saved convention unless explicitly overridden. See [orientation correction and compatibility](ORIENTATION_INJECTION.md).
+Operator version: fresh `configs/train_rw.yaml` training uses corrected `rw`. Released checkpoints retain their historical `legacy_rt_w` training convention; current manuscript measurements explicitly execute `rw` with those weights frozen. Checkpoint loading preserves the saved convention unless explicitly overridden. See [orientation correction and compatibility](ORIENTATION_INJECTION.md).
 
 EFF-Dock performs fragment-level flow matching on SE(3). A single heterogeneous graph contains ligand atoms, ligand fragments, protein
 atoms, and residue virtual nodes. Edge-typed equivariant message passing
-predicts atom forces, which Newton-Euler aggregation maps to per-fragment
-translation velocity in R3 and observable angular velocity in SO(3).
+predicts atom-vector proposals, which Newton-Euler aggregation maps to per-fragment
+translation velocity and observable angular velocity in the world frame. These
+learned proposals are not assumed to be gradients of a scalar energy; proper
+rotations in SO(3) are integrated from the angular velocities.
 
 The compatibility architecture is configured in `configs/train.yaml` and
 implemented under `src/effdock/models/`. Inputs are variable-size tensor
@@ -39,6 +41,16 @@ Architecture, representation, preprocessing, or output-head changes require a
 new model compatibility version and cannot silently reuse current weights.
 
 ## Pose confidence
+
+Coordinate-only scoring supports the explicit `--confidence-frame-policy
+contextual_v1` option. It uses surrounding molecular coordinates to resolve
+rank-deficient fragment fits while holding the prepared local template fixed.
+The compatibility default remains `historical_kabsch`, and released confidence
+weights were trained with that historical recovery policy. Applying the new
+policy is a recorded frozen-weight feature change, not a retrained or calibrated
+confidence model. For a single prepared-conformer pipeline, refinement and
+confidence scoring also support `--reference-conformer-policy generation`;
+the historical sampling-seed reference remains an explicit reproduction option.
 
 `src/effdock/confidence/` contains the active docking-graph pose-confidence
 model, PLINDER pose-shard dataset, multitask ranking losses, safe checkpoint

@@ -23,12 +23,17 @@ Its time distribution was `0.80 SimpleFold + 0.10 U(0,0.3) + 0.10 exact t=0`.
 The run used fresh AdamW state, EMA decay 0.999, and a registered internal
 PLINDER-validation endpoint.
 
-Internal single-pose rollout success below 2 Angstrom improved from
-192/1,076 at step 0 to 219/1,076 at step 50,000. On the subsequently inspected
-Astex and PoseBusters N100 banks, the model increased the number of
-sub-2-Angstrom candidates but reduced any-hit coverage by five complexes. The
-supported interpretation is improved candidate density on already-solvable
-complexes, not universal coverage improvement.
+Under the original training-time operator and validation protocol, internal
+single-pose rollout success below 2 Angstrom increased from 192/1,076 at step 0
+to 219/1,076 at step 50,000. These are checkpoint-selection records, rather than
+results under the manuscript's inference-time coordinate conventions.
+
+The manuscript evaluation keeps these weights frozen and explicitly uses `rw`
+angular features, generation-consistent ligand references, and `contextual_v1`
+confidence frames. Current external results are in the
+[paired confidence model card](CONFIDENCE_MODEL_CARD.md) and
+[Supplementary Information](../papers/SI.tex). They do not establish a causal
+benefit of individual architecture components or of the original fine-tuning intervention.
 
 ## Limitations
 
@@ -43,5 +48,5 @@ complexes, not universal coverage improvement.
 Exact sample IDs, exclusions and hashes are in
 [training membership](../benchmarks/inputs/training_membership/README.md).
 The public [training specification](../docs/methods/06_training_and_checkpoint_selection.md)
-and [current benchmark report](../docs/BENCHMARK_RESULTS.md) separate this
+and [current manuscript](../papers/main.tex) separate this
 checkpoint's provenance from later three-repeat external characterization.

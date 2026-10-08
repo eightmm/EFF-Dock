@@ -1,4 +1,11 @@
-# Rw manuscript evidence
+# Historical Rw figure evidence
+
+This document describes the earlier saved-bank figure release. Its tables and
+case selections have not been refreshed for the corrected generation-reference
+and confidence-frame evaluation. Use the [canonical article](../../papers/main.pdf),
+[Supplementary Information](../../papers/SI.pdf) and [Source Data guide](../../papers/data/README.md)
+for the current manuscript results. Retaining this document supports interpretation
+and reproduction of the historical tables; its values are not current submission results.
 
 Completed corrected Rw, frozen released docking/confidence weights, unguided N100/S10, 10 Å supplied pocket, physical/interaction energy refinement, input-chirality-filtered minimum-pRMSD selection. Seeds 42, 100042 and 200042. Every original complex is retained. Benchmark statistics are derived from the completed study without new cohort inference, training, reference-based selection or tuned thresholds. One fixed-complex Rw N1 run supplies the separate method illustration.
 

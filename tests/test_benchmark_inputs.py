@@ -16,8 +16,49 @@ from effdock.workflows.benchmark_inputs import (
     load_benchmark_inputs,
     load_benchmark_ligand,
     mapping_sha256,
+    prepared_ligand_identity,
+    reference_conformer_seed,
     sorted_id_sha256,
 )
+
+
+def test_reference_conformer_seed_preserves_zero_and_never_uses_sampling_implicitly() -> None:
+    record = {"ligand_conformer_seed": "0", "sampling_seed": "43"}
+    assert reference_conformer_seed(record, policy="generation") == 0
+    assert reference_conformer_seed(record, policy="historical_sampling") == 43
+    with pytest.raises(ValueError, match="no implicit"):
+        reference_conformer_seed({"sampling_seed": 43}, policy="generation")
+
+
+@pytest.mark.parametrize("value", [None, "", "1.5", 1.5, True, -1, "-1"])
+def test_reference_conformer_seed_rejects_invalid_values(value) -> None:
+    with pytest.raises(ValueError):
+        reference_conformer_seed({"ligand_conformer_seed": value}, policy="generation")
+
+
+def test_prepared_ligand_identity_binds_coordinates_atom_order_and_fragments() -> None:
+    mol = Chem.MolFromSmiles("CCO")
+    conf = Chem.Conformer(3)
+    for i, xyz in enumerate(((0., 0., 0.), (1.4, 0., 0.), (2.2, 1., 0.))):
+        conf.SetAtomPosition(i, xyz)
+    mol.AddConformer(conf)
+    original = prepared_ligand_identity(mol, [0, 0, 1])
+    assert original == prepared_ligand_identity(Chem.Mol(mol), [0, 0, 1])
+    assert original != prepared_ligand_identity(mol, [0, 1, 1])
+    assert original != prepared_ligand_identity(Chem.RenumberAtoms(mol, [2, 1, 0]), [1, 0, 0])
+    moved = Chem.Mol(mol)
+    moved.GetConformer().SetAtomPosition(0, (0.01, 0., 0.))
+    assert original != prepared_ligand_identity(moved, [0, 0, 1])
+
+
+def test_prepared_identity_binds_same_element_index_connectivity() -> None:
+    # Coincident coordinates isolate graph identity from coordinate and element hashes.
+    left = Chem.MolFromSmiles("CCCC")
+    right = Chem.RenumberAtoms(left, [0, 2, 1, 3])
+    for mol in (left, right):
+        mol.AddConformer(Chem.Conformer(4))
+    assert Chem.MolToSmiles(left, canonical=False) == Chem.MolToSmiles(right, canonical=False)
+    assert prepared_ligand_identity(left, [0] * 4) != prepared_ligand_identity(right, [0] * 4)
 
 
 @pytest.mark.parametrize(

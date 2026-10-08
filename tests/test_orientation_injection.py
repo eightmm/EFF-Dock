@@ -200,6 +200,56 @@ def test_confidence_runtime_discloses_cross_operator_features(monkeypatch):
             )
 
 
+def test_contextual_confidence_policy_is_explicit_and_reaches_feature_extraction(monkeypatch):
+    import effdock.confidence.runtime as runtime
+
+    parser = build_arg_parser()
+    args = ["--protein", "protein.pdb", "--ligand", "CC", "--pocket-center", "0,0,0"]
+    assert options_from_args(parser.parse_args(args)).confidence_frame_policy == "historical_kabsch"
+    assert (
+        options_from_args(
+            parser.parse_args([*args, "--confidence-frame-policy", "contextual_v1"])
+        ).confidence_frame_policy
+        == "contextual_v1"
+    )
+    docking = nn.Module()
+    docking.orientation_injection = "rw"
+    confidence = nn.Module()
+    confidence.docking_orientation_injection = "rw"
+    confidence.confidence_frame_policy = "historical_kabsch"
+
+    def stop(*_args, **kwargs):
+        assert kwargs["frame_policy"] == "contextual_v1"
+        raise RuntimeError("contextual extraction reached")
+
+    monkeypatch.setattr(runtime, "extract_t1_ligand_irreps", stop)
+    with pytest.warns(UserWarning, match="frozen-weight recovery-policy"):
+        with pytest.raises(RuntimeError, match="contextual extraction reached"):
+            runtime.score_poses_with_confidence(
+                confidence,
+                docking,
+                {},
+                {},
+                {},
+                [torch.zeros(1, 3)],
+                sigma=2.0,
+                device=torch.device("cpu"),
+                frame_policy="contextual_v1",
+            )
+    with pytest.raises(ValueError, match="unknown confidence frame policy"):
+        runtime.score_poses_with_confidence(
+            confidence,
+            docking,
+            {},
+            {},
+            {},
+            [],
+            sigma=2.0,
+            device=torch.device("cpu"),
+            frame_policy="unversioned",
+        )
+
+
 def test_weights_only_migration_records_source_operator(tmp_path):
     source = nn.Linear(2, 1)
     path = tmp_path / "old.pt"

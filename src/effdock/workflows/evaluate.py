@@ -17,6 +17,7 @@ import torch
 from rdkit import Chem
 
 from effdock.checkpoint import ORIENTATION_INJECTIONS, checkpoint_orientation_injection
+from effdock.confidence.features import FRAME_RECOVERY_POLICIES
 from effdock.evaluation.benchmark import (
     apply_refinement,
     compute_pose_rmsd_with_method,
@@ -713,7 +714,10 @@ def evaluate_one(
     fk_resample_rotation_jitter: float = 0.0,
     translation_sde_base_sigma: float = 0.0,
     ligand_conformer_seed: int | None = None,
+    confidence_frame_policy: str = "historical_kabsch",
 ) -> dict:
+    if confidence_frame_policy not in FRAME_RECOVERY_POLICIES:
+        raise ValueError(f"unknown confidence frame policy: {confidence_frame_policy!r}")
     if selector_profile not in SELECTOR_PROFILES:
         raise ValueError(f"unknown selector profile: {selector_profile!r}")
     cluster_free_profile = selector_profile == "confidence_cluster_free"
@@ -1190,6 +1194,7 @@ def evaluate_one(
             poses,
             sigma=sample_sigmas(results, sigma),
             device=device,
+            frame_policy=confidence_frame_policy,
         )
         if cluster_free_profile:
             confidence_indices = select_confidence_cluster_free(
@@ -1332,6 +1337,7 @@ def evaluate_one(
     row = {
         "id": item.complex_id,
         "selector_profile": selector_profile,
+        **({"confidence_frame_policy": confidence_frame_policy} if confidence_scores is not None else {}),
         "protein": str(item.protein),
         "ligand_ref": str(item.ligand_ref),
         "protein_sha256": file_sha256(item.protein),
@@ -1595,6 +1601,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Disable learned confidence evaluation.",
     )
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument(
+        "--confidence-frame-policy", choices=FRAME_RECOVERY_POLICIES,
+        default="historical_kabsch",
+        help="Terminal confidence frame recovery; contextual_v1 uses only input ligand/receptor context.",
+    )
     parser.add_argument(
         "--orientation-injection",
         choices=ORIENTATION_INJECTIONS,
@@ -2071,6 +2082,7 @@ def main(argv: list[str] | None = None) -> None:
                 fk_resample_rotation_jitter=args.fk_resample_rotation_jitter,
                 translation_sde_base_sigma=args.translation_sde_base_sigma,
                 ligand_conformer_seed=args.ligand_conformer_seed,
+                confidence_frame_policy=args.confidence_frame_policy,
             )
             rows.append(row)
             selector_log = f"first={row['first_rmsd']:.3f} "
@@ -2242,6 +2254,8 @@ def main(argv: list[str] | None = None) -> None:
         ),
         "checkpoint_sha256": file_sha256(args.checkpoint),
         "orientation_injection": model.orientation_injection,
+        "confidence_frame_policy": args.confidence_frame_policy if confidence_model is not None else None,
+        "confidence_training_frame_policy": getattr(confidence_model, "confidence_frame_policy", None),
         "orientation_injection_requested": args.orientation_injection or "checkpoint",
         "checkpoint_orientation_injection": checkpoint_orientation_injection(ckpt),
         "confidence_docking_orientation_injection": (

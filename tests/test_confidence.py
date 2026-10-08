@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import pytest
 import torch
 
+from effdock.confidence.features import recover_frag_state
 from effdock.confidence.losses import pose_confidence_loss
 from effdock.confidence.selectors import (
     ConfidenceFilterConfig,
     select_confidence_filter,
     select_confidence_poses,
 )
+from effdock.geometry.se3 import quaternion_to_matrix
 from effdock.preprocess.graph_types import NTYPE_PROT_ATOM
 from effdock.workflows.tune_confidence_filter import _select_batch
 
@@ -246,3 +249,147 @@ def test_selection_losses_reward_successful_pose_ranking() -> None:
     correctly_ranked = selection_loss(torch.tensor([2.0, 1.0, -1.0, -2.0]))
     incorrectly_ranked = selection_loss(torch.tensor([-2.0, -1.0, 1.0, 2.0]))
     assert correctly_ranked < incorrectly_ranked
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+@pytest.mark.parametrize("first", ["line", "plane", "full"])
+def test_contextual_recovery_is_se3_covariant_and_preserves_geometry(dtype, first):
+    fragments = {
+        "line": [[-1.0, -0.3, -0.2], [0.0, 0.0, 0.0], [1.0, 0.3, 0.2]],
+        "plane": [[0.0, 0.0, 0.0], [1.0, 0.2, 0.0], [-0.2, 0.8, 0.0]],
+        "full": [[0.0, 0.0, 0.0], [1.0, 0.2, 0.0], [-0.2, 0.8, 0.1], [0.1, -0.3, 1.0]],
+    }
+    left = torch.tensor(fragments[first], dtype=dtype)
+    right = torch.tensor(fragments["full"], dtype=dtype) + torch.tensor(
+        [3.0, 2.0, 1.0], dtype=dtype
+    )
+    template = torch.cat((left, right))
+    ids = torch.tensor([0] * len(left) + [1] * len(right))
+    centers = torch.stack((left.mean(0), right.mean(0)))
+    local = template - centers[ids]
+    rotation = quaternion_to_matrix(torch.tensor([0.7, 0.2, -0.4, 0.5], dtype=dtype))
+    change = quaternion_to_matrix(torch.tensor([0.1, -0.7, 0.2, 0.3], dtype=dtype))
+    translation = torch.tensor([2.3, -1.7, 0.5], dtype=dtype)
+    posed = template @ rotation.T + translation
+    T, q = recover_frag_state(
+        posed, local, ids, 2, frame_policy="contextual_v1", template_atom_pos=template
+    )
+    R = quaternion_to_matrix(q)
+    changed = posed @ change.T + translation
+    new_T, new_q = recover_frag_state(
+        changed, local, ids, 2, frame_policy="contextual_v1", template_atom_pos=template
+    )
+    new_R = quaternion_to_matrix(new_q)
+    tolerance = 3e-5 if dtype == torch.float32 else 1e-10
+    assert torch.allclose(new_T, T @ change.T + translation, atol=tolerance, rtol=0)
+    assert torch.allclose(new_R, change @ R, atol=tolerance, rtol=0)
+    assert torch.allclose(R, rotation.expand_as(R), atol=tolerance, rtol=0)
+    assert torch.allclose(torch.linalg.det(R), torch.ones(2, dtype=dtype), atol=tolerance, rtol=0)
+    reconstructed = torch.einsum("nij,nj->ni", R[ids], local) + T[ids]
+    assert torch.allclose(reconstructed, posed, atol=tolerance, rtol=0)
+    if first != "line":
+        old_T, old_q = recover_frag_state(posed, local, ids, 2)
+        assert torch.equal(T, old_T) and torch.equal(q, old_q)
+
+
+def test_contextual_rank_one_recovery_uses_receptor_when_ligand_is_collinear():
+    local = torch.tensor([[-1.0, 0.0, 0.0], [1.0, 0.0, 0.0]], dtype=torch.float64)
+    ids = torch.zeros(2, dtype=torch.long)
+    pose = local + torch.tensor([1.0, 3.0, -2.0], dtype=torch.float64)
+    context = torch.tensor([[0.0, 1.0, 2.0], [2.0, -1.0, 3.0]], dtype=torch.float64)
+    Q = quaternion_to_matrix(torch.tensor([0.7, 0.2, 0.3, -0.4], dtype=torch.float64))
+    shift = torch.tensor([0.8, -1.1, 0.2], dtype=torch.float64)
+    T, q = recover_frag_state(
+        pose, local, ids, 1, frame_policy="contextual_v1", receptor_atom_pos=context
+    )
+    new_T, new_q = recover_frag_state(
+        pose @ Q.T + shift,
+        local,
+        ids,
+        1,
+        frame_policy="contextual_v1",
+        receptor_atom_pos=context @ Q.T + shift,
+    )
+    assert torch.allclose(
+        quaternion_to_matrix(new_q), Q @ quaternion_to_matrix(q), atol=1e-10, rtol=0
+    )
+    assert torch.allclose(new_T, T @ Q.T + shift, atol=1e-10, rtol=0)
+
+
+def test_contextual_singleton_frame_is_covariant():
+    pose = torch.tensor([[1.0, 2.0, 3.0]], dtype=torch.float64)
+    context = torch.tensor([[2.0, 3.0, 5.0], [0.0, 5.0, 1.0]], dtype=torch.float64)
+    ids = torch.zeros(1, dtype=torch.long)
+    Q = quaternion_to_matrix(torch.tensor([0.7, 0.2, 0.3, -0.4], dtype=torch.float64))
+    _, q = recover_frag_state(
+        pose,
+        torch.zeros_like(pose),
+        ids,
+        1,
+        frame_policy="contextual_v1",
+        receptor_atom_pos=context,
+    )
+    _, changed_q = recover_frag_state(
+        pose @ Q.T,
+        torch.zeros_like(pose),
+        ids,
+        1,
+        frame_policy="contextual_v1",
+        receptor_atom_pos=context @ Q.T,
+    )
+    assert torch.allclose(
+        quaternion_to_matrix(changed_q), Q @ quaternion_to_matrix(q), atol=1e-10, rtol=0
+    )
+
+
+@pytest.mark.parametrize("height", [1e-7, 1e-3])
+def test_contextual_nearly_collinear_template_has_covariant_frame(height):
+    template = torch.tensor(
+        [[-1.0, 0.0, 0.0], [0.0, height, 0.0], [1.0, 0.0, 0.0], [0.2, 2.0, 1.0], [0.3, 2.5, -1.0]],
+        dtype=torch.float64,
+    )
+    ids = torch.tensor([0, 0, 0, 1, 1])
+    centers = torch.stack((template[:3].mean(0), template[3:].mean(0)))
+    local = template - centers[ids]
+    Q = quaternion_to_matrix(torch.tensor([0.7, 0.2, 0.3, -0.4], dtype=torch.float64))
+    _, q = recover_frag_state(
+        template, local, ids, 2, frame_policy="contextual_v1", template_atom_pos=template
+    )
+    _, new_q = recover_frag_state(
+        template @ Q.T, local, ids, 2, frame_policy="contextual_v1", template_atom_pos=template
+    )
+    assert torch.allclose(
+        quaternion_to_matrix(new_q), Q @ quaternion_to_matrix(q), atol=1e-9, rtol=0
+    )
+
+
+def test_contextual_recovery_rejects_unobservable_scene_and_collapsed_fragment():
+    local = torch.tensor([[-1.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
+    ids = torch.zeros(2, dtype=torch.long)
+    with pytest.raises(ValueError, match="no context perpendicular"):
+        recover_frag_state(local, local, ids, 1, frame_policy="contextual_v1")
+    with pytest.raises(ValueError, match="observed fragment is collapsed"):
+        recover_frag_state(torch.zeros_like(local), local, ids, 1, frame_policy="contextual_v1")
+    with pytest.raises(ValueError, match="collapsed multi-atom template"):
+        recover_frag_state(local, torch.zeros_like(local), ids, 1, frame_policy="contextual_v1")
+    with pytest.raises(ValueError, match="nonfinite"):
+        recover_frag_state(local * float("nan"), local, ids, 1, frame_policy="contextual_v1")
+
+
+def test_contextual_recovery_uses_each_pose_independently():
+    template = torch.tensor([[-1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 2.0, 1.0]])
+    ids = torch.tensor([0, 0, 1, 1])
+    local = template - torch.stack((template[:2].mean(0), template[2:].mean(0)))[ids]
+    _, q = recover_frag_state(
+        template, local, ids, 2, frame_policy="contextual_v1", template_atom_pos=template
+    )
+    jitter = template.clone()
+    jitter[2:, 2] += 1e-6
+    _, perturbed_q = recover_frag_state(
+        jitter, local, ids, 2, frame_policy="contextual_v1", template_atom_pos=template
+    )
+    _, repeated_q = recover_frag_state(
+        template, local, ids, 2, frame_policy="contextual_v1", template_atom_pos=template
+    )
+    assert torch.equal(q, repeated_q)
+    assert float((quaternion_to_matrix(q) - quaternion_to_matrix(perturbed_q)).abs().max()) < 3e-6

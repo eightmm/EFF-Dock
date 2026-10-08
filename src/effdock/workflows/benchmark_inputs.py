@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Any
 
-from rdkit import Chem
+from rdkit import Chem, rdBase
 
 from effdock.inference.preprocess import load_ligand as load_generic_ligand
 
@@ -39,6 +40,56 @@ class BenchmarkInputMismatchError(ValueError):
             "message": self.message,
             "details": self.details,
         }
+
+
+def reference_conformer_seed(record: dict[str, Any], *, policy: str) -> int:
+    """Keep the prepared-conformer seed distinct from the sampling RNG seed."""
+    fields = {"generation": "ligand_conformer_seed", "historical_sampling": "sampling_seed"}
+    if policy not in fields:
+        raise ValueError(f"unsupported reference conformer policy: {policy!r}")
+    field = fields[policy]
+    value = record.get(field)
+    if isinstance(value, bool) or not isinstance(value, (int, str)):
+        raise ValueError(f"missing or invalid {field}; no implicit conformer-seed fallback")
+    try:
+        seed = int(value)
+    except ValueError as exc:
+        raise ValueError(f"invalid {field}: {value!r}") from exc
+    if seed < 0:
+        raise ValueError(f"{field} must be non-negative")
+    return seed
+
+
+def prepared_ligand_identity(mol: Chem.Mol, fragment_ids: list[int]) -> dict[str, Any]:
+    """Bind atom order, conformer coordinates and fragment assignment for replay."""
+    if mol.GetNumConformers() != 1 or len(fragment_ids) != mol.GetNumAtoms():
+        raise ValueError("prepared ligand must have one conformer and one fragment ID per atom")
+    coords = mol.GetConformer().GetPositions()
+    if not all(math.isfinite(float(x)) for row in coords for x in row):
+        raise ValueError("prepared ligand coordinates must be finite")
+    if any(isinstance(f, bool) or not isinstance(f, int) or f < 0 for f in fragment_ids):
+        raise ValueError("prepared ligand fragment IDs must be non-negative integers")
+    payload = {
+        "schema_version": "effdock.prepared_ligand_identity.v1",
+        "rdkit_version": rdBase.rdkitVersion,
+        "preparation_contract": HEAVY_ATOM_POLICY,
+        "preparation_source_sha256": file_sha256(Path(__file__).resolve().parents[1] / "inference/preprocess.py"),
+        "fragmentation_source_sha256": file_sha256(Path(__file__).resolve().parents[1] / "preprocess/fragments.py"),
+        "atom_ordered_smiles": Chem.MolToSmiles(mol, canonical=False, isomericSmiles=True),
+        "indexed_atoms": [
+            [atom.GetAtomicNum(), atom.GetIsotope(), atom.GetFormalCharge(), int(atom.GetChiralTag())]
+            for atom in mol.GetAtoms()
+        ],
+        "indexed_bonds": [
+            [bond.GetBeginAtomIdx(), bond.GetEndAtomIdx(), str(bond.GetBondType()),
+             int(bond.GetStereo()), list(bond.GetStereoAtoms()), int(bond.GetBondDir())]
+            for bond in mol.GetBonds()
+        ],
+        "coordinates_sha256": hashlib.sha256(coords.astype("<f8").tobytes()).hexdigest(),
+        "fragment_ids": fragment_ids,
+    }
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    return {**payload, "sha256": hashlib.sha256(canonical).hexdigest()}
 
 
 def file_sha256(path: Path) -> str:
@@ -359,5 +410,7 @@ __all__ = [
     "load_benchmark_inputs",
     "load_benchmark_ligand",
     "mapping_sha256",
+    "prepared_ligand_identity",
+    "reference_conformer_seed",
     "sorted_id_sha256",
 ]

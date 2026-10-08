@@ -9,7 +9,7 @@ from typing import Any
 import torch
 
 from effdock.checkpoint import load_portable_model_state, validate_orientation_injection
-from effdock.confidence.features import extract_t1_ligand_irreps
+from effdock.confidence.features import FRAME_RECOVERY_POLICIES, extract_t1_ligand_irreps
 from effdock.confidence.model import DockingGraphPoseConfidence
 
 
@@ -47,6 +47,11 @@ def load_pose_confidence_model(
     model.docking_orientation_injection = validate_orientation_injection(
         ckpt.get("docking_orientation_injection", "legacy_rt_w")
     )
+    model.confidence_frame_policy = ckpt.get("confidence_frame_policy", "historical_kabsch")
+    if model.confidence_frame_policy not in FRAME_RECOVERY_POLICIES:
+        raise ValueError(
+            f"unknown checkpoint confidence frame policy: {model.confidence_frame_policy!r}"
+        )
     model.eval()
     return model, ckpt
 
@@ -68,13 +73,24 @@ def score_poses_with_confidence(
     sigma: float | torch.Tensor,
     device: torch.device,
     hidden_dtype: torch.dtype = torch.float32,
+    frame_policy: str = "historical_kabsch",
 ) -> list[dict[str, float]]:
+    if frame_policy not in FRAME_RECOVERY_POLICIES:
+        raise ValueError(f"unknown confidence frame policy: {frame_policy!r}")
     feature_mode = getattr(docking_model, "orientation_injection", "legacy_rt_w")
     trained_mode = getattr(confidence_model, "docking_orientation_injection", "legacy_rt_w")
     if feature_mode != trained_mode:
         warnings.warn(
             f"Confidence was trained on {trained_mode} docking features, but is scoring "
             f"{feature_mode} features. This is a cross-operator frozen-weight evaluation.",
+            UserWarning,
+            stacklevel=2,
+        )
+    trained_frame = getattr(confidence_model, "confidence_frame_policy", "historical_kabsch")
+    if frame_policy != trained_frame:
+        warnings.warn(
+            f"Confidence was trained with {trained_frame} recovered frames, but is scoring "
+            f"{frame_policy} frames. This is a frozen-weight recovery-policy evaluation.",
             UserWarning,
             stacklevel=2,
         )
@@ -88,6 +104,7 @@ def score_poses_with_confidence(
         sigma=sigma,
         device=device,
         hidden_dtype=hidden_dtype,
+        frame_policy=frame_policy,
     )
     graph_centered = {
         key: value.detach().cpu() for key, value in graph.items() if torch.is_tensor(value)

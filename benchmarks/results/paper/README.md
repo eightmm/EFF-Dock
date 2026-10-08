@@ -1,12 +1,19 @@
-# Numerical source data for the manuscript figures
+# Historical numerical source data
 
-All submitted EFF-Dock measurements and illustrations use corrected Rw.
-Primary results come from the complete frozen-weight N100/S10 three-seed study;
+These tables and rendering commands reproduce the earlier figure release.
+They do not reproduce the corrected generation-reference and confidence-frame
+evaluation used in the current article. Use [papers/data/](../../../papers/data/README.md)
+for current Source Data and [papers/](../../../papers) for the article, Supplementary
+Information and figure captions. Historical case-level records remain available
+for the existing collectors and verifiers.
+
+All EFF-Dock measurements and illustrations in this historical release use corrected Rw.
+Historical primary results come from the complete frozen-weight N100/S10 three-seed study;
 `rw_report.json` is its campaign summary. Released docking/confidence weights
-retain their documented historical training provenance. Pocket/prior and guidance/N40 figures now use complete Rw sensitivity runs;
-the operator-comparison figure remains outside this submission.
+retain their documented historical training provenance. The historical pocket/prior
+and guidance/N40 figures use the complete earlier Rw sensitivity runs.
 
-The current 20 figures in [docs/paper](../../../docs/paper/README.md) can be
+The historical figure set recorded in the [manifest](../../../docs/paper/manifest.json) can be
 rendered from this checkout without checkpoints or private benchmark banks:
 
 ```bash
@@ -17,9 +24,9 @@ uv run python -m benchmarks.figures.paper --output outputs/paper_figures
 For a figure-only CPU environment, use
 `uv run --locked --only-group dev python -m benchmarks.figures.paper`.
 The development group pins Matplotlib and omits the model's CUDA stack.
-The renderer produces 20 PDF/PNG pairs plus `source_data.csv`, whose
+The renderer produces PDF/PNG pairs plus `source_data.csv`, whose
 `json_pointer` and `value_json` columns index the canonical JSON inputs.
-Source filenames and LaTeX labels remain stable; PDF page order and working
+Historical source filenames and LaTeX labels remain stable; PDF page order and working
 figure IDs are defined by the [manifest](../../../docs/paper/manifest.json).
 
 | Working figure | Inputs |
@@ -56,13 +63,13 @@ Mixed GPU device counts and 720 source-log hashes are retained. This is not
 a controlled hardware comparison or saturated throughput measurement.
 `benchmarks.analysis.rw_runtime` re-collects these records when the immutable
 private source logs are available. Older cost/ablation records remain historical
-provenance and are not plotted in the current package.
+provenance and are not plotted in this historical package.
 
 Public [training membership](../../inputs/training_membership/README.md)
 contains the executed 47,277-sample docking reference and separate confidence
 set. The sequence analysis retains 3,158 query records and eligible training
 witnesses. Primary selected outcomes, descriptors and similarity inputs are
-unchanged by the submission consolidation.
+unchanged by that historical submission consolidation.
 
 The renderer verifies hashes, repeat statistics, cohort/stratum counts,
 cumulative endpoints, failure partitions, training membership and witness

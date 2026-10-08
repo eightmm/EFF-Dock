@@ -1,12 +1,16 @@
 # Current manuscript methods
 
-**Version boundary:** current primary manuscript numbers use the completed corrected `rw` three-seed evaluation with frozen, legacy-trained released weights. Historical guidance/budget/runtime/pocket ablations and illustrations retain `legacy_rt_w` provenance. See [operator equations, evidence and compatibility](ORIENTATION_INJECTION.md); the update uses fresh corrected outputs rather than relabelling historical values.
+The canonical manuscript [Methods](../papers/main.tex) and
+[Supplementary Information](../papers/SI.tex) define the current scientific
+protocols and equations. [Figure captions](../papers/figure_captions.md)
+specify each reported condition. This overview and the
+[implementation notes](methods/README.md) describe the released pair and its
+source code; they are not separate versions of the manuscript.
 
-This overview describes the released docking/confidence pair and the current
-23-figure package. The [detailed methods](methods/README.md) contain equations,
-dimensions, parameter tables and implementation links. [Prism methods](paper/prism/methods.tex)
-provide editable LaTeX; [figure captions](paper/FIGURE_CAPTIONS.md) define each
-reported condition.
+The manuscript evaluation uses explicit `rw` angular features,
+`contextual_v1` confidence frames and generation-consistent ligand references,
+with the released weights frozen. Training and compatibility conventions are
+documented in [the coordinate contract](ORIENTATION_INJECTION.md).
 
 ## Task and checkpoints
 
@@ -101,25 +105,32 @@ all-candidates-fail chirality fallback.
 RMSD is symmetry-aware, no-alignment heavy-atom RDKit CalcRMS, with strict
 threshold <2 Å. PB-valid success requires that same selected pose to pass the
 official PoseBusters evaluator. All original denominators remain. Benchmarks
-are Astex Diverse Set (85), PoseBusters v2 (308), PhiBench (206; three reconstructed
-cases), FoldBench (558) and OpenBind (925; auxiliary single-protease set including
-two flagged noncovalent approximations of covalent systems). FoldBench PB uses
-three disclosed energy-reference InChI compatibility repairs. Dataset v2 and
-PoseBusters software version are distinct identifiers.
+are Astex Diverse Set (85), PoseBusters v2 (308), PhiBench-derived (206 locally
+selected cases; three reconstructed cases), FoldBench (558) and OpenBind
+(925; auxiliary single-protease set including two flagged noncovalent
+approximations of covalent systems). Astex/PoseBusters use native redock;
+the three temporal cohorts use the disclosed InChI energy-reference
+compatibility adapter. Dataset v2 and PoseBusters software version are distinct
+identifiers.
 
 Frozen benchmark pocket centres can be reference-ligand-derived, and receptors
-can be holo structures. Reference coordinates serve mapping/evaluation
-purposes, not the learned field, confidence ranking or minimized energy.
+can be holo structures. Primary benchmark ligand templates are prepared from
+ligand chemistry using the recorded generation preparation. Crystal-ligand
+coordinates provide the supplied pocket definition, atom-mapping references
+and evaluation labels; they are not candidate-ranking inputs or the molecular
+templates used for primary refinement.
 These retrospective redocking results do not establish blind docking,
 prospective screening, affinity prediction or cofolding performance.
 
 ## Figure data and statistical interpretation
 
-The [numerical source package](../benchmarks/results/paper/README.md) renders
-all 23 figures from versioned files. It includes 24,984 selected-outcome rows,
-3,158 relatedness records across six cohorts and the original aggregate values.
-Figures retain three-seed sample SD; paired differences use 2,000-resample
-95% percentile CIs, comparing complex and exact-PDB-group resampling.
+The canonical [Source Data](../papers/data) provide the numerical inputs and
+provenance of current manuscript figures. The older
+[renderer inputs](../benchmarks/results/paper/README.md) describe historical
+analyses and must not be substituted for the current results. Figures report
+sample SD across three fixed-weight inference repeats; paired differences use
+2,000-resample 95% percentile intervals, comparing complex and exact-PDB-group
+resampling where specified in the captions.
 
 Relatedness uses the 47,277 docking samples. Binding-chain identity is
 query-normalized over one-to-one chain assignments within a training sample;
@@ -130,7 +141,7 @@ Validation is included in relatedness composition but has no matched
 three-repeat external performance bank.
 
 Opened external cohorts are descriptive and do not select checkpoints.
-Guidance/budget, guided pocket/prior robustness, and literature baselines
-retain their separately captioned protocols. PoseX is outside this figure
-package. No new training, inference or external-outcome tuning accompanies
-this documentation/source-data release.
+Unguided generation-input sensitivity, supplementary guided controls and
+literature baselines retain their separately captioned protocols. Released
+weights remain frozen; these evaluations do not tune checkpoints or thresholds
+using external outcomes.

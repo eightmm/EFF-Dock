@@ -39,7 +39,19 @@ from scripts.run_guidance_sdf_post_refinement import (  # noqa: E402
     _persisted_energy_groups,
     _select_record,
     _tensor_sha256,
+    _validate_generation_template,
 )
+
+
+def test_generation_witness_checks_all_raw_poses_without_reference_labels() -> None:
+    local = torch.tensor([[0., 0., 0.], [1., 0., 0.], [0., 1., 0.]])
+    local -= local.mean(0)
+    ligand = {"frag_local_coords": local, "fragment_id": torch.zeros(3, dtype=torch.long)}
+    poses = torch.stack([local, local + torch.tensor([5., 7., -4.])])
+    assert _validate_generation_template(poses, ligand)["max_raw_reconstruction_rmsd_angstrom"] < 1e-5
+    poses[-1, 0, 0] += 0.1
+    with pytest.raises(ValueError, match="does not reconstruct"):
+        _validate_generation_template(poses, ligand)
 from scripts.run_guidance_sdf_post_refinement_posebusters_shard import (  # noqa: E402
     _validated_checks,
 )
@@ -50,7 +62,29 @@ from scripts.score_guidance_sdf_post_refinement_confidence import (  # noqa: E40
     _chunk_ranges,
     _load_refinement,
     _select_index,
+    _validate_prepared_reference,
 )
+
+
+def test_confidence_requires_matching_generation_policy_and_prepared_identity() -> None:
+    identity = {"sha256": "prepared-reference"}
+    inputs = {"reference_conformer_policy": "generation", "prepared_ligand_identity": identity}
+    _validate_prepared_reference(inputs, identity, "generation")
+    with pytest.raises(ValueError, match="explicit matching"):
+        _validate_prepared_reference({"prepared_ligand_identity": identity}, identity, "generation")
+    with pytest.raises(ValueError, match="no prepared-ligand identity"):
+        _validate_prepared_reference({"reference_conformer_policy": "generation"}, identity, "generation")
+    with pytest.raises(ValueError, match="differs from refinement"):
+        _validate_prepared_reference(inputs, {"sha256": "different"}, "generation")
+
+
+def test_historical_summary_requires_explicit_replay_and_checks_any_recorded_identity() -> None:
+    identity = {"sha256": "prepared-reference"}
+    _validate_prepared_reference({}, identity, "historical_sampling")
+    with pytest.raises(ValueError, match="explicit matching"):
+        _validate_prepared_reference({}, identity, "generation")
+    with pytest.raises(ValueError, match="differs from refinement"):
+        _validate_prepared_reference({"prepared_ligand_identity": identity}, {"sha256": "other"}, "historical_sampling")
 
 
 def test_select_record_is_exact_and_eta_typed() -> None:

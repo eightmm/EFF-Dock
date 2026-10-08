@@ -1,7 +1,15 @@
-# Saved-bank empirical evidence
+# Historical saved-bank empirical evidence
 
-Numerical sources for supplementary Figures S4–S9 and S11–S12. No new docking inference or
-training was run. Primary results now use the completed frozen-weight Rw study. Historical cost records retain their operator provenance. The primary protocol and fixed analyses are in
+This directory supports the earlier figure release. Its result tables, molecular
+captures and working figure numbers are historical and differ from the current
+corrected generation-reference and confidence-frame evaluation. Current results
+and captions are in [papers/](../../../../papers); their data definitions are in
+the [Source Data guide](../../../../papers/data/README.md).
+
+Numerical sources for historical supplementary Figures S4–S9 and S11–S12. These
+analyses reuse saved banks from the completed frozen-weight Rw study; they do not
+run docking inference or training. Historical cost records retain their operator
+provenance. The historical primary protocol and fixed analyses are in
 [PROTOCOL.md](PROTOCOL.md); manuscript interpretation is in
 [EVIDENCE.md](../../../../docs/paper/EVIDENCE.md).
 
@@ -27,8 +35,8 @@ uv run python -m benchmarks.figures.evidence --output outputs/paper_figures
 ```
 
 The unified `python -m benchmarks.figures.paper` command verifies and renders
-all 23 figures. Package checks additionally verify the manifest, page order,
-English captions and Prism ZIP. Counts, selected outcomes, threshold membership,
+the historical figure set defined by its manifest. Historical evidence checks
+verify the manifest and source records. Counts, selected outcomes, threshold membership,
 repeat aggregation and calibration denominators are checked against case-level
 records and the original published tables. AUROC uses average ranks for ties;
 average precision uses score-group step area, not trapezoidal PR integration.

@@ -6,7 +6,9 @@ Implementation: [sampler](../../src/effdock/inference/sampler.py),
 [physical energy](../../src/effdock/guidance/physical.py),
 [interaction energy](../../src/effdock/guidance/interaction.py), and
 [force projection](../../src/effdock/guidance/runtime.py).
-The current result conditions are defined by the [figure captions](../paper/FIGURE_CAPTIONS.md).
+Current result conditions are defined by the canonical
+[Supplementary Information](../../papers/SI.tex) and
+[figure captions](../../papers/figure_captions.md).
 
 ## 1. Fixed sampler
 
@@ -189,8 +191,9 @@ Do not substitute that training-bank stop for the external benchmark stop.
 
 ## 4. Guided sampling in the diagnostic figures
 
-Figures 6 and 8 additionally use direct ODE guidance at `eta=2`; the main
-unguided condition has `eta=0`. Let `U(v,omega)` denote the induced atom
+The supplementary guidance controls use direct ODE guidance at `eta=2`.
+The primary condition and crop/prior sensitivity grids are unguided (`eta=0`).
+Let `U(v,omega)` denote the induced atom
 velocity and `RMS(U)=sqrt(mean_a ||U_a||²)`. With raw projected energy
 directions `(V,Omega)`, the added drift before capping is
 
@@ -256,7 +259,8 @@ curves equal the full-bank RMSD oracle at 100. Their full-bank PB endpoints
 have not been evaluated and must not be inferred from selected-pose PB.
 
 The five main cohorts per seed are Astex Diverse Set (85), PoseBusters v2
-(308), PhiBench (206; three reconstructed cases), FoldBench (558), and OpenBind
+(308), PhiBench-derived (206 locally selected cases; three reconstructed cases),
+FoldBench (558), and OpenBind
 (925; a dense single-protease auxiliary cohort with two flagged noncovalent
 approximations of covalent systems). They total 2,082 complexes. Validation
 (1,076) is additionally included in relatedness composition, but has no matched
@@ -264,7 +268,8 @@ three-repeat performance bank. Input/evaluation failures retain denominators.
 The PoseBusters **v2 dataset** label is distinct from the evaluator's software
 version. Literature baselines retain their reported evaluation versions.
 
-Main figures show means and sample SD over three seeds. For Figure S1, average
+Main figures show means and sample SD over three inference repeats. For
+Supplementary Figure S9, average
 paired per-complex success differences across seeds, then take 2,000 bootstrap
 resamples, either individual complexes or complete exact-PDB groups; the latter
 uses the complex-weighted mean. Report percentile 95% CIs in percentage points,
@@ -274,7 +279,6 @@ are defined in [RELATEDNESS.md](../paper/RELATEDNESS.md); they are not certified
 pocket identity or a validated binary leakage definition.
 
 Opened external cohorts are descriptive. U70k was selected on the fixed
-1,035-complex internal bank. Guidance/budget and pocket/prior figures retain
-their separately captioned guided conditions and cannot be pooled with the
-unguided main condition. PoseX follows a separate protocol and is outside this
-23-figure package.
+1,035-complex internal bank. Sampling-input perturbations and guided controls
+use distinct protocols specified in the canonical Supplementary Information;
+guided results cannot be pooled with the unguided primary condition.

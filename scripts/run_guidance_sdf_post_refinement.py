@@ -19,6 +19,7 @@ from typing import Any
 import torch
 from rdkit import Chem
 
+from effdock.confidence.features import recover_frag_state
 from effdock.evaluation.benchmark import (
     compute_pose_rmsd,
     match_atoms,
@@ -26,6 +27,7 @@ from effdock.evaluation.benchmark import (
 from effdock.evaluation.benchmark import (
     load_ligand as load_ref_ligand,
 )
+from effdock.geometry.se3 import quaternion_to_matrix
 from effdock.guidance import InteractionEnergyConfig, build_physical_system
 from effdock.guidance.parameterization import guidance_parameter_identity
 from effdock.guidance.provenance import (
@@ -38,6 +40,8 @@ from effdock.workflows.benchmark_inputs import (
     ligand_input_identity,
     load_benchmark_inputs,
     load_benchmark_ligand,
+    prepared_ligand_identity,
+    reference_conformer_seed,
 )
 from effdock.workflows.evaluate import file_sha256
 from effdock.workflows.relax_guidance import (
@@ -126,6 +130,24 @@ def _energy_sdf_properties(pose_summary: dict[str, Any], step: int) -> dict[str,
 def _synchronize(device: torch.device) -> None:
     if device.type == "cuda":
         torch.cuda.synchronize(device)
+
+
+def _validate_generation_template(poses: torch.Tensor, ligand_data: dict[str, torch.Tensor]) -> dict[str, float]:
+    """Witness the regenerated template against every immutable raw candidate."""
+    local = ligand_data["frag_local_coords"]
+    fragment_id = ligand_data["fragment_id"]
+    n_frag = int(fragment_id.max()) + 1
+    residuals = []
+    for pose in poses:
+        T, q = recover_frag_state(pose, local, fragment_id, n_frag)
+        R = quaternion_to_matrix(q)
+        rebuilt = torch.einsum("nij,nj->ni", R[fragment_id], local) + T[fragment_id]
+        residuals.append(((rebuilt - pose).square().sum(-1).mean()).sqrt())
+    rmsds = torch.stack(residuals)
+    if not torch.isfinite(rmsds).all() or float(rmsds.max()) > 1e-3:
+        raise ValueError("generation template does not reconstruct the saved raw bank within 0.001 Angstrom")
+    return {"max_raw_reconstruction_rmsd_angstrom": float(rmsds.max()),
+            "median_raw_reconstruction_rmsd_angstrom": float(rmsds.median())}
 
 
 def _canonical_json(value: Any) -> str:
@@ -344,6 +366,10 @@ def main() -> None:
         required=True,
     )
     parser.add_argument("--eta", type=float, default=0.0)
+    parser.add_argument(
+        "--reference-conformer-policy", choices=("generation", "historical_sampling"),
+        default="generation", help="Reuse generation's conformer; historical_sampling is explicit replay only.",
+    )
     parser.add_argument("--complex-id", required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--device", default="cuda")
@@ -406,7 +432,10 @@ def main() -> None:
     if source_row.get("ligand_input_identity_sha256") != expected_identity["sha256"]:
         raise ValueError("source sampling ligand-input identity mismatch")
     seed = int(record["sampling_seed"])
-    mol_input, _ = load_benchmark_ligand(raw_smiles, random_seed=seed)
+    if reference_conformer_seed(source_row, policy="historical_sampling") != seed:
+        raise ValueError("sampling seed differs between source CSV and manifest")
+    conformer_seed = reference_conformer_seed(source_row, policy=args.reference_conformer_policy)
+    mol_input, _ = load_benchmark_ligand(raw_smiles, random_seed=conformer_seed)
     initial_absolute, original_properties = _load_pose_batch(Path(record["pose_path"]), mol_input)
 
     centers = json.loads(args.pocket_centers.read_text())
@@ -429,6 +458,10 @@ def main() -> None:
     )
     if not torch.equal(meta["pocket_center"], pocket_center_absolute):
         raise AssertionError("preprocessing changed pocket center")
+    generation_witness = (
+        _validate_generation_template(initial_absolute, ligand_data)
+        if args.reference_conformer_policy == "generation" else None
+    )
     system = build_physical_system(
         mol_input,
         Path(record["protein"]),
@@ -579,6 +612,12 @@ def main() -> None:
             "ligand_reference": record["ligand_ref"],
             "ligand_reference_sha256": record["ligand_ref_sha256"],
             "sampling_seed": seed,
+            "ligand_conformer_seed": conformer_seed,
+            "reference_conformer_policy": args.reference_conformer_policy,
+            "generation_template_witness": generation_witness,
+            "prepared_ligand_identity": prepared_ligand_identity(
+                mol_input, ligand_data["fragment_id"].tolist()
+            ),
             "ligand_input_identity": expected_identity,
             "benchmark_mapping_identity": mapping_identity,
             "pocket_centers": str(args.pocket_centers.resolve()),

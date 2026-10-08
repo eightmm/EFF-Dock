@@ -2,14 +2,15 @@
 
 ## Manuscript drafting materials
 
-- [Figure PDF](paper/paper_figures.pdf): 11 main figures and 3 supplementary figures.
-- [English figure captions](paper/FIGURE_CAPTIONS.md)
-- [Prism package](paper/prism/prism_figure_reference.zip)
-- [Editable LaTeX methods](paper/prism/methods.tex)
-- [Figure index](paper/README.md)
+- [Article](../papers/main.tex) and [compiled PDF](../papers/main.pdf)
+- [Supplementary Information](../papers/SI.tex) and [compiled PDF](../papers/SI.pdf)
+- [Figure PDFs](../papers/assets) and [LaTeX captions](../papers/figure_captions.md)
+- [Numerical Source Data](../papers/data)
+- [Prism authoring ZIP](../papers/Prism.zip)
 
-These are manuscript working materials, not a published paper. See the
-[paper guide](paper/README.md) for version and usage notes.
+The canonical files live in `papers`; figure numbering follows the article and
+Supplementary Information. These are working manuscript materials, not a
+published paper.
 
 ## Model and evaluation
 
@@ -21,11 +22,10 @@ These are manuscript working materials, not a published paper. See the
 - [Benchmark report](BENCHMARK_RESULTS.md)
 - [Detailed methods](methods/README.md)
 - [Released training IDs and eligibility](../benchmarks/inputs/training_membership/README.md)
-- [Figure numerical data and reproduction](../benchmarks/results/paper/README.md)
+- [Figure numerical data and captions](../papers/data)
 - [Repository structure](STRUCTURE.md)
 
-Historical experiment protocols, intermediate results and superseded plots are
-retained locally, outside the current public file listing. References to those
-historical records in retained reports describe local provenance; use the current
-figure captions for manuscript assembly. Required benchmark inputs and reference tables are under `benchmarks/inputs`
-and `benchmarks/reference`; test-only results are under `tests/fixtures`.
+Required benchmark inputs, training membership and literature reference tables
+are under `benchmarks/inputs` and `benchmarks/reference`. Test-only data are
+under `tests/fixtures`. The manuscript package contains the selected figure
+PDFs and their numerical source data.

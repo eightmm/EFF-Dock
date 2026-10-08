@@ -17,10 +17,16 @@ from typing import Any
 
 import torch
 
+from effdock.confidence.features import FRAME_RECOVERY_POLICIES
 from effdock.confidence.runtime import load_pose_confidence_model, score_poses_with_confidence
 from effdock.inference.docking import load_model
 from effdock.inference.preprocess import preprocess_complex
-from effdock.workflows.benchmark_inputs import load_benchmark_inputs, load_benchmark_ligand
+from effdock.workflows.benchmark_inputs import (
+    load_benchmark_inputs,
+    load_benchmark_ligand,
+    prepared_ligand_identity,
+    reference_conformer_seed,
+)
 from effdock.workflows.evaluate import file_sha256
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -37,6 +43,25 @@ from run_guidance_sdf_post_refinement import (
 PROTOCOL_ID = "EFFDOCK-GUIDANCE-SDF-POST-REFINEMENT-CONFIDENCE-V2"
 SCHEMA_VERSION = "effdock.guidance_sdf_post_refinement_confidence.v2"
 FROZEN_POSE_BATCH_SIZE = 20
+
+
+def _validate_prepared_reference(
+    inputs: dict[str, Any], identity: dict[str, Any], policy: str
+) -> None:
+    recorded_policy = inputs.get("reference_conformer_policy")
+    if policy == "generation" and recorded_policy != "generation":
+        raise ValueError(
+            "confidence generation policy requires an explicit matching refinement policy"
+        )
+    if recorded_policy is not None and recorded_policy != policy:
+        raise ValueError("confidence reference conformer policy differs from refinement")
+    recorded_identity = inputs.get("prepared_ligand_identity")
+    if policy == "generation" and recorded_identity is None:
+        raise ValueError(
+            "refinement has no prepared-ligand identity; regenerate with the generation policy"
+        )
+    if recorded_identity is not None and identity != recorded_identity:
+        raise ValueError("confidence prepared ligand differs from refinement")
 
 
 def _synchronize(device: torch.device) -> None:
@@ -71,6 +96,7 @@ def _score_in_batches(
     sigma: float,
     device: torch.device,
     batch_size: int,
+    frame_policy: str = "historical_kabsch",
 ) -> list[dict[str, float]]:
     scores: list[dict[str, float]] = []
     for start, stop in _chunk_ranges(len(poses), batch_size):
@@ -84,6 +110,7 @@ def _score_in_batches(
                 poses[start:stop],
                 sigma=sigma,
                 device=device,
+                frame_policy=frame_policy,
             )
         )
         if device.type == "cuda":
@@ -147,6 +174,15 @@ def main() -> None:
     parser.add_argument("--docking-checkpoint", type=Path, required=True)
     parser.add_argument("--confidence-checkpoint", type=Path, required=True)
     parser.add_argument("--orientation-injection", choices=("rw", "legacy_rt_w"))
+    parser.add_argument(
+        "--confidence-frame-policy", choices=FRAME_RECOVERY_POLICIES, default="historical_kabsch"
+    )
+    parser.add_argument(
+        "--reference-conformer-policy",
+        choices=("generation", "historical_sampling"),
+        default="generation",
+        help="Must match refinement; historical_sampling is explicit replay only.",
+    )
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--sigma", type=float, default=0.5)
     parser.add_argument("--pocket-cutoff", type=float)
@@ -169,15 +205,11 @@ def main() -> None:
     dataset = str(inputs["dataset"])
     complex_id = str(inputs["complex_id"])
     refinement_cutoff = float(inputs.get("pocket_cutoff_angstrom", 10.0))
-    pocket_cutoff = (
-        refinement_cutoff if args.pocket_cutoff is None else args.pocket_cutoff
-    )
+    pocket_cutoff = refinement_cutoff if args.pocket_cutoff is None else args.pocket_cutoff
     if not math.isfinite(pocket_cutoff) or pocket_cutoff <= 0:
         raise ValueError("pocket-cutoff must be finite and positive")
     if not math.isclose(pocket_cutoff, refinement_cutoff, abs_tol=1e-12):
-        raise ValueError(
-            "confidence pocket-cutoff must match the refinement pocket-cutoff"
-        )
+        raise ValueError("confidence pocket-cutoff must match the refinement pocket-cutoff")
     artifacts = refinement["artifacts"]
     stage_specs = {
         "step_000": artifacts["step_000_sdf"],
@@ -203,7 +235,7 @@ def main() -> None:
     mapping, mapping_identity = load_benchmark_inputs(
         dataset, args.external_dir, args.benchmark_input_manifest
     )
-    seed = int(inputs["sampling_seed"])
+    seed = reference_conformer_seed(inputs, policy=args.reference_conformer_policy)
     mol_input, _ = load_benchmark_ligand(mapping[complex_id], random_seed=seed)
     pocket_center = torch.tensor(inputs["pocket_center_absolute"], dtype=torch.float32)
     graph, ligand_data, meta = preprocess_complex(
@@ -214,13 +246,17 @@ def main() -> None:
     )
     if not torch.equal(meta["pocket_center"], pocket_center):
         raise AssertionError("preprocessing changed frozen pocket center")
+    prepared_identity = prepared_ligand_identity(mol_input, ligand_data["fragment_id"].tolist())
+    _validate_prepared_reference(inputs, prepared_identity, args.reference_conformer_policy)
 
     stage_coordinates = _trajectory_stages(refinement, mol_input)
     input_preparation_seconds = time.perf_counter() - pipeline_started
     _synchronize(device)
     model_load_started = time.perf_counter()
     model, _, docking_ckpt = load_model(
-        args.config, args.docking_checkpoint, device,
+        args.config,
+        args.docking_checkpoint,
+        device,
         orientation_injection=args.orientation_injection,
     )
     confidence_model, confidence_ckpt = load_pose_confidence_model(
@@ -246,6 +282,7 @@ def main() -> None:
             sigma=args.sigma,
             device=device,
             batch_size=args.pose_batch_size,
+            frame_policy=args.confidence_frame_policy,
         )
         _synchronize(device)
         confidence_forward_seconds[stage] = time.perf_counter() - scoring_started
@@ -280,14 +317,10 @@ def main() -> None:
             raise ValueError("source confidence ledger pose count mismatch")
         baseline_deltas = [
             abs(float(actual["confidence_rmsd"]) - float(expected["confidence_rmsd"]))
-            for actual, expected in zip(
-                stage_scores["step_000"], expected_scores, strict=True
-            )
+            for actual, expected in zip(stage_scores["step_000"], expected_scores, strict=True)
         ]
         expected_index: int | None = int(source_row["confidence_index"])
-        baseline_index_matches: bool | None = (
-            selected["step_000"]["pose_index"] == expected_index
-        )
+        baseline_index_matches: bool | None = selected["step_000"]["pose_index"] == expected_index
     else:
         baseline_deltas = []
         expected_index = None
@@ -343,6 +376,8 @@ def main() -> None:
         "confidence_cross_orientation": (
             model.orientation_injection != confidence_model.docking_orientation_injection
         ),
+        "confidence_frame_policy": args.confidence_frame_policy,
+        "confidence_training_frame_policy": confidence_model.confidence_frame_policy,
         "pocket_cutoff_angstrom": pocket_cutoff,
         "selected": selected,
         "selector_changed": selected["step_000"]["pose_index"]
@@ -351,9 +386,7 @@ def main() -> None:
             "source_selected_index": expected_index,
             "rescored_selected_index": selected["step_000"]["pose_index"],
             "selected_index_matches": baseline_index_matches,
-            "max_abs_predicted_rmsd_delta": (
-                max(baseline_deltas) if baseline_deltas else None
-            ),
+            "max_abs_predicted_rmsd_delta": (max(baseline_deltas) if baseline_deltas else None),
             "role": (
                 "diagnostic_only_not_a_completion_gate"
                 if baseline_deltas
@@ -363,6 +396,11 @@ def main() -> None:
         "inputs": {
             "refinement_summary": str(refinement_path),
             "refinement_summary_sha256": file_sha256(refinement_path),
+            "sampling_seed": int(inputs["sampling_seed"]),
+            "ligand_conformer_seed": seed,
+            "reference_conformer_policy": args.reference_conformer_policy,
+            "confidence_frame_policy": args.confidence_frame_policy,
+            "prepared_ligand_identity": prepared_identity,
             "benchmark_input_identity": {
                 key: value for key, value in mapping_identity.items() if key != "per_id"
             },

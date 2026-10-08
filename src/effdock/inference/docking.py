@@ -23,6 +23,7 @@ from effdock.checkpoint import (
     load_portable_model_state,
     validate_orientation_injection,
 )
+from effdock.confidence.features import FRAME_RECOVERY_POLICIES
 from effdock.inference.defaults import (
     DEFAULT_CONFIDENCE_CHECKPOINT,
     DEFAULT_CONFIG,
@@ -79,6 +80,7 @@ class DockingOptions:
     confidence_checkpoint: Path | None = DEFAULT_CONFIDENCE_CHECKPOINT
     rank_by: str = "auto"
     orientation_injection: str | None = None
+    confidence_frame_policy: str = "historical_kabsch"
 
 
 def parse_center(value: str | None) -> torch.Tensor | None:
@@ -208,6 +210,7 @@ def write_docking_outputs(
     effective_orientation_injection: str | None = None,
     checkpoint_orientation: str | None = None,
     confidence_training_orientation: str | None = None,
+    confidence_training_frame_policy: str | None = None,
 ) -> None:
     opts.out_dir.mkdir(parents=True, exist_ok=True)
     pocket_center = meta["pocket_center"]
@@ -242,6 +245,8 @@ def write_docking_outputs(
         "orientation_injection_requested": opts.orientation_injection or "checkpoint",
         "checkpoint_orientation_injection": checkpoint_orientation,
         "confidence_docking_orientation_injection": confidence_training_orientation,
+        "confidence_frame_policy": opts.confidence_frame_policy,
+        "confidence_training_frame_policy": confidence_training_frame_policy,
         "confidence_cross_orientation": (
             effective_orientation_injection != confidence_training_orientation
             if confidence_training_orientation is not None
@@ -303,6 +308,8 @@ def write_docking_outputs(
 
 
 def dock(opts: DockingOptions) -> None:
+    if opts.confidence_frame_policy not in FRAME_RECOVERY_POLICIES:
+        raise ValueError(f"unknown confidence frame policy: {opts.confidence_frame_policy!r}")
     if not opts.protein.exists():
         raise FileNotFoundError(f"Protein PDB not found: {opts.protein}")
 
@@ -399,6 +406,7 @@ def dock(opts: DockingOptions) -> None:
 
     confidence_indices: dict[str, int] = {}
     confidence_training_orientation = None
+    confidence_training_frame_policy = None
     if opts.confidence_checkpoint is not None:
         from effdock.confidence.runtime import (
             load_pose_confidence_model,
@@ -412,6 +420,7 @@ def dock(opts: DockingOptions) -> None:
             opts.confidence_checkpoint, device
         )
         confidence_training_orientation = confidence_model.docking_orientation_injection
+        confidence_training_frame_policy = confidence_model.confidence_frame_policy
         default_sigma = float(
             opts.sigma if opts.sigma is not None else cfg["data"].get("prior_sigma", 1.0)
         )
@@ -424,6 +433,7 @@ def dock(opts: DockingOptions) -> None:
             poses,
             sigma=sample_sigmas(results, default_sigma),
             device=device,
+            frame_policy=opts.confidence_frame_policy,
         )
         if scores is None:
             scores = confidence_scores
@@ -509,6 +519,7 @@ def dock(opts: DockingOptions) -> None:
         effective_orientation_injection=model.orientation_injection,
         checkpoint_orientation=checkpoint_orientation_injection(ckpt),
         confidence_training_orientation=confidence_training_orientation,
+        confidence_training_frame_policy=confidence_training_frame_policy,
     )
 
 
@@ -520,6 +531,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ligand", type=str, required=True)
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_DOCKING_CHECKPOINT)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument(
+        "--confidence-frame-policy", choices=FRAME_RECOVERY_POLICIES,
+        default="historical_kabsch",
+        help="Terminal confidence frame recovery; contextual_v1 fixes low-rank scene covariance with frozen weights.",
+    )
     parser.add_argument(
         "--orientation-injection",
         choices=ORIENTATION_INJECTIONS,
@@ -625,6 +641,7 @@ def options_from_args(args: argparse.Namespace) -> DockingOptions:
         ligand=args.ligand,
         checkpoint=args.checkpoint,
         config=args.config,
+        confidence_frame_policy=args.confidence_frame_policy,
         pocket_center=args.pocket_center,
         pocket_cutoff=args.pocket_cutoff,
         num_steps=args.num_steps,

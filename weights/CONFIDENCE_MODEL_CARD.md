@@ -41,24 +41,37 @@ state, not the deployment checkpoint.
 
 ## External characterization
 
-The current characterization uses three seeds, unguided N100/S10/sigma-2
-sampling, explicit energy refinement and input-chirality-filtered confidence
-selection. Values are mean ± sample SD (%); PB-valid success requires RMSD
-<2 Å and PB validity of the same selected pose. These are the full current
-cohorts, replacing the historical PhiBench203/OpenBind860 subset table.
+The manuscript evaluation uses three fixed-weight inference repeats, explicit
+`rw` angular features, `contextual_v1` confidence frames, and ligand reference
+conformers reconstructed from the generation preparation. Sampling is unguided
+N100/S10/sigma-2, followed by explicit energy refinement and input-chirality-filtered
+predicted-RMSD selection, including the all-ineligible fallback. These settings
+must be requested explicitly; compatibility defaults do not reproduce this evaluation.
 
-| Dataset | N per seed | RMSD <2 Å | PB-valid poses | PB-valid success |
+Values are percent mean ± sample SD. RMSD is symmetry-aware heavy-atom RMSD
+without receptor alignment. RMSD–PoseBusters success requires the same selected
+pose to have RMSD <2 Å and pass all 27 non-RMSD PoseBusters checks. An unavailable
+required check is conservatively treated as nonpassing.
+
+| Dataset | N per repeat | RMSD <2 Å | PB-valid poses | RMSD–PoseBusters success |
 |---|---:|---:|---:|---:|
-| Astex Diverse Set | 85 | 82.35 ± 2.04 | 95.69 ± 0.68 | 79.22 ± 2.72 |
-| PoseBusters v2 | 308 | 81.60 ± 0.94 | 95.56 ± 0.50 | 79.22 ± 1.42 |
-| PhiBench reconstructed full | 206 | 62.62 ± 3.79 | 94.01 ± 0.28 | 60.19 ± 3.36 |
-| FoldBench-Pocket full | 558 | 74.49 ± 0.37 | 96.36 ± 0.37 | 72.82 ± 0.63 |
-| OpenBind full | 925 | 52.58 ± 0.61 | 99.64 ± 0.17 | 52.58 ± 0.61 |
+| Astex Diverse Set | 85 | 83.14 ± 0.68 | 95.69 ± 0.68 | 80.00 ± 0.00 |
+| PoseBusters v2 | 308 | 81.49 ± 0.56 | 95.24 ± 0.19 | 79.11 ± 0.19 |
+| PhiBench-derived | 206 | 63.11 ± 3.36 | 93.69 ± 0.00 | 60.52 ± 3.23 |
+| FoldBench-Pocket | 558 | 75.27 ± 0.54 | 96.54 ± 0.10 | 73.78 ± 0.63 |
+| OpenBind | 925 | 53.19 ± 0.56 | 99.68 ± 0.19 | 53.19 ± 0.56 |
 
-Raw, refined and chirality-selection ablations remain separate in
-[Figure 2](../docs/paper/FIGURE_CAPTIONS.md). U70k was selected on internal
-validation; external results are descriptive. These postprocessing results do
-not imply that the public inference API silently performs refinement.
+These are supplied-pocket redocking cohorts. PhiBench-derived is not asserted
+to match the published PhiBench cohort or PAL-RMSD endpoint. The FoldBench row
+uses fixed-receptor RMSD rather than the native cofolding endpoint. OpenBind
+contains all 925 local cases; the separate benchmark-specific analysis uses the
+official 802-case follow-on subset. Those endpoint analyses and their protocol
+limitations are in the [Supplementary Information](../papers/SI.tex).
+
+Raw/refined and chirality-selection results are reported separately in
+Supplementary Figure S9. U70k was selected on internal validation; external
+results are descriptive. Refinement and chirality filtering are explicit
+postprocessing stages, rather than implicit operations in the public `dock()` API.
 
 ## Limitations
 
@@ -73,7 +86,7 @@ not imply that the public inference API silently performs refinement.
 Exact [training membership](../benchmarks/inputs/training_membership/README.md),
 [method equations](../docs/methods/05_confidence_model_and_loss.md),
 [training settings](../docs/methods/06_training_and_checkpoint_selection.md), and
-[current benchmark results](../docs/BENCHMARK_RESULTS.md) are public. The
+[current manuscript results](../papers/main.tex) are public. The
 43,092 confidence training IDs and 47,277 docking IDs are independently filtered
 sets sharing 43,067 IDs, not a nested pair.
 

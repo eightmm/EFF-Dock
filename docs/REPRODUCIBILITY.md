@@ -1,6 +1,6 @@
 # Reproducibility
 
-The [orientation operator contract](ORIENTATION_INJECTION.md) distinguishes corrected `rw` from historical `legacy_rt_w`. Specify the operator when changing frozen-weight inference; use the recorded source revision for hash-pinned historical experiments. Checkpoint resume cannot silently switch operators.
+The [orientation and confidence-input contract](ORIENTATION_INJECTION.md) distinguishes `rw` evaluation from the historical `legacy_rt_w` training convention. The manuscript uses explicit `--orientation-injection rw`, `--confidence-frame-policy contextual_v1` and generation-consistent ligand references, with the released weights frozen. Compatibility defaults retain the historical operator and frame recovery; do not rely on those defaults to reproduce the manuscript. Checkpoint resume cannot silently switch operators.
 
 The environment is locked by `pyproject.toml` and `uv.lock`, including PyTorch
 2.10.0 CUDA 13.0 wheels and matching PyG extension wheels.
@@ -60,17 +60,33 @@ publishes original sample IDs, separate docking/confidence eligibility and
 hashes. It preserves the released split; the newer strict split builder is not
 a reproduction of those checkpoint inventories.
 
-The current 14 manuscript figures can be reconstructed without raw structures
-or weights from [versioned source data](../benchmarks/results/paper/README.md):
+The current article, Supplementary Information, figure PDFs and numerical
+Source Data are kept together in [`papers/`](../papers). Use the
+[canonical captions](../papers/figure_captions.md) for figure numbering and
+endpoint definitions. The [saved-endpoint verifier](../benchmarks/analysis/published_endpoints.py)
+recomputes the released benchmark-specific aggregate rates and sample SD without
+structures or weights:
+
+```bash
+uv run python -m benchmarks.analysis.published_endpoints
+```
+
+This checks aggregation of the saved case outcomes for Supplementary Table S15
+and Figure S20. It does not rerun molecular scoring or candidate selection.
+
+The earlier [figure inputs](../benchmarks/results/paper/README.md) and renderer
+remain available for reproducing the earlier figure package:
 
 ```bash
 uv run python -m benchmarks.figures.paper --check
 uv run python -m benchmarks.figures.paper --output outputs/paper_figures
 ```
 
-This produces individual PDFs/PNGs and `source_data.csv`. The figure renderer
-does not rerun scientific evaluations. Selected original PDFs remain unchanged
-until explicitly replaced and packaged with `scripts/package_paper_figures.py`.
+This produces individual PDFs/PNGs and `source_data.csv` from those earlier
+inputs; it does not reproduce the current corrected manuscript measurements or
+rerun scientific evaluations. Use the canonical manuscript files and
+`papers/Prism.zip` for paper writing; the superseded drafting bundle has been
+removed.
 
 GPU work runs through the project Slurm scripts. `confidence_prepare.sbatch`
 generates immutable-by-default labeled pose shards and

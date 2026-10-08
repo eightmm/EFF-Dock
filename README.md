@@ -11,7 +11,7 @@ binder/non-binder classification.
 
 ## Released model
 
-**Orientation correction:** [Rw versus historical Rᵀw](docs/ORIENTATION_INJECTION.md) documents the mathematical fix, checkpoint compatibility and completed three-seed evaluation. Fresh training with `configs/train_rw.yaml` uses Rw; loading released weights preserves their historical operator unless `--orientation-injection rw` is requested. Primary benchmark figures now use the completed corrected Rw three-seed results. All submitted EFF-Dock measurements and illustrations use Rw; legacy ablations are excluded from the current figure package.
+The manuscript evaluates the released weights with explicit `rw` local-to-world feature injection and `contextual_v1` coordinate-only confidence frame recovery. Checkpoint-compatible defaults remain available; the example below opts into the evaluated conventions. [Coordinate conventions and checkpoint compatibility](docs/ORIENTATION_INJECTION.md) and the [model contract](docs/MODEL.md) describe these fixed-weight changes. Fresh training can use `configs/train_rw.yaml`.
 
 The public model is one paired deployment stack:
 
@@ -72,6 +72,8 @@ options = DockingOptions(
     time_schedule="late",
     schedule_power=3.0,
     rank_by="confidence",
+    orientation_injection="rw",
+    confidence_frame_policy="contextual_v1",
     out_dir=Path("outputs/docked"),
     device="cuda",
     seed=42,
@@ -80,7 +82,7 @@ options = DockingOptions(
 dock(options)
 ```
 
-The call writes the complete pose ensemble to `docked_poses.sdf`, raw tensors
+This example generates and scores a raw ensemble. The manuscript's primary evaluation additionally uses energy refinement and input-stereochemistry-aware selection, as documented in the [reproducibility guide](docs/REPRODUCIBILITY.md). The call writes the complete pose ensemble to `docked_poses.sdf`, raw tensors
 and provenance to `results.pt`, and convenience selected-pose artifacts under
 the requested output directory. A receptor, ligand chemistry, and explicit
 pocket center are required; target/crystal ligand coordinates must not be used
@@ -109,49 +111,54 @@ checkpoint selection, and exact evaluation definitions are documented in:
 
 ## Main results
 
-The current reporting baseline uses **corrected Rw, three seeds, unguided N100/S10/sigma2**, using the
+The current reporting baseline uses **Rw, contextual confidence frames, three inference repeats and unguided N100/S10/sigma2**, using the
 frozen released docking/U70k pair, explicit physical refinement and input-chirality
 selection. These postprocessing steps are not silently applied by `dock()`.
 RMSD is symmetry-aware heavy-atom RMSD without alignment. PB-valid success
 requires the same pose to have RMSD <2 Angstrom and pass PoseBusters. Values
 are percent mean ± sample SD. Released weights retain legacy-trained features;
-these Rw results are a cross-operator frozen-weight evaluation, using an explicit
-operator override documented in the [protocol](docs/RW_THREE_SEED_PROTOCOL.md).
+these Rw results are a cross-operator frozen-weight evaluation, using explicit
+coordinate conventions documented in the [model contract](docs/MODEL.md).
 
 | Dataset | N per seed | RMSD <2 Å | PB-valid poses | PB-valid success |
 |---|---:|---:|---:|---:|
-| Astex Diverse Set | 85 | 83.14 ± 1.80 | 95.69 ± 0.68 | 80.00 ± 2.04 |
-| PoseBusters v2 | 308 | 81.82 ± 0.56 | 95.02 ± 0.50 | 79.00 ± 0.82 |
-| PhiBench reconstructed full | 206 | 62.94 ± 3.23 | 93.69 ± 0.00 | 60.36 ± 3.08 |
-| FoldBench-Pocket full | 558 | 75.27 ± 0.54 | 96.54 ± 0.10 | 73.78 ± 0.63 |
-| OpenBind full | 925 | 53.19 ± 0.56 | 99.68 ± 0.19 | 53.19 ± 0.56 |
+| Astex Diverse Set | 85 | 83.14 ± 0.68 | 95.69 ± 0.68 | 80.00 ± 0.00 |
+| PoseBusters v2 | 308 | 81.49 ± 0.56 | 95.24 ± 0.19 | 79.11 ± 0.19 |
+| PhiBench-derived | 206 | 63.11 ± 3.36 | 93.69 ± 0.00 | 60.52 ± 3.23 |
+| FoldBench-Pocket | 558 | 75.27 ± 0.54 | 96.54 ± 0.10 | 73.78 ± 0.63 |
+| OpenBind | 925 | 53.19 ± 0.56 | 99.68 ± 0.19 | 53.19 ± 0.56 |
 
 Postprocessing and metric definitions are in the
-[figure captions](docs/paper/FIGURE_CAPTIONS.md).
+[Supplementary Information](papers/SI.tex).
 
 These are supplied-pocket redocking results, not blind docking or prospective
 screening. Astex, PoseBusters, and the temporal cohorts were inspected during
 development, so their results are descriptive. U70k was selected only on the
-fixed 1,035-complex PLINDER validation bank. PhiBench and FoldBench are the
+fixed 1,035-complex PLINDER validation bank. PhiBench-derived and FoldBench are the
 core temporal checks; OpenBind is reported separately as a dense
 single-protease auxiliary cohort.
 
 FoldBench-Pocket uses holo-receptor, crystal-pocket redocking targets, rather
-than the native FoldBench cofolding task. Benchmark conditions and comparisons
-are documented in [the benchmark report](docs/BENCHMARK_RESULTS.md).
+than the native FoldBench cofolding task. Benchmark conditions, preparation differences and comparison endpoints
+are documented in the [Supplementary Information](papers/SI.tex).
 
-## Manuscript figures
+## Manuscript materials
 
-[Paper materials](docs/paper/README.md) contain a 23-page result PDF,
-individual PDF/PNG files, captions and a Prism reference package. They are
-working materials for writing the manuscript; figure numbering and placement
-can change. Their presence here does not indicate a published paper.
+The canonical article and Supplementary Information are maintained in
+[`papers`](papers). These are manuscript drafting materials, not a published paper.
 
-[Detailed equations](docs/methods/README.md), [editable LaTeX methods](docs/paper/prism/methods.tex),
-[training membership](benchmarks/inputs/training_membership/README.md), and
-[figure source data](benchmarks/results/paper/README.md) connect the manuscript
-to the released implementation. Recreate all 14 figures from public numerical
-records with `uv run python -m benchmarks.figures.paper`.
+- [Article LaTeX](papers/main.tex) and [compiled article PDF](papers/main.pdf)
+- [Supplementary LaTeX](papers/SI.tex) and [compiled Supplementary PDF](papers/SI.pdf)
+- [Bibliography](papers/references.bib)
+- [Figure PDFs](papers/assets) and [figure captions](papers/figure_captions.md)
+- [Numerical Source Data](papers/data)
+- [Prism authoring ZIP](papers/Prism.zip)
+
+The figure captions and numerical data specify the evaluated protocols and
+which analyses use stored candidate restrictions. [Training membership and
+eligibility](benchmarks/inputs/training_membership/README.md) and
+[implementation details](docs/methods/README.md) accompany the released code.
+
 
 ## Repository map
 

@@ -1,6 +1,12 @@
-# Manuscript figure captions
+# Historical figure captions
 
-All submitted EFF-Dock measurements and illustrations use corrected Rw with frozen released weights. Training provenance remains documented in [the orientation note](../ORIENTATION_INJECTION.md). PB-valid success is solid; RMSD-successful PB-invalid portions are hatched. Page/figure IDs below are working reference IDs; manuscript numbering can be adapted.
+These captions belong to the earlier figure release and retain its original
+page numbers, case selections and measurements. The current article and
+Supplementary Information use the [canonical captions](../../papers/figure_captions.md)
+and figure numbering in [papers/](../../papers). Use those files for manuscript
+writing; the captions below document the historical rendering inputs.
+
+All EFF-Dock measurements and illustrations in this historical release use corrected Rw with frozen released weights. Training provenance remains documented in [the orientation note](../ORIENTATION_INJECTION.md). PB-valid success is solid; RMSD-successful PB-invalid portions are hatched. Page/figure IDs below are historical working reference IDs.
 
 PDF SHA-256: `287f792c8b1638998bb2a45a5151c4d1d77424e251395723ac1f6159f5cff21b`
 

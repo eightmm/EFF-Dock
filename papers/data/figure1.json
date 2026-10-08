@@ -1,0 +1,77 @@
+{
+  "figure": "Fig1",
+  "dataset": "Astex Diverse Set",
+  "complex": "1t46",
+  "inference_repeat": 0,
+  "candidate_bank_size": 100,
+  "primary_rank": "predicted_RMSD among input-stereochemistry-eligible candidates",
+  "angular_feature_injection": "Rw",
+  "reference_conformer": "same as generation",
+  "confidence_frame_recovery": "contextual_v1",
+  "candidate_annotations": [
+    {
+      "index": 68,
+      "rank": 1,
+      "predicted_rmsd": 1.5513402223587036,
+      "symmetry_rmsd": 1.362280844541048,
+      "verified_rmsd": 1.36228083193366
+    },
+    {
+      "index": 35,
+      "rank": 25,
+      "predicted_rmsd": 2.337100028991699,
+      "symmetry_rmsd": 1.7735310225663026,
+      "verified_rmsd": 1.7735310141477727
+    },
+    {
+      "index": 4,
+      "rank": 50,
+      "predicted_rmsd": 2.7432024478912354,
+      "symmetry_rmsd": 2.419151679801573,
+      "verified_rmsd": 2.41915169316358
+    },
+    {
+      "index": 84,
+      "rank": 100,
+      "predicted_rmsd": 4.4362640380859375,
+      "symmetry_rmsd": 4.308885241743502,
+      "verified_rmsd": 4.308885348706181
+    }
+  ],
+  "RMSD_definition": "Symmetry-aware heavy-atom RMSD in the receptor frame, without structural alignment",
+  "N1_trajectory_scope": "Separately sampled fixed illustrative trajectory; not the N100 selected candidate",
+  "crystal_overlay_scope": "Retrospective evaluation only; excluded from candidate ranking",
+  "figure_pdf_sha256": "a23c85e658fc609c1fb87e7a7da05514e112374024b693943a3b07529ffcd57e",
+  "trajectory_sha256": "f4bcb0a5e83d4ea76176558d9d84f3c060d947e0917c4f3024db190b350fc71b",
+  "selection_source_sha256": "94ead49ea563a7618f0de293482436c9867a8cf44bfcb99e4188c28ed44a1027",
+  "confidence_scores_sha256": "f5d4aa6ed4698c9fa2c71c7d9d3eb796613f23a95ab7f1210a89dd3a4b291dc1",
+  "illustrative_trajectory_input": "Supplied SDF starting conformer; independent of the SMILES-prepared N100 benchmark bank",
+  "benchmark_bank_input": "SMILES, generation ETKDG seed0; downstream reference reconstructed from that generation preparation",
+  "illustrative_flow_snapshots": [
+    {
+      "frame_index": 0,
+      "flow_time": 0.0
+    },
+    {
+      "frame_index": 2,
+      "flow_time": 0.48799997568130493
+    },
+    {
+      "frame_index": 4,
+      "flow_time": 0.7839999794960022
+    },
+    {
+      "frame_index": 10,
+      "flow_time": 1.0
+    }
+  ],
+  "illustrative_refinement_snapshots": [
+    0,
+    50,
+    100
+  ],
+  "selection_markers": {
+    "checkmark": "Selected candidate",
+    "cross": "Unselected example"
+  }
+}
