@@ -1362,7 +1362,7 @@ The cumulative-ranking and generation-prefix analyses in Figs.~\ref{fig:si-pose-
 
 The docking model has 5,719,970 parameters; the confidence model has 9,403,274.
 
-Candidate-acquisition runs took mean wall times of 141.7, 136.8, 138.0, 119.9 and 98.8 seconds per complex on Astex, PoseBusters, PhiBench-derived, FoldBench and OpenBind. The corresponding allocated CUDA memory peaks were 11.9, 16.7, 17.3, 17.1 and 11.8 GiB. Profiling used mixed RTX A5000, RTX 6000 Ada and RTX PRO 6000 devices. Recorded times include the original refinement and confidence scoring but exclude subsequent refinement and rescoring passes. These values do not estimate the end-to-end cost of the primary protocol or support a controlled hardware comparison.
+Runtime and memory measurements are shown in Figs.~\ref{fig:si-runtime} and \ref{fig:si-generation-memory}. Profiling used mixed RTX A5000, RTX 6000 Ada and RTX PRO 6000 devices. Recorded times include the original refinement and confidence scoring but exclude subsequent refinement and rescoring passes; they do not estimate the end-to-end cost of the primary protocol or support a controlled hardware comparison.
 
 \begin{figure}[!htbp]
     \centering
@@ -1382,12 +1382,9 @@ Candidate-acquisition runs took mean wall times of 141.7, 136.8, 138.0, 119.9 an
 
 \subsection{Training-set relatedness}
 
-Receptor sequence relatedness was high in several cohorts: 79/85 Astex, 228/308 PoseBusters, 137/206 PhiBench-derived, 480/558 FoldBench, and all 925 OpenBind complexes were in the 90--100\% maximum sequence-identity bin (Fig.~\ref{fig:si-relatedness-overview}).
-An exact ligand match and at least 70\% sequence identity occurred in the same training sample for 8.2\% of Astex, 10.4\% of PoseBusters, 11.7\% of PhiBench-derived, 63.4\% of FoldBench, and 2.3\% of OpenBind complexes; the corresponding fraction was zero in the 1,076-complex docking-validation set.
-PDB-accession sharing with a docking-training sample occurred for 3/85 Astex, 28/308 PoseBusters, 0/206 PhiBench-derived and 341/558 FoldBench complexes; accession correspondence was unavailable for OpenBind. Sharing an accession can involve different chains or ligands and is distinct from the same-training-sample ligand--sequence conjunction.
-Exact ligand identity and sequence-identity strata were not monotonically associated with docking success (Figs.~\ref{fig:si-relatedness-ligand} and \ref{fig:si-relatedness-sequence}).
+Training-set relatedness varied across cohorts (Figs.~\ref{fig:si-relatedness-overview}--\ref{fig:si-relatedness-sequence}). All OpenBind complexes occupied the highest sequence-identity bin. FoldBench had the greatest same-training-sample overlap: 63.4\% shared an exact ligand match and at least 70\% sequence identity, whereas this conjunction was absent in docking validation. PDB-accession sharing is distinct from joint ligand--sequence overlap because an accession can contain different chains or ligands; accession correspondence was unavailable for OpenBind. Neither ligand nor sequence relatedness showed a consistent monotonic association with success.
 
-\begin{figure}[p]
+\begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{training_relatedness.pdf}
     \caption{\textbf{Sequence and ligand relatedness to the docking-training set.} The five external cohorts and 1,076-complex docking-validation set are compared with 47,277 executed docking-training samples. (A) Maximum query-normalized binding-chain sequence identity. (B) Joint ligand and sequence overlap classified by whether the matches occur in the same training sample. (C) The same-sample overlap fraction with counts. Ligand-binding chains use protein--ligand heavy-atom contacts within \(6\,\angstrom\).}
@@ -1524,7 +1521,7 @@ The sensitivity protocol in Online Methods crosses five crop radii with three ce
 
 Paired conditions use the same seeds, fragment inventories and prior-draw construction. The jitter stream is independent of the pose prior; within each complex and repeat, jitter levels scale the same perturbation vector. Translation draws were identical; backend quaternion roundoff produced initial-rotation differences of at most \(2.81\times10^{-7}\) radians, without bitwise prior identity across backends. The 40- and 100-pose budgets are generated separately and are not nested banks.
 
-Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift}. With 100 poses and ten steps, guided RMSD--PoseBusters success was \(78.4\pm1.8\%\) on Astex versus \(80.0\pm0.0\%\) without guidance, and \(79.4\pm1.3\%\) on PoseBusters versus \(79.1\pm0.2\%\). With 40 poses and 25 steps, unguided/guided success was \(78.0/78.0\%\) on Astex and \(76.7/77.6\%\) on PoseBusters. Guided raw-bank mean success was higher in all four cohort/budget comparisons; the refined-bank differences were smaller and had mixed signs. These descriptive controls do not select guidance as a primary setting.
+Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift}. Guided raw-bank mean RMSD--PoseBusters success was higher in both cohorts at each candidate budget, but refined-bank differences were smaller and had mixed signs (Fig.~\ref{fig:si-guidance-budget}). These descriptive results did not select guidance as a primary setting.
 
 \begin{figure}[!htbp]
     \centering

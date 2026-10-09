@@ -136,12 +136,12 @@ The evaluation uses a fixed holo receptor, a reference-derived pocket, 100 candi
 
 \subsection{Supplied-pocket comparison}
 
-Fig.~\ref{fig:benchmark-comparison} compares selected-pose performance on Astex Diverse and PoseBusters v2.
+Fig.~\ref{fig:benchmark-comparison} compares selected-pose RMSD success and RMSD--PoseBusters success on Astex Diverse and PoseBusters v2.
 The local comparison includes SigmaDock \citep{prat2025sigmadock}, DiffDock-Pocket \citep{plainer2023diffdockpocket}, RLDiff RL++ \citep{broster2026rldiff}, DiffBindFR \citep{zhu2024diffbindfr}, and force-optimized SurfDock \citep{cao2025surfdock}.
-On Astex, EFF-Dock achieved 83.1\% RMSD success and 80.0\% same-pose RMSD--PoseBusters success.
+On Astex, EFF-Dock achieved 80.0\% same-pose RMSD--PoseBusters success.
 SigmaDock, SurfDock and RLDiff RL++ had higher point estimates on both endpoints.
-On PoseBusters v2, EFF-Dock reached 81.5\% RMSD success and 79.1\% RMSD--PoseBusters success. Relative to SigmaDock, the paired difference in RMSD--PoseBusters success was +2.71 percentage points (95\% bootstrap interval, \(-2.27\) to +7.47), compared with \(-9.02\) points (\(-16.08\) to \(-1.96\)) on Astex. The PoseBusters interval does not establish superiority, equivalence or non-inferiority; intervals are unadjusted for multiple comparisons (Supplementary Fig.~S14).
-Requiring PoseBusters validity reduced RMSD-only success by 3.1 percentage points on Astex and 2.4 points on PoseBusters. Most selected RMSD-successful EFF-Dock poses therefore passed the full validity endpoint.
+On PoseBusters v2, EFF-Dock reached 79.1\% RMSD--PoseBusters success. Relative to SigmaDock, the paired difference in RMSD--PoseBusters success was +2.7 percentage points (95\% bootstrap interval, \(-2.3\) to +7.5), compared with \(-9.0\) points (\(-16.1\) to \(-2.0\)) on Astex. The PoseBusters interval does not establish superiority, equivalence or non-inferiority; intervals are unadjusted for multiple comparisons (Supplementary Fig.~S14).
+Most selected RMSD-successful EFF-Dock poses also passed PoseBusters.
 The learned methods use their native sampling and ranking procedures, while GOLD and Vina are literature values \citep{buttenschoen2024posebusters}; the comparison evaluates protocol-conditioned pipelines with differing receptor and ligand preparation, pocket construction, candidate budgets and native selectors, rather than matched-compute implementations.
 Saved-pose reevaluation under benchmark-specific endpoints gave 71.4\% top-1 success on all 558 FoldBench interfaces, requiring BiSyRMSD \(<2\,\angstrom\) and LDDT-PLI \(>0.8\) on the same refined pose. On the official 802-case OpenBind follow-on subset, top-1 BiSyRMSD \(\le2\,\angstrom\) and PoseBusters success was 56.4\%, falling to 48.3\% with the additional LDDT-PLI \(\ge0.8\) requirement (Supplementary Fig.~S20; \sisection{S7.3}). PhiBench-derived results retain the local cohort and fixed-receptor RMSD definition. Published results accompany these analyses, but differences in tasks, cohorts, preparation, training exposure and candidate budgets preclude direct paired comparisons.
 
@@ -156,15 +156,9 @@ Saved-pose reevaluation under benchmark-specific endpoints gave 71.4\% top-1 suc
 
 \subsection{Refinement and chirality-aware selection}
 
-Fig.~\ref{fig:refinement-selection} compares coordinate-refinement and chirality-aware selection conditions.
-Without the chirality filter, refinement increased RMSD--PoseBusters success from 54.5\% to 77.6\% on Astex, 51.3\% to 77.8\% on PoseBusters, 37.2\% to 58.9\% on PhiBench-derived, 49.0\% to 72.9\% on FoldBench, and 26.9\% to 52.9\% on OpenBind.
-Without chirality filtering, these are gains of 21.7--26.5 percentage points across the five cohorts; the corresponding gains under the primary chirality-filtered selector were 15.7--23.2 points.
-Mean RMSD-only selected-pose success was 1.0--3.7 points higher after refinement.
-These pipeline-level differences combine coordinate changes with changes in the selected candidate after fresh confidence scoring; they do not measure the repair of a fixed pose.
+Fig.~\ref{fig:refinement-selection} compares refinement and chirality-aware selection. Refinement and rescoring increased mean RMSD--PoseBusters success by 15.7--23.2 percentage points under the primary selector and 21.7--26.5 points without chirality filtering. Without chirality filtering, mean RMSD-only selected-pose success increased more modestly. These differences combine coordinate changes with reselection and do not measure the repair of a fixed pose.
 
-After refinement, chirality filtering increased RMSD--PoseBusters success by 2.4 points on Astex, 1.3 on PoseBusters, 1.6 on PhiBench-derived, 0.8 on FoldBench, and 0.3 on OpenBind (Supplementary Fig.~S9).
-The resulting primary success rates were 80.0\%, 79.1\%, 60.5\%, 73.8\%, and 53.2\%, respectively.
-The refinement-and-rescoring stage accounts for most of the observed gain; chirality filtering adds a smaller improvement. Across all candidates, input-tetrahedral compatibility increased from 58.5--74.4\% in raw banks to 88.2--96.8\% after refinement. Rigid fragments preserve their own geometry but do not automatically preserve stereochemistry across cut interfaces.
+Chirality filtering added smaller mean improvements of 0.3--2.4 percentage points after refinement (Supplementary Fig.~S9). Refinement also increased input-tetrahedral compatibility across all candidate banks. Rigid fragments preserve their own geometry but do not automatically preserve stereochemistry across cut interfaces.
 
 The complexity analysis in Supplementary Fig.~S1 localizes the remaining error.
 Selected top-1 and RMSD--PoseBusters success generally deteriorated for larger ligands, more rotatable bonds, and more fragments, most clearly in PoseBusters, PhiBench-derived, and FoldBench.
@@ -193,15 +187,7 @@ For refined banks, mean within-complex Spearman correlation between predicted an
 The median selection regret and conditional top-1 success in Fig.~\ref{fig:confidence-diagnostics}C,D quantify how an available RMSD-successful candidate can fail to be selected.
 Reliability curves and performance as a function of near-native candidate density are reported in Supplementary Fig.~S12.
 
-Confidence ranking nevertheless enriches near-native poses at early ranks relative to saved generation order (Supplementary Fig.~S2).
-For the refined unfiltered banks, top-1 RMSD success was 82.7\%, 81.8\%, 63.8\%, 75.1\%, and 53.5\% on Astex, PoseBusters, PhiBench-derived, FoldBench, and OpenBind, respectively.
-Expanding from top-1 to top-5 raised coverage to 92.9\%, 89.3\%, 78.2\%, 85.4\%, and 73.8\%---gains of 7.5--20.3 points from only four additional ranked candidates.
-The confidence score enriches useful poses at early ranks, although rank one remains imperfect.
-
-The corresponding oracle-100 values were 96.5\%, 94.3\%, 88.5\%, 91.6\%, and 87.9\% (Supplementary Fig.~S10).
-The remaining top-5-to-oracle gaps were 3.5, 5.0, 10.4, 6.2, and 14.0 points, respectively.
-OpenBind was the most selection-limited cohort: only 6.3\% of its individual refined candidates were near-native, yet 87.9\% of complexes contained at least one such pose.
-The corresponding candidate densities were 34.5\% for Astex, 31.7\% for PoseBusters, 22.9\% for PhiBench-derived, and 26.0\% for FoldBench.
+Confidence ranking enriches near-native poses at early ranks relative to generation order (Supplementary Fig.~S2). In refined unfiltered banks, expanding from top-1 to top-5 increased RMSD coverage by 7.5--20.3 percentage points, although substantial gaps to the full-bank oracle remained (Supplementary Fig.~S10). OpenBind illustrates this selection bottleneck: only 6.3\% of its refined candidates were near-native, yet 87.9\% of complexes contained at least one such pose.
 
 The generation-prefix experiment in Supplementary Fig.~S3 reaches the same conclusion from a deployable selection perspective.
 Oracle coverage cannot decrease as additional generated poses become available, whereas confidence-selected top-1 can plateau or decline when a newly added pose is incorrectly promoted.
@@ -220,8 +206,8 @@ Larger candidate banks improve coverage, but the gain reaches top-1 only when th
 \subsection{Eligibility-aware selection bottlenecks}
 
 Supplementary Fig.~S18 partitions every primary outcome into absence of an RMSD-successful candidate in the refined bank, exclusion of all near-native candidates by the effective chirality mask, ranking failure within the eligible set, PoseBusters failure of an RMSD-successful selection, or RMSD--PoseBusters success.
-The fraction without an RMSD-successful refined candidate ranged from 3.5\% on Astex to 12.1\% on OpenBind, whereas chirality exclusion accounted for at most 0.3\%.
-Ranking failure was larger, ranging from 12.4\% on PoseBusters to 34.4\% on OpenBind. Selected RMSD-successful poses failing PoseBusters accounted for 0.0--3.1\% of all complexes.
+Chirality exclusion accounted for at most 0.3\% of complexes.
+Ranking failure was larger, ranging from 12.4\% on PoseBusters to 34.4\% on OpenBind.
 Within the refined banks, RMSD-based ranking failure exceeds chirality exclusion. Because PoseBusters was not evaluated for every candidate, this gap does not quantify attainable improvement in RMSD--PoseBusters success.
 The regret curves in Supplementary Fig.~S18B measure loss relative to the best RMSD in the same effective candidate set available to the deployed selector.
 
@@ -231,9 +217,9 @@ These analyses qualify claims of prospective generalization without identifying 
 
 \subsection{Sensitivity to generation inputs}
 
-We varied the generation crop, supplied-center error and translation-prior scale on all Astex and PoseBusters complexes while holding the networks, downstream spatial context and primary selector fixed (Fig.~\ref{fig:pocket-sensitivity}). With a \(10\,\angstrom\) crop and prior scale \(2\,\angstrom\), RMSD--PoseBusters success was 80.0\% on Astex and 79.1\% on PoseBusters without center error. Gaussian center error with standard deviation \(1\,\angstrom\) per axis gave 75.3\% and 76.3\%, respectively; at \(2\,\angstrom\), success was 71.0\% and 64.4\%. Refined-bank RMSD-only oracle coverage at \(2\,\angstrom\) error was 86.3\% and 82.8\%.
+We varied the generation crop, supplied-center error and translation-prior scale on all Astex and PoseBusters complexes while holding the networks, downstream spatial context and primary selector fixed (Fig.~\ref{fig:pocket-sensitivity}). With a \(10\,\angstrom\) crop and prior scale \(2\,\angstrom\), RMSD--PoseBusters success was 80.0\% on Astex and 79.1\% on PoseBusters without center error. Center error with standard deviation \(2\,\angstrom\) per axis reduced success to 71.0\% and 64.4\%, respectively. Refined-bank RMSD-only oracle coverage at \(2\,\angstrom\) error was 86.3\% and 82.8\%.
 
-At a \(6\,\angstrom\) crop with \(2\,\angstrom\) center error, RMSD--PoseBusters success was 66.3\% on Astex and 55.1\% on PoseBusters. A \(14\,\angstrom\) crop under the same error gave 71.4\% and 65.5\%. At the unperturbed \(10\,\angstrom\) crop, prior scales of \(1/2/4\,\angstrom\) gave RMSD--PoseBusters success of \(83.9/80.0/74.5\%\) on Astex and \(79.8/79.1/75.1\%\) on PoseBusters. These descriptive comparisons do not select a new operating point.
+Larger generation crops partly buffered center error, whereas prior-scale effects varied with the cohort and perturbation level. The complete crop and prior grids are shown in Fig.~\ref{fig:pocket-sensitivity}; these descriptive comparisons did not select a new operating point.
 
 Refinement and confidence scoring retained the original unperturbed center and a \(10\,\angstrom\) crop in all conditions. The crop and center-jitter grids perturb sampling inputs with fixed downstream spatial context. Prior-scale comparisons include the scale's influence on both sampling and the recomputed docking features used for ranking. Guidance and candidate-allocation controls at equal learned pose-step counts are reported separately (Supplementary Fig.~S19).
 
@@ -252,7 +238,7 @@ Refinement and confidence scoring retained the original unperturbed center and a
 
 The results identify coordinate validity and pose selection as distinct limitations. Refinement and rescoring increased RMSD--PoseBusters success substantially, while the smaller change in RMSD-only success indicates that geometric validity accounts for much of the gain. Matched-candidate analyses support coordinate repair, whereas aggregate gains also include reselection. The remaining RMSD-only oracle--top-1 gap identifies ranking loss without establishing that every unselected near-native pose is physically valid.
 
-Candidate density helps explain differences among cohorts. Only 6.3\% of OpenBind candidates were near-native, despite an 87.9\% full-bank oracle rate. Sparse banks and complex ligands were more susceptible to ranking loss, and adding candidates could reduce top-1 accuracy when an incorrect pose was promoted. The eligibility-aware analysis confirms that ranking loss was larger than chirality exclusion (Supplementary Fig.~S18).
+Candidate density helps explain differences among cohorts. OpenBind combined sparse near-native candidates with high full-bank coverage. Sparse banks and complex ligands were more susceptible to ranking loss, and adding candidates could reduce top-1 accuracy when an incorrect pose was promoted. The eligibility-aware analysis confirms that ranking loss was larger than chirality exclusion (Supplementary Fig.~S18).
 
 Training relatedness showed no consistent monotonic association with success across cohorts. However, cohort composition, sparse strata and incomplete ancestral training-exposure records limit what these descriptive comparisons can establish.
 
@@ -260,7 +246,7 @@ Training relatedness showed no consistent monotonic association with success acr
 
 Training pocket centers and fragment templates were derived from crystal complexes. The center-perturbation experiments kept downstream refinement and ranking context fixed, so they do not establish complete-pipeline wrong-pocket robustness. Starting-conformer sensitivity was not systematically evaluated, and rigid-fragment motion cannot repair intrafragment errors. Fragmentation depends on atom order and uses soft cut-bond closure constraints.
 
-The cohorts are reference-pocket redocking sets rather than prospective target-discovery benchmarks. Astex and PoseBusters were repeatedly used during development, PhiBench-derived and FoldBench adapt their source tasks, and OpenBind samples one protease family and includes two noncovalent approximations of covalent systems. Training relatedness remains substantial: all OpenBind complexes fall in the 90--100\% sequence-identity bin, and 341 of 558 FoldBench complexes share a training PDB accession. Accession sharing does not imply the same protein--ligand complex. Only 22 external complexes met the simultaneous sequence-identity, ligand-similarity and exact-match restrictions. These evaluations therefore provide limited evidence for generalization to unrelated targets.
+The cohorts are reference-pocket redocking sets rather than prospective target-discovery benchmarks. Astex and PoseBusters were repeatedly used during development, PhiBench-derived and FoldBench adapt their source tasks, and OpenBind samples one protease family and includes two noncovalent approximations of covalent systems. Training relatedness remains substantial: all OpenBind complexes occupy the highest sequence-identity bin, and many FoldBench complexes share a training PDB accession (Supplementary Figs.~S6--S8 and Table~S16). Accession sharing does not imply the same protein--ligand complex. Only 22 external complexes met the simultaneous sequence-identity, ligand-similarity and exact-match restrictions. These evaluations therefore provide limited evidence for generalization to unrelated targets.
 
 Component ablations are needed to distinguish the contributions of fragmentation, higher-order features, Newton--Euler readout, auxiliary losses and dynamic contacts. Confidence diagnostics quantify ranking and empirical reliability within the evaluated banks, without establishing calibration for new candidate-generation distributions. The three inference repeats describe stochastic variation under fixed trained weights, rather than retraining variability or target-population uncertainty.
 
@@ -531,7 +517,7 @@ Full typing rules, energy equations, mass--inertia projection, refinement safegu
 
 Training data were derived from PLINDER 2024-06/v2 \citep{durairaj2024plinder}. Curation applies ligand validity, covalency, interaction, experimental-quality, resolution, contact and size criteria, followed by deterministic representative selection within ligand and pocket-community groups. The filters and cohort counts are detailed in the \sisection{S6}.
 
-After model-specific input filtering, docking uses 47,277 training and 1,076 validation samples, while confidence uses 43,092 training and 1,035 validation samples. The sets have 43,067 shared training IDs; their differing input requirements are detailed in the \sisection{S6}.
+After model-specific input filtering, docking uses 47,277 training and 1,076 validation samples, while confidence uses 43,092 training and 1,035 validation samples. Their differing input requirements and overlap are detailed in the \sisection{S6}.
 
 External exclusion required both an exact ligand match and membership in a benchmark-associated pocket community, removing 904 samples. This rule does not independently exclude recurring ligands or homologous proteins; training relatedness is measured separately.
 
