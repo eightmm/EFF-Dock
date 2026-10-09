@@ -94,6 +94,13 @@ Table~\ref{tab:si_notation} summarizes the notation used throughout the article 
     \end{tabular}
 \end{table}
 
+\paragraph{Units, operators and reused indices.}
+Bold symbols denote vectors or matrices; calligraphic symbols denote sets, graphs or state spaces. \(\R^3\), \(\SO(3)\) and \(\SE(3)\) denote Euclidean three-space, proper three-dimensional rotations, and their translation--rotation group. \(\mathbf I_3\) is the identity matrix, \(\top\) is transpose, \(^{-1}\) is inverse, and \(^{+}\) is the specified truncated pseudoinverse. \(|\mathcal A|\) is set cardinality, \(\|\cdot\|_2\) the Euclidean norm, \(\times\) the vector cross product, \(\odot\) element-wise multiplication, and \(\oplus\) feature concatenation in the architecture diagram. Stars indicate targets or an explicitly defined selected index; hats indicate predictions, except that \(\widehat{\mathbf h}\) denotes normalized hidden features in Fig.~2.
+
+Coordinates, distances, displacement and RMSD use Angstrom; angles use radians unless degrees are displayed. Flow time \(t\in[0,1]\) is dimensionless transport time, not elapsed simulation time. \(m=1,\ldots,M\) indexes candidates, \(s=0,\ldots,S\) integration states, and \(b\) a minibatch complex; bold \(\mathbf b\) instead denotes the pocket center. The \(N\) in the pose representation counts heavy atoms; \(N\) in candidate-prefix plots and workflow labels instead denotes the available candidate count. \(n\) in benchmark labels counts complexes or explicitly labelled strata. A top-\(k\) cutoff is a ranking count, not a fragment index. All logarithms are natural and act on numerical values in the stated units: \(\log\sigma\) abbreviates \(\log[\sigma/(1\,\angstrom)]\), and \(\log(1+r)\) abbreviates \(\log[1+r/(1\,\angstrom)]\) for an RMSD \(r\). Logits are real pre-sigmoid scores; \(\operatorname{sigmoid}(a)=1/(1+e^{-a})\) and \(\operatorname{softplus}(a)=\log(1+e^a)\) for scalar argument \(a\). Hidden features have no assigned physical units. The rotation Exp map converts an axis--angle vector to a proper rotation, and Log returns its principal axis--angle vector. \(\mathcal N(\boldsymbol\mu,\boldsymbol\Sigma)\) denotes a Gaussian with mean \(\boldsymbol\mu\) and covariance \(\boldsymbol\Sigma\); \(\mathbb 1[A]\) is one when condition \(A\) holds and zero otherwise. Diagram \(\otimes\) denotes an equivariant tensor product.
+
+Numerical settings below distinguish measured outcomes, benchmark definitions, fixed model or protocol choices, and numerical safeguards. A reported setting documents the evaluated implementation; absent a stated validation criterion or ablation, its particular value is not established as optimal.
+
 \paragraph{Input standardization and coordinate frame.}
 Geometry-training ligands are read from crystal-complex coordinates with RDKit, and the sanitization outcome is recorded \citep{landrum2024rdkit}.
 Stereochemistry is assigned from coordinates before hydrogen removal, and the largest connected component defines the heavy-atom graph.
@@ -129,6 +136,7 @@ Evaluation uses fixed docking and confidence weights with local-to-world feature
 Finite network verification used five complexes, three flow times per complex, and four joint rotations per time.
 All 60 tested translation and 60 angular outputs satisfied the tolerance \(\|\Delta\|_2\le10^{-4}+10^{-4}\|\text{expected}\|_2\); the maximum relative errors were \(9.2\times10^{-6}\) and \(1.8\times10^{-5}\), respectively.
 These core-network tests support covariance under joint world rotations but do not prove exact equivariance of the entire data-preparation, sampling, refinement, and selection pipeline.
+In the tolerance expression, \(\Delta\) is measured output minus the jointly transformed expected output. The two \(10^{-4}\) coefficients are absolute and relative numerical acceptance tolerances, rather than docking-accuracy thresholds. Singular-value floors, anchor-angle tolerances and inertia truncation likewise identify numerically usable geometry; they are not learned parameters.
 
 \subsection{Numerical checks for coordinate-only frame recovery}
 \label{si:frame_recovery_checks}
@@ -208,7 +216,7 @@ Starting from \(r_i^{(0)}=\deg_G(i)\), candidates are swept once in that order. 
      \mathbb{1}[e_q\ \text{is retained}].
     \label{eq:si_fragment_degree_sweep}
 \end{equation}
-Here \(q\) is the candidate-bond sweep index, \(a\in V\) is an arbitrary atom index, and \(\mathbb 1[\cdot]\) is the indicator function.
+Here \(q\) is the candidate-bond sweep index, \(a\in V\) is an arbitrary atom index, and \(\mathbb 1[\cdot]\) is the indicator function. The vertex and edge sets \(V,E\) are heavy atoms and covalent bonds; \(\deg_G(i)\) is heavy-atom degree. Eligibility \(\chi_{ij}\) is zero when the stated rule fails, \(\operatorname{sort}_{\mathrm{lex}}\) orders atom-index pairs lexicographically, and \(r_i^{(q)}\) is the remaining degree after the first \(q\) candidate cuts.
 Removing the retained cuts gives the preliminary connected components.  Singleton components are repeatedly merged into the largest adjacent component (with RDKit neighbor order resolving a tie), until no singleton remains or a sweep makes no change.  Cuts whose endpoints subsequently share a component are discarded.  For the resulting atom set \(\mathcal{A}_k\),
 \begin{equation}
     \mathbf{T}_k=\frac{1}{|\mathcal{A}_k|}
@@ -243,6 +251,7 @@ Geometry training samples
     \label{eq:si_prior_mixture}
 \end{equation}
 and embeds $\log\sigma$ together with flow time.
+The entries of \(p_\sigma\) correspond in order to the five listed scales and sum to one; they specify how often each spatial prior is sampled, rather than probabilities assigned to generated poses.
 For paired prior and target fragment poses, the left-action coupling is
 \begin{align}
     \mathbf{T}_{k,t}
@@ -280,13 +289,15 @@ The released docking checkpoint uses
 \end{equation}
 The \(\delta_0\) component replays the exact prior endpoint at \(t=0\).
 Here \(\mathcal U(a,b)\) is uniform on \([a,b]\), \(\operatorname{Law}[X]\) denotes the distribution of \(X\), and \(\delta_0\) is the unit point mass at zero.
+The 0.8 and 1.7 in the base distribution are the location and scale of the Gaussian before the sigmoid. The 0.02 uniform component preserves sampling across the full interval; the continuation adds early-time draws and exact-prior replay. These are retained training settings, not parameters selected by the external benchmarks.
 At inference, the sampler uses
 \begin{equation}
     t_s=1-\left(1-\frac{s}{S}\right)^3,
     \qquad s=0,\ldots,S,
     \label{eq:si_time_grid}
 \end{equation}
-with \(\Delta t_s=t_{s+1}-t_s\), the explicit Euler translation update \(\mathbf T_{k,t+\Delta t}=\mathbf T_{k,t}+\Delta t\,\widehat{\mathbf v}_{k,t}\), and the left-multiplicative rotation update,
+with \(\Delta t_s=t_{s+1}-t_s\), the explicit Euler translation update \(\mathbf T_{k,t+\Delta t}=\mathbf T_{k,t}+\Delta t\,\widehat{\mathbf v}_{k,t}\), and the left-multiplicative rotation update below.
+The power 3 makes intervals shorter near the target endpoint; \(S\) intervals use \(S+1\) grid points including both endpoints. The grid power and primary ten-interval budget are fixed protocol choices.
 \begin{equation}
     \mathbf{R}_{k,t+\Delta t}
     =
@@ -322,7 +333,7 @@ Raw endpoints are saved before refinement. For a confidence model \(c_\phi\), th
     c_\phi\!\left(\mathbf z_S^{(m)},\mathcal P,\mathcal G_L,\mathcal C_L,\sigma\right).
     \label{eq:si_confidence_selection}
 \end{equation}
-Here \(q_m\) denotes compatibility with the input-defined tetrahedral stereocenters. Ties follow saved candidate order. The unfiltered argmin is reported separately as a diagnostic condition.
+Here \(q_m=1\) means that candidate \(m\) matches all assigned input tetrahedral stereocenters, and \(q_m=0\) otherwise; \(\mathcal E\) is the effective eligible set, including the all-ineligible fallback. Ties follow saved candidate order. The unfiltered argmin is reported separately as a diagnostic condition.
 The function \(c_\phi\) is the nonnegative predicted RMSD from Eq.~\eqref{eq:confidence_reported_rmsd}, parameterized by learned weights \(\phi\).
 Unsupported inputs and sampling exceptions are recorded as complex-level failures.
 
@@ -360,6 +371,11 @@ For edge \(j\rightarrow i\), a compact layer description is
 \end{equation}
 Here \(\mathbf Y_{0:2}\) denotes real spherical harmonics through order two and \(\mathbf e_{ji}^{(\ell)}\) is the edge descriptor. The message operator applies edge-dependent input and output channel scales around a shared-weight tensor product, followed by equivariant activation. Gated aggregation combines a scalar gate, nonscalar channel gates and relation-specific exponential distance decay. After gate-normalized aggregation, nonscalar magnitudes receive learned invariant rescaling within each angular-order group. The post-convolution block applies an equivariant linear map, activation and channel dropout. Its output is added to the original, pre-normalization hidden state before adaptive normalization.
 Scalar channels use SiLU, non-scalar channels use invariant norm gates, and dropout masks are shared over the \(2l+1\) components of each irreducible channel.
+
+In Eq.~\eqref{eq:si_compact_layer}, \(\ell\) is the layer index, \(\mathbf h_i^{(\ell)}\) the feature vector of node \(i\), \(\mathcal N(i)\) its incoming neighbors, and \(b(i)\) its complex. The unit direction \(\widehat{\mathbf r}_{ji}\), written \(\widehat{\mathbf r}_{ij}\) in Fig.~2, points from sender \(j\) to receiver \(i\). Norm denotes equivariant root-mean-square normalization, GateMean the learned gate-normalized neighbor aggregation, Block the post-convolution transformation, and AdaLN adaptive layer normalization. Angular order \(l=0,1,2\), distinct from layer depth, has \(2l+1=1,3,5\) components per channel. Even and odd parity describe behavior under inversion; the evaluated symmetry claim concerns proper joint rotations.
+
+\paragraph{Architecture-diagram notation.}
+In Fig.~2, \(c=E_t(t)+E_\sigma(\log\sigma)\) is the conditioning vector called \(\boldsymbol\eta_b\) here; \(E_t\) and \(E_\sigma\) are learned embeddings. Diagram superscript \((k)\) counts layers, whereas subscript \(f\) indexes fragments; diagram \(I_f\) is the unit-weight geometric inertia \(\mathbf J_f\) of Eq.~\eqref{eq:si_newton_euler}, not the mass-weighted guidance inertia. \(\alpha\) mixes terminal docking features into the confidence embedding and is initialized to 0.25. \(h_{\mathrm{in}}\), \(h_{\mathrm{conv}}\) and \(h'\) denote convolution input, convolution output and transformed features. \(\delta_{\mathrm{in/out}}\) are learned radial channel-scale offsets. Distance \(d_{ij}\) and learned positive relation-specific scale \(\sigma_{\mathrm{type}}\) define distance decay; the latter is distinct from the translation prior \(\sigma\). RMSNorm is root-mean-square normalization; scalar blocks normalize by scalar RMS and nonscalar blocks by RMS channel norm, with a numerical denominator stabilizer. \(\gamma_0,\beta_0\) are scalar affine scale/shift outputs, while \(\gamma_{>0}\) controls nonscalar rescaling. The subscript \(>0\) refers to angular order, not the sign of \(\gamma\). Its \(0.1\tanh\) factor bounds modulation to 10\% about identity. \(g\) is the invariant norm-dependent gate, shared over each channel's components. SiLU is \(a\operatorname{sigmoid}(a)\); MLP denotes multilayer perceptron and concat denotes concatenation. The channel counts, layer depths, radial features and dropout specify the retained architecture; no ablation establishes these dimensions as optimal.
 
 \begin{table}[htbp]
     \centering
@@ -445,6 +461,7 @@ The primary losses are Cartesian-component-averaged translation MSE and observab
 \label{eq:si_primary_flow_losses}
 \end{equation}
 An empty rotational set contributes zero.
+Here \(\mathcal K_{\mathrm{rot}}\) contains fragments with retained rotational modes, \(\mathbf P_k\) projects onto those modes, and \(\mathbf u_i^\star\) is the atom velocity induced by the target fragment translation and angular velocity. The factors \(3N\), \(3K\) and \(3|\mathcal K_{\mathrm{rot}}|\) average squared errors over Cartesian components and valid items; they do not weight complexes by success. In Eq.~\eqref{eq:distance_geometry_loss}, \(t_b\) is complex \(b\)'s flow time, \(\mathcal P_b\) its interfragment atom-pair set, and \(\ell_b\) its mean squared endpoint-distance error. The \(t_b^2\) weight reduces the contribution of early extrapolations. The coefficients 8, 0.3 and 3 set relative task emphasis in the retained checkpoint's numerical units; their optimality was not isolated experimentally.
 The released objective is
 \begin{equation}
 \mathcal L_{\mathrm{geom}}
@@ -480,6 +497,7 @@ The score used for ranking is
 \label{eq:confidence_reported_rmsd}
 \end{equation}
 Lower \(\widehat r_m\) ranks earlier.
+The clip limits \(-2,5\) act on dimensionless predicted log-RMSD; exp-minus-one reverses the log-one-plus target transformation, and the outer maximum prevents negative reported RMSD. Clipping is a fixed reporting safeguard, not a success threshold. Contact-count radii define local proximity summaries; the exponential count uses weight \(\exp[-d/(2\,\angstrom)]\) for atom--protein distance \(d\), and its scale is a fixed feature setting.
 
 \subsection{Targets and objective}
 \label{app:confidence_loss_details}
@@ -503,6 +521,7 @@ With the corresponding losses denoted by their subscripts, the complete objectiv
 \end{align}
 Empty admissible pair sets contribute zero to \(\mathcal L_{\mathrm{rank}}\).
 Crystal anchors may enter confidence training but are excluded from validation model selection.
+The reg and BCE subscripts denote Huber regression and binary cross entropy, each averaged over its atom or pose targets. The Huber transition 1 and ranking margin/gap 0.05/0.3 are in log-target units. Rank loss averages the hinge penalty over admissible ordered pairs. The success-listwise term is cross entropy between the normalized soft-success target and a softmax over pose success logits; it trains the auxiliary success head, not the deployed predicted-RMSD selector. The \(0.2\,\angstrom\) width smooths the target near \(2\,\angstrom\), and the six objective coefficients are fixed relative training weights.
 
 \section{Interaction Energy and Rigid-Fragment Refinement}
 \label{si:guidance}
@@ -560,6 +579,7 @@ For weights \(w_{ij}\in[0,1]\),
     \label{eq:si_soft_or}
 \end{equation}
 Clamping precedes the logarithmic implementation of this expression.
+The scalar \(u\) is a switch argument, and \(\bar u\) clips it to \([0,1]\). The coefficients 6, \(-15\) and 10 give the quintic interpolation with zero first and second endpoint derivatives. The floor \(\delta=10^{-7}\) keeps the logarithmic soft union finite at unit pair weight. Site occupancy saturates rather than rewarding unlimited contacts with one site.
 
 \subsection{Static typing and receptor admission}
 \label{si:guidance_typing}
@@ -626,6 +646,7 @@ In primary measurements, the bond, angle and chiral reference values are obtaine
 Refinement and confidence use matching conformer templates and fragment partitions. Compatibility with generated poses was checked by independent proper fragment fits, with whole-ligand heavy-atom RMSD at most $10^{-3}\,\angstrom$. Original generation-template hashes were unavailable, so this geometric check does not establish identity of the fragment body-axis convention. Previously refined PhiBench-derived, FoldBench and OpenBind coordinates and energy references were verified unchanged and reused without rerunning refinement; rescoring used the evaluated frame convention.
 
 The proper term is independent of its starting torsion, and the weights around each cut bond sum to one. Conjugated or aromatic interfaces use \(n_p=2,\delta_p=\pi\); other cut bonds use \(n_p=3,\delta_p=0\). Chiral improper restraints are active; the separate chemical-constraint auxiliary channel has zero weight. The coefficients are given in Table~\ref{tab:si_physical_parameters}.
+Here \(r_b\), \(\theta_a\) and \(\phi_p\) are bond length, bond angle and proper dihedral; ref denotes the specified reference-conformer value. The \(k\) coefficients are restraint strengths, not learned parameters. Twofold and threefold torsion profiles are generic periodic preferences for the stated interface classes, not fitted torsional free energies. Their coefficients and the steric-barrier settings are fixed custom geometric parameters; only the stated element-level UFF constants and radius tables are taken from the cited physical parameter sources.
 
 Let \(\mathcal N_{\mathrm{LJ}}\) be the admitted ligand--ligand and protein--ligand nonbonded pairs after topological exclusions.
 For \((i,j)\in\mathcal N_{\mathrm{LJ}}\), \(r_{ij}=\|\mathbf x_i-\mathbf x_j\|_2\), \(s_{ij}\) is the topological scale, and \(x_i,D_i\) are the UFF size and well-depth parameters.
@@ -678,6 +699,7 @@ Under the geometry-only receptor policy, unresolved receptor atoms contribute re
  \label{eq:si_generic_obstacles}
 \end{align}
 The total obstacle term \(E_{\mathrm{obs}}\) is the sum of the typed and generic repulsive terms; neither provides a hydrogen-bond, charge or dispersion attraction.
+In the barrier, \(\rho\) scales the radius sum, \(\tau\) controls smooth penetration, and \(\Delta_{\mathrm{cut}}\) is the support margin. Generic-obstacle length 1.7 Å, soft-core length 0.5 Å, amplitude 10 kcal/mol, exponent 12 and 2.5--3.0 Å switch define a bounded repulsive fallback rather than element-specific chemistry. In the LJ term, 12 and 6 are repulsive and attractive exponents; 1--2, 1--3 and 1--4 refer to atoms separated by one, two and three bonds. Soft cores regularize close approaches, and outer cutoffs limit interaction neighborhoods.
 
 \begin{table}[tbp]
     \centering
@@ -687,8 +709,9 @@ The total obstacle term \(E_{\mathrm{obs}}\) is the sum of the typed and generic
         \toprule
         Parameter & Value & Role \\
         \midrule
-        Bond / angle coefficient & \(160\) / \(35\) & {\raggedright Harmonic restraint across a cut interface (\(\mathrm{kcal\,mol^{-1}\,\angstrom^{-2}}\) for bonds; rad\(^{-2}\) for angles)\par} \\
-        Proper / improper coefficient & \(0.5\) / \(12\) & Periodic torsion / chiral or planar restraint (kcal/mol) \\
+        Bond / angle coefficient & \(160\) / \(35\) & {\raggedright Harmonic restraint across a cut interface (\(\mathrm{kcal\,mol^{-1}\,\angstrom^{-2}}\) for bonds; \(\mathrm{kcal\,mol^{-1}\,rad^{-2}}\) for angles)\par} \\
+        Proper / planar coefficient & \(0.5\) / \(12\) & Periodic torsion / planar restraint (kcal/mol) \\
+        Chiral coefficient & \(12\) & Harmonic improper restraint (\(\mathrm{kcal\,mol^{-1}\,rad^{-2}}\)) \\
         LJ 1--4 scale & \(0.5\) & Intraligand topological exclusion \\
         LJ switch / cutoff & \(6/8\,\angstrom\) & \(C^2\) radial truncation \\
         Steric radius scale / coefficient & \(0.8/20\) & Protein--ligand compact overlap barrier (coefficient in \(\mathrm{kcal\,mol^{-1}\,\angstrom^{-2}}\)) \\
@@ -710,7 +733,7 @@ For \(i\in\mathcal H_L\) and \(j\in\mathcal H_P\),
 \end{equation}
 The contact window is centered around the structural criterion used by PLIP \citep{salentin2015plip}.
 
-Explicit hydrogens and lone pairs are not required. The direction-normalization floor is \(\epsilon=10^{-8}\) in the coordinate units used by the kernel (Angstrom for bond lengths).
+Explicit hydrogens and lone pairs are not required. Bond lengths are numerical values in Angstrom; the normalization floor is \(\epsilon=10^{-8}\). The same numerical floor is also used for dimensionless direction-vector norms.
 For typed heavy-atom site \(i\), heavy neighbor \(k\), and bond length \(l_{ik}\), define
 \begin{align}
     q_b(l)&=Q_5\left(\frac{l-0.10}{0.50-0.10}\right),\\
@@ -744,6 +767,7 @@ For donor \(D\), acceptor \(A\), and \(\widehat{\mathbf{r}}_{DA}=(\mathbf{x}_A-\
     \label{eq:si_hydrogen_bond}
 \end{align}
 Here \(t_D\) and \(t_A\) are the target cosines assigned to the donor and acceptor by the preceding valence rule.
+In Eq.~\eqref{eq:si_missing_valence_axis}, \(q_b\) suppresses collapsed bonds and \(q_i^{\mathrm{axis}}\) suppresses poorly defined site directions; the 0.10/0.50 bond-length limits use Angstrom, whereas 0.10/0.40 axis-norm limits are dimensionless. \(\widetilde{\mathbf v}_i\) is the weighted missing-valence direction sum and \(\mathbf v_i\) its normalized direction, distinct from a fragment velocity. Ideal linear, trigonal and tetrahedral geometry determines the target cosines. The hydrogen-bond distance peak 2.9 Å, width 0.35 Å, 3.5--4.1 Å switch and 60°/45° donor/acceptor cone widths are fixed geometric gates; their values are not inferred from the evaluated poses.
 Ligand-donor/protein-acceptor and protein-donor/ligand-acceptor directions are both evaluated.
 If the axis norm is at most \(\epsilon\), its direction and interaction weight are set to zero.
 
@@ -766,6 +790,7 @@ For \((a,b)\in\mathcal Q_L\times\mathcal Q_P\),
     \label{eq:si_screened_charge}
 \end{align}
 Opposite charges are attractive and equal charges repulsive; signed pair energies are summed directly without saturation.
+\(Q_a\) is charge in units of the elementary charge, \(W_{ai}\) normalized site membership, and \(\mathbf R_a\) a site centroid rather than a fragment rotation. \(d_{ab}\) is centroid separation and \(\rho_{ab}\) its soft-core distance. The prefactor 332.06371 converts elementary-charge pairs and Angstrom to nominal kcal/mol; 78.5 is the relative dielectric and 0.127 Å\(^{-1}\) the screening wavenumber. The 0.75 Å soft core and 8--10 Å switch regularize and truncate the pair interaction; distances substituted in the displayed expression are numerical Angstrom values.
 The Debye--H\"uckel-inspired screening constant represents 0.15 M monovalent ionic strength, 298.15 K, and bulk-water \(\epsilon_r=78.5\) \citep{lee2002electrostatic}.
 The term omits partial charge, protonation inference, heterogeneous dielectric, desolvation, polarization, solvent/counterion reorganization, and receptor relaxation.
 
@@ -785,15 +810,15 @@ For typed site sets \(A\) and \(B\) and clipped pair weights \(w_{ij}^{X}\in[0,1
     \label{eq:si_typed_occupancy}
 \end{align}
 The weight \(w_{ij}^{X}\) is the product of the versioned distance, angular, donor-cone, aromatic-offset, or coordination-profile gates for interaction family \(X\); the static site definitions are given in Table~\ref{tab:si_typing}.
-Let \(\mathcal R_L,\mathcal R_P\) denote ligand and protein aromatic systems, \(\mathcal C_L,\mathcal C_P\) positive-charge sites, \(\mathcal X_L\) ligand halogen donors, and \(\mathcal A_P^{X}\) receptor halogen acceptors.
+Let \(\mathcal R_L,\mathcal R_P\) denote ligand and protein aromatic systems, \(\mathcal Q_L^+,\mathcal Q_P^+\) positive-charge sites, \(\mathcal X_L\) ligand halogen donors, and \(\mathcal A_P^{X}\) receptor halogen acceptors.
 The aromatic and halogen contributions are
 \begin{align}
     E_{\pi}
     &=-0.25\,\operatorname{SymOcc}_{\mathcal R_L,\mathcal R_P}(w^{\pi}),\\
     E_{\mathrm{cat}\text{-}\pi}
     &=-0.5\left[
-      \operatorname{SymOcc}_{\mathcal R_L,\mathcal C_P}(w^{\mathrm{cat}\text{-}\pi})
-      +\operatorname{SymOcc}_{\mathcal C_L,\mathcal R_P}(w^{\mathrm{cat}\text{-}\pi})
+      \operatorname{SymOcc}_{\mathcal R_L,\mathcal Q_P^+}(w^{\mathrm{cat}\text{-}\pi})
+      +\operatorname{SymOcc}_{\mathcal Q_L^+,\mathcal R_P}(w^{\mathrm{cat}\text{-}\pi})
       \right],\\
     E_{\mathrm{XB}}
     &=-0.5\,\operatorname{Occ}_{\mathcal X_L\rightarrow\mathcal A_P^{X}}
@@ -811,6 +836,7 @@ For admitted metal profile \(h\), let \(E_h^{\mathrm{pair}}\), \(E_h^{\mathrm{ov
 where \(\mathcal M\) is the set of recognized receptor-metal profiles.
 Unsupported profiles have no attractive pair or slot contribution and remain repulsion only.
 The low-level gate thresholds and metal-profile capacities are versioned implementation parameters rather than learned quantities.
+The sets \(\mathcal Q_L^+,\mathcal Q_P^+\) contain the positive-charge sites from \(\mathcal Q_L,\mathcal Q_P\). \(X\) indexes an interaction family and \(h\) a metal profile. Occ and SymOcc sum one-sided and symmetric site occupancies; their factor \(1/2\) averages the two directions. Negative principal coefficients favor admitted contacts, and all displayed attraction amplitudes use nominal kcal/mol. These geometric gates and coefficients specify the fixed interaction profile rather than calibrated binding energetics.
 
 \begin{table}[htbp]
     \centering
@@ -855,6 +881,7 @@ For fragment \(k\), let \(m_i\) be the mass of atom \(i\), \(m_k^{\mathrm{frag}}
 The truncated pseudoinverse is evaluated in double precision after symmetrizing \(\mathbf{I}_k\).
 Eigenmodes not exceeding 1\% of the largest eigenvalue are removed.
 This mass--inertia-preconditioned projection is distinct from the learned model's unit-weight atom-vector readout.
+Atomic masses use the frozen element table in atomic mass units. \(\boldsymbol\tau_k\) is torque about the center of mass, while \(\mathbf d_k^T,\mathbf d_k^\omega\) are preconditioned search directions, not physical velocities or a molecular-dynamics acceleration.
 It is recorded without coordinate updates, converted to a normalized inference-time drift, or used by the post-sampling refiner described below.
 
 \subsection{Normalized inference-time guidance drift}
@@ -897,6 +924,7 @@ The guidance controls reported in Fig.~\ref{fig:si-guidance-budget} use \(\eta=2
 For each active interval, the LJ soft-core length is evaluated at \(t_{\mathrm{mid}}=[\max(t_j,0.5)+t_{j+1}]/2\). It decreases linearly from \(1.5\) to \(0.75\,\angstrom\) over the active half of integration.
 The ligand coordinates and pose-dependent contacts are rebuilt after each guided \(\SE(3)\) update.
 This is an inference-only modification; guidance is not present in the geometry-training objective.
+Here \(\eta\) is dimensionless pre-cap strength, \(\bar r_j\) the average ramp over interval \(j\), and \(\beta_j\) the factor matching projected atom-motion magnitude to the learned field. The ramp is zero through \(t=0.5\) and rises to one at \(t=1\). The atom-force cap 20 uses nominal kcal mol\(^{-1}\) Å\(^{-1}\); the RMS floor prevents division by a negligible direction. Guidance strength, ramp, soft-core schedule and motion caps are fixed control settings rather than benchmark-selected optima.
 
 \subsection{Bounded post-sampling refinement}
 \label{si:guidance_refinement}
@@ -933,6 +961,7 @@ Starting at iteration 25, a pose stops after five consecutive accepted updates s
 \end{equation}
 All 100 candidates are refined independently; finite coordinates from early-stopped poses define their final output.
 Raw coordinates are retained for paired analysis.
+Refinement index \(r\) counts optimization iterations, unrelated to an interatomic distance. \(\alpha_r\) is the dimensionless accepted backtracking multiplier; \(\mathbf x_{\mathrm{trial}}\) is its trial geometry. The 13 trial multipliers from \(0.5^0\) to \(0.5^{12}\) reduce the proposed move until acceptance. The \(10^{-10}\) allowance accommodates energy roundoff; displacement, energy-plateau and iteration limits bound numerical work and movement, rather than certifying convergence to a physical minimum.
 Refinement is rigid-fragment \(\SE(3)\) descent on \(E_{\mathrm{G}}\) and does not call the docking network, Vina, or another minimizer.
 
 \subsection{Inputs and numerical verification}
@@ -985,6 +1014,7 @@ Missing resolution, real-space correlation coefficient (RSCC), real-space R fact
 
 Deterministic representative ranking prefers biological assembly 1, followed by more interactions, larger RSCC, smaller RSR, smaller resolution, and stable system and ligand-chain identifiers.
 Preprocessing succeeded for 50,213 of the 50,297 selected records. The remaining 84 failed because of missing inputs, parsing, featurization or fragment decomposition.
+The resolved-atom fraction divides observed ligand heavy atoms by the total; RSCC measures real-space model--density correlation and RSR a real-space density residual. Resolution, resolved-atom fraction, RSCC and RSR thresholds screen experimental completeness and fit; interaction/interface and crystal-contact filters screen usable receptor--ligand context. Size and fragmentation limits bound accepted input complexity. These are fixed curation rules, not optimal quality cutoffs or additional prediction-success criteria. The \texttt{pocket70} label is the supplied PLINDER \texttt{pocket\_fident\_\_70\_\_community} assignment: a community of its pocket-sequence-identity similarity graph thresholded at 70\% \citep{durairaj2024plinder}. It is a graph-community label, not a guarantee of 70\% pairwise identity between every member, nor the binding-chain identity used in our evaluation.
 
 \subsection{Dataset split}
 
@@ -1097,6 +1127,7 @@ For internal model selection, let \(\mathcal V_{1035}\) be the fixed set of 1,03
 is maximized, where \(\widehat r_{cm}\) is predicted RMSD and \(r_{cm}\) is the symmetry-aware validation RMSD.
 The checkpoint maximizing this fixed internal-validation metric was released; it produced 622/1,035 (60.10\%) top-1 successes on that bank.
 External benchmark outcomes do not enter this selection.
+Update counts measure optimizer steps, not epochs. Global batch counts complexes across all distributed processes; rank in the batch configuration means process rank, not pose rank. Learning rate sets optimizer step scale, weight decay shrinks parameters, and the gradient cap limits global gradient norm. EMA means exponential moving average; decay 0.999 weights the previous parameter average by 0.999 and the current parameters by 0.001. Warmup, plateau and cooldown numbers specify the recorded learning-rate schedule. Training seeds identify random streams, and loader node/pose caps bound batch size and memory. These settings and stage lengths are retained run configurations; only the stated internal-validation criterion selects the confidence checkpoint.
 
 \section{Evaluation Details}
 \label{si:evaluation_contract}
@@ -1133,6 +1164,7 @@ Missing reference coordinates were completed from a fixed Chemical Component Dic
 
 The reported results use reference-pocket holo redocking; apo-receptor docking, blind docking, and sequence-conditioned cofolding are separate tasks.
 The primary setting uses $M=100$ candidates, $S=10$ late-biased Euler intervals with power 3, $\sigma=2\,\angstrom$, a $10\,\angstrom$ receptor crop, no center jitter, and no inference-time guidance.
+These values specify the retained reference-pocket protocol: candidate count controls bank size, interval count controls integration work, prior scale controls initial spatial spread, and crop radius controls receptor context. The seed labels 42, 100042 and 200042 distinguish fixed random streams; three repeats measure sampling variation under this protocol without establishing an optimal repeat count.
 All five external cohorts use three inference repeats with fixed trained weights under this common unguided protocol.
 Primary measurements use the feature injection in Eq.~\eqref{eq:si_orientation_injection} with the frozen released docking and confidence weights.
 Every saved candidate is refined independently for at most 100 iterations, and raw and refined banks are rescored separately by the selected confidence model.
@@ -1275,6 +1307,8 @@ Each method retains the documented local upstream generation, selection and refi
     \end{tabularx}
 \end{table}
 
+In the baseline labels, MDN means mixture density network and EC denotes the native error-correction step; these identify the source scoring and post-processing procedures rather than additional EFF-Dock components.
+
 Starting ligand geometry was method-specific rather than harmonized. SigmaDock used independent ETKDGv3/MMFF conformers after restoring unspecified SDF double-bond stereochemistry from the supplied three-dimensional coordinates. SurfDock used independent ETKDGv2 conformers, with MMFF optimization in its embedding-failure fallback. Retained DiffDock-Pocket, RLDiff and DiffBindFR paths used supplied local ligand geometry before their native pose randomization. For DiffDock-Pocket and RLDiff, this description is supported by retained source and runner configuration; complete resolved-argument records for every execution were not recovered. These preparation differences limit attribution of performance differences to model architecture alone.
 
 DiffBindFR's retained generation path samples pocket side-chain torsions while keeping the backbone fixed. The common PoseBusters evaluation instead uses the frozen holo receptor for its selected ligand, as for the other local methods. This endpoint therefore differs from evaluating the jointly sampled protein--ligand structure and may penalize clashes relieved by native side-chain motion.
@@ -1305,6 +1339,7 @@ PhiBench-derived retains the three recovered systems, OpenBind retains all 925 a
 \subsection{Metrics and uncertainty}
 
 Confidence discrimination uses negative predicted RMSD as the score and RMSD \(<2\,\angstrom\) as the binary label within each candidate bank. AUROC and average precision are macro-averaged over banks containing both positive and negative candidates; all-success and all-failure banks are excluded from these two metrics. Spearman correlation uses average ranks for ties and excludes banks with a constant score or constant RMSD. The numerical source tables report the contributing bank counts for each repeat. Raw and refined discrimination summaries can therefore contain different sets of contributing banks. Reliability curves use the saved predictions without fitting a calibration transform; the success-probability head is separate from the predicted-RMSD score used for selection.
+RMSD means root-mean-square deviation: the square root of the mean squared heavy-atom position error over a complete atom correspondence. Primary scoring minimizes over admitted symmetry-equivalent correspondences without independent ligand alignment. AUROC is area under the receiver-operating-characteristic curve and measures discrimination over score thresholds; average precision summarizes precision weighted by recall increments. Spearman correlation, labelled \(\rho\) in the figure, compares candidate ranks; this statistical \(\rho\) is distinct from the steric radius scale. Macro-averaging weights each contributing bank equally. The \(2\,\angstrom\) endpoint follows the cited docking benchmarks, rather than a threshold fitted to EFF-Dock scores. A 27-check PoseBusters conjunction is determined by the evaluation configuration, not by 27 learned model outputs. Lower RMSD and regret are preferable; larger success, correlation, AUROC and average precision are preferable. LDDT-PLI is the local distance difference test for protein--ligand interactions; BiSyRMSD is binding-site-superposed, symmetry-aware ligand RMSD.
 
 The primary endpoint is top-1 redocking success: symmetry-aware heavy-atom RMSD below \(2\,\angstrom\), measured without alignment.
 Secondary endpoints are top-5 and oracle-100 coverage, selected mean and median RMSD, official PoseBusters 27-check non-RMSD pass-all, and RMSD--PoseBusters success for the same pose.
@@ -1316,6 +1351,7 @@ Continuous RMSD summaries use complete cases and are reported with their coverag
 Ligand-binding chains in the training-relatedness analysis are defined by protein--ligand heavy-atom contacts within $6\,\angstrom$.
 Maximum sequence identity is query-normalized: identical known residues under one-to-one chain assignments are divided by the total observed query binding-chain length, including unaligned residues and unmatched query chains.
 Exact ligand identity uses canonical heavy-atom isomeric SMILES with explicit-hydrogen normalization; non-identical ligands are compared by radius-2, 2,048-bit Morgan-fingerprint Tanimoto similarity without chirality \citep{rogers2010ecfp,landrum2024rdkit}.
+Fingerprint radius 2 uses atom environments out to two bonds, and 2,048 is the hashed bit-vector length. Tanimoto is the number of shared on-bits divided by the number in their union, ranging from zero to one; identical fingerprints do not alone establish exact chemical identity.
 All relatedness panels use the same 47,277-member docking-training reference; each metric uses its available, parseable ligand or chain records. Unparseable ligands are not certified as negative matches.
 The figures describe overlap with this docking-training set. An additional comparison includes the 25 confidence-training identities absent from it, giving a combined training set of 47,302 samples (Table~\ref{tab:si_confidence_only_overlap}). Neither analysis reconstructs the complete ancestral-checkpoint lineage or establishes causal memorization.
 
@@ -1343,6 +1379,7 @@ Adding the 25 confidence-only samples left external exact ligand matches, Morgan
 Unless stated otherwise, uncertainty is the sample standard deviation across three inference repeats on the same complex set, with identical trained weights. Astex and PoseBusters use a fixed seed-zero generation conformer; in PhiBench-derived, FoldBench and OpenBind, conformer generation follows the per-complex sampling seed. Repeat variability in the latter cohorts therefore includes starting-conformer variation. None of these repeats represents independent training or target-population resampling.
 For the paired improvement analysis, per-complex differences are first averaged across repeats and then resampled with 2,000 percentile-bootstrap draws; the complex bootstrap resamples complexes, whereas the PDB-cluster bootstrap resamples exact-PDB groups and reports a complex-weighted mean \citep{efron1979bootstrap}.
 The paired baseline-difference analysis likewise uses 2,000 percentile draws but resamples exact PDB-accession groups; every retained Astex and PoseBusters complex has a distinct PDB accession, so group and complex resampling coincide for those two cohorts.
+Percent rates are successful complexes divided by the stated denominator, multiplied by 100; a percentage-point difference subtracts two percent rates without dividing by the baseline. Sample SD uses the three-repeat mean and divisor \(3-1\); it is distinct from a bootstrap confidence interval. The 95\% percentile interval uses the 2.5th and 97.5th percentiles of 2,000 resampled estimates. The draw count is a fixed Monte Carlo setting, not 2,000 new docking runs. Cohort sizes, exclusions and success counts are observed inventory or outcome counts; versions, dates and PDB/CCD identifiers specify provenance rather than numerical hyperparameters.
 
 \clearpage
 
@@ -1377,6 +1414,7 @@ The cumulative-ranking and generation-prefix analyses in Figs.~\ref{fig:si-pose-
 \subsection{Resource measurements}
 
 The docking model has 5,719,970 parameters; the confidence model has 9,403,274.
+These counts sum parameter-tensor elements in the respective networks, rather than counting channels or stored poses. Runtime uses wall-clock seconds per complex, and plotted GiB denotes \(2^{30}\) bytes of CUDA allocated memory; GPU model numerals are device names.
 
 Runtime and memory measurements are shown in Figs.~\ref{fig:si-runtime} and \ref{fig:si-generation-memory}. Profiling used mixed RTX A5000, RTX 6000 Ada and RTX PRO 6000 devices. Recorded times include the original refinement and confidence scoring but exclude subsequent refinement and rescoring passes; they do not estimate the end-to-end cost of the primary protocol or support a controlled hardware comparison.
 
@@ -1399,6 +1437,7 @@ Runtime and memory measurements are shown in Figs.~\ref{fig:si-runtime} and \ref
 \subsection{Training-set relatedness}
 
 Training-set relatedness varied across cohorts (Figs.~\ref{fig:si-relatedness-overview}--\ref{fig:si-relatedness-sequence}). All OpenBind complexes occupied the highest sequence-identity bin. FoldBench had the greatest same-training-sample overlap: 63.4\% shared an exact ligand match and at least 70\% sequence identity, whereas this conjunction was absent in docking validation. PDB-accession sharing is distinct from joint ligand--sequence overlap because an accession can contain different chains or ligands; accession correspondence was unavailable for OpenBind. Neither ligand nor sequence relatedness showed a consistent monotonic association with success.
+In the overlap legend, same-sample means an observed exact ligand match and binding-chain identity of at least 70\% in the same training sample; separate matches satisfy the two criteria in different samples without such a joint match. Ligand-only and sequence-only satisfy one criterion, and neither observed indicates absence of both observed matches. The 70\% identity threshold is a descriptive overlap rule, distinct from PLINDER pocket-community membership. In the ligand-similarity bins, \(T\) denotes Tanimoto similarity, not the selected-success rate \(T\) used in failure decomposition.
 
 \begin{figure}[!htbp]
     \centering
@@ -1454,6 +1493,7 @@ Figs.~\ref{fig:si-paired-effects}--\ref{fig:si-complexity-failures} separate the
 
 Fig.~\ref{fig:si-confidence-reliability} complements the within-bank rank diagnostics in the main text with empirical reliability curves.
 The stringent slices in Fig.~\ref{fig:si-stringent-slices} are small, predefined evaluation subsets defined by the simultaneous ligand and sequence criteria and are therefore descriptive rather than population-level estimates.
+Probability bins have boundaries 0.1, 0.2, \(\ldots\), 0.9; predicted-RMSD bins have boundaries 1, 2, 3, 4, 6 and 10 Å. Bin summaries pool candidates across repeats, with boundary values assigned to the higher bin. Near-native-count groups are 0, 1--5, 6--20, 21--50 and 51--100. These are fixed display strata, not ranker training or success thresholds. The simultaneous identity \(<30\%\) and Tanimoto \(<0.5\) limits define a descriptive low-relatedness slice; they do not certify absence of all training exposure.
 
 \begin{figure}[p]
     \centering
@@ -1533,7 +1573,7 @@ Fig.~\ref{fig:selection-bottlenecks} partitions outcomes using the same effectiv
 
 \subsection{Generation-input sensitivity and guidance controls}
 
-The sensitivity protocol in Online Methods crosses five crop radii with three center-jitter levels at prior scale \(2\,\angstrom\), and three prior scales with the same jitter levels at a \(10\,\angstrom\) crop. Three grid cells are shared. Four candidate-budget/guidance cells include the reused primary baseline, giving 24 unique conditions in total. The same three inference seeds are used for each complex. This analysis refines and rescores saved candidate banks from those prespecified generation conditions; it does not generate additional candidates. Raw and refined banks are scored with the actual source prior scale, which also enters the docking features recomputed for confidence. Neither refinement nor confidence scoring receives the perturbed center or generation crop: both retain the original center and a \(10\,\angstrom\) crop. These experiments therefore do not quantify end-to-end performance under a wrongly supplied pocket.
+The sensitivity protocol in Online Methods crosses five crop radii with three center-jitter levels at prior scale \(2\,\angstrom\), and three prior scales with the same jitter levels at a \(10\,\angstrom\) crop. Three grid cells are shared. Four candidate-budget/guidance cells include the reused primary baseline, giving \(5\times3+3\times3-3+(4-1)=24\) unique conditions in total. The same three inference seeds are used for each complex. This analysis refines and rescores saved candidate banks from those prespecified generation conditions; it does not generate additional candidates. Raw and refined banks are scored with the actual source prior scale, which also enters the docking features recomputed for confidence. Neither refinement nor confidence scoring receives the perturbed center or generation crop: both retain the original center and a \(10\,\angstrom\) crop. These experiments therefore do not quantify end-to-end performance under a wrongly supplied pocket.
 
 Paired conditions use the same seeds, fragment inventories and prior-draw construction. The jitter stream is independent of the pose prior; within each complex and repeat, jitter levels scale the same perturbation vector. Translation draws were identical; backend quaternion roundoff produced initial-rotation differences of at most \(2.81\times10^{-7}\) radians, without bitwise prior identity across backends. The 40- and 100-pose budgets are generated separately and are not nested banks.
 

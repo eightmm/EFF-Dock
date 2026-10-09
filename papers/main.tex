@@ -304,6 +304,7 @@ The generative state and atom reconstruction are
     \label{eq:pose_manifold}
 \end{equation}
 Here \(\mathcal{M}_{L}\) is the ligand pose space, \(\R^3\) is the translation space, and \(\SO(3)\) is the group of proper three-dimensional rotations.
+The group \(\SE(3)\) combines proper rotations and translations. Coordinates and distances use Angstrom, angles use radians unless degrees are shown, and flow time is dimensionless. Superscript \(\top\) denotes transpose and \(\mathbf I_3\) is the three-dimensional identity matrix; further notation and parameter conventions are collected in the \sisection{S1.1}.
 For fragment \(k\), \(\mathbf{T}_k\in\R^3\) is its geometric-centroid state origin and \(\mathbf{R}_k\in\SO(3)\) is its rotation; \(\mathbf{z}\) collects all fragment states, and \(\mathbf{x}_i(\mathbf{z})\in\R^3\) is the reconstructed coordinate of ligand atom \(i\) in the pocket-centered frame.
 This representation preserves intrafragment geometry while allowing fragments to translate and rotate relative to one another.
 
@@ -437,7 +438,7 @@ For a candidate set \(\{\mathbf z_S^{(m)}\}_{m=1}^{M}\), the deployed selector i
     c_\phi\!\left(\mathbf z_S^{(m)},\mathcal P,\mathcal G_L,\mathcal C_L,\sigma\right).
     \label{eq:confidence_selection}
 \end{equation}
-Here \(q_m\) denotes compatibility with the input-defined tetrahedral stereocenters. Ties follow saved candidate order. The unfiltered argmin is reported separately as a diagnostic condition.
+Here \(q_m\in\{0,1\}\) indicates whether candidate \(m\) matches all assigned input tetrahedral stereocenters, and \(\mathcal E\) is the effective eligible set. Ties follow saved candidate order. The unfiltered argmin is reported separately as a diagnostic condition.
 The confidence network's nonnegative predicted-RMSD score is \(c_\phi\), with learned parameters \(\phi\); \(m^\star\) is the selected candidate index.
 The prior scale enters this score through the recomputed docking representations.
 The score is interpreted only as a within-candidate-set ranking signal and not as calibrated RMSD, uncertainty, binding probability, or affinity.
@@ -537,7 +538,7 @@ Raw coordinates are saved before refinement.
 \label{sec:geometry_training}
 \label{sec:confidence_training}
 
-The docking model was trained for 200,000 base updates, 100,000 geometry-fine-tuning updates and 50,000 early-time-replay updates, with global batch sizes of 256, 256 and 64. The final stage used AdamW with peak learning rate \(2\times10^{-5}\), weight decay 0.01, gradient clipping at 1.0 and EMA decay 0.999 \citep{loshchilov2019decoupled}; its terminal EMA was evaluated. The confidence model was trained on raw and refined poses and selected at update 70,000 by predicted-RMSD-ranked top-1 success on 1,035 internal-validation complexes. Training stages, initialization, optimization schedules and selection criteria are specified in the \sisection{S6.4}. External benchmark results did not select the evaluated checkpoints.
+The docking model was trained for 200,000 base updates, 100,000 geometry-fine-tuning updates and 50,000 early-time-replay updates, with global batch sizes of 256, 256 and 64. The final stage used AdamW with peak learning rate \(2\times10^{-5}\), weight decay 0.01, gradient clipping at 1.0 and exponential moving average (EMA) decay 0.999 \citep{loshchilov2019decoupled}; its terminal EMA was evaluated. The confidence model was trained on raw and refined poses and selected at update 70,000 by predicted-RMSD-ranked top-1 success on 1,035 internal-validation complexes. Training stages, initialization, optimization schedules and selection criteria are specified in the \sisection{S6.4}. External benchmark results did not select the evaluated checkpoints.
 
 \subsection{Benchmarks and comparison protocol}
 \label{sec:evaluation_tasks}
