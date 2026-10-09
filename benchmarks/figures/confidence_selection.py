@@ -118,7 +118,7 @@ def render(out):
     ax.legend(handles=[Patch(facecolor=COLORS[2], label="Selected top-1 (RMSD & PB)"),
                        Patch(facecolor=COLORS[0], label="Joint oracle (RMSD & PB)"),
                        Patch(facecolor="white", edgecolor=DARK, hatch="//", label="RMSD-only oracle")],
-              frameon=False, fontsize=8, ncol=1, loc="lower right")
+              frameon=False, fontsize=8, ncol=2, loc="upper center", bbox_to_anchor=(0.5, -0.17))
     fig.subplots_adjust(wspace=0.22, hspace=0.62)
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, bbox_inches="tight", metadata={"CreationDate": None, "ModDate": None})
