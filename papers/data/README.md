@@ -14,6 +14,7 @@ of frozen networks, rather than three independently trained models.
 | [published_endpoints.csv](published_endpoints.csv) | Complex-level endpoint outcomes used to calculate those aggregates. Each row identifies a complex, repeat, candidate-bank stage, saved prefix and Top-k selection. |
 | [foldbench_strata.json](foldbench_strata.json) | Fixed docking-training accession and release-date strata for Supplementary Table S16, including membership IDs and aggregate outcomes. |
 | [confidence_only_overlap.json](confidence_only_overlap.json) | Additional training-set overlap checks for the 25 confidence-training samples absent from the docking-training inventory. |
+| [all_candidate_pb.json](all_candidate_pb.json) | Official PoseBusters 0.6.5 results for every raw and refined candidate of the primary Astex and PoseBusters v2 banks, summarized as candidate validity, RMSD and joint oracles, the joint outcome partition, same-candidate raw-to-refined transitions and complex-level bootstrap intervals (main Fig. 5D; Supplementary Tables S20 and S21). |
 | [figure1.json](figure1.json) | Candidate ranks, predicted and retrospective RMSD, input provenance and the scope of the separate illustrative trajectory in Figure 1. |
 | [literature_context.json](literature_context.json) | Published comparator counts, source versions, method-specific denominators and linked EFF-Dock saved-pose results for Supplementary Table S14; these are descriptive comparisons with explicit task and protocol differences. |
 
