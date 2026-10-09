@@ -56,56 +56,24 @@ Jaemin Sim\textsuperscript{1} and Juyong Lee\textsuperscript{1,2,3,4,*}\\[0.75em
 \maketitle
 
 \begin{abstract}
-Protein--ligand docking requires accurate candidate generation, physically plausible coordinates and reliable pose selection. We present \method, a fixed-receptor, supplied-pocket method that learns a flow over the translations and rotations of rigid ligand fragments. An equivariant protein--ligand graph network predicts atom-wise vectors that are projected onto fragment motion, a separate network ranks candidates, and a differentiable interaction energy refines their geometry. Across five reference-pocket redocking cohorts, refined 100-pose banks contained a candidate with RMSD below \(2\,\angstrom\) for 87.9--96.5\% of complexes. Refinement followed by rescoring increased selected-pose RMSD--PoseBusters success by 15.7--23.2 percentage points under the primary chirality-filtered selector (21.7--26.5 without filtering), giving success rates of 53.2--80.0\%. In 12.4--34.4\% of complexes, the eligible bank contained an RMSD-successful candidate but the selected pose was not RMSD-successful. These analyses distinguish candidate availability, coordinate validity and ranking loss, while pocket-center perturbations expose generation-input sensitivity with fixed downstream spatial context.
+Protein--ligand docking couples pose generation, geometric validity and candidate selection. We present \method, a fixed-receptor, supplied-pocket method that learns a flow over rigid-fragment translations and rotations. An equivariant protein--ligand network predicts atom-wise vectors, a Newton--Euler readout projects them onto fragment motion, and separate energy refinement and confidence ranking produce the selected pose. Across five reference-pocket redocking cohorts, refined 100-pose banks contained an RMSD \(<2\,\angstrom\) candidate for 87.9--96.5\% of complexes. Refinement and rescoring increased selected-pose RMSD--PoseBusters success by 15.7--23.2 percentage points under chirality-filtered selection, yielding success rates of 53.2--80.0\%. Ranking within the effective eligible set failed for 12.4--34.4\% of complexes despite an available RMSD-successful candidate. These results separate candidate availability, coordinate validity and selection loss, identifying ranking as a major remaining bottleneck in the evaluated pipeline.
 \end{abstract}
 
 \label{sec:introduction}
 
-The three-dimensional pose of a small molecule determines its protein contacts and shapes subsequent structure--activity analysis.
-Experimental complexes provide the best reference, but they are unavailable for many targets and ligand series.
-Protein--ligand docking fills this gap by predicting ligand placement and conformation for a prepared receptor.
-Here we study fixed-receptor docking with a supplied binding site; pocket discovery, binding classification, and affinity prediction are outside the scope of the model.
+A ligand's three-dimensional pose determines its protein contacts and informs structure--activity analysis. Docking predicts this pose when an experimental complex is unavailable. Here we study fixed-receptor docking with a supplied binding site.
 
-Docking remains difficult because global placement and internal conformation are coupled on a rugged, multimodal landscape.
-A finite search must resolve translation, orientation, rotatable bonds, covalent geometry, and local protein--ligand complementarity.
-Protonation and tautomeric state, cofactors, metals, solvent, and receptor reorganization create additional ambiguity that is not removed by increasing the number of sampled poses.
-Classical docking programs combine conformational search with approximate scoring \citep{trott2010vina,eberhardt2021vina}.
-GNINA augments this workflow with learned three-dimensional convolutional scoring \citep{mcnutt2025gnina}.
-Their output depends strongly on receptor preparation, search-region definition, flexibility settings, and post-docking refinement.
+Docking couples global placement and internal conformation on a multimodal landscape. Search must resolve translation, orientation and rotatable bonds while maintaining covalent geometry and protein--ligand complementarity. Receptor preparation, protonation and tautomeric state, cofactors and solvent shape this task. Classical programs combine conformational search with approximate scoring \citep{trott2010vina,eberhardt2021vina}; GNINA adds learned three-dimensional convolutional scoring \citep{mcnutt2025gnina}.
 
-Learned geometric models have broadened both the search mechanism and the task definition.
-DiffDock samples ligand translation, rotation, and torsion by a diffusion process \citep{corso2023diffdock}; Uni-Mol Docking V2 predicts poses within a specified binding pocket \citep{alcaide2024unimoldocking}; and DiffBindFR jointly treats ligand motion and selected receptor-side-chain flexibility \citep{zhu2024diffbindfr}.
-DynamicBind generates ligand-specific receptor conformations \citep{lu2024dynamicbind}, FlowDock applies conditional geometric flow matching to flexible complex generation \citep{morehead2025flowdock}, and AlphaFold~3 addresses a broader biomolecular cofolding problem \citep{abramson2024alphafold3}.
-These methods solve different tasks and receive different receptor and pocket information.
-Direct docking comparisons use supplied-pocket protocols and retain each method's native receptor handling; benchmark-specific comparisons additionally report cofolding results with their different input conditions specified.
+Learned geometric models address several receptor and pocket settings. DiffDock samples translation, rotation and torsion \citep{corso2023diffdock}, Uni-Mol Docking V2 predicts poses within a specified pocket \citep{alcaide2024unimoldocking}, and DiffBindFR includes selected receptor-side-chain flexibility \citep{zhu2024diffbindfr}. DynamicBind generates ligand-specific receptor conformations \citep{lu2024dynamicbind}, FlowDock uses conditional geometric flow matching \citep{morehead2025flowdock}, and AlphaFold~3 predicts biomolecular complexes by cofolding \citep{abramson2024alphafold3}. We compare supplied-pocket docking pipelines directly and report cofolding references with their distinct input conditions.
 
-A docking pipeline has three main components: pose generation, candidate ranking, and coordinate validation.
-Oracle minimum RMSD over a finite candidate set measures sampling coverage, not top-1 docking.
-A low ligand RMSD also does not guarantee valid stereochemistry, bond geometry, or protein--ligand contacts \citep{buttenschoen2024posebusters}.
-We report coverage, selected top-1 accuracy, PoseBusters validity, and RMSD--PoseBusters success as separate endpoints.
-A confidence network is used only for ranking within a candidate bank, consistent with recent work that separates pose quality from binding-oriented predictions \citep{sim2026rmsdpred}.
+Candidate generation, ranking and coordinate validation answer different questions. Full-bank minimum RMSD measures candidate coverage; selected-pose RMSD measures ranking accuracy; and PoseBusters tests stereochemistry, covalent geometry and contacts \citep{buttenschoen2024posebusters}. Reporting these endpoints separately distinguishes useful sampling from successful deployment. Our confidence network ranks poses within a candidate bank, following the separation of pose-quality and binding-oriented prediction \citep{sim2026rmsdpred}.
 
-Ligand flexibility can be parameterized at several geometric scales.
-Treating the ligand as one rigid body preserves internal geometry but cannot represent torsional rearrangement.
-Direct all-atom generation is flexible but requires the model to maintain covalent structure while solving global placement.
-Torsion-tree methods preserve local bond geometry, although each rotation moves a convention-dependent downstream subgraph.
-Classical incremental docking instead anchors and grows rigid ligand pieces \citep{rarey1996incremental}, while chemistry-oriented schemes such as Breaking of Retrosynthetically Interesting Chemical Substructures (BRICS) define fragments for a different purpose: retrosynthetically meaningful molecular decomposition \citep{degen2008brics}.
-SigmaDock applies diffusion to rigid-fragment ligand poses \citep{prat2025sigmadock}.
-Our decomposition cuts a restricted set of rotatable bonds to define rigid components that move simultaneously.
-It lies between a single rigid ligand and unconstrained atom coordinates, while soft geometric terms maintain the cut interfaces.
+Rigid-fragment models occupy a middle scale between a rigid ligand and unconstrained atom coordinates. Torsion-tree methods preserve local geometry but move a convention-dependent downstream subgraph at each rotation. Classical incremental docking anchors and grows rigid pieces \citep{rarey1996incremental}, whereas Breaking of Retrosynthetically Interesting Chemical Substructures (BRICS) defines retrosynthetically meaningful fragments \citep{degen2008brics}. SigmaDock applies diffusion to rigid-fragment poses \citep{prat2025sigmadock}. \method cuts a restricted set of rotatable bonds, moves the resulting components simultaneously, and uses soft geometric terms to maintain their interfaces.
 
-Flow matching learns a continuous vector field that transports a tractable prior toward a data distribution without integrating the generative ordinary differential equation (ODE) during training \citep{lipman2023flow}.
-Its extension to non-Euclidean state spaces provides a natural language for translation--rotation products \citep{chen2024generalgeometries}. Matcha applies multistage Riemannian flow matching to molecular docking \citep{frolova2026matcha}.
-Equivariant tensor-product networks allow scalar, vector, and higher-order features to transform consistently under a joint rigid motion \citep{liao2023equiformer}.
-Related flexible-docking work has used Newton--Euler mechanics to map interaction energy to geometric motion \citep{huang2024redock}.
-In \method, a shared protein--ligand network instead predicts atom-level equivariant vectors and aggregates them for each ligand fragment.
-An independently parameterized interaction energy provides pose diagnostics, optional inference guidance, and post-sampling refinement.
+Flow matching learns a vector field that transports a prior toward the target distribution without integrating the generative ordinary differential equation (ODE) during training \citep{lipman2023flow}. Riemannian formulations accommodate translation--rotation spaces \citep{chen2024generalgeometries}, including multistage docking approaches such as Matcha \citep{frolova2026matcha}. Equivariant tensor products couple scalar, vector and higher-order features under rigid motion \citep{liao2023equiformer}. Newton--Euler mechanics has also been used to map interaction energy to flexible-docking motion \citep{huang2024redock}. In \method, the learned network predicts atom-wise vectors and a kinematic readout aggregates them into fragment velocities; a separate interaction energy supplies refinement gradients.
 
-\method represents the ligand on a product of fragment rigid-body pose spaces.
-A heterogeneous graph connects ligand atoms and fragments with protein atoms and residue nodes through covalent, topological, and spatial relations.
-A shared \(\SE(3)\)-equivariant trunk and fragment-wise Newton--Euler readout define the conditional flow, while a separate confidence model ranks the sampled poses.
-
-Here we evaluate candidate availability, physical validity and pose selection separately across five reference-pocket redocking cohorts. The experiments assess the resulting pipeline rather than isolating the causal contribution of each architectural component.
+\method combines a heterogeneous protein--ligand graph, fragment-space \(\SE(3)\) flow, geometric refinement and confidence ranking. We evaluate the resulting pipeline across five reference-pocket redocking cohorts, using candidate availability, physical validity and selection loss to locate its remaining bottlenecks.
 
 \FloatBarrier
 
@@ -116,12 +84,12 @@ Here we evaluate candidate availability, physical validity and pose selection se
 
 \method represents a ligand as rigid components obtained by cutting a restricted set of rotatable bonds. A heterogeneous protein--ligand graph conditions a flow over the fragments' translations and rotations (Fig.~\ref{fig:workflow-overview}). An equivariant network predicts one vector per ligand atom; a least-squares rigid-motion projection converts these vectors to fragment velocities (Fig.~\ref{fig:model-architecture}). A separate network predicts a within-bank pose-ranking score. Generated candidates are refined by bounded descent on a differentiable geometric interaction energy and then ranked again. The energy supplies coordinate gradients independently of the learned vector field; it is neither an affinity predictor nor a free-energy model.
 
-The evaluation uses a fixed holo receptor, a reference-derived pocket, 100 candidates and ten integration steps. Three inference repeats use the same docking and confidence weights. The evaluated coordinate-to-feature conventions and their differences from training are specified in Online Methods and Supplementary Information, Secs.~S1.2--S1.3.
+Evaluation uses a fixed holo receptor, a reference-derived pocket, 100 candidates and ten integration steps, with three repeats of the same trained weights. Online Methods and Supplementary Information, Secs.~S1.2--S1.3 specify the evaluated coordinate-to-feature conventions and their differences from training.
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{Fig1.pdf}
-    \caption{\textbf{Overview of the \method docking pipeline.} A prepared receptor, one ligand chemical state and conformer, and a supplied pocket center define the input. The ligand is decomposed into rigid fragments whose \(\SE(3)\) states are transported by the learned flow. The illustrated candidate is subsequently optimized by bounded rigid-fragment energy refinement. A separate 100-pose benchmark bank prepared from SMILES is scored by the confidence model, and the selected pose is compared with the crystal pose only for evaluation. The checkmark identifies the selected candidate; crosses mark unselected examples. Candidate ranks use predicted RMSD (pRMSD); the displayed RMSD values are retrospective errors and do not enter selection. The illustrated trajectory uses a supplied starting conformer and is a prespecified one-pose example, not an aggregate benchmark result.}
+    \caption{\textbf{Overview of the \method docking pipeline.} A prepared receptor, ligand chemical state and conformer, and supplied pocket center define the input. Rigid ligand fragments follow the learned \(\SE(3)\) flow and bounded energy refinement. The illustrated seed-42 trajectory is a prespecified one-pose example from a supplied conformer. Confidence ranking uses a separate 100-pose benchmark bank prepared from SMILES. Ranks use predicted RMSD (pRMSD); displayed RMSD and crystal overlays are retrospective evaluations. The checkmark identifies the selected candidate and crosses unselected examples.}
     \label{fig:workflow-overview}
 \end{figure}
 
@@ -140,10 +108,12 @@ Fig.~\ref{fig:benchmark-comparison} compares selected-pose RMSD success and RMSD
 The local comparison includes SigmaDock \citep{prat2025sigmadock}, DiffDock-Pocket \citep{plainer2023diffdockpocket}, RLDiff RL++ \citep{broster2026rldiff}, DiffBindFR \citep{zhu2024diffbindfr}, and force-optimized SurfDock \citep{cao2025surfdock}.
 On Astex, EFF-Dock achieved 80.0\% same-pose RMSD--PoseBusters success.
 SigmaDock, SurfDock and RLDiff RL++ had higher point estimates on both endpoints.
-On PoseBusters v2, EFF-Dock reached 79.1\% RMSD--PoseBusters success. Relative to SigmaDock, the paired difference in RMSD--PoseBusters success was +2.7 percentage points (95\% bootstrap interval, \(-2.3\) to +7.5), compared with \(-9.0\) points (\(-16.1\) to \(-2.0\)) on Astex. The PoseBusters interval does not establish superiority, equivalence or non-inferiority; intervals are unadjusted for multiple comparisons (Supplementary Fig.~S14).
+On PoseBusters v2, EFF-Dock reached 79.1\% RMSD--PoseBusters success. Relative to SigmaDock, the paired difference in RMSD--PoseBusters success was +2.7 percentage points (95\% bootstrap interval, \(-2.3\) to +7.5), compared with \(-9.0\) points (\(-16.1\) to \(-2.0\)) on Astex. The PoseBusters interval includes zero, leaving relative performance unresolved; intervals are exploratory and unadjusted for multiple comparisons (Supplementary Fig.~S14).
 Most selected RMSD-successful EFF-Dock poses also passed PoseBusters.
-The learned methods use their native sampling and ranking procedures, while GOLD and Vina are literature values \citep{buttenschoen2024posebusters}; the comparison evaluates protocol-conditioned pipelines with differing receptor and ligand preparation, pocket construction, candidate budgets and native selectors, rather than matched-compute implementations.
-Saved-pose reevaluation under benchmark-specific endpoints gave 71.4\% top-1 success on all 558 FoldBench interfaces, requiring BiSyRMSD \(<2\,\angstrom\) and LDDT-PLI \(>0.8\) on the same refined pose. On the official 802-case OpenBind follow-on subset, top-1 BiSyRMSD \(\le2\,\angstrom\) and PoseBusters success was 56.4\%, falling to 48.3\% with the additional LDDT-PLI \(\ge0.8\) requirement (Supplementary Fig.~S20; \sisection{S7.3}). Supplementary Table~S14 compares these results with published cofolding references and GNINA holo redocking, and reports pocket-conditioned PhiBench baselines alongside EFF-Dock top-5 results for 40-pose and 100-pose banks. PhiBench-derived retains the local cohort and fixed-receptor RMSD definition. Task, preparation, evaluability, training exposure and budget differences remain explicit; these comparisons do not establish paired superiority.
+
+Learned methods retain their native preparation, sampling and ranking procedures; GOLD and Vina are literature values \citep{buttenschoen2024posebusters}. Protocol and candidate-budget differences are specified in Supplementary Information, Sec.~S7.4.
+
+Supplementary Table~S14 and Fig.~S20 extend the comparison to PhiBench-derived, FoldBench and the official 802-case OpenBind subset using benchmark-specific endpoints. They include pocket-conditioned baselines, cofolding references and GNINA holo redocking, with task, cohort, preparation and evaluability differences specified in Sec.~S7.3.
 
 \begin{figure}[!htbp]
     \centering
@@ -156,9 +126,9 @@ Saved-pose reevaluation under benchmark-specific endpoints gave 71.4\% top-1 suc
 
 \subsection{Refinement and chirality-aware selection}
 
-Fig.~\ref{fig:refinement-selection} compares refinement and chirality-aware selection. Refinement and rescoring increased mean RMSD--PoseBusters success by 15.7--23.2 percentage points under the primary selector and 21.7--26.5 points without chirality filtering. Without chirality filtering, mean RMSD-only selected-pose success increased more modestly. These differences combine coordinate changes with reselection and do not measure the repair of a fixed pose.
+Fig.~\ref{fig:refinement-selection} compares refinement and chirality-aware selection. Refinement and rescoring increased mean RMSD--PoseBusters success by 15.7--23.2 percentage points under the primary selector and 21.7--26.5 points without chirality filtering. Without chirality filtering, mean RMSD-only selected-pose success increased more modestly. These gains combine coordinate refinement with confidence reselection.
 
-Chirality filtering added smaller mean improvements of 0.3--2.4 percentage points after refinement (Supplementary Fig.~S9). Refinement also increased input-tetrahedral compatibility across all candidate banks. Rigid fragments preserve their own geometry but do not automatically preserve stereochemistry across cut interfaces.
+Chirality filtering added smaller mean improvements of 0.3--2.4 percentage points after refinement (Supplementary Fig.~S9). Refinement also increased input-tetrahedral compatibility across all banks, addressing stereochemistry at the cut interfaces between internally rigid fragments.
 
 The complexity analysis in Supplementary Fig.~S1 localizes the remaining error.
 Selected top-1 and RMSD--PoseBusters success generally deteriorated for larger ligands, more rotatable bonds, and more fragments, most clearly in PoseBusters, PhiBench-derived, and FoldBench.
@@ -176,7 +146,7 @@ The smallest Astex and high-complexity bins are too sparse for a clear trend.
 Supplementary Fig.~S16 resolves the aggregate validity gain into individual PoseBusters checks.
 Refinement reduced selected-pose failures associated with bond geometry, internal clashes, receptor clashes, and internal energy, while stereochemical and ring-planarity failures were less uniformly affected.
 The matched-candidate panels separate same-index fail-to-pass and pass-to-fail transitions from changes caused by selecting a different pose after refinement.
-Because matched pairs exist only for candidates with saved official evaluations at both stages, these transitions diagnose the evaluated subset rather than the complete candidate banks.
+Matched-index transitions characterize the subset with saved official evaluations at both stages (Supplementary Fig.~S16).
 
 \FloatBarrier
 
@@ -190,8 +160,7 @@ Reliability curves and performance as a function of near-native candidate densit
 Confidence ranking enriches near-native poses at early ranks relative to generation order (Supplementary Fig.~S2). In refined unfiltered banks, expanding from top-1 to top-5 increased RMSD coverage by 7.5--20.3 percentage points, although substantial gaps to the full-bank oracle remained (Supplementary Fig.~S10). OpenBind illustrates this selection bottleneck: only 6.3\% of its refined candidates were near-native, yet 87.9\% of complexes contained at least one such pose.
 
 The generation-prefix experiment in Supplementary Fig.~S3 reaches the same conclusion from a deployable selection perspective.
-Oracle coverage cannot decrease as additional generated poses become available, whereas confidence-selected top-1 can plateau or decline when a newly added pose is incorrectly promoted.
-Chirality filtering improves some prefixes but does not remove this non-monotonicity.
+Oracle coverage increases or stays constant as candidates are added; selected top-1 can decline when the ranker promotes an incorrect new pose. This non-monotonicity persists in some chirality-filtered prefixes.
 Larger candidate banks improve coverage, but the gain reaches top-1 only when the ranker remains stable as new poses are added.
 
 \begin{figure}[!htbp]
@@ -208,18 +177,18 @@ Larger candidate banks improve coverage, but the gain reaches top-1 only when th
 Supplementary Fig.~S18 partitions every primary outcome into absence of an RMSD-successful candidate in the refined bank, exclusion of all near-native candidates by the effective chirality mask, ranking failure within the eligible set, PoseBusters failure of an RMSD-successful selection, or RMSD--PoseBusters success.
 Chirality exclusion accounted for at most 0.3\% of complexes.
 Ranking failure was larger, ranging from 12.4\% on PoseBusters to 34.4\% on OpenBind.
-Within the refined banks, RMSD-based ranking failure exceeds chirality exclusion. Because PoseBusters was not evaluated for every candidate, this gap does not quantify attainable improvement in RMSD--PoseBusters success.
+RMSD-based ranking failure exceeds chirality exclusion in the refined banks. Its joint-validity headroom remains unmeasured because PoseBusters labels cover selected candidates.
 The regret curves in Supplementary Fig.~S18B measure loss relative to the best RMSD in the same effective candidate set available to the deployed selector.
 
 Training-set relatedness is examined in Supplementary Figs.~S6--S8.
 Sequence and ligand overlap differed substantially among cohorts, but neither exact ligand matches nor sequence-identity strata showed a consistent association with docking success.
-These analyses qualify claims of prospective generalization without identifying a single overlap measure that explains the benchmark results.
+The relatedness strata contextualize these cohort-specific outcomes.
 
 \subsection{Sensitivity to generation inputs}
 
 We varied the generation crop, supplied-center error and translation-prior scale on all Astex and PoseBusters complexes while holding the networks, downstream spatial context and primary selector fixed (Fig.~\ref{fig:pocket-sensitivity}). With a \(10\,\angstrom\) crop and prior scale \(2\,\angstrom\), RMSD--PoseBusters success was 80.0\% on Astex and 79.1\% on PoseBusters without center error. Center error with standard deviation \(2\,\angstrom\) per axis reduced success to 71.0\% and 64.4\%, respectively. Refined-bank RMSD-only oracle coverage at \(2\,\angstrom\) error was 86.3\% and 82.8\%.
 
-Larger generation crops partly buffered center error, whereas prior-scale effects varied with the cohort and perturbation level. The complete crop and prior grids are shown in Fig.~\ref{fig:pocket-sensitivity}; these descriptive comparisons did not select a new operating point.
+Larger generation crops partly buffered center error, whereas prior-scale effects varied with the cohort and perturbation level. Fig.~\ref{fig:pocket-sensitivity} reports the complete grids under the fixed primary protocol.
 
 Refinement and confidence scoring retained the original unperturbed center and a \(10\,\angstrom\) crop in all conditions. The crop and center-jitter grids perturb sampling inputs with fixed downstream spatial context. Prior-scale comparisons include the scale's influence on both sampling and the recomputed docking features used for ranking. Guidance and candidate-allocation controls at equal learned pose-step counts are reported separately (Supplementary Fig.~S19).
 
@@ -236,25 +205,17 @@ Refinement and confidence scoring retained the original unperturbed center and a
 \section{Discussion}
 \label{sec:discussion}
 
-The results identify coordinate validity and pose selection as distinct limitations. Refinement and rescoring increased RMSD--PoseBusters success substantially, while the smaller change in RMSD-only success indicates that geometric validity accounts for much of the gain. Matched-candidate analyses support coordinate repair, whereas aggregate gains also include reselection. The remaining RMSD-only oracle--top-1 gap identifies ranking loss without establishing that every unselected near-native pose is physically valid.
+Refinement and ranking improve different stages of docking. Refinement with rescoring raised RMSD--PoseBusters success more than RMSD-only success, emphasizing geometric validity in the aggregate gain. Matched-candidate transitions support coordinate repair within the evaluated subset, while primary selected-pose improvements also include reselection. The remaining RMSD oracle--top-1 gap measures selection loss; its joint-validity headroom requires PoseBusters labels beyond selected candidates.
 
-Candidate density helps explain differences among cohorts. OpenBind combined sparse near-native candidates with high full-bank coverage. Sparse banks and complex ligands were more susceptible to ranking loss, and adding candidates could reduce top-1 accuracy when an incorrect pose was promoted. The eligibility-aware analysis confirms that ranking loss was larger than chirality exclusion (Supplementary Fig.~S18).
+Candidate density clarifies this gap. OpenBind combined sparse near-native candidates with high full-bank coverage, and complex ligands were more susceptible to ranking loss. Adding candidates expanded coverage but could reduce top-1 accuracy when an incorrect pose was promoted. Ranking failure within the effective eligible set exceeded chirality exclusion (Supplementary Fig.~S18), motivating rankers that remain stable as candidate banks grow.
 
-Training relatedness showed no consistent monotonic association with success across cohorts. However, cohort composition, sparse strata and incomplete ancestral training-exposure records limit what these descriptive comparisons can establish.
+The experiments assess the complete fixed-receptor, supplied-pocket pipeline. Component contributions remain unresolved without controlled ablations, and within-bank confidence diagnostics establish empirical ranking behavior rather than cross-generator calibration. Three fixed-weight repeats measure sampling variation. Evaluation-specific coordinate-to-feature handling differs from training; finite tests support joint-world covariance conditional on the prepared body convention, with residual unobservable-twist dependence documented in Online Methods and Supplementary Information, Secs.~S1.2--S1.3.
 
-\method assumes a prepared fixed receptor, one ligand chemical state and conformer, and a supplied pocket center. Receptor flexibility, pocket discovery, water rearrangement, ligand-state enumeration and covalent docking remain outside the evaluated scope. Support for selected monatomic metals does not establish general coordination-chemistry modeling. Unsupported cofactors, metal clusters and macrocycles near the fragmentation boundary also remain outside the demonstrated scope.
+The scope is known-pocket holo redocking with one ligand chemical state and starting conformer. Geometry training uses crystal-derived pockets and fragment templates; rigid-fragment motion preserves intrafragment errors, and systematic starting-conformer sensitivity remains unmeasured. Center perturbations vary generation inputs with downstream spatial context fixed. Receptor flexibility, pocket discovery, solvent rearrangement, chemical-state enumeration and covalent docking are separate tasks; unsupported cofactors, metal clusters and boundary-case macrocycles remain outside the demonstrated chemistry. Fragmentation uses a fixed atom ordering and soft cut-interface constraints. The interaction energy represents geometric preferences and the confidence score within-bank pose quality; pose accuracy and validity are distinct from binding or affinity.
 
-Training pocket centers and fragment templates were derived from crystal complexes. The center-perturbation experiments kept downstream refinement and ranking context fixed, so they do not establish complete-pipeline wrong-pocket robustness. Starting-conformer sensitivity was not systematically evaluated, and rigid-fragment motion cannot repair intrafragment errors. Fragmentation depends on atom order and uses soft cut-bond closure constraints.
+Generalization depends on the evaluated cohorts and training exposure. Astex and PoseBusters were used repeatedly during development, PhiBench-derived and FoldBench adapt their source tasks, and OpenBind concentrates one protease family, including two noncovalent approximations of covalent systems. Training relatedness is substantial: all OpenBind cases occupy the highest sequence-identity bin, and many FoldBench cases share a training accession (Supplementary Figs.~S6--S8 and Table~S16). Accession sharing differs from complex identity, and the ancestral exposure inventory is incomplete. Only 22 external complexes satisfy the simultaneous sequence, ligand-similarity and exact-match restrictions; broader unrelated-target evaluation remains necessary.
 
-The cohorts are reference-pocket redocking sets rather than prospective target-discovery benchmarks. Astex and PoseBusters were repeatedly used during development, PhiBench-derived and FoldBench adapt their source tasks, and OpenBind samples one protease family and includes two noncovalent approximations of covalent systems. Training relatedness remains substantial: all OpenBind complexes occupy the highest sequence-identity bin, and many FoldBench complexes share a training PDB accession (Supplementary Figs.~S6--S8 and Table~S16). Accession sharing does not imply the same protein--ligand complex. Only 22 external complexes met the simultaneous sequence-identity, ligand-similarity and exact-match restrictions. These evaluations therefore provide limited evidence for generalization to unrelated targets.
-
-Component ablations are needed to distinguish the contributions of fragmentation, higher-order features, Newton--Euler readout, auxiliary losses and dynamic contacts. Confidence diagnostics quantify ranking and empirical reliability within the evaluated banks, without establishing calibration for new candidate-generation distributions. The three inference repeats describe stochastic variation under fixed trained weights, rather than retraining variability or target-population uncertainty.
-
-Evaluation changes coordinate-to-feature handling under fixed trained weights (Supplementary Information, Secs.~S1.2--S1.3). Finite tests support covariance conditional on a fixed prepared body-coordinate convention, but do not establish invariance to supplied-conformer reorientation or unobservable fragment twist, or exact equivariance of the complete pipeline.
-
-The interaction energy is a geometric refinement model, and the confidence score ranks poses within a candidate bank; neither predicts binding free energy or affinity. RMSD and PoseBusters assess pose accuracy and common coordinate errors, but do not establish binding or identify every valid binding mode.
-
-\method combines rigid-fragment flow matching with geometric refinement and confidence ranking. The evaluated 100-pose protocol provides high near-native coverage, while the remaining selection loss motivates better ranking and broader validation of receptor and ligand preparation.
+\method separates rigid-fragment generation, geometric refinement and candidate ranking within one docking pipeline. Its finite banks provide broad near-native coverage under the evaluated preparation, while selection loss identifies a concrete target for improving deployment accuracy.
 
 \section{Online Methods}\label{sec:online-methods}
 \label{sec:method}
@@ -283,8 +244,7 @@ Coordinate-to-feature conventions, their differences from training, and finite n
 \method takes a prepared fixed receptor \(\mathcal{P}\), a heavy-atom ligand graph \(\mathcal{G}_{L}\) in one specified chemical state, one supplied or generated ligand conformer \(\mathcal{C}_{L}\), and an explicit pocket center \(\mathbf{b}\in\R^3\).
 We denote their complete conditioning context by \(\mathcal{C}_{\mathrm{cond}}=(\mathcal{P},\mathcal{G}_{L},\mathcal{C}_{L},\mathbf{b})\).
 It returns a finite set of ligand poses and a separate score used only to rank poses within that set.
-Target ligand coordinates, target-derived atom or fragment frames, RMSD, validity outcomes, and benchmark identity are excluded from deployment inputs.
-Reference-derived pocket centers are used only in experiments explicitly labelled reference-pocket redocking and are not interpreted as pocket discovery.
+Deployment inputs exclude target ligand coordinates, target-derived frames, RMSD, validity outcomes and benchmark identity. The reference-pocket experiments derive the supplied center from the reference structure before removing the ligand.
 
 The ligand contains \(N\) heavy atoms partitioned into \(K\) rigid fragments, with \(i\in\{1,\ldots,N\}\) and \(k\in\{1,\ldots,K\}\) indexing atoms and fragments, respectively.
 The map \(g(i)\) assigns atom \(i\) to a fragment, and \(\mathbf{y}_i\in\R^3\) is its local coordinate relative to that fragment's geometric centroid.
@@ -441,7 +401,7 @@ For a candidate set \(\{\mathbf z_S^{(m)}\}_{m=1}^{M}\), the deployed selector i
 Here \(q_m\in\{0,1\}\) indicates whether candidate \(m\) matches all assigned input tetrahedral stereocenters, and \(\mathcal E\) is the effective eligible set. Ties follow saved candidate order. The unfiltered argmin is reported separately as a diagnostic condition.
 The confidence network's nonnegative predicted-RMSD score is \(c_\phi\), with learned parameters \(\phi\); \(m^\star\) is the selected candidate index.
 The prior scale enters this score through the recomputed docking representations.
-The score is interpreted only as a within-candidate-set ranking signal and not as calibrated RMSD, uncertainty, binding probability, or affinity.
+The score ranks candidates within a bank; empirical reliability is evaluated separately from the deployed selector.
 Energy restraints and confidence features use conformers prepared by the same procedure and seed as pose generation. Refinement preserves each saved candidate's fragment-internal coordinates. For rescoring, candidate coordinates are mapped to fragment frames by proper Kabsch fitting for templates of rank at least two and an input-indexed, scene-defined convention for lower-rank fragments. This resolves the recovery convention without making the frozen network invariant to unobservable fragment twist; finite numerical checks and their limits are reported in the \sisection{S1.3}.
 The complete readout and confidence objective are given in the \sisection{S4}.
 
@@ -463,9 +423,9 @@ For ligand coordinates \(\mathbf{x}=(\mathbf{x}_1,\ldots,\mathbf{x}_N)\), we def
 The cut-interface terms restrain only bond, angle, proper-torsion, chiral, and planar geometry that spans independently moving fragments.
 The nonbonded terms include a soft-core Universal Force Field (UFF)-style Lennard--Jones profile on admitted interfragment ligand--ligand and protein--ligand pairs, a compact receptor-overlap barrier and repulsion-only obstacles for unresolved receptor chemistry \citep{rappe1992uff}.
 The seven interaction terms describe hydrophobic contacts, directional hydrogen bonds, screened formal-charge groups, pi stacking, cation--pi contacts, halogen bonds, and typed metal coordination \citep{salentin2015plip,mcgaughey1998pistacking,gallivan1999cationpi,desiraju2013halogen,dokmanic2008metals}.
-These bounded geometric preferences do not define binding free energy, affinity, or a molecular-dynamics Hamiltonian.
+These terms define a geometric refinement objective in nominal energy units.
 
-Compact radial and angular gates use a clipped quintic smoothstep with zero first and second derivatives at its endpoints. This cutoff envelope joins constant regions with continuous energy and first and second derivatives; it is not a physical force law. Energy forms, occupancy aggregation, typing conventions and numerical constants are specified in the \sisection{S5}.
+Compact radial and angular gates use a clipped quintic smoothstep with zero first and second derivatives at its endpoints. The envelope joins constant regions with continuous energy and first and second derivatives. Energy forms, occupancy aggregation, typing conventions and numerical constants are specified in the \sisection{S5}.
 
 The coordinate gradient \(\nabla_{\mathbf{x}_i}\) gives the guidance force \(\mathbf{F}_i=-\nabla_{\mathbf{x}_i}E_{\mathrm{G}}\), which is distinct from the learned atom-vector proposal \(\mathbf{f}_i\).
 For atom mass \(m_i\), the fragment mass is \(m_k^{\mathrm{frag}}=\sum_{i\in\mathcal{A}_k}m_i\), the center of mass is \(\mathbf{c}_k=(m_k^{\mathrm{frag}})^{-1}\sum_{i\in\mathcal{A}_k}m_i\mathbf{x}_i\), and the resultant is \(\mathbf{F}_k=\sum_{i\in\mathcal{A}_k}\mathbf{F}_i\).
@@ -506,8 +466,7 @@ Here \((\bar{\mathbf d}^T,\bar{\mathbf d}^\omega)=\operatorname{Cap}(\mathbf d^T
 The refinement is bounded and stops on convergence, line-search failure, or a sustained energy plateau; the numerical safeguards and termination criteria are given in the \sisection{S5.10}.
 Raw and refined candidates are compared with unchanged network parameters.
 
-The guidance subsystem uses a typed \(18\,\angstrom\) receptor shell, which can expose coordinates outside the \(10\,\angstrom\) neural crop.
-This shell is not an additional neural input.
+The guidance energy uses a typed \(18\,\angstrom\) receptor shell, separate from the \(10\,\angstrom\) neural crop.
 Full typing rules, energy equations, mass--inertia projection, refinement safeguards, and permitted information are provided in the \sisection{S5}.
 
 \label{sec:experiments}
@@ -520,7 +479,7 @@ Training data were derived from PLINDER 2024-06/v2 \citep{durairaj2024plinder}. 
 
 After model-specific input filtering, docking uses 47,277 training and 1,076 validation samples, while confidence uses 43,092 training and 1,035 validation samples. Their differing input requirements and overlap are detailed in the \sisection{S6}.
 
-External exclusion required both an exact ligand match and membership in a benchmark-associated pocket community, removing 904 samples. This rule does not independently exclude recurring ligands or homologous proteins; training relatedness is measured separately.
+External exclusion required both an exact ligand match and membership in a benchmark-associated pocket community, removing 904 samples. Recurring ligands and homologous proteins are assessed separately through training-relatedness analysis.
 
 \subsection{Evaluation scope}
 \label{sec:information_boundary}
@@ -558,13 +517,13 @@ Each cohort uses the same trained weights with inference seeds 42, 100042 and 20
 Candidates are scored before and after bounded refinement.
 The primary selector removes chirality-mismatched candidates and then chooses the lowest predicted symmetry-aware RMSD; if none passes the chirality screen, it uses the unfiltered ranking.
 Failed complexes remain in the cohort denominator.
-Supplementary Figs.~S4 and S5 report runtime and generation-process memory for the candidate-acquisition runs, including their original refinement and confidence scoring but excluding subsequent refinement and rescoring passes. These are not end-to-end timings of the primary evaluation. Sensitivity to generation inputs is analyzed in Fig.~\ref{fig:pocket-sensitivity}; supplementary guidance controls are described below.
+Supplementary Figs.~S4 and S5 report runtime and generation-process memory for the candidate-acquisition runs, including their original refinement and confidence scoring but excluding subsequent refinement and rescoring passes. Their scope is initial candidate acquisition, as defined in the figure captions. Sensitivity to generation inputs is analyzed in Fig.~\ref{fig:pocket-sensitivity}; supplementary guidance controls are described below.
 
 \subsection{Generation-input sensitivity and guidance controls}
 
 Sensitivity experiments use all 85 Astex and 308 PoseBusters complexes with the same three inference seeds and chirality-filtered selector. At translation-prior scale \(2\,\angstrom\), generation crop radii \(6,8,10,12,14\,\angstrom\) are crossed with Gaussian center jitter of \(0,1,2\,\angstrom\) per Cartesian axis. Separately, prior scales \(1,2,4\,\angstrom\) are crossed with the same jitter levels at a \(10\,\angstrom\) crop. Shared cells are evaluated once, and the primary baseline is reused from the primary evaluation. The jitter random stream is independent of the pose prior, and matching seeds couple prior draws within a candidate budget. Refinement and confidence scoring always use the original center and a \(10\,\angstrom\) crop; the docking-feature re-evaluation used for confidence scoring retains each candidate's source prior scale.
 
-Four budget/guidance conditions, including the shared primary baseline, cross 100 poses/ten steps or 40 poses/25 steps with unguided sampling or normalized energy guidance of strength \(\eta=2\). Both budgets use 1,000 learned pose-steps, but guidance and candidate processing add work, so equal pose-step counts do not imply equal runtime. Forty- and 100-pose banks are generated separately, without a nested-prior claim. All sensitivity and guidance conditions are descriptive external evaluations and do not choose a sampler, guidance strength or selector.
+Four budget/guidance conditions, including the shared primary baseline, cross 100 poses/ten steps or 40 poses/25 steps with unguided sampling or normalized energy guidance of strength \(\eta=2\). Both budgets use 1,000 learned pose-steps, but guidance and candidate processing add work, so equal pose-step counts do not imply equal runtime. Forty- and 100-pose banks are generated separately under prespecified control settings.
 
 \subsection{Endpoints and statistical analysis}
 \label{sec:metrics}

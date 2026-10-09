@@ -9,7 +9,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [Fig1.pdf](assets/Fig1.pdf)
 
 ```latex
-\caption{\textbf{Overview of the \method docking pipeline.} A prepared receptor, one ligand chemical state and conformer, and a supplied pocket center define the input. The ligand is decomposed into rigid fragments whose \(\SE(3)\) states are transported by the learned flow. The illustrated candidate is subsequently optimized by bounded rigid-fragment energy refinement. A separate 100-pose benchmark bank prepared from SMILES is scored by the confidence model, and the selected pose is compared with the crystal pose only for evaluation. The checkmark identifies the selected candidate; crosses mark unselected examples. Candidate ranks use predicted RMSD (pRMSD); the displayed RMSD values are retrospective errors and do not enter selection. The illustrated trajectory uses a supplied starting conformer and is a prespecified one-pose example, not an aggregate benchmark result.}
+\caption{\textbf{Overview of the \method docking pipeline.} A prepared receptor, ligand chemical state and conformer, and supplied pocket center define the input. Rigid ligand fragments follow the learned \(\SE(3)\) flow and bounded energy refinement. The illustrated seed-42 trajectory is a prespecified one-pose example from a supplied conformer. Confidence ranking uses a separate 100-pose benchmark bank prepared from SMILES. Ranks use predicted RMSD (pRMSD); displayed RMSD and crystal overlays are retrospective evaluations. The checkmark identifies the selected candidate and crosses unselected examples.}
 \label{fig:workflow-overview}
 ```
 
@@ -128,7 +128,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [sequence_similarity.pdf](assets/sequence_similarity.pdf)
 
 ```latex
-\caption{\textbf{Docking performance by training-set sequence identity.} Complexes are grouped by maximum query-normalized binding-chain identity to the docking-training set. Solid bars show RMSD--PoseBusters success, and hatched segments extend to RMSD-only success. Bars show mean \(\pm\) sample SD across three repeats; labels give stratum sizes. Empty and very small strata should not be interpreted as stable estimates.}
+\caption{\textbf{Docking performance by training-set sequence identity.} Strata use maximum query-normalized binding-chain identity to the docking-training set. Solid bars show RMSD--PoseBusters success; hatching extends to RMSD-only success. Bars and whiskers show three-repeat means and sample SD; labels give stratum sizes, including empty and sparse groups.}
 \label{fig:si-relatedness-sequence}
 ```
 
@@ -173,7 +173,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [stringent_subset.pdf](assets/stringent_subset.pdf)
 
 ```latex
-\caption{\textbf{Performance under simultaneous sequence and ligand relatedness restrictions.} Each benchmark is compared with the fixed subset satisfying maximum training-relative binding-chain identity \(<30\%\), maximum Morgan Tanimoto \(<0.5\), and no observed exact training-ligand match. \method selected RMSD and RMSD--PoseBusters success and full-bank RMSD oracle are shown. Only 2, 4, 7, 9, and 0 complexes remain for Astex, PoseBusters, PhiBench-derived, FoldBench, and OpenBind, so the result is descriptive rather than a held-out generalization claim.}
+\caption{\textbf{Performance under simultaneous sequence and ligand restrictions.} The fixed subset requires maximum training-relative binding-chain identity \(<30\%\), Morgan Tanimoto \(<0.5\), and no observed exact training-ligand match. Selected RMSD and RMSD--PoseBusters success and full-bank RMSD oracle are shown for EFF-Dock. Remaining counts are 2, 4, 7, 9 and 0 for Astex, PoseBusters, PhiBench-derived, FoldBench and OpenBind, respectively; the slices are descriptive.}
 \label{fig:si-stringent-slices}
 ```
 
@@ -191,7 +191,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [fragment_trajectory.pdf](assets/fragment_trajectory.pdf)
 
 ```latex
-\caption{\textbf{Fragment motion along a saved ODE generation trajectory.} \method states for Astex 1T46--STI are shown at five actually saved flow times in a fixed receptor frame. Colors track the same six rigid fragments; omitted interfragment bonds in early panels are a display convention rather than bond formation. Flow time is dimensionless and is not refinement time. This seed-42, unguided one-pose trajectory is separate from the 100-pose benchmark-selected banks and carries no representative-success claim.}
+\caption{\textbf{Fragment motion along a saved ODE trajectory.} Astex 1T46--STI at five saved flow times in a fixed receptor frame. Colors track six rigid fragments; omission of early interfragment bonds is a display convention. Dimensionless flow time describes generation, separate from refinement. This prespecified seed-42, unguided one-pose illustration is separate from the 100-pose benchmark banks.}
 \label{fig:si-generation-trajectory}
 ```
 

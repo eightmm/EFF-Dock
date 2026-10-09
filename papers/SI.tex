@@ -99,7 +99,7 @@ Bold symbols denote vectors or matrices; calligraphic symbols denote sets, graph
 
 Coordinates, distances, displacement and RMSD use Angstrom; angles use radians unless degrees are displayed. Flow time \(t\in[0,1]\) is dimensionless transport time, not elapsed simulation time. \(m=1,\ldots,M\) indexes candidates, \(s=0,\ldots,S\) integration states, and \(b\) a minibatch complex; bold \(\mathbf b\) instead denotes the pocket center. The \(N\) in the pose representation counts heavy atoms; \(N\) in candidate-prefix plots and workflow labels instead denotes the available candidate count. \(n\) in benchmark labels counts complexes or explicitly labelled strata. A top-\(k\) cutoff is a ranking count, not a fragment index. All logarithms are natural and act on numerical values in the stated units: \(\log\sigma\) abbreviates \(\log[\sigma/(1\,\angstrom)]\), and \(\log(1+r)\) abbreviates \(\log[1+r/(1\,\angstrom)]\) for an RMSD \(r\). Logits are real pre-sigmoid scores; \(\operatorname{sigmoid}(a)=1/(1+e^{-a})\) and \(\operatorname{softplus}(a)=\log(1+e^a)\) for scalar argument \(a\). Hidden features have no assigned physical units. The rotation Exp map converts an axis--angle vector to a proper rotation, and Log returns its principal axis--angle vector. \(\mathcal N(\boldsymbol\mu,\boldsymbol\Sigma)\) denotes a Gaussian with mean \(\boldsymbol\mu\) and covariance \(\boldsymbol\Sigma\); \(\mathbb 1[A]\) is one when condition \(A\) holds and zero otherwise. Diagram \(\otimes\) denotes an equivariant tensor product.
 
-Numerical settings below distinguish measured outcomes, benchmark definitions, fixed model or protocol choices, and numerical safeguards. A reported setting documents the evaluated implementation; absent a stated validation criterion or ablation, its particular value is not established as optimal.
+Numerical values denote measured outcomes, benchmark criteria, fixed settings or numerical safeguards. Fixed settings reproduce the evaluated implementation; their optimality requires an explicit selection criterion or controlled experiment.
 
 \paragraph{Input standardization and coordinate frame.}
 Geometry-training ligands are read from crystal-complex coordinates with RDKit, and the sanitization outcome is recorded \citep{landrum2024rdkit}.
@@ -251,7 +251,7 @@ Geometry training samples
     \label{eq:si_prior_mixture}
 \end{equation}
 and embeds $\log\sigma$ together with flow time.
-The entries of \(p_\sigma\) correspond in order to the five listed scales and sum to one; they specify how often each spatial prior is sampled, rather than probabilities assigned to generated poses.
+The entries of \(p_\sigma\) correspond in order to the five listed scales and sum to one; they specify the training frequency of each spatial prior.
 For paired prior and target fragment poses, the left-action coupling is
 \begin{align}
     \mathbf{T}_{k,t}
@@ -289,7 +289,7 @@ The released docking checkpoint uses
 \end{equation}
 The \(\delta_0\) component replays the exact prior endpoint at \(t=0\).
 Here \(\mathcal U(a,b)\) is uniform on \([a,b]\), \(\operatorname{Law}[X]\) denotes the distribution of \(X\), and \(\delta_0\) is the unit point mass at zero.
-The 0.8 and 1.7 in the base distribution are the location and scale of the Gaussian before the sigmoid. The 0.02 uniform component preserves sampling across the full interval; the continuation adds early-time draws and exact-prior replay. These are retained training settings, not parameters selected by the external benchmarks.
+The 0.8 and 1.7 in the base distribution are the location and scale of the Gaussian before the sigmoid. The 0.02 uniform component preserves sampling across the full interval; the continuation adds early-time draws and exact-prior replay. These parameters are retained from the training configuration.
 At inference, the sampler uses
 \begin{equation}
     t_s=1-\left(1-\frac{s}{S}\right)^3,
@@ -375,7 +375,7 @@ Scalar channels use SiLU, non-scalar channels use invariant norm gates, and drop
 In Eq.~\eqref{eq:si_compact_layer}, \(\ell\) is the layer index, \(\mathbf h_i^{(\ell)}\) the feature vector of node \(i\), \(\mathcal N(i)\) its incoming neighbors, and \(b(i)\) its complex. The unit direction \(\widehat{\mathbf r}_{ji}\), written \(\widehat{\mathbf r}_{ij}\) in Fig.~2, points from sender \(j\) to receiver \(i\). Norm denotes equivariant root-mean-square normalization, GateMean the learned gate-normalized neighbor aggregation, Block the post-convolution transformation, and AdaLN adaptive layer normalization. Angular order \(l=0,1,2\), distinct from layer depth, has \(2l+1=1,3,5\) components per channel. Even and odd parity describe behavior under inversion; the evaluated symmetry claim concerns proper joint rotations.
 
 \paragraph{Architecture-diagram notation.}
-In Fig.~2, \(c=E_t(t)+E_\sigma(\log\sigma)\) is the conditioning vector called \(\boldsymbol\eta_b\) here; \(E_t\) and \(E_\sigma\) are learned embeddings. Diagram superscript \((k)\) counts layers, whereas subscript \(f\) indexes fragments; diagram \(I_f\) is the unit-weight geometric inertia \(\mathbf J_f\) of Eq.~\eqref{eq:si_newton_euler}, not the mass-weighted guidance inertia. \(\alpha\) mixes terminal docking features into the confidence embedding and is initialized to 0.25. \(h_{\mathrm{in}}\), \(h_{\mathrm{conv}}\) and \(h'\) denote convolution input, convolution output and transformed features. \(\delta_{\mathrm{in/out}}\) are learned radial channel-scale offsets. Distance \(d_{ij}\) and learned positive relation-specific scale \(\sigma_{\mathrm{type}}\) define distance decay; the latter is distinct from the translation prior \(\sigma\). RMSNorm is root-mean-square normalization; scalar blocks normalize by scalar RMS and nonscalar blocks by RMS channel norm, with a numerical denominator stabilizer. \(\gamma_0,\beta_0\) are scalar affine scale/shift outputs, while \(\gamma_{>0}\) controls nonscalar rescaling. The subscript \(>0\) refers to angular order, not the sign of \(\gamma\). Its \(0.1\tanh\) factor bounds modulation to 10\% about identity. \(g\) is the invariant norm-dependent gate, shared over each channel's components. SiLU is \(a\operatorname{sigmoid}(a)\); MLP denotes multilayer perceptron and concat denotes concatenation. The channel counts, layer depths, radial features and dropout specify the retained architecture; no ablation establishes these dimensions as optimal.
+In Fig.~2, \(c=E_t(t)+E_\sigma(\log\sigma)\) is the conditioning vector called \(\boldsymbol\eta_b\) here; \(E_t\) and \(E_\sigma\) are learned embeddings. Diagram superscript \((k)\) counts layers, whereas subscript \(f\) indexes fragments; diagram \(I_f\) is the unit-weight geometric inertia \(\mathbf J_f\) of Eq.~\eqref{eq:si_newton_euler}, not the mass-weighted guidance inertia. \(\alpha\) mixes terminal docking features into the confidence embedding and is initialized to 0.25. \(h_{\mathrm{in}}\), \(h_{\mathrm{conv}}\) and \(h'\) denote convolution input, convolution output and transformed features. \(\delta_{\mathrm{in/out}}\) are learned radial channel-scale offsets. Distance \(d_{ij}\) and learned positive relation-specific scale \(\sigma_{\mathrm{type}}\) define distance decay; the latter is distinct from the translation prior \(\sigma\). RMSNorm is root-mean-square normalization; scalar blocks normalize by scalar RMS and nonscalar blocks by RMS channel norm, with a numerical denominator stabilizer. \(\gamma_0,\beta_0\) are scalar affine scale/shift outputs, while \(\gamma_{>0}\) controls nonscalar rescaling. The subscript \(>0\) refers to angular order, not the sign of \(\gamma\). Its \(0.1\tanh\) factor bounds modulation to 10\% about identity. \(g\) is the invariant norm-dependent gate, shared over each channel's components. SiLU is \(a\operatorname{sigmoid}(a)\); MLP denotes multilayer perceptron and concat denotes concatenation. Channel counts, layer depths, radial features and dropout specify the retained architecture.
 
 \begin{table}[htbp]
     \centering
@@ -461,7 +461,7 @@ The primary losses are Cartesian-component-averaged translation MSE and observab
 \label{eq:si_primary_flow_losses}
 \end{equation}
 An empty rotational set contributes zero.
-Here \(\mathcal K_{\mathrm{rot}}\) contains fragments with retained rotational modes, \(\mathbf P_k\) projects onto those modes, and \(\mathbf u_i^\star\) is the atom velocity induced by the target fragment translation and angular velocity. The factors \(3N\), \(3K\) and \(3|\mathcal K_{\mathrm{rot}}|\) average squared errors over Cartesian components and valid items; they do not weight complexes by success. In Eq.~\eqref{eq:distance_geometry_loss}, \(t_b\) is complex \(b\)'s flow time, \(\mathcal P_b\) its interfragment atom-pair set, and \(\ell_b\) its mean squared endpoint-distance error. The \(t_b^2\) weight reduces the contribution of early extrapolations. The coefficients 8, 0.3 and 3 set relative task emphasis in the retained checkpoint's numerical units; their optimality was not isolated experimentally.
+Here \(\mathcal K_{\mathrm{rot}}\) contains fragments with retained rotational modes, \(\mathbf P_k\) projects onto those modes, and \(\mathbf u_i^\star\) is the atom velocity induced by the target fragment translation and angular velocity. The factors \(3N\), \(3K\) and \(3|\mathcal K_{\mathrm{rot}}|\) average squared errors over Cartesian components and valid items; they do not weight complexes by success. In Eq.~\eqref{eq:distance_geometry_loss}, \(t_b\) is complex \(b\)'s flow time, \(\mathcal P_b\) its interfragment atom-pair set, and \(\ell_b\) its mean squared endpoint-distance error. The \(t_b^2\) weight reduces the contribution of early extrapolations. The coefficients 8, 0.3 and 3 set relative task emphasis in the retained checkpoint's numerical units; their provenance follows the common convention in Sec.~S1.1.
 The released objective is
 \begin{equation}
 \mathcal L_{\mathrm{geom}}
@@ -475,7 +475,7 @@ All reductions use valid-item counts and distributed count rescaling so that une
 \section{Confidence Model Details}
 \label{app:confidence_details}
 
-The confidence model ranks poses within a generated candidate bank; its output is not interpreted as an affinity, binding probability, or cross-dataset calibrated RMSD.
+The confidence model predicts within-bank pose quality for ranking.
 For each candidate, the fixed docking network is re-evaluated at $t=1$ with recovered fragment frames and the source prior scale to obtain ligand-atom and fragment features. These features are mixed into a fresh heterogeneous-graph representation through a learned gate initialized to 0.25, followed by four additional equivariant interaction layers. Each layer retains 384 scalar channels, 32 channels of each vector parity and 16 channels of each rank-2 parity, as in the docking trunk; the invariant readout MLPs have hidden width 512. Prior-scale dependence enters the composite score through the docking features; the confidence interaction layers use a zero conditioning vector rather than a separate prior-scale input.
 
 \subsection{Invariant readout}
@@ -550,7 +550,7 @@ Its physical and interaction components are
     \label{eq:si_guidance_components}
 \end{align}
 The receptor is fixed, and distances are expressed in Angstrom.
-Individual terms use nominal kcal/mol units, but the combined potential is not calibrated as a molecular energy.
+Individual terms use nominal kcal/mol units in a geometric potential.
 Its gradient is used for coordinate diagnostics, optional inference-time drift, and post-sampling refinement.
 Inference guidance changes the numerical vector field without modifying the learned network parameters.
 This use of an auxiliary inference-time field is related to guidance formulations for flow matching, while the energy, normalization, and fragment projection below are specific to \method \citep{feng2025flowguidance}.
@@ -646,7 +646,7 @@ In primary measurements, the bond, angle and chiral reference values are obtaine
 Refinement and confidence use matching conformer templates and fragment partitions. Compatibility with generated poses was checked by independent proper fragment fits, with whole-ligand heavy-atom RMSD at most $10^{-3}\,\angstrom$. Original generation-template hashes were unavailable, so this geometric check does not establish identity of the fragment body-axis convention. Previously refined PhiBench-derived, FoldBench and OpenBind coordinates and energy references were verified unchanged and reused without rerunning refinement; rescoring used the evaluated frame convention.
 
 The proper term is independent of its starting torsion, and the weights around each cut bond sum to one. Conjugated or aromatic interfaces use \(n_p=2,\delta_p=\pi\); other cut bonds use \(n_p=3,\delta_p=0\). Chiral improper restraints are active; the separate chemical-constraint auxiliary channel has zero weight. The coefficients are given in Table~\ref{tab:si_physical_parameters}.
-Here \(r_b\), \(\theta_a\) and \(\phi_p\) are bond length, bond angle and proper dihedral; ref denotes the specified reference-conformer value. The \(k\) coefficients are restraint strengths, not learned parameters. Twofold and threefold torsion profiles are generic periodic preferences for the stated interface classes, not fitted torsional free energies. Their coefficients and the steric-barrier settings are fixed custom geometric parameters; only the stated element-level UFF constants and radius tables are taken from the cited physical parameter sources.
+Here \(r_b\), \(\theta_a\) and \(\phi_p\) are bond length, bond angle and proper dihedral; ref denotes the specified reference-conformer value. The \(k\) coefficients are restraint strengths, not learned parameters. Twofold and threefold profiles specify generic periodic preferences for the stated interface classes. Their coefficients and the steric-barrier settings are fixed custom geometric parameters; only the stated element-level UFF constants and radius tables are taken from the cited physical parameter sources.
 
 Let \(\mathcal N_{\mathrm{LJ}}\) be the admitted ligand--ligand and protein--ligand nonbonded pairs after topological exclusions.
 For \((i,j)\in\mathcal N_{\mathrm{LJ}}\), \(r_{ij}=\|\mathbf x_i-\mathbf x_j\|_2\), \(s_{ij}\) is the topological scale, and \(x_i,D_i\) are the UFF size and well-depth parameters.
@@ -688,7 +688,7 @@ With versioned van der Waals radii \(R_i^{\mathrm{vdW}}\) and \(R_j^{\mathrm{vdW
 \end{align}
 The defaults are \(\rho=0.8\), \(k_{\mathrm{steric}}=20\,\mathrm{kcal\,mol^{-1}\,\angstrom^{-2}}\), \(\tau=0.1\,\angstrom\), and \(\Delta_{\mathrm{cut}}=0.5\,\angstrom\).
 The barrier has compact support and joins zero with continuous first and second radial derivatives at its outer cutoff. It is smooth away from exact atom coincidence.
-This barrier is a geometric safeguard rather than a calibrated thermodynamic term.
+The barrier discourages receptor overlap during coordinate optimization.
 
 Under the geometry-only receptor policy, unresolved receptor atoms contribute repulsion without attractive interaction typing. Obstacles with admitted element-level UFF parameters use only the repulsive branch of Eq.~\eqref{eq:si_lj}. For remaining generic obstacles \(j\in\mathcal O\),
 \begin{align}
@@ -699,7 +699,7 @@ Under the geometry-only receptor policy, unresolved receptor atoms contribute re
  \label{eq:si_generic_obstacles}
 \end{align}
 The total obstacle term \(E_{\mathrm{obs}}\) is the sum of the typed and generic repulsive terms; neither provides a hydrogen-bond, charge or dispersion attraction.
-In the barrier, \(\rho\) scales the radius sum, \(\tau\) controls smooth penetration, and \(\Delta_{\mathrm{cut}}\) is the support margin. Generic-obstacle length 1.7 Å, soft-core length 0.5 Å, amplitude 10 kcal/mol, exponent 12 and 2.5--3.0 Å switch define a bounded repulsive fallback rather than element-specific chemistry. In the LJ term, 12 and 6 are repulsive and attractive exponents; 1--2, 1--3 and 1--4 refer to atoms separated by one, two and three bonds. Soft cores regularize close approaches, and outer cutoffs limit interaction neighborhoods.
+In the barrier, \(\rho\) scales the radius sum, \(\tau\) controls smooth penetration, and \(\Delta_{\mathrm{cut}}\) is the support margin. Generic-obstacle length 1.7 Å, soft-core length 0.5 Å, amplitude 10 kcal/mol, exponent 12 and 2.5--3.0 Å switch define the bounded repulsive fallback. In the LJ term, 12 and 6 are repulsive and attractive exponents; 1--2, 1--3 and 1--4 refer to atoms separated by one, two and three bonds. Soft cores regularize close approaches, and outer cutoffs limit interaction neighborhoods.
 
 \begin{table}[tbp]
     \centering
@@ -836,7 +836,7 @@ For admitted metal profile \(h\), let \(E_h^{\mathrm{pair}}\), \(E_h^{\mathrm{ov
 where \(\mathcal M\) is the set of recognized receptor-metal profiles.
 Unsupported profiles have no attractive pair or slot contribution and remain repulsion only.
 The low-level gate thresholds and metal-profile capacities are versioned implementation parameters rather than learned quantities.
-The sets \(\mathcal Q_L^+,\mathcal Q_P^+\) contain the positive-charge sites from \(\mathcal Q_L,\mathcal Q_P\). \(X\) indexes an interaction family and \(h\) a metal profile. Occ and SymOcc sum one-sided and symmetric site occupancies; their factor \(1/2\) averages the two directions. Negative principal coefficients favor admitted contacts, and all displayed attraction amplitudes use nominal kcal/mol. These geometric gates and coefficients specify the fixed interaction profile rather than calibrated binding energetics.
+The sets \(\mathcal Q_L^+,\mathcal Q_P^+\) contain the positive-charge sites from \(\mathcal Q_L,\mathcal Q_P\). \(X\) indexes an interaction family and \(h\) a metal profile. Occ and SymOcc sum one-sided and symmetric site occupancies; their factor \(1/2\) averages the two directions. Negative principal coefficients favor admitted contacts, and all displayed attraction amplitudes use nominal kcal/mol. These gates and coefficients specify the fixed interaction profile.
 
 \begin{table}[htbp]
     \centering
@@ -924,7 +924,7 @@ The guidance controls reported in Fig.~\ref{fig:si-guidance-budget} use \(\eta=2
 For each active interval, the LJ soft-core length is evaluated at \(t_{\mathrm{mid}}=[\max(t_j,0.5)+t_{j+1}]/2\). It decreases linearly from \(1.5\) to \(0.75\,\angstrom\) over the active half of integration.
 The ligand coordinates and pose-dependent contacts are rebuilt after each guided \(\SE(3)\) update.
 This is an inference-only modification; guidance is not present in the geometry-training objective.
-Here \(\eta\) is dimensionless pre-cap strength, \(\bar r_j\) the average ramp over interval \(j\), and \(\beta_j\) the factor matching projected atom-motion magnitude to the learned field. The ramp is zero through \(t=0.5\) and rises to one at \(t=1\). The atom-force cap 20 uses nominal kcal mol\(^{-1}\) Å\(^{-1}\); the RMS floor prevents division by a negligible direction. Guidance strength, ramp, soft-core schedule and motion caps are fixed control settings rather than benchmark-selected optima.
+Here \(\eta\) is dimensionless pre-cap strength, \(\bar r_j\) the average ramp over interval \(j\), and \(\beta_j\) the factor matching projected atom-motion magnitude to the learned field. The ramp is zero through \(t=0.5\) and rises to one at \(t=1\). The atom-force cap 20 uses nominal kcal mol\(^{-1}\) Å\(^{-1}\); the RMS floor prevents division by a negligible direction. Guidance strength, ramp, soft-core schedule and motion caps are fixed control settings.
 
 \subsection{Bounded post-sampling refinement}
 \label{si:guidance_refinement}
@@ -961,7 +961,7 @@ Starting at iteration 25, a pose stops after five consecutive accepted updates s
 \end{equation}
 All 100 candidates are refined independently; finite coordinates from early-stopped poses define their final output.
 Raw coordinates are retained for paired analysis.
-Refinement index \(r\) counts optimization iterations, unrelated to an interatomic distance. \(\alpha_r\) is the dimensionless accepted backtracking multiplier; \(\mathbf x_{\mathrm{trial}}\) is its trial geometry. The 13 trial multipliers from \(0.5^0\) to \(0.5^{12}\) reduce the proposed move until acceptance. The \(10^{-10}\) allowance accommodates energy roundoff; displacement, energy-plateau and iteration limits bound numerical work and movement, rather than certifying convergence to a physical minimum.
+Refinement index \(r\) counts optimization iterations, unrelated to an interatomic distance. \(\alpha_r\) is the dimensionless accepted backtracking multiplier; \(\mathbf x_{\mathrm{trial}}\) is its trial geometry. The 13 trial multipliers from \(0.5^0\) to \(0.5^{12}\) reduce the proposed move until acceptance. The \(10^{-10}\) allowance accommodates energy roundoff; displacement, plateau and iteration limits bound movement and numerical work.
 Refinement is rigid-fragment \(\SE(3)\) descent on \(E_{\mathrm{G}}\) and does not call the docking network, Vina, or another minimizer.
 
 \subsection{Inputs and numerical verification}
@@ -1014,7 +1014,7 @@ Missing resolution, real-space correlation coefficient (RSCC), real-space R fact
 
 Deterministic representative ranking prefers biological assembly 1, followed by more interactions, larger RSCC, smaller RSR, smaller resolution, and stable system and ligand-chain identifiers.
 Preprocessing succeeded for 50,213 of the 50,297 selected records. The remaining 84 failed because of missing inputs, parsing, featurization or fragment decomposition.
-The resolved-atom fraction divides observed ligand heavy atoms by the total; RSCC measures real-space model--density correlation and RSR a real-space density residual. Resolution, resolved-atom fraction, RSCC and RSR thresholds screen experimental completeness and fit; interaction/interface and crystal-contact filters screen usable receptor--ligand context. Size and fragmentation limits bound accepted input complexity. These are fixed curation rules, not optimal quality cutoffs or additional prediction-success criteria. The \texttt{pocket70} label is the supplied PLINDER \texttt{pocket\_fident\_\_70\_\_community} assignment: a community of its pocket-sequence-identity similarity graph thresholded at 70\% \citep{durairaj2024plinder}. It is a graph-community label, not a guarantee of 70\% pairwise identity between every member, nor the binding-chain identity used in our evaluation.
+The resolved-atom fraction divides observed ligand heavy atoms by the total; RSCC measures real-space model--density correlation and RSR a real-space density residual. Resolution, resolved-atom fraction, RSCC and RSR thresholds screen experimental completeness and fit; interaction/interface and crystal-contact filters screen usable receptor--ligand context. Size and fragmentation limits bound accepted input complexity. These fixed curation rules define the training inventory separately from prediction-success criteria. The \texttt{pocket70} label is the supplied PLINDER \texttt{pocket\_fident\_\_70\_\_community} assignment: a community of its pocket-sequence-identity similarity graph thresholded at 70\% \citep{durairaj2024plinder}. It is a graph-community label, not a guarantee of 70\% pairwise identity between every member, nor the binding-chain identity used in our evaluation.
 
 \subsection{Dataset split}
 
@@ -1056,7 +1056,7 @@ Pose-level targets use symmetry-aware, no-alignment RDKit \texttt{CalcRMS}; atom
 \subsection{Training and checkpoint selection}
 \label{si:runtime_provenance}
 
-The evaluated docking model has three sequential training stages (Table~\ref{tab:si_docking_lineage}). The geometry stage was initialized from the terminal base model, and the early-time-replay stage from the geometry checkpoint selected by median internal-validation rollout RMSD. Optimizer and scheduler states were reset between stages; model and available EMA states were retained. The final 50,000-update stage used the time distribution in Eq.~\eqref{eq:si_time_distribution} and objective in Eq.~\eqref{eq:si_total_geometry_loss}. Relative to geometry fine-tuning, it changed the optimizer, learning rate, batch size, time distribution and auxiliary-loss weights; it is not an isolated test of time sampling. Atom-velocity and distance-geometry weights were \(0.5/4\) in the geometry-stage configuration and \(0.3/3\) in the final stage.
+The evaluated docking model has three sequential training stages (Table~\ref{tab:si_docking_lineage}). The geometry stage was initialized from the terminal base model, and the early-time-replay stage from the geometry checkpoint selected by median internal-validation rollout RMSD. Optimizer and scheduler states were reset between stages; model and available EMA states were retained. The final 50,000-update stage used the time distribution in Eq.~\eqref{eq:si_time_distribution} and objective in Eq.~\eqref{eq:si_total_geometry_loss}. The continuation changed the optimizer, learning rate, batch size, time distribution and auxiliary-loss weights together. Atom-velocity and distance-geometry weights were \(0.5/4\) in the geometry-stage configuration and \(0.3/3\) in the final stage.
 
 \begin{table}[htbp]
     \centering
@@ -1109,9 +1109,6 @@ Membership inventories cover the docking and confidence training sets, not a rec
     \end{tabular}
 \end{table}
 
-The paired confidence network has four interaction layers with the same irreducible-representation channel dimensions as the docking trunk, followed by invariant readout MLPs of hidden width 512.
-The confidence output is used for within-bank ranking and is not calibrated as an absolute RMSD across datasets.
-
 The confidence architecture uses 32 radial basis functions, $l_{\max}=2$, a 128-dimensional zero conditioning vector, dropout 0.1, a $5\,\angstrom$ contact cutoff and global contact attention. The confidence training loader caps protein-atom nodes at 1,024; coordinate-based benchmark scoring instead uses all retained nodes in the specified $10\,\angstrom$ residue crop, without this loader cap.
 One complex forms a batch, and pose sets are stratified before batching.
 For internal model selection, let \(\mathcal V_{1035}\) be the fixed set of 1,035 validation complexes. Each complex contributes the highest-ranked candidate and the selection metric
@@ -1127,7 +1124,7 @@ For internal model selection, let \(\mathcal V_{1035}\) be the fixed set of 1,03
 is maximized, where \(\widehat r_{cm}\) is predicted RMSD and \(r_{cm}\) is the symmetry-aware validation RMSD.
 The checkpoint maximizing this fixed internal-validation metric was released; it produced 622/1,035 (60.10\%) top-1 successes on that bank.
 External benchmark outcomes do not enter this selection.
-Update counts measure optimizer steps, not epochs. Global batch counts complexes across all distributed processes; rank in the batch configuration means process rank, not pose rank. Learning rate sets optimizer step scale, weight decay shrinks parameters, and the gradient cap limits global gradient norm. EMA means exponential moving average; decay 0.999 weights the previous parameter average by 0.999 and the current parameters by 0.001. Warmup, plateau and cooldown numbers specify the recorded learning-rate schedule. Training seeds identify random streams, and loader node/pose caps bound batch size and memory. These settings and stage lengths are retained run configurations; only the stated internal-validation criterion selects the confidence checkpoint.
+Update counts measure optimizer steps, not epochs. Global batch counts complexes across all distributed processes; rank in the batch configuration means process rank, not pose rank. Learning rate sets optimizer step scale, weight decay shrinks parameters, and the gradient cap limits global gradient norm. EMA means exponential moving average; decay 0.999 weights the previous parameter average by 0.999 and the current parameters by 0.001. Warmup, plateau and cooldown numbers specify the recorded learning-rate schedule. Training seeds identify random streams, and loader node/pose caps bound batch size and memory. Settings and stage lengths record the retained runs; the stated internal-validation criterion selects the confidence checkpoint.
 
 \section{Evaluation Details}
 \label{si:evaluation_contract}
@@ -1164,7 +1161,7 @@ Missing reference coordinates were completed from a fixed Chemical Component Dic
 
 The reported results use reference-pocket holo redocking; apo-receptor docking, blind docking, and sequence-conditioned cofolding are separate tasks.
 The primary setting uses $M=100$ candidates, $S=10$ late-biased Euler intervals with power 3, $\sigma=2\,\angstrom$, a $10\,\angstrom$ receptor crop, no center jitter, and no inference-time guidance.
-These values specify the retained reference-pocket protocol: candidate count controls bank size, interval count controls integration work, prior scale controls initial spatial spread, and crop radius controls receptor context. The seed labels 42, 100042 and 200042 distinguish fixed random streams; three repeats measure sampling variation under this protocol without establishing an optimal repeat count.
+These values specify the retained reference-pocket protocol: candidate count controls bank size, interval count controls integration work, prior scale controls initial spatial spread, and crop radius controls receptor context. Seed labels 42, 100042 and 200042 identify the three fixed random streams used to measure sampling variation.
 All five external cohorts use three inference repeats with fixed trained weights under this common unguided protocol.
 Primary measurements use the feature injection in Eq.~\eqref{eq:si_orientation_injection} with the frozen released docking and confidence weights.
 Every saved candidate is refined independently for at most 100 iterations, and raw and refined banks are rescored separately by the selected confidence model.
@@ -1175,23 +1172,18 @@ Two reference chains missing one heavy-atom coordinate are repaired by a local K
 Results are retained for the full 558-interface set and the 556 interfaces with fully observed references.
 The 66 later-release and 492 complementary interfaces are subdivisions of the same FoldBench campaign.
 
-\subsection{Interpretive boundaries of the executed evaluation}
+\subsection{Evaluation scope}
 
 The external results describe fixed-holo, reference-pocket redocking rather than blind docking, apo-receptor docking, induced-fit docking, or prospective target discovery.
 Astex and PoseBusters were inspected repeatedly during development; PhiBench-derived and FoldBench-Pocket are task adaptations; and OpenBind is a dense single-protease-family cohort. OpenBind retains 65 records with at least one source flag: covalency (2), a prepared PoseBusters failure flag (6), a reference PoseBusters failure flag (28), or suspected artefact (39). These categories overlap and are source annotations rather than re-evaluated predictions. All 925 records remain in the primary denominator.
 Training-set relatedness is therefore reported directly rather than inferred from dataset names or deposition dates.
 
-The executed campaigns do not isolate the causal contribution of the fragment representation, \(l=2\) equivariant channels, dynamic contacts, Newton--Euler readout, atom-velocity auxiliary loss, or distance-geometry loss.
-They provide within-bank rank correlation, discrimination, regret, and descriptive reliability diagnostics, but not a prospective cross-generator calibration test or a fitted calibration study.
-The numerical consistency tests in Section~S5 establish implementation behavior, while the docking benchmarks evaluate the complete released pipeline; neither substitutes for a controlled component ablation.
-
-The three generation repeats quantify stochastic variation for the fixed complexes and preparation protocol.
-They do not quantify uncertainty under resampling of target families, receptor structures, ligand chemical states, or pocket predictors.
+The experiments evaluate the complete released pipeline and within-bank rank correlation, discrimination, regret and empirical reliability. Component effects and cross-generator calibration require separate controlled studies. Numerical consistency tests in Section~S5 assess implementation behavior; the three fixed-weight repeats quantify sampling variation on these prepared cohorts.
 
 \subsection{Benchmark-specific comparisons}
 \label{si:literature_context}
 
-Table~\ref{tab:si_literature_context} places published comparator results alongside EFF-Dock under the corresponding selection rules and benchmark-specific endpoints. The source-defined tasks and denominators remain explicit; these are descriptive comparisons rather than paired or matched-compute experiments.
+Table~\ref{tab:si_literature_context} places published comparator results alongside EFF-Dock under the corresponding selection rules and benchmark-specific endpoints. Each row retains its task, endpoint and denominator; source aggregates and locally evaluated EFF-Dock results are distinguished.
 
 For PhiBench, the pocket-conditioned arm of PhysDock's Figure~2 and \href{https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf}{Supplementary Table~2} reports PhysDock and seven supplied-pocket baselines using top-5 of 40 candidates \citep{zhang2025physdock}. The reported evaluable denominators range from 180 to 206 and are retained. The source uses protein-aligned ligand RMSD (PAL-RMSD) and reports 18 PoseBusters criteria. EFF-Dock uses its locally selected 206-case PhiBench-derived cohort, fixed-receptor symmetry-aware RMSD and 27 non-RMSD PoseBusters checks. The 40-pose restriction is a saved generation-order prefix, not a new matched-budget run. Identity with the published 206 cases, ligand preparation and the historical atom-mapping/validity implementation are not established. The reported check counts alone do not establish different stringency.
 
@@ -1202,7 +1194,7 @@ For OpenBind, the \href{https://github.com/OpenBind-Consortium/EV-A71_2A_benchma
 \begin{table}[p]
     \centering
     \small
-    \caption{Benchmark-specific comparison with published models. PhiBench source rows are top-5 of 40 pocket-conditioned predictions; $n$ is each method's reported evaluable denominator. EFF-Dock rows use the local PhiBench-derived cohort and fixed-receptor RMSD, so equal sizes do not establish identical cases. FoldBench source rows are cofolding, while EFF-Dock uses a supplied holo receptor; their common structural conjunction requires binding-site-superposed RMSD $<2\,\angstrom$ and LDDT-PLI $>0.8$. FoldBench $n=558$ denotes the released group, not a verified source-model scoreable denominator. OpenBind uses the official 802-case follow-on subset, RMSD $\le2\,\angstrom$ and PoseBusters validity, with LDDT-PLI $\ge0.8$ for the additional conjunction. Source PhiBench RMSD requires PAL-RMSD $<2\,\angstrom$; EFF-Dock uses symmetry-aware RMSD $<2\,\angstrom$ and the 27-check conjunction. The 40-pose EFF-Dock prefix is selected from the stored 100-pose bank. Dashes denote unreported metrics. No cross-task superiority or statistical significance is inferred.}
+    \caption{Benchmark-specific comparison with published models. PhiBench source rows are top-5 of 40 pocket-conditioned predictions; $n$ is each method's reported evaluable denominator. EFF-Dock rows use the local PhiBench-derived cohort and fixed-receptor RMSD, so equal sizes do not establish identical cases. FoldBench source rows are cofolding, while EFF-Dock uses a supplied holo receptor; their common structural conjunction requires binding-site-superposed RMSD $<2\,\angstrom$ and LDDT-PLI $>0.8$. FoldBench $n=558$ denotes the released group, not a verified source-model scoreable denominator. OpenBind uses the official 802-case follow-on subset, RMSD $\le2\,\angstrom$ and PoseBusters validity, with LDDT-PLI $\ge0.8$ for the additional conjunction. Source PhiBench RMSD requires PAL-RMSD $<2\,\angstrom$; EFF-Dock uses symmetry-aware RMSD $<2\,\angstrom$ and the 27-check conjunction. The 40-pose EFF-Dock prefix is selected from the stored 100-pose bank. Dashes denote unreported metrics. Rows retain their distinct tasks and preparation protocols.}
     \label{tab:si_literature_context}
     \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X r >{\raggedright\arraybackslash}p{0.20\textwidth} rr@{}}
         \toprule
@@ -1339,7 +1331,7 @@ PhiBench-derived retains the three recovered systems, OpenBind retains all 925 a
 \subsection{Metrics and uncertainty}
 
 Confidence discrimination uses negative predicted RMSD as the score and RMSD \(<2\,\angstrom\) as the binary label within each candidate bank. AUROC and average precision are macro-averaged over banks containing both positive and negative candidates; all-success and all-failure banks are excluded from these two metrics. Spearman correlation uses average ranks for ties and excludes banks with a constant score or constant RMSD. The numerical source tables report the contributing bank counts for each repeat. Raw and refined discrimination summaries can therefore contain different sets of contributing banks. Reliability curves use the saved predictions without fitting a calibration transform; the success-probability head is separate from the predicted-RMSD score used for selection.
-RMSD means root-mean-square deviation: the square root of the mean squared heavy-atom position error over a complete atom correspondence. Primary scoring minimizes over admitted symmetry-equivalent correspondences without independent ligand alignment. AUROC is area under the receiver-operating-characteristic curve and measures discrimination over score thresholds; average precision summarizes precision weighted by recall increments. Spearman correlation, labelled \(\rho\) in the figure, compares candidate ranks; this statistical \(\rho\) is distinct from the steric radius scale. Macro-averaging weights each contributing bank equally. The \(2\,\angstrom\) endpoint follows the cited docking benchmarks, rather than a threshold fitted to EFF-Dock scores. A 27-check PoseBusters conjunction is determined by the evaluation configuration, not by 27 learned model outputs. Lower RMSD and regret are preferable; larger success, correlation, AUROC and average precision are preferable. LDDT-PLI is the local distance difference test for protein--ligand interactions; BiSyRMSD is binding-site-superposed, symmetry-aware ligand RMSD.
+RMSD means root-mean-square deviation: the square root of the mean squared heavy-atom position error over a complete atom correspondence. Primary scoring minimizes over admitted symmetry-equivalent correspondences without independent ligand alignment. AUROC is area under the receiver-operating-characteristic curve and measures discrimination over score thresholds; average precision summarizes precision weighted by recall increments. Spearman correlation, labelled \(\rho\) in the figure, compares candidate ranks; this statistical \(\rho\) is distinct from the steric radius scale. Macro-averaging weights each contributing bank equally. The \(2\,\angstrom\) endpoint follows the cited docking benchmarks, and the evaluation configuration defines the 27-check PoseBusters conjunction. Lower RMSD and regret are preferable; larger success, correlation, AUROC and average precision are preferable. LDDT-PLI is the local distance difference test for protein--ligand interactions; BiSyRMSD is binding-site-superposed, symmetry-aware ligand RMSD.
 
 The primary endpoint is top-1 redocking success: symmetry-aware heavy-atom RMSD below \(2\,\angstrom\), measured without alignment.
 Secondary endpoints are top-5 and oracle-100 coverage, selected mean and median RMSD, official PoseBusters 27-check non-RMSD pass-all, and RMSD--PoseBusters success for the same pose.
@@ -1379,7 +1371,7 @@ Adding the 25 confidence-only samples left external exact ligand matches, Morgan
 Unless stated otherwise, uncertainty is the sample standard deviation across three inference repeats on the same complex set, with identical trained weights. Astex and PoseBusters use a fixed seed-zero generation conformer; in PhiBench-derived, FoldBench and OpenBind, conformer generation follows the per-complex sampling seed. Repeat variability in the latter cohorts therefore includes starting-conformer variation. None of these repeats represents independent training or target-population resampling.
 For the paired improvement analysis, per-complex differences are first averaged across repeats and then resampled with 2,000 percentile-bootstrap draws; the complex bootstrap resamples complexes, whereas the PDB-cluster bootstrap resamples exact-PDB groups and reports a complex-weighted mean \citep{efron1979bootstrap}.
 The paired baseline-difference analysis likewise uses 2,000 percentile draws but resamples exact PDB-accession groups; every retained Astex and PoseBusters complex has a distinct PDB accession, so group and complex resampling coincide for those two cohorts.
-Percent rates are successful complexes divided by the stated denominator, multiplied by 100; a percentage-point difference subtracts two percent rates without dividing by the baseline. Sample SD uses the three-repeat mean and divisor \(3-1\); it is distinct from a bootstrap confidence interval. The 95\% percentile interval uses the 2.5th and 97.5th percentiles of 2,000 resampled estimates. The draw count is a fixed Monte Carlo setting, not 2,000 new docking runs. Cohort sizes, exclusions and success counts are observed inventory or outcome counts; versions, dates and PDB/CCD identifiers specify provenance rather than numerical hyperparameters.
+Percent rates are successful complexes divided by the stated denominator, multiplied by 100; a percentage-point difference subtracts two percent rates without dividing by the baseline. Sample SD uses the three-repeat mean and divisor \(3-1\); it is distinct from a bootstrap confidence interval. The 95\% percentile interval uses the 2.5th and 97.5th percentiles of 2,000 resampled estimates. The draw count specifies Monte Carlo resampling of existing outcomes. Cohort sizes, exclusions and success counts are observed inventory or outcome counts; versions, dates and PDB/CCD identifiers specify provenance rather than numerical hyperparameters.
 
 \clearpage
 
@@ -1414,7 +1406,7 @@ The cumulative-ranking and generation-prefix analyses in Figs.~\ref{fig:si-pose-
 \subsection{Resource measurements}
 
 The docking model has 5,719,970 parameters; the confidence model has 9,403,274.
-These counts sum parameter-tensor elements in the respective networks, rather than counting channels or stored poses. Runtime uses wall-clock seconds per complex, and plotted GiB denotes \(2^{30}\) bytes of CUDA allocated memory; GPU model numerals are device names.
+These counts sum parameter-tensor elements in the respective networks. Runtime uses wall-clock seconds per complex, and plotted GiB denotes \(2^{30}\) bytes of CUDA allocated memory; GPU model numerals are device names.
 
 Runtime and memory measurements are shown in Figs.~\ref{fig:si-runtime} and \ref{fig:si-generation-memory}. Profiling used mixed RTX A5000, RTX 6000 Ada and RTX PRO 6000 devices. Recorded times include the original refinement and confidence scoring but exclude subsequent refinement and rescoring passes; they do not estimate the end-to-end cost of the primary protocol or support a controlled hardware comparison.
 
@@ -1456,7 +1448,7 @@ In the overlap legend, same-sample means an observed exact ligand match and bind
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{sequence_similarity.pdf}
-    \caption{\textbf{Docking performance by training-set sequence identity.} Complexes are grouped by maximum query-normalized binding-chain identity to the docking-training set. Solid bars show RMSD--PoseBusters success, and hatched segments extend to RMSD-only success. Bars show mean \(\pm\) sample SD across three repeats; labels give stratum sizes. Empty and very small strata should not be interpreted as stable estimates.}
+    \caption{\textbf{Docking performance by training-set sequence identity.} Strata use maximum query-normalized binding-chain identity to the docking-training set. Solid bars show RMSD--PoseBusters success; hatching extends to RMSD-only success. Bars and whiskers show three-repeat means and sample SD; labels give stratum sizes, including empty and sparse groups.}
     \label{fig:si-relatedness-sequence}
 \end{figure}
 
@@ -1493,7 +1485,7 @@ Figs.~\ref{fig:si-paired-effects}--\ref{fig:si-complexity-failures} separate the
 
 Fig.~\ref{fig:si-confidence-reliability} complements the within-bank rank diagnostics in the main text with empirical reliability curves.
 The stringent slices in Fig.~\ref{fig:si-stringent-slices} are small, predefined evaluation subsets defined by the simultaneous ligand and sequence criteria and are therefore descriptive rather than population-level estimates.
-Probability bins have boundaries 0.1, 0.2, \(\ldots\), 0.9; predicted-RMSD bins have boundaries 1, 2, 3, 4, 6 and 10 Å. Bin summaries pool candidates across repeats, with boundary values assigned to the higher bin. Near-native-count groups are 0, 1--5, 6--20, 21--50 and 51--100. These are fixed display strata, not ranker training or success thresholds. The simultaneous identity \(<30\%\) and Tanimoto \(<0.5\) limits define a descriptive low-relatedness slice; they do not certify absence of all training exposure.
+Probability bins have boundaries 0.1, 0.2, \(\ldots\), 0.9; predicted-RMSD bins have boundaries 1, 2, 3, 4, 6 and 10 Å. Bin summaries pool candidates across repeats, with boundary values assigned to the higher bin. Near-native-count groups are 0, 1--5, 6--20, 21--50 and 51--100. Bins are fixed display strata. Identity \(<30\%\) and Tanimoto \(<0.5\), together with no observed exact ligand match, define the low-relatedness slice.
 
 \begin{figure}[p]
     \centering
@@ -1505,7 +1497,7 @@ Probability bins have boundaries 0.1, 0.2, \(\ldots\), 0.9; predicted-RMSD bins 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{stringent_subset.pdf}
-    \caption{\textbf{Performance under simultaneous sequence and ligand relatedness restrictions.} Each benchmark is compared with the fixed subset satisfying maximum training-relative binding-chain identity \(<30\%\), maximum Morgan Tanimoto \(<0.5\), and no observed exact training-ligand match. \method selected RMSD and RMSD--PoseBusters success and full-bank RMSD oracle are shown. Only 2, 4, 7, 9, and 0 complexes remain for Astex, PoseBusters, PhiBench-derived, FoldBench, and OpenBind, so the result is descriptive rather than a held-out generalization claim.}
+    \caption{\textbf{Performance under simultaneous sequence and ligand restrictions.} The fixed subset requires maximum training-relative binding-chain identity \(<30\%\), Morgan Tanimoto \(<0.5\), and no observed exact training-ligand match. Selected RMSD and RMSD--PoseBusters success and full-bank RMSD oracle are shown for EFF-Dock. Remaining counts are 2, 4, 7, 9 and 0 for Astex, PoseBusters, PhiBench-derived, FoldBench and OpenBind, respectively; the slices are descriptive.}
     \label{fig:si-stringent-slices}
 \end{figure}
 
@@ -1525,7 +1517,7 @@ Fig.~\ref{fig:si-baseline-differences} reports paired uncertainty for the locall
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.34\textheight,keepaspectratio]{fragment_trajectory.pdf}
-    \caption{\textbf{Fragment motion along a saved ODE generation trajectory.} \method states for Astex 1T46--STI are shown at five actually saved flow times in a fixed receptor frame. Colors track the same six rigid fragments; omitted interfragment bonds in early panels are a display convention rather than bond formation. Flow time is dimensionless and is not refinement time. This seed-42, unguided one-pose trajectory is separate from the 100-pose benchmark-selected banks and carries no representative-success claim.}
+    \caption{\textbf{Fragment motion along a saved ODE trajectory.} Astex 1T46--STI at five saved flow times in a fixed receptor frame. Colors track six rigid fragments; omission of early interfragment bonds is a display convention. Dimensionless flow time describes generation, separate from refinement. This prespecified seed-42, unguided one-pose illustration is separate from the 100-pose benchmark banks.}
     \label{fig:si-generation-trajectory}
 \end{figure}
 
@@ -1577,7 +1569,7 @@ The sensitivity protocol in Online Methods crosses five crop radii with three ce
 
 Paired conditions use the same seeds, fragment inventories and prior-draw construction. The jitter stream is independent of the pose prior; within each complex and repeat, jitter levels scale the same perturbation vector. Translation draws were identical; backend quaternion roundoff produced initial-rotation differences of at most \(2.81\times10^{-7}\) radians, without bitwise prior identity across backends. The 40- and 100-pose budgets are generated separately and are not nested banks.
 
-Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift}. Guided raw-bank mean RMSD--PoseBusters success was higher in both cohorts at each candidate budget, but refined-bank differences were smaller and had mixed signs (Fig.~\ref{fig:si-guidance-budget}). These descriptive results did not select guidance as a primary setting.
+Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift}. Guided raw-bank mean RMSD--PoseBusters success was higher in both cohorts at each budget; refined-bank differences were smaller and had mixed signs (Fig.~\ref{fig:si-guidance-budget}). The primary protocol remains unguided.
 
 \begin{figure}[!htbp]
     \centering
@@ -1586,7 +1578,7 @@ Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift
     \label{fig:si-guidance-budget}
 \end{figure}
 
-Refinement preserves candidate identity between the raw and refined banks. Energy reduction and numerical consistency verify the optimization procedure but are not evidence of improved binding thermodynamics.
+Refinement preserves candidate identity, enabling raw--refined coordinate comparisons.
 
 \begin{figure}[!htbp]
 \centering
