@@ -132,6 +132,24 @@ For a fragment-local learned vector \(\mathbf w\), the world-frame injection is
 Source-local edge coordinates \(\mathbf R^\top(\mathbf x_j-\mathbf x_i)\) map a world displacement into a local frame.
 
 Evaluation uses fixed docking and confidence weights with local-to-world feature injection and coordinate-to-frame recovery that differ from training. These conventions also determine the terminal docking features supplied to the confidence network.
+The released weights were trained with the historical injection \(G(\mathbf R,\mathbf w)=\mathbf R^\top\mathbf w\), for which \(G(\mathbf Q\mathbf R,\mathbf w)=\mathbf R^\top\mathbf Q^\top\mathbf w\neq\mathbf Q\,G(\mathbf R,\mathbf w)\) in general. Table~\ref{tab:si_operator_control} compares the two maps with the same weights, seeds and priors. This paired control used the earlier downstream scoring pipeline, so its values differ slightly from the primary results; it isolates the injection map rather than reproducing the final protocol.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{Paired operator control with fixed weights. Values are percent mean over three inference repeats for chirality-filtered selection; RMSD--PB denotes RMSD \(<2\,\angstrom\) and all PoseBusters checks on the same selected pose.}
+    \label{tab:si_operator_control}
+    \begin{tabular}{llrrrr}
+        \toprule
+        Cohort & Injection & Raw RMSD & Raw RMSD--PB & Refined RMSD & Refined RMSD--PB \\
+        \midrule
+        Astex & \(\mathbf R^\top\mathbf w\) (training) & 82.7 & 65.1 & 81.6 & 78.4 \\
+        Astex & \(\mathbf R\mathbf w\) (evaluated) & 83.1 & 65.1 & 83.1 & 80.0 \\
+        PoseBusters v2 & \(\mathbf R^\top\mathbf w\) (training) & 79.7 & 56.0 & 81.9 & 79.4 \\
+        PoseBusters v2 & \(\mathbf R\mathbf w\) (evaluated) & 79.3 & 56.1 & 81.8 & 79.0 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 Finite network verification used five complexes, three flow times per complex, and four joint rotations per time.
 All 60 tested translation and 60 angular outputs satisfied the tolerance \(\|\Delta\|_2\le10^{-4}+10^{-4}\|\text{expected}\|_2\); the maximum relative errors were \(9.2\times10^{-6}\) and \(1.8\times10^{-5}\), respectively.
@@ -1554,12 +1572,21 @@ Fig.~\ref{fig:representative-cases} illustrates selected-pose success, refinemen
 
 \subsection{Eligibility-aware failure decomposition}
 
-Fig.~\ref{fig:selection-bottlenecks} partitions outcomes using the same effective eligible set as the primary selector, including its unfiltered fallback. Candidate-bank success is defined solely by RMSD. Official PoseBusters labels were not collected for every candidate, so neither the full-bank nor the eligible-bank oracle establishes attainable RMSD--PoseBusters success.
+Main Fig.~5C partitions outcomes using the same effective eligible set as the primary selector, including its unfiltered fallback; Fig.~\ref{fig:selection-bottlenecks} reports the corresponding regret. For all five cohorts this partition defines candidate-bank success by RMSD alone. For Astex and PoseBusters v2, Section~\ref{si:all_candidate_pb} adds official PoseBusters labels for every candidate and repeats the partition with joint RMSD--PoseBusters success.
+
+\subsection{All-candidate PoseBusters evaluation}
+\label{si:all_candidate_pb}
+
+Every raw and refined candidate in the primary Astex and PoseBusters v2 banks was evaluated with PoseBusters 0.6.5 in \texttt{redock} mode against the same reference ligand and receptor used for the selected-pose endpoint (85 and 308 complexes, three repeats, 100 candidates per bank and stage; 235,800 poses). Before any summary, the recomputed checks for each selected and default-ranked candidate were required to equal the saved selected-pose checks; all banks passed this test. A candidate is jointly successful when its symmetry-aware RMSD is below \(2\,\angstrom\) and it passes all 27 non-RMSD checks. The joint oracle records whether any jointly successful candidate exists in a bank, and the eligible joint oracle restricts this to the effective chirality-eligible set. Labels are retrospective and never enter selection.
+
+The joint partition assigns each complex to exactly one state: no RMSD-successful candidate; RMSD-successful candidates but none passing PoseBusters; jointly successful candidates but none eligible; an eligible jointly successful candidate that was not selected (joint ranking failure); or a selected jointly successful pose. Rates use all complexes as the denominator; conditional selection rates use complexes with an eligible jointly successful candidate. Complex-level bootstrap intervals (10,000 resamples, repeats kept paired) describe uncertainty over complexes, not over training runs. Same-index raw-to-refined transitions compare each candidate with its own refined coordinates.
+
+% ALLCAND_RESULTS
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{selector_bottleneck.pdf}
-    \caption{\textbf{Eligibility-aware selection bottlenecks and regret.} \method results use refined 100-pose banks and the frozen chirality-filtered confidence selector. (A) Mutually exclusive outcomes separate absence of an RMSD-successful candidate, chirality exclusion, ranking failure within the effective eligible set, selected-pose PoseBusters failure, and RMSD--PoseBusters success. The ``generation failure'' category refers to the refined bank and does not isolate the initial sampler. If no candidate passes the mask, the effective set follows the actual unfiltered fallback. (B) Cumulative selected-pose RMSD regret relative to the minimum RMSD in that same effective set. Reference RMSD is used only for retrospective analysis, and PoseBusters validity is known only for selected poses.}
+    \includegraphics[width=\linewidth,keepaspectratio]{selection_regret.pdf}
+    \caption{\textbf{Selection regret and conditional top-1 success.} \method results use the primary chirality-filtered confidence selector. (A) Median selected-minus-full-bank-oracle RMSD regret for raw and refined banks. (B) Selected top-1 RMSD success among complexes whose full bank contains an RMSD-successful candidate. Losses in A and B can include chirality-eligibility exclusions. (C) Cumulative refined selected-pose RMSD regret relative to the minimum RMSD within the same effective eligible set, including the unfiltered fallback when no candidate passes the mask. The corresponding outcome partition is shown in main Fig.~5C. Reference RMSD is used only for retrospective analysis. Bars show three-repeat means and sample SD.}
     \label{fig:selection-bottlenecks}
 \end{figure}
 

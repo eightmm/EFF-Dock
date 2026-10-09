@@ -61,17 +61,11 @@ Protein--ligand docking couples pose generation, geometric validity and candidat
 
 \label{sec:introduction}
 
-A ligand's three-dimensional pose determines its protein contacts and informs structure--activity analysis. Docking predicts this pose when an experimental complex is unavailable. Here we study fixed-receptor docking with a supplied binding site.
+A ligand's three-dimensional pose determines its protein contacts and guides structure-based design. When no experimental complex is available, docking predicts this pose from a receptor structure and a ligand. Here we study the common setting of a fixed receptor with a known binding site.
 
-Docking couples global placement and internal conformation on a multimodal landscape. Search must resolve translation, orientation and rotatable bonds while maintaining covalent geometry and protein--ligand complementarity. Receptor preparation, protonation and tautomeric state, cofactors and solvent shape this task. Classical programs combine conformational search with approximate scoring \citep{trott2010vina,eberhardt2021vina}; GNINA adds learned three-dimensional convolutional scoring \citep{mcnutt2025gnina}.
+A docking prediction can fail at three distinct stages. The search may never produce a pose close to the bound one; it may produce such a pose with distorted bonds, inverted stereocentres or steric clashes; or it may produce a valid near-native pose that the scoring function does not rank first. Classical programs combine conformational search with approximate scoring \citep{trott2010vina,eberhardt2021vina}, and GNINA adds learned three-dimensional convolutional scoring \citep{mcnutt2025gnina}. Learned generative models now sample poses directly: DiffDock diffuses over translation, rotation and torsions \citep{corso2023diffdock}, Uni-Mol Docking V2 predicts poses within a specified pocket \citep{alcaide2024unimoldocking}, DiffBindFR adds receptor side-chain flexibility \citep{zhu2024diffbindfr}, DynamicBind generates ligand-specific receptor conformations \citep{lu2024dynamicbind}, FlowDock uses conditional geometric flow matching \citep{morehead2025flowdock}, and AlphaFold~3 predicts complexes by cofolding \citep{abramson2024alphafold3}. PoseBusters showed that many learned methods return poses that are close in RMSD yet physically implausible \citep{buttenschoen2024posebusters}. A single top-1 success rate cannot show which of the three stages limits a method, and best-of-many metrics mix sampling with selection.
 
-Learned geometric models address several receptor and pocket settings. DiffDock samples translation, rotation and torsion \citep{corso2023diffdock}, Uni-Mol Docking V2 predicts poses within a specified pocket \citep{alcaide2024unimoldocking}, and DiffBindFR includes selected receptor-side-chain flexibility \citep{zhu2024diffbindfr}. DynamicBind generates ligand-specific receptor conformations \citep{lu2024dynamicbind}, FlowDock uses conditional geometric flow matching \citep{morehead2025flowdock}, and AlphaFold~3 predicts biomolecular complexes by cofolding \citep{abramson2024alphafold3}. We compare supplied-pocket docking pipelines directly and report cofolding references with their distinct input conditions.
-
-Candidate generation, ranking and coordinate validation answer different questions. Full-bank minimum RMSD measures candidate coverage; selected-pose RMSD measures ranking accuracy; and PoseBusters tests stereochemistry, covalent geometry and contacts \citep{buttenschoen2024posebusters}. Reporting these endpoints separately distinguishes useful sampling from successful deployment. Our confidence network ranks poses within a candidate bank, following the separation of pose-quality and binding-oriented prediction \citep{sim2026rmsdpred}.
-
-Rigid-fragment models occupy a middle scale between a rigid ligand and unconstrained atom coordinates. Torsion-tree methods preserve local geometry but move a convention-dependent downstream subgraph at each rotation. Classical incremental docking anchors and grows rigid pieces \citep{rarey1996incremental}, whereas Breaking of Retrosynthetically Interesting Chemical Substructures (BRICS) defines retrosynthetically meaningful fragments \citep{degen2008brics}. SigmaDock applies diffusion to rigid-fragment poses \citep{prat2025sigmadock}. \method cuts a restricted set of rotatable bonds, moves the resulting components simultaneously, and uses soft geometric terms to maintain their interfaces.
-
-Flow matching learns a vector field that transports a prior toward the target distribution without integrating the generative ordinary differential equation (ODE) during training \citep{lipman2023flow}. Riemannian formulations accommodate translation--rotation spaces \citep{chen2024generalgeometries}, including multistage docking approaches such as Matcha \citep{frolova2026matcha}. Equivariant tensor products couple scalar, vector and higher-order features under rigid motion \citep{liao2023equiformer}. Newton--Euler mechanics has also been used to map interaction energy to flexible-docking motion \citep{huang2024redock}. In \method, the learned network predicts atom-wise vectors and a kinematic readout aggregates them into fragment velocities; a separate interaction energy supplies refinement gradients.
+The representation of the ligand shapes all three stages. Rigid-fragment models occupy a middle scale between a rigid ligand and unconstrained atom coordinates: fragments preserve local geometry, whereas torsion-tree parameterizations move a convention-dependent downstream subgraph at each bond rotation. Incremental docking anchors and grows rigid pieces \citep{rarey1996incremental}, Breaking of Retrosynthetically Interesting Chemical Substructures (BRICS) defines retrosynthetically meaningful fragments \citep{degen2008brics}, and SigmaDock applies diffusion to rigid-fragment poses \citep{prat2025sigmadock}. Flow matching learns a vector field that transports a prior toward the data distribution without integrating the generative ordinary differential equation (ODE) during training \citep{lipman2023flow}, and Riemannian formulations accommodate translation--rotation spaces \citep{chen2024generalgeometries,frolova2026matcha}. Equivariant tensor products couple scalar, vector and higher-order features under rigid motion \citep{liao2023equiformer}, and Newton--Euler mechanics has been used to map interaction energy to flexible-docking motion \citep{huang2024redock}.
 
 \method combines a heterogeneous protein--ligand graph, fragment-space \(\SE(3)\) flow, geometric refinement and confidence ranking. We evaluate the resulting pipeline across five reference-pocket redocking cohorts, using candidate availability, physical validity and selection loss to locate its remaining bottlenecks.
 
@@ -82,21 +76,21 @@ Flow matching learns a vector field that transports a prior toward the target di
 
 \subsection{Fragment-space docking pipeline}
 
-\method represents a ligand as rigid components obtained by cutting a restricted set of rotatable bonds. A heterogeneous protein--ligand graph conditions a flow over the fragments' translations and rotations (Fig.~\ref{fig:workflow-overview}). An equivariant network predicts one vector per ligand atom; a least-squares rigid-motion projection converts these vectors to fragment velocities (Fig.~\ref{fig:model-architecture}). A separate network predicts a within-bank pose-ranking score. Generated candidates are refined by bounded descent on a differentiable geometric interaction energy and then ranked again. The energy supplies coordinate gradients independently of the learned vector field; it is neither an affinity predictor nor a free-energy model.
+\method represents a ligand as rigid components obtained by cutting a restricted set of rotatable bonds. A heterogeneous protein--ligand graph conditions a flow over the fragments' translations and rotations (Fig.~\ref{fig:workflow-overview}). An equivariant network predicts one vector per ligand atom; a least-squares rigid-motion projection converts these vectors to fragment velocities (Fig.~\ref{fig:model-architecture}). A separate network scores candidates for ranking within the set generated for each complex, termed a candidate bank. Generated candidates are refined by bounded descent on a differentiable geometric interaction energy and then ranked again. The energy supplies coordinate gradients independently of the learned vector field; it is neither an affinity predictor nor a free-energy model.
 
 Evaluation uses a fixed holo receptor, a reference-derived pocket, 100 candidates and ten integration steps, with three repeats of the same trained weights. Online Methods and Supplementary Information, Secs.~S1.2--S1.3 specify the evaluated coordinate-to-feature conventions and their differences from training.
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{Fig1.pdf}
-    \caption{\textbf{Overview of the \method docking pipeline.} A prepared receptor, ligand chemical state and conformer, and supplied pocket center define the input. Rigid ligand fragments follow the learned \(\SE(3)\) flow and bounded energy refinement. The illustrated seed-42 trajectory is a prespecified one-pose example from a supplied conformer. Confidence ranking uses a separate 100-pose benchmark bank prepared from SMILES. Ranks use predicted RMSD (pRMSD); displayed RMSD and crystal overlays are retrospective evaluations. The checkmark identifies the selected candidate and crosses unselected examples.}
+    \caption{\textbf{Overview of the \method pipeline, illustrated on Astex complex 1T46.} Input: a prepared receptor, the ligand and a supplied pocket center; the ligand is cut into rigid fragments (colors). Pose generation: fragments move along the learned \(\SE(3)\) flow from a random prior (\(t=0\)) to a predicted pose (\(t=1\)); one prespecified trajectory (seed 42) from the supplied conformer is shown, whereas the benchmark bank uses a conformer generated from SMILES. Pose refinement: bounded descent on the geometric interaction energy for the same pose. Confidence ranking: candidates from the separately generated 100-pose benchmark bank are ordered by predicted RMSD (pRMSD), and the top-ranked candidate (check mark) is selected. RMSD values and crystal overlays (orange) are retrospective and are not available to the method.}
     \label{fig:workflow-overview}
 \end{figure}
 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.88\textheight,keepaspectratio]{Fig2.pdf}
-    \caption{\textbf{Docking and confidence architectures.} (A) The docking network applies six conditioned equivariant interaction layers and converts ligand-atom features to fragment translation and angular velocities with the Newton--Euler readout. For each candidate, terminal docking features are recomputed at \(t=1\) with its source prior scale. The confidence network combines these with a new embedding, applies four interaction layers with zero conditioning vector \(c=0\), invariantizes the resulting features, and predicts pose-level RMSD and success scores from global and contact-aware summaries. (B) Each interaction layer contains normalization, equivariant convolution, post-convolution transformation, a residual connection, and adaptive layer normalization. (C) The equivariant convolution uses radial and gating networks, shared tensor products through \(\ell\le2\), distance decay, and gate-normalized aggregation with invariant nonscalar rescaling. (D) Scalar and nonscalar channels use type-appropriate adaptive normalization and equivariant activation. Detailed tensor definitions are provided in Supplementary Information, Sec.~S3.}
+    \caption{\textbf{Docking and confidence architectures.} (A) The docking network applies six conditioned equivariant interaction layers and converts ligand-atom features to fragment translation and angular velocities with the Newton--Euler readout. For each candidate, terminal docking features are recomputed at \(t=1\) using the translation-prior standard deviation used to generate it. The confidence network combines these with a new embedding, applies four interaction layers with zero conditioning vector \(c=0\), converts the resulting features into rotation-invariant quantities, and predicts pose-level RMSD and success scores from global and contact-aware summaries. (B) Each interaction layer contains normalization, equivariant convolution, post-convolution transformation, a residual connection, and adaptive layer normalization. (C) The equivariant convolution uses radial and gating networks, shared tensor products through \(\ell\le2\), distance decay, and gate-normalized aggregation with invariant nonscalar rescaling. (D) Scalar and nonscalar channels use type-appropriate adaptive normalization and equivariant activation. Detailed tensor definitions are provided in Supplementary Information, Sec.~S3.}
     \label{fig:model-architecture}
 \end{figure}
 
@@ -110,6 +104,7 @@ On Astex, EFF-Dock achieved 80.0\% same-pose RMSD--PoseBusters success.
 SigmaDock, SurfDock and RLDiff RL++ had higher point estimates on both endpoints.
 On PoseBusters v2, EFF-Dock reached 79.1\% RMSD--PoseBusters success. Relative to SigmaDock, the paired difference in RMSD--PoseBusters success was +2.7 percentage points (95\% bootstrap interval, \(-2.3\) to +7.5), compared with \(-9.0\) points (\(-16.1\) to \(-2.0\)) on Astex. The PoseBusters interval includes zero, leaving relative performance unresolved; intervals are exploratory and unadjusted for multiple comparisons (Supplementary Fig.~S14).
 Most selected RMSD-successful EFF-Dock poses also passed PoseBusters.
+The local baselines generate 40 poses, whereas the primary EFF-Dock protocol generates 100. A separately generated 40-pose, 25-step EFF-Dock bank, with the same product of candidate count and integration-step count, reached RMSD--PoseBusters success of 78.0\% on Astex and 76.7\% on PoseBusters v2 (Supplementary Fig.~S19): between SigmaDock (76.4\%) and SurfDock (77.8\%) on PoseBusters v2, and below SigmaDock, SurfDock and RLDiff RL++ on Astex.
 
 Learned methods retain their native preparation, sampling and ranking procedures; GOLD and Vina are literature values \citep{buttenschoen2024posebusters}. Protocol and candidate-budget differences are specified in Supplementary Information, Sec.~S7.4.
 
@@ -126,14 +121,14 @@ Supplementary Table~S14 and Fig.~S20 extend the comparison to PhiBench-derived, 
 
 \subsection{Refinement and chirality-aware selection}
 
-Fig.~\ref{fig:refinement-selection} compares refinement and chirality-aware selection. Refinement and rescoring increased mean RMSD--PoseBusters success by 15.7--23.2 percentage points under the primary selector and 21.7--26.5 points without chirality filtering. Without chirality filtering, mean RMSD-only selected-pose success increased more modestly. These gains combine coordinate refinement with confidence reselection.
+Fig.~\ref{fig:refinement-selection} compares refinement and chirality-aware selection. Most of the gain from refinement was in physical validity. Under the primary selector, the fraction of selected poses passing all PoseBusters checks rose from 57.1--72.2\% for raw banks to 93.7--99.7\% for refined banks, whereas RMSD-only success rose by 2.0--8.3 percentage points. RMSD--PoseBusters success therefore increased by 15.7--23.2 points under the primary selector and by 21.7--26.5 points without chirality filtering. These selected-pose gains combine coordinate refinement with confidence reselection.
 
-Chirality filtering added smaller mean improvements of 0.3--2.4 percentage points after refinement (Supplementary Fig.~S9). Refinement also increased input-tetrahedral compatibility across all banks, addressing stereochemistry at the cut interfaces between internally rigid fragments.
+Chirality filtering added smaller mean improvements of 0.3--2.4 percentage points after refinement (Supplementary Fig.~S9). Refinement also increased the fraction of candidates whose tetrahedral centers matched the input stereochemistry from 58.5--74.4\% to 88.2--96.8\% across cohorts; such centers can be inverted where a cut bond joins two independently moving fragments.
 
-The complexity analysis in Supplementary Fig.~S1 localizes the remaining error.
-Selected top-1 and RMSD--PoseBusters success generally deteriorated for larger ligands, more rotatable bonds, and more fragments, most clearly in PoseBusters, PhiBench-derived, and FoldBench.
+Supplementary Fig.~S1 examines how docking outcomes vary with molecular complexity.
+Selected-pose RMSD success and RMSD--PoseBusters success generally decreased for larger ligands, more rotatable bonds, and more fragments, most clearly in PoseBusters, PhiBench-derived, and FoldBench.
 Oracle success was substantially less sensitive than selected top-1, so the top-1--oracle gap tended to widen in harder strata.
-Molecular complexity affects ranking and selected-pose validity as well as near-native pose generation.
+These patterns suggest that molecular complexity is associated with selection loss as well as near-native candidate availability.
 The smallest Astex and high-complexity bins are too sparse for a clear trend.
 
 \begin{figure}[!htbp]
@@ -144,9 +139,8 @@ The smallest Astex and high-complexity bins are too sparse for a clear trend.
 \end{figure}
 
 Supplementary Fig.~S16 resolves the aggregate validity gain into individual PoseBusters checks.
-Refinement reduced selected-pose failures associated with bond geometry, internal clashes, receptor clashes, and internal energy, while stereochemical and ring-planarity failures were less uniformly affected.
-The matched-candidate panels separate same-index fail-to-pass and pass-to-fail transitions from changes caused by selecting a different pose after refinement.
-Matched-index transitions characterize the subset with saved official evaluations at both stages (Supplementary Fig.~S16).
+Refinement reduced selected-pose failures in bond geometry, internal clashes, receptor clashes and internal energy, whereas stereochemistry and ring-planarity failures changed less consistently.
+Because refinement can change which candidate is selected, the figure also follows the same candidate before and after refinement, separating coordinate repair from reselection.
 
 \FloatBarrier
 
@@ -180,22 +174,22 @@ Ranking failure was larger, ranging from 12.4\% on PoseBusters to 34.4\% on Open
 RMSD-based ranking failure exceeds chirality exclusion in the refined banks. Its joint-validity headroom remains unmeasured because PoseBusters labels cover selected candidates.
 The regret curves in Supplementary Fig.~S18B measure loss relative to the best RMSD in the same effective candidate set available to the deployed selector.
 
-Training-set relatedness is examined in Supplementary Figs.~S6--S8.
-Sequence and ligand overlap differed substantially among cohorts, but neither exact ligand matches nor sequence-identity strata showed a consistent association with docking success.
-The relatedness strata contextualize these cohort-specific outcomes.
+\subsection{Training-set relatedness}
+
+Sequence and ligand overlap with the training set differed substantially among cohorts (Supplementary Figs.~S6--S8). Neither exact ligand matches nor sequence-identity strata showed a consistent association with docking success. Performance was nevertheless lower on the most distant complexes. Only 22 external complexes satisfied the simultaneous restrictions of binding-chain identity below 30\%, nearest training-ligand Tanimoto similarity below 0.5 and no exact ligand match (Supplementary Fig.~S13). On the 7 PhiBench-derived and 9 FoldBench complexes in this subset, RMSD--PoseBusters success was 47.6\% and 55.6\%, compared with 60.5\% and 73.8\% on the full cohorts. On FoldBench, interfaces without a shared training PDB accession reached 69.7\%, compared with 76.3\% for shared accessions, and the 66 interfaces released after June 2024 reached 68.2\% (Supplementary Table~S16). These small subsets provide limited evidence about performance on targets dissimilar to the training set and do not establish a generalization gap.
 
 \subsection{Sensitivity to generation inputs}
 
 We varied the generation crop, supplied-center error and translation-prior scale on all Astex and PoseBusters complexes while holding the networks, downstream spatial context and primary selector fixed (Fig.~\ref{fig:pocket-sensitivity}). With a \(10\,\angstrom\) crop and prior scale \(2\,\angstrom\), RMSD--PoseBusters success was 80.0\% on Astex and 79.1\% on PoseBusters without center error. Center error with standard deviation \(2\,\angstrom\) per axis reduced success to 71.0\% and 64.4\%, respectively. Refined-bank RMSD-only oracle coverage at \(2\,\angstrom\) error was 86.3\% and 82.8\%.
 
-Larger generation crops partly buffered center error, whereas prior-scale effects varied with the cohort and perturbation level. Fig.~\ref{fig:pocket-sensitivity} reports the complete grids under the fixed primary protocol.
+Larger generation crops partly buffered center error. The prespecified prior scale of \(2\,\angstrom\) was not the best setting for an exact center: a \(1\,\angstrom\) prior reached 83.9\% on Astex and 79.8\% on PoseBusters v2. The narrower prior was, however, less tolerant of center error, falling to 65.1\% and 58.4\% at \(2\,\angstrom\) jitter, compared with 71.0\% and 64.4\% for the \(2\,\angstrom\) prior. Fig.~\ref{fig:pocket-sensitivity} reports the complete grids; the production setting was fixed before these grids were measured and was not changed.
 
-Refinement and confidence scoring retained the original unperturbed center and a \(10\,\angstrom\) crop in all conditions. The crop and center-jitter grids perturb sampling inputs with fixed downstream spatial context. Prior-scale comparisons include the scale's influence on both sampling and the recomputed docking features used for ranking. Guidance and candidate-allocation controls at equal learned pose-step counts are reported separately (Supplementary Fig.~S19).
+Refinement and confidence scoring retained the original unperturbed center in all conditions, with the refinement energy shell and the \(10\,\angstrom\) scoring crop unchanged. The crop and center-jitter grids perturb sampling inputs with fixed downstream spatial context. Prior-scale comparisons include the scale's influence on both sampling and the recomputed docking features used for ranking. Guidance and candidate-allocation controls at equal learned pose-step counts are reported separately (Supplementary Fig.~S19).
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]{pocket_prior.pdf}
-    \caption{\textbf{Sensitivity to supplied-pocket radius, center error and translation-prior scale.} (A,B) Joint selected-pose RMSD \(<2\,\angstrom\) and PoseBusters success across generation crop radii at prior scale \(2\,\angstrom\), for Astex Diverse Set (85 complexes) and PoseBusters v2 (308 complexes). (C,D) Prior-scale dependence at a \(10\,\angstrom\) generation crop on the same cohorts. Rows vary Gaussian center error, with standard deviation reported per Cartesian axis. Cells show three-inference-seed means. All conditions use unguided 100-pose, ten-step generation, energy refinement and chirality-filtered confidence ranking. Refinement and ranking retain the original center and \(10\,\angstrom\) crop; terminal docking features used for confidence retain the generation prior scale. The grid isolates the crop and prior axes rather than crossing every pair. Downstream spatial context is fixed; prior-scale effects include sampling and terminal feature extraction.}
+    \caption{\textbf{Sensitivity to supplied-pocket radius, center error and translation-prior scale.} (A,B) Joint selected-pose RMSD \(<2\,\angstrom\) and PoseBusters success across generation crop radii at prior scale \(2\,\angstrom\), for Astex Diverse Set (85 complexes) and PoseBusters v2 (308 complexes). (C,D) Prior-scale dependence at a \(10\,\angstrom\) generation crop on the same cohorts. Rows vary Gaussian center error, with standard deviation reported per Cartesian axis. Cells show three-inference-seed means. All conditions use unguided 100-pose, ten-step generation, energy refinement and chirality-filtered confidence ranking. Refinement and ranking retain the original center, the refinement energy shell and the \(10\,\angstrom\) scoring crop. Terminal docking features used for confidence are recomputed with the translation-prior scale used to generate each candidate. The grid isolates the crop and prior axes rather than crossing every pair. Downstream spatial context is fixed; prior-scale effects include sampling and terminal feature extraction.}
     \label{fig:pocket-sensitivity}
 \end{figure}
 
@@ -224,7 +218,7 @@ Generalization depends on the evaluated cohorts and training exposure. Astex and
 \label{sec:orientation_convention}
 
 The coordinate reconstruction in Eq.~\eqref{eq:pose_manifold} uses an active local-to-world rotation, \(\mathbf x=\mathbf R\mathbf y+\mathbf T\).
-Equivariance is defined conditional on a fixed prepared fragment-local template and its body-coordinate convention. Under a joint rigid transformation of the receptor and current ligand pose, the prepared local coordinates remain fixed while world coordinates transform as \(\mathbf x'=\mathbf Q\mathbf x+\mathbf a\) and fragment rotations as \(\mathbf R'=\mathbf Q\mathbf R\). Supplied conformers are centered fragment-wise without canonicalizing their local axes.
+Equivariance is defined with the prepared fragment-local coordinates and the orientation of their local axes held fixed. Under a joint rigid transformation of the receptor and current ligand pose, the prepared local coordinates remain fixed while world coordinates transform as \(\mathbf x'=\mathbf Q\mathbf x+\mathbf a\) and fragment rotations as \(\mathbf R'=\mathbf Q\mathbf R\). Supplied conformers are centered fragment-wise without canonicalizing their local axes.
 Accordingly, a learned fragment-local vector \(\mathbf w\) is injected into world-frame features as
 \begin{equation}
     \mathbf h=\mathbf R\mathbf w,
@@ -235,8 +229,9 @@ Accordingly, a learned fragment-local vector \(\mathbf w\) is injected into worl
 under a joint world rotation \(\mathbf Q\in\SO(3)\).
 Source-local edge coordinates of the form \(\mathbf R^\top(\mathbf x_j-\mathbf x_i)\) perform the inverse world-to-local map.
 
-All measurements use fixed docking and confidence weights; no retraining, probability recalibration, or result-dependent thresholding was performed.
-Coordinate-to-feature conventions, their differences from training, and finite numerical verification are documented in the \sisection{S1.2}.
+All evaluations of the released pipeline use fixed docking and confidence weights, without retraining, probability recalibration or result-dependent thresholding.
+The released weights were trained with a historical injection \(\mathbf R^\top\mathbf w\), which does not transform covariantly under joint rotations. All reported results execute the covariant map of Eq.~\eqref{eq:orientation_injection} with the same weights. In a paired control on Astex and PoseBusters v2 with identical seeds and an earlier version of the downstream scoring pipeline, executing the historical map instead changed refined RMSD--PoseBusters success from 80.0\% to 78.4\% and from 79.0\% to 79.4\%, respectively. Under the covariant map, joint rotations of the receptor and candidate changed network outputs by at most \(1.8\times10^{-5}\) in relative norm, and the frame convention for fragments with an unobservable twist changed predicted RMSD by at most \(1.5\times10^{-3}\,\angstrom\).
+Coordinate-to-feature conventions and the numerical checks are documented in the \sisection{S1.2}; the readout ablation was trained with the covariant map throughout.
 
 \subsection{Task definition and fragment pose representation}
 \label{sec:problem}
@@ -265,7 +260,7 @@ The generative state and atom reconstruction are
 \end{equation}
 Here \(\mathcal{M}_{L}\) is the ligand pose space, \(\R^3\) is the translation space, and \(\SO(3)\) is the group of proper three-dimensional rotations.
 The group \(\SE(3)\) combines proper rotations and translations. Coordinates and distances use Angstrom, angles use radians unless degrees are shown, and flow time is dimensionless. Superscript \(\top\) denotes transpose and \(\mathbf I_3\) is the three-dimensional identity matrix; further notation and parameter conventions are collected in the \sisection{S1.1}.
-For fragment \(k\), \(\mathbf{T}_k\in\R^3\) is its geometric-centroid state origin and \(\mathbf{R}_k\in\SO(3)\) is its rotation; \(\mathbf{z}\) collects all fragment states, and \(\mathbf{x}_i(\mathbf{z})\in\R^3\) is the reconstructed coordinate of ligand atom \(i\) in the pocket-centered frame.
+For fragment \(k\), \(\mathbf{T}_k\in\R^3\) is the position of its geometric centroid and \(\mathbf{R}_k\in\SO(3)\) maps its local coordinates into the pocket-centered frame; \(\mathbf{z}\) collects all fragment states, and \(\mathbf{x}_i(\mathbf{z})\in\R^3\) is the reconstructed coordinate of ligand atom \(i\) in the pocket-centered frame.
 This representation preserves intrafragment geometry while allowing fragments to translate and rotate relative to one another.
 
 Ligands are standardized with RDKit \citep{landrum2024rdkit}: stereochemistry is assigned before hydrogen removal, the largest connected component is retained, and formal charge and the supplied protonation state are preserved.
@@ -285,7 +280,7 @@ This indexed greedy rule is deterministic for a fixed atom ordering; exact eligi
 
 The receptor is cropped residue-wise around the supplied center.
 Geometry training samples a radius uniformly from \(6\) to \(12\,\angstrom\) and applies isotropic center jitter with standard deviation \(2\,\angstrom\); held-out validation uses an \(8\,\angstrom\) crop, and the external reference-pocket protocol uses a fixed \(10\,\angstrom\) crop.
-The graph contains ligand atoms, ligand fragments, protein atoms, and residue virtual nodes.
+The graph contains nodes representing ligand atoms, ligand fragments, protein atoms and protein residues; residue nodes are virtual rather than individual atoms.
 Typed static relations encode covalent structure, fragment membership and topology, protein hierarchy, and residue--fragment context, while protein-atom--ligand-atom contacts within \(5\,\angstrom\) are rebuilt at every forward pass.
 Node chemistry, all ten directed relation types, crop fallbacks, and edge descriptors are listed in the \sisection{S3.1}.
 
@@ -294,7 +289,7 @@ Node chemistry, all ten directed relation types, crop fallbacks, and edge descri
 
 After pocket centering, fragment translations are drawn from an isotropic Gaussian and multi-atom fragment rotations from the uniform distribution on \(\SO(3)\) \citep{shoemake1992uniform}.
 Let \(t\in[0,1]\) denote dimensionless flow time, with subscripts \(0\) and \(1\) denoting the sampled prior and bound target states, respectively, and let \(\sigma>0\) be the translation-prior standard deviation in Angstrom.
-For a paired prior and target state, translations follow a linear path and rotations follow the shortest geodesic under a left-action convention:
+For a paired prior and target state, translations follow a linear path and rotations follow the shortest geodesic, with rotation increments applied by left multiplication:
 \begin{align}
     \mathbf{T}_{k,0}
     &\sim\mathcal{N}(\mathbf{0},\sigma^2\mathbf{I}_3),
@@ -329,7 +324,7 @@ The prior-scale mixture, time distribution, rotation augmentation, and numerical
 
 All node types share six equivariant interaction layers with 384 scalar channels, 32 channels of each vector parity and 16 channels of each rank-two parity. Time and prior scale enter through a 128-dimensional conditioning embedding. Each layer combines normalized sender features, radial edge features and real spherical harmonics through order two using tensor products, gated residual aggregation and adaptive normalization. Static relations and rebuilt protein--ligand contacts use relation-specific edge features. Complete equations and dimensions are given in the \sisection{S3}.
 
-The output head predicts one polar atom-vector proposal \(\mathbf{f}_i\) for each ligand atom. Its unit-weight Newton--Euler aggregation is a least-squares rigid-body velocity fit restricted to the retained rotational modes; these vectors are not physical forces or energy gradients.
+The output head predicts a velocity proposal \(\mathbf{f}_i\) for each ligand atom; this proposal transforms as a polar vector. Its unit-weight Newton--Euler aggregation is a least-squares rigid-body velocity fit restricted to the retained rotational modes; these vectors are not physical forces or energy gradients.
 For fragment \(k\), with atom set \(\mathcal{A}_k\), center \(\mathbf{T}_k\), and lever arm \(\mathbf{r}_i=\mathbf{x}_i-\mathbf{T}_k\), the fragment field is obtained by
 \begin{align}
     \widehat{\mathbf{v}}_k
@@ -355,7 +350,7 @@ For fragment \(k\), with atom set \(\mathcal{A}_k\), center \(\mathbf{T}_k\), an
 \end{align}
 Here \(\widehat{\mathbf{v}}_k\) is the predicted translational tangent, \(\boldsymbol{\mu}_k\) is the moment of the atom vectors, \(\mathbf{J}_k\) is the unit-mass geometric inertia about the fragment centroid, and \(\widehat{\boldsymbol{\omega}}_k\) is the predicted angular tangent.
 The truncated pseudoinverse \(\mathbf{J}_k^+\) removes geometric-inertia eigenmodes at or below 1\% of the largest eigenvalue, and the same observable subspace is applied to the angular training target.
-This prevents singleton and nearly collinear fragments from receiving arbitrary angular velocities; the exact eigenspace construction is given in the \sisection{S3.2}.
+This removes angular-velocity components that are unobservable or poorly determined by the fragment geometry; the exact eigenspace construction is given in the \sisection{S3.2}.
 
 \subsection{Objective and sampling}
 \label{sec:objective}
@@ -371,7 +366,7 @@ The geometry objective combines fragment translation and observable angular-velo
      +\lambda_{\mathrm{DG}}\mathcal{L}_{\mathrm{DG}}.
     \label{eq:geometry_objective}
 \end{equation}
-Here \(\mathcal L_v\) is fragment translation MSE, \(\mathcal L_\omega\) is angular MSE after projecting the target onto retained rotational modes, and \(\mathcal L_{\mathrm{atom}}\) compares reconstructed atom velocities. The distance-geometry term \(\mathcal L_{\mathrm{DG}}\) compares interfragment atom-pair distances after a one-step endpoint extrapolation, with a \(t^2\)-weighted valid-complex reduction. Unobservable terms contribute zero. The final continuation uses weights \((\lambda_\omega,\lambda_{\mathrm{atom}},\lambda_{\mathrm{DG}})=(8,0.3,3)\); definitions, normalizations and distributed reductions are given in the \sisection{S3.3}.
+Here \(\mathcal L_v\) is the MSE in fragment translational velocity, \(\mathcal L_\omega\) is the MSE in angular velocity after projecting the target onto retained rotational modes, and \(\mathcal L_{\mathrm{atom}}\) compares reconstructed atom velocities. The distance-geometry term \(\mathcal L_{\mathrm{DG}}\) compares interfragment atom-pair distances after a one-step endpoint extrapolation, with \(t^2\) weighting and aggregation over valid complexes. Unobservable terms contribute zero. The final continuation uses weights \((\lambda_\omega,\lambda_{\mathrm{atom}},\lambda_{\mathrm{DG}})=(8,0.3,3)\); definitions, normalizations and distributed reductions are given in the \sisection{S3.3}.
 
 The final continuation samples flow time from an 80\% base distribution, a 10\% uniform component on \([0,0.3]\), and a 10\% point mass at \(t=0\). The base distribution mixes uniform sampling with a late-biased logit-normal distribution. Its parameters and the prior-scale mixture are specified in the \sisection{S2}.
 
@@ -384,7 +379,7 @@ The sampling schedule and candidate selection are specified in the \sisection{S2
 \label{sec:confidence}
 
 Pose generation and top-1 selection are separated.
-For each candidate, the fixed docking network is evaluated at \(t=1\), using recovered fragment frames and the source translation-prior scale, to recompute terminal ligand representations. A second equivariant network combines these with a fresh heterogeneous-graph embedding and applies four additional interaction layers.
+For each candidate, fragment translations and rotations are recovered from its atom coordinates. The fixed docking network is then evaluated at \(t=1\), using these fragment states and the translation-prior scale used to generate the candidate, to recompute terminal ligand representations. A second equivariant network combines these with a fresh heterogeneous-graph embedding and applies four additional interaction layers.
 Invariantized node features and explicit protein-contact summaries are pooled by ligand-contact attention and type-wise mean--maximum aggregation.
 Atom and pose heads are trained with displacement and RMSD regression, \(2\,\angstrom\) success classification, pairwise ranking, and a success-focused listwise objective.
 For a candidate set \(\{\mathbf z_S^{(m)}\}_{m=1}^{M}\), the deployed selector is
@@ -398,11 +393,11 @@ For a candidate set \(\{\mathbf z_S^{(m)}\}_{m=1}^{M}\), the deployed selector i
     c_\phi\!\left(\mathbf z_S^{(m)},\mathcal P,\mathcal G_L,\mathcal C_L,\sigma\right).
     \label{eq:confidence_selection}
 \end{equation}
-Here \(q_m\in\{0,1\}\) indicates whether candidate \(m\) matches all assigned input tetrahedral stereocenters, and \(\mathcal E\) is the effective eligible set. Ties follow saved candidate order. The unfiltered argmin is reported separately as a diagnostic condition.
+Here \(q_m\in\{0,1\}\) indicates whether candidate \(m\) matches all assigned input tetrahedral stereocenters, and \(\mathcal E\) contains the chirality-matching candidates, or all candidates if none matches. Ties follow saved candidate order. The unfiltered argmin is reported separately as a diagnostic condition.
 The confidence network's nonnegative predicted-RMSD score is \(c_\phi\), with learned parameters \(\phi\); \(m^\star\) is the selected candidate index.
 The prior scale enters this score through the recomputed docking representations.
 The score ranks candidates within a bank; empirical reliability is evaluated separately from the deployed selector.
-Energy restraints and confidence features use conformers prepared by the same procedure and seed as pose generation. Refinement preserves each saved candidate's fragment-internal coordinates. For rescoring, candidate coordinates are mapped to fragment frames by proper Kabsch fitting for templates of rank at least two and an input-indexed, scene-defined convention for lower-rank fragments. This resolves the recovery convention without making the frozen network invariant to unobservable fragment twist; finite numerical checks and their limits are reported in the \sisection{S1.3}.
+Energy restraints and confidence features use conformers prepared by the same procedure and seed as pose generation. Refinement preserves each saved candidate's fragment-internal coordinates. For rescoring, fragment translations and rotations are recovered from candidate coordinates by Kabsch fitting restricted to proper rotations for templates of rank at least two; lower-rank templates use a convention based on input atom ordering and the surrounding geometry. This convention specifies the recovered frames, but network predictions can still depend on rotations of a fragment frame that leave its atom coordinates unchanged; numerical checks and their limits are reported in the \sisection{S1.3}.
 The complete readout and confidence objective are given in the \sisection{S4}.
 
 \FloatBarrier
@@ -441,7 +436,7 @@ The translational and angular guidance directions are
     \label{eq:guidance_projection}
 \end{equation}
 Here \(\mathbf{d}^{T}_k\) and \(\mathbf{d}^{\omega}_k\) are guidance directions, \(\mathbf{I}_k^+\) is the mass-inertia truncated pseudoinverse, and \(\mathbf{T}_k-\mathbf{c}_k\) corrects for the offset between the fragment's geometric-centroid state origin and its center of mass.
-For guidance experiments, let \((\Delta\mathbf v_k,\Delta\boldsymbol\omega_k)\) denote the mass--inertia directions after RMS matching to the learned atom velocity, late-time interval ramping, and the translation, rotation, and atom-displacement caps.  The guided field is
+For guidance experiments, let \((\Delta\mathbf v_k,\Delta\boldsymbol\omega_k)\) denote the mass--inertia directions after matching the root-mean-square magnitude of the learned atom velocities, increasing guidance strength over late-time integration intervals, and applying caps on translation, rotation and atom displacement.  The guided field is
 \begin{equation}
     \widetilde{\mathbf v}_k
     =\widehat{\mathbf v}_k+\Delta\mathbf v_k,
@@ -462,7 +457,7 @@ Post-sampling refinement updates only the fragment state of each candidate.  At 
      \mathbf{R}_k^{(r)},
     \label{eq:guidance_refinement}
 \end{equation}
-Here \((\bar{\mathbf d}^T,\bar{\mathbf d}^\omega)=\operatorname{Cap}(\mathbf d^T,\mathbf d^\omega)\) are capped increments and \(\alpha_r\) is the accepted line-search step size. The cap first bounds each fragment translation and rotation separately, then jointly rescales both until the reconstructed atom displacement meets its bound.  Writing \(E_r=E_{\mathrm G}(\mathbf{x}^{(r)})\), the proposed translation, rotation, and induced atom displacement are bounded and \(\alpha_r\) is reduced by monotone backtracking until a finite non-increasing guidance energy is obtained.
+Here \((\bar{\mathbf d}^T,\bar{\mathbf d}^\omega)=\operatorname{Cap}(\mathbf d^T,\mathbf d^\omega)\) are capped increments and \(\alpha_r\) is the accepted line-search step size. The cap first bounds each fragment translation and rotation separately, then jointly rescales both until the reconstructed atom displacement meets its bound.  Writing \(E_r=E_{\mathrm G}(\mathbf{x}^{(r)})\), backtracking reduces \(\alpha_r\) until the proposed update yields a finite energy no greater than \(E_r\).
 The refinement is bounded and stops on convergence, line-search failure, or a sustained energy plateau; the numerical safeguards and termination criteria are given in the \sisection{S5.10}.
 Raw and refined candidates are compared with unchanged network parameters.
 
@@ -521,7 +516,7 @@ Supplementary Figs.~S4 and S5 report runtime and generation-process memory for t
 
 \subsection{Generation-input sensitivity and guidance controls}
 
-Sensitivity experiments use all 85 Astex and 308 PoseBusters complexes with the same three inference seeds and chirality-filtered selector. At translation-prior scale \(2\,\angstrom\), generation crop radii \(6,8,10,12,14\,\angstrom\) are crossed with Gaussian center jitter of \(0,1,2\,\angstrom\) per Cartesian axis. Separately, prior scales \(1,2,4\,\angstrom\) are crossed with the same jitter levels at a \(10\,\angstrom\) crop. Shared cells are evaluated once, and the primary baseline is reused from the primary evaluation. The jitter random stream is independent of the pose prior, and matching seeds couple prior draws within a candidate budget. Refinement and confidence scoring always use the original center and a \(10\,\angstrom\) crop; the docking-feature re-evaluation used for confidence scoring retains each candidate's source prior scale.
+Sensitivity experiments use all 85 Astex and 308 PoseBusters complexes with the same three inference seeds and chirality-filtered selector. At translation-prior scale \(2\,\angstrom\), generation crop radii \(6,8,10,12,14\,\angstrom\) are crossed with Gaussian center jitter of \(0,1,2\,\angstrom\) per Cartesian axis. Separately, prior scales \(1,2,4\,\angstrom\) are crossed with the same jitter levels at a \(10\,\angstrom\) crop. Shared cells are evaluated once, and the primary baseline is reused from the primary evaluation. The jitter random stream is independent of the pose prior, and matching seeds couple prior draws within a candidate budget. Refinement and confidence scoring always use the original center, the refinement energy shell and the \(10\,\angstrom\) scoring crop. Docking features used for confidence scoring are recomputed with the translation-prior scale used to generate each candidate.
 
 Four budget/guidance conditions, including the shared primary baseline, cross 100 poses/ten steps or 40 poses/25 steps with unguided sampling or normalized energy guidance of strength \(\eta=2\). Both budgets use 1,000 learned pose-steps, but guidance and candidate processing add work, so equal pose-step counts do not imply equal runtime. Forty- and 100-pose banks are generated separately under prespecified control settings.
 
@@ -529,9 +524,10 @@ Four budget/guidance conditions, including the shared primary baseline, cross 10
 \label{sec:metrics}
 
 The primary pose endpoint is confidence-selected, symmetry-aware heavy-atom RMSD below \(2\,\angstrom\) after complete atom mapping.
-Secondary endpoints include top-\(q\) and oracle-\(q\) coverage and complete-case RMSD summaries.
-Physical validity uses PoseBusters 0.6.5 in \texttt{redock} mode, with a reference-molecule representation adapter for the three temporal cohorts as detailed in the \sisection{S7}; pass-all is the conjunction of all 27 non-RMSD checks on the same selected pose \citep{buttenschoen2024posebusters}.
+Secondary endpoints include top-\(q\) coverage, the presence of an RMSD-successful candidate among the \(q\) highest-ranked candidates; oracle coverage, its presence anywhere in the bank or in the first \(q\) generated candidates; and complete-case RMSD summaries.
+Physical validity uses PoseBusters 0.6.5 in \texttt{redock} mode, with a reference-molecule representation adapter for the PhiBench-derived, FoldBench and OpenBind cohorts, as detailed in the \sisection{S7}; pass-all is the conjunction of all 27 non-RMSD checks on the same selected pose \citep{buttenschoen2024posebusters}.
 RMSD--PoseBusters success requires both RMSD \(<2\,\angstrom\) and PoseBusters pass-all.
+For Astex and PoseBusters v2, the same official checks were also applied to every raw and refined candidate in all three repeats (235,800 poses). Recomputed checks for each selected and default-ranked candidate were required to reproduce the saved selected-pose evaluation exactly. These labels define a joint oracle, the presence of any candidate with RMSD \(<2\,\angstrom\) that passes all checks, and a joint failure partition over all complexes; they are used only for retrospective analysis and never by the selector.
 
 Binary endpoints use the full cohort denominator; continuous summaries use successfully evaluated poses and report their coverage.
 Error bars are sample standard deviations across the three repeats unless stated otherwise.
@@ -544,9 +540,13 @@ OpenAI Codex and Anthropic Claude were used to assist with code review, analysis
 The authors reviewed the generated text against the source code and primary literature and retain full responsibility for the manuscript.
 These tools are not authors.
 
-\section*{Data and Code Availability}
+\section*{Data availability}
 
-Source code, model weights, training-membership lists, numerical source data and analysis scripts are available at \href{https://github.com/eightmm/EFF-Dock}{https://github.com/eightmm/EFF-Dock}. Benchmark structures remain subject to their original distribution and redistribution terms.
+Training data were derived from PLINDER 2024-06/v2 \citep{durairaj2024plinder}; evaluation structures are available from the Astex Diverse Set, PoseBusters, PhysDock, FoldBench and OpenBind releases cited in the text and remain subject to their original distribution terms. Training-membership lists, per-complex outcomes and the numerical source data for every figure are provided with the repository below.
+
+\section*{Code availability}
+
+Source code, configuration files, released docking and confidence weights and analysis scripts are available at \href{https://github.com/eightmm/EFF-Dock}{https://github.com/eightmm/EFF-Dock}. The version used in this study will be archived with a persistent identifier upon publication.
 
 \section*{Author Contributions}
 
