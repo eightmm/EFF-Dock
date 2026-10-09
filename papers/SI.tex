@@ -340,7 +340,7 @@ With \(\Phi_{\Delta t_s}\) denoting the \(\SE(3)\) integration step, sampling is
     \qquad s=0,\ldots,S-1,
     \label{eq:si_sampling_update}
 \end{equation}
-Raw endpoints are saved before refinement. For a confidence model \(c_\phi\), the selected pose is
+Raw endpoints are saved before refinement. The selection rule below applies to the raw bank; refined-bank selection replaces each raw endpoint with its refined state and recomputes confidence. For a confidence model \(c_\phi\), the selected pose is
 \begin{equation}
     \mathcal E=\begin{cases}
        \{m:q_m=1\}, & \text{if any }q_m=1,\\
@@ -416,7 +416,7 @@ In Fig.~2, \(c=E_t(t)+E_\sigma(\log\sigma)\) is the conditioning vector called \
 Ligand attributes encode element, formal charge, aromaticity, hybridization, valence, chirality, ring membership, and pharmacophore flags.
 Protein attributes encode residue--atom identity, backbone status, supported-metal identity, and protein-side pharmacophore flags.
 The distance basis uses 32 Gaussian functions spanning \(0\)--\(16\,\angstrom\) with width \(0.5\,\angstrom\); unavailable discrete attributes use explicit sentinel categories.
-Joint rigid motion of all coordinates rotates the predicted fragment translation and angular velocities and leaves invariant outputs unchanged.
+With the evaluated feature convention and prepared fragment-local templates held fixed, the network is constructed to transform fragment translation and angular velocities covariantly under joint world rotations and to leave scalar outputs invariant; finite numerical checks are reported in Secs.~S1.2--S1.3.
 
 \subsection{Atom readout and observable fragment motion}
 
@@ -637,7 +637,7 @@ All external refinements and guidance controls use the geometry-only receptor po
 \subsection{Physical energy at fragment interfaces}
 \label{si:guidance_physical}
 
-Because every fragment is rigid, only geometry spanning distinct fragments can change.
+Internal ligand geometry can change only across fragment interfaces; ligand--receptor geometry changes as fragments move.
 Let \(\mathcal B\) be the cut bonds, \(\mathcal H\) the cross-fragment angles, \(\mathcal D\) the retained proper-torsion quadruplets, and \(\mathcal I_\chi\) and \(\mathcal I_p\) the chiral and planar improper sets.
 For proper term \(p\in\mathcal D\), \(w_p\) is its normalized multiplicity weight, \(\phi_p\) its dihedral angle, and \((n_p,\delta_p)\) its periodicity and phase.
 The function \(\operatorname{wrap}(\psi)\) returns the representative of angle \(\psi\) in \(( -\pi,\pi]\).
@@ -1196,7 +1196,7 @@ The external results describe fixed-holo, reference-pocket redocking rather than
 Astex and PoseBusters were inspected repeatedly during development; PhiBench-derived and FoldBench-Pocket are task adaptations; and OpenBind is a dense single-protease-family cohort. OpenBind retains 65 records with at least one source flag: covalency (2), a prepared PoseBusters failure flag (6), a reference PoseBusters failure flag (28), or suspected artefact (39). These categories overlap and are source annotations rather than re-evaluated predictions. All 925 records remain in the primary denominator.
 Training-set relatedness is therefore reported directly rather than inferred from dataset names or deposition dates.
 
-The experiments evaluate the complete released pipeline and within-bank rank correlation, discrimination, regret and empirical reliability. Component effects and cross-generator calibration require separate controlled studies. Numerical consistency tests in Section~S5 assess implementation behavior; the three fixed-weight repeats quantify sampling variation on these prepared cohorts.
+The experiments evaluate the complete released pipeline and within-bank rank correlation, discrimination, regret and empirical reliability. Refinement, chirality filtering and guidance are examined in the reported controls, and the readout in a matched training ablation; cross-generator calibration requires a separate study. Numerical consistency tests in Section~S5 assess implementation behavior; the three fixed-weight repeats quantify sampling variation on these prepared cohorts.
 
 \subsection{Benchmark-specific comparisons}
 \label{si:literature_context}
@@ -1270,7 +1270,7 @@ OpenBind & Both scores assigned & 802,802,802 & $56.4\pm0.5$ & $56.4\pm0.5$ & $4
 \bottomrule
 \end{tabularx}
 \end{table}
-The combined endpoint remains unresolved for FoldBench: 0/0/0; OpenBind: 0/0/0 complexes across the three repeats, respectively. A known failure of one component resolves a combined failure without imputing another component. Table~\ref{tab:si_native_scoreability} uses refined, chirality-filtered top-1 selection from the original 100-pose banks.
+No combined endpoint was unresolved for FoldBench or OpenBind in any repeat. A known failure of one component resolves a combined failure without imputing another component. Table~\ref{tab:si_native_scoreability} uses refined, chirality-filtered top-1 selection from the original 100-pose banks.
 
 \begin{table}[!htbp]
 \centering\small
@@ -1341,10 +1341,10 @@ Failed or unavailable reported check results make pass-all false. A non-passing 
 Unsupported chemistry, preprocessing failure, incomplete atom mapping, sampling failure, non-finite coordinates, missing output, evaluator failure, and resource failure remain in the cohort denominator and are reported by reason.
 
 For each complex, receptor and ligand identities, input preparation, and pocket provenance are verified before docking.
-Reference-ligand coordinates are removed from model and guidance inputs, and one independently generated conformer is prepared.
+For EFF-Dock benchmark generation, reference-ligand coordinates are removed from model and guidance inputs, and one independently generated conformer is prepared.
 Raw candidates are saved before refinement; both raw and refined banks retain original candidate indices and are scored without RMSD or validity labels.
-The confidence-selected pose is then used for complete heavy-atom RMSD mapping and PoseBusters \texttt{redock} evaluation.
-PhiBench-derived retains the three recovered systems, OpenBind retains all 925 annotated rows, and FoldBench retains its recorded International Chemical Identifier (InChI)-compatibility outcomes in the corresponding denominators \citep{heller2015inchi}.
+Selected poses undergo complete heavy-atom RMSD mapping and PoseBusters \texttt{redock} evaluation. Every raw and refined candidate in the Astex and PoseBusters v2 banks also undergoes PoseBusters evaluation for the retrospective analysis in Sec.~\ref{si:all_candidate_pb}.
+All complexes remain in the cohort denominators, including those whose reference ligands required International Chemical Identifier (InChI)-based normalization \citep{heller2015inchi}.
 
 \subsection{Metrics and uncertainty}
 
@@ -1353,7 +1353,7 @@ RMSD means root-mean-square deviation: the square root of the mean squared heavy
 
 The primary endpoint is top-1 redocking success: symmetry-aware heavy-atom RMSD below \(2\,\angstrom\), measured without alignment.
 Secondary endpoints are top-5 and oracle-100 coverage, selected mean and median RMSD, official PoseBusters 27-check non-RMSD pass-all, and RMSD--PoseBusters success for the same pose.
-For confidence-ranked top-$k$ coverage, a complex succeeds if any of the first $k$ ranked candidates has RMSD below the threshold. Oracle-100 evaluates the complete bank regardless of ranking.
+For confidence-ranked top-$k$ RMSD coverage, a complex succeeds if any of the first $k$ ranked candidates has RMSD below the threshold. Joint top-$k$ coverage requires one candidate within those ranks to satisfy every component of the endpoint. Oracle-100 evaluates the complete bank regardless of ranking.
 For generation-prefix analyses, only the first $N$ saved poses are retained, after which top-1 is reselected within that prefix; this reuses an existing 100-pose bank and is not a separately executed $N$-pose campaign.
 Raw and refined outcomes and selection-condition transitions are paired by complex ID and summarized by gain/loss counts.
 Continuous RMSD summaries use complete cases and are reported with their coverage.
@@ -1424,7 +1424,7 @@ The cumulative-ranking and generation-prefix analyses in Figs.~\ref{fig:si-pose-
 \subsection{Resource measurements}
 
 The docking model has 5,719,970 parameters; the confidence model has 9,403,274.
-These counts sum parameter-tensor elements in the respective networks. Runtime uses wall-clock seconds per complex, and plotted GiB denotes \(2^{30}\) bytes of CUDA allocated memory; GPU model numerals are device names.
+Runtime is measured in wall-clock seconds per complex; memory is CUDA allocated memory in GiB (\(2^{30}\) bytes).
 
 Runtime and memory measurements are shown in Figs.~\ref{fig:si-runtime} and \ref{fig:si-generation-memory}. Profiling used mixed RTX A5000, RTX 6000 Ada and RTX PRO 6000 devices. Recorded times include the original refinement and confidence scoring but exclude subsequent refinement and rescoring passes; they do not estimate the end-to-end cost of the primary protocol or support a controlled hardware comparison.
 
@@ -1493,7 +1493,7 @@ Figs.~\ref{fig:si-paired-effects}--\ref{fig:si-complexity-failures} separate the
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.76\textheight,keepaspectratio]{complexity_failures.pdf}
-    \caption{\textbf{Descriptive failure decomposition across ligand-complexity strata.} \method, refined, chirality-filtered outcomes are partitioned into no RMSD-successful candidate, an available successful candidate not selected, selected RMSD success with PoseBusters failure, or RMSD--PoseBusters success. The fractions are the algebraic decomposition \(100-O\), \(O-T\), \(T-J\), and \(J\) of oracle coverage \(O\), selected RMSD success \(T\), and RMSD--PoseBusters success \(J\). Generation failure refers to the refined bank and does not isolate the sampler.}
+    \caption{\textbf{Descriptive failure decomposition across ligand-complexity strata.} \method, refined, chirality-filtered outcomes are partitioned into no RMSD-successful candidate, an available successful candidate not selected, selected RMSD success with PoseBusters failure, or RMSD--PoseBusters success. The fractions are the algebraic decomposition \(100-O\), \(O-T\), \(T-J\), and \(J\) of oracle coverage \(O\), selected RMSD success \(T\), and RMSD--PoseBusters success \(J\). The \(100-O\) category denotes absence of an RMSD-successful candidate after refinement. The \(O-T\) category combines chirality exclusion and ranking loss, which main Fig.~5C separates.}
     \label{fig:si-complexity-failures}
 \end{figure}
 
@@ -1535,7 +1535,7 @@ Fig.~\ref{fig:si-baseline-differences} reports paired uncertainty for the locall
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.34\textheight,keepaspectratio]{fragment_trajectory.pdf}
-    \caption{\textbf{Fragment motion along a saved ODE trajectory.} Astex 1T46--STI at five saved flow times in a fixed receptor frame. Colors track six rigid fragments; omission of early interfragment bonds is a display convention. Dimensionless flow time describes generation, separate from refinement. This prespecified seed-42, unguided one-pose illustration is separate from the 100-pose benchmark banks.}
+    \caption{\textbf{Fragment motion along a saved ODE trajectory.} Astex 1T46--STI at five saved flow times in a fixed receptor frame. Colors track six rigid fragments; omission of early interfragment bonds is a display convention. Dimensionless flow time describes generation, separate from refinement. This prespecified seed-42, unguided one-pose illustration starts from the supplied conformer and is separate from the 100-pose benchmark banks, which use conformers generated from SMILES.}
     \label{fig:si-generation-trajectory}
 \end{figure}
 
@@ -1577,7 +1577,7 @@ Main Fig.~5C partitions outcomes using the same effective eligible set as the pr
 \subsection{All-candidate PoseBusters evaluation}
 \label{si:all_candidate_pb}
 
-Every raw and refined candidate in the primary Astex and PoseBusters v2 banks was evaluated with PoseBusters 0.6.5 in \texttt{redock} mode against the same reference ligand and receptor used for the selected-pose endpoint (85 and 308 complexes, three repeats, 100 candidates per bank and stage; 235,800 poses). Before any summary, the recomputed checks for each selected and default-ranked candidate were required to equal the saved selected-pose checks; all banks passed this test. A candidate is jointly successful when its symmetry-aware RMSD is below \(2\,\angstrom\) and it passes all 27 non-RMSD checks. The joint oracle records whether any jointly successful candidate exists in a bank, and the eligible joint oracle restricts this to the effective chirality-eligible set. Labels are retrospective and never enter selection.
+Every raw and refined candidate in the primary Astex and PoseBusters v2 banks was evaluated with PoseBusters 0.6.5 in \texttt{redock} mode against the same reference ligand and receptor used for the selected-pose endpoint (85 and 308 complexes, three repeats, 100 candidates per bank and stage; 235,800 poses). Before any summary, the recomputed checks for each selected and default-ranked candidate were required to equal the saved selected-pose checks; all banks passed this test. A candidate is jointly successful when its symmetry-aware RMSD is below \(2\,\angstrom\) and it passes all 27 non-RMSD checks. The joint oracle records whether any jointly successful candidate exists in a bank, and the eligible joint oracle restricts this to the effective chirality-eligible set. PoseBusters labels do not enter the primary selector; they are used only for retrospective analyses, including the explicitly labelled PB-filtered selector.
 
 The joint partition assigns each complex to exactly one state: no RMSD-successful candidate; RMSD-successful candidates but none passing PoseBusters; jointly successful candidates but none eligible; an eligible jointly successful candidate that was not selected (joint ranking failure); or a selected jointly successful pose. Rates use all complexes as the denominator; conditional selection rates use complexes with an eligible jointly successful candidate. Complex-level bootstrap intervals (10,000 resamples, repeats kept paired) describe uncertainty over complexes, not over training runs. Same-index raw-to-refined transitions compare each candidate with its own refined coordinates.
 
@@ -1603,7 +1603,7 @@ PoseBusters v2 & Refined & 88.1\(\pm\)0.1 & 93.7\(\pm\)0.3 & 94.3\(\pm\)0.5 & 93
 
 \begin{table}[htbp]
 \centering\footnotesize\setlength{\tabcolsep}{4pt}
-\caption{Joint outcome partition with all-candidate PoseBusters labels (percent of all complexes, three-repeat means). States are mutually exclusive: no RMSD-successful candidate (No RMSD); RMSD-successful candidates but none valid (No joint); jointly successful candidates but none chirality-eligible (Chirality); an eligible jointly successful candidate not selected (Ranking); selected success. Conditional: selected success among complexes with an eligible jointly successful candidate. PB-filtered: retrospective selector described in the text.}
+\caption{Joint outcome partition with all-candidate PoseBusters labels (percent of all complexes, three-repeat means). States are mutually exclusive: no RMSD-successful candidate (No RMSD); RMSD-successful candidates but none valid (No joint); jointly successful candidates but none chirality-eligible (Chirality); an eligible jointly successful candidate not selected (Ranking); selected success. Conditional: selected success among complexes with an eligible jointly successful candidate. The fraction lacking any jointly successful candidate is the sum of No RMSD and No joint. PB-filtered: retrospective selector described in the text.}
 \label{tab:si_allcand_partition}
 \begin{tabular}{llrrrrrrr}
 \toprule
@@ -1627,7 +1627,7 @@ PoseBusters v2 & Refined & 5.7 & 1.2 & 0.2 & 13.7 & 79.1 & 85.2 & 81.0 \\
 
 \subsection{Generation-input sensitivity and guidance controls}
 
-The sensitivity protocol in Online Methods crosses five crop radii with three center-jitter levels at prior scale \(2\,\angstrom\), and three prior scales with the same jitter levels at a \(10\,\angstrom\) crop. Three grid cells are shared. Four candidate-budget/guidance cells include the reused primary baseline, giving \(5\times3+3\times3-3+(4-1)=24\) unique conditions in total. The same three inference seeds are used for each complex. This analysis refines and rescores saved candidate banks from those prespecified generation conditions; it does not generate additional candidates. Raw and refined banks are scored with the actual source prior scale, which also enters the docking features recomputed for confidence. Neither refinement nor confidence scoring receives the perturbed center or generation crop: both retain the original center and a \(10\,\angstrom\) crop. These experiments therefore do not quantify end-to-end performance under a wrongly supplied pocket.
+The sensitivity protocol in Online Methods crosses five crop radii with three center-jitter levels at prior scale \(2\,\angstrom\), and three prior scales with the same jitter levels at a \(10\,\angstrom\) crop. Three grid cells are shared. Four candidate-budget/guidance cells include the reused primary baseline, giving \(5\times3+3\times3-3+(4-1)=24\) unique conditions in total. The same three inference seeds are used for each complex. This analysis refines and rescores saved candidate banks from those prespecified generation conditions; it does not generate additional candidates. Raw and refined banks are scored with the actual source prior scale, which also enters the docking features recomputed for confidence. Neither refinement nor confidence scoring receives the perturbed center or generation crop. Refinement retains the original center and its \(18\,\angstrom\) receptor shell; confidence scoring retains the original center and its \(10\,\angstrom\) crop. These experiments therefore do not quantify end-to-end performance under a wrongly supplied pocket.
 
 Paired conditions use the same seeds, fragment inventories and prior-draw construction. The jitter stream is independent of the pose prior; within each complex and repeat, jitter levels scale the same perturbation vector. Translation draws were identical; backend quaternion roundoff produced initial-rotation differences of at most \(2.81\times10^{-7}\) radians, without bitwise prior identity across backends. The 40- and 100-pose budgets are generated separately and are not nested banks.
 
@@ -1640,7 +1640,6 @@ Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift
     \label{fig:si-guidance-budget}
 \end{figure}
 
-Refinement preserves candidate identity, enabling raw--refined coordinate comparisons.
 
 \begin{figure}[!htbp]
 \centering
