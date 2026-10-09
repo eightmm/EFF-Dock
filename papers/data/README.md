@@ -15,7 +15,7 @@ of frozen networks, rather than three independently trained models.
 | [foldbench_strata.json](foldbench_strata.json) | Fixed docking-training accession and release-date strata for Supplementary Table S16, including membership IDs and aggregate outcomes. |
 | [confidence_only_overlap.json](confidence_only_overlap.json) | Additional training-set overlap checks for the 25 confidence-training samples absent from the docking-training inventory. |
 | [figure1.json](figure1.json) | Candidate ranks, predicted and retrospective RMSD, input provenance and the scope of the separate illustrative trajectory in Figure 1. |
-| [literature_context.json](literature_context.json) | Source-defined published comparator values and cohort/protocol qualifications; these are not locally executed paired comparisons. |
+| [literature_context.json](literature_context.json) | Published comparator counts, source versions, method-specific denominators and linked EFF-Dock saved-pose results for Supplementary Table S14; these are descriptive comparisons with explicit task and protocol differences. |
 
 The primary OpenBind cohort contains 925 complexes; the benchmark-specific
 follow-on analysis uses the official 802-case annotation subset. FoldBench uses

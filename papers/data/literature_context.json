@@ -1,7 +1,247 @@
 {
   "schema": "effdock.literature_context.v1",
-  "scope": "Published source-defined results, not locally executed or harmonized paired comparisons. EFF-Dock benchmark rates are not included. Source-defined thresholds and selectors are retained. No inferred SD or confidence interval.",
+  "scope": "Published source-defined results and linked EFF-Dock saved-pose comparison rows. Task, cohort, evaluable denominator, structural endpoint, preparation and budget differences are retained; no paired or matched-compute inference.",
   "rows": [
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 206,
+      "success_count": 171,
+      "task": "pocket-conditioned complex prediction",
+      "method": "PhysDock",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A",
+      "success_percent": 83.00970873786407,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 206,
+      "success_count": 160,
+      "task": "pocket-conditioned complex prediction",
+      "method": "PhysDock",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
+      "success_percent": 77.66990291262135,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 184,
+      "success_count": 132,
+      "task": "supplied-pocket docking",
+      "method": "SurfDock",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A",
+      "success_percent": 71.73913043478261,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 184,
+      "success_count": 131,
+      "task": "supplied-pocket docking",
+      "method": "SurfDock",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
+      "success_percent": 71.19565217391305,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 180,
+      "success_count": 123,
+      "task": "supplied-pocket docking",
+      "method": "Interformer",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A",
+      "success_percent": 68.33333333333333,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 180,
+      "success_count": 114,
+      "task": "supplied-pocket docking",
+      "method": "Interformer",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
+      "success_percent": 63.333333333333336,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 184,
+      "success_count": 98,
+      "task": "supplied-pocket docking",
+      "method": "Uni-Mol Docking V2",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A",
+      "success_percent": 53.26086956521739,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 184,
+      "success_count": 96,
+      "task": "supplied-pocket docking",
+      "method": "Uni-Mol Docking V2",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
+      "success_percent": 52.17391304347826,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 186,
+      "success_count": 74,
+      "task": "supplied-pocket docking",
+      "method": "DiffDock-L",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A",
+      "success_percent": 39.784946236559136,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 186,
+      "success_count": 66,
+      "task": "supplied-pocket docking",
+      "method": "DiffDock-L",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
+      "success_percent": 35.483870967741936,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 185,
+      "success_count": 47,
+      "task": "supplied-pocket docking",
+      "method": "Glide",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A",
+      "success_percent": 25.405405405405407,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 185,
+      "success_count": 45,
+      "task": "supplied-pocket docking",
+      "method": "Glide",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
+      "success_percent": 24.324324324324323,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 198,
+      "success_count": 47,
+      "task": "supplied-pocket docking",
+      "method": "Vina",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A",
+      "success_percent": 23.737373737373737,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 198,
+      "success_count": 45,
+      "task": "supplied-pocket docking",
+      "method": "Vina",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
+      "success_percent": 22.727272727272727,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 186,
+      "success_count": 57,
+      "task": "supplied-pocket docking",
+      "method": "DiffDock",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A",
+      "success_percent": 30.64516129032258,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
+    {
+      "dataset": "PhiBench",
+      "released_group_count": 206,
+      "reported_evaluable_count": 186,
+      "success_count": 48,
+      "task": "supplied-pocket docking",
+      "method": "DiffDock",
+      "selection": "top-5 of 40 generated candidates",
+      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
+      "success_percent": 25.806451612903224,
+      "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+    },
     {
       "dataset": "FoldBench",
       "released_group_count": 558,
@@ -58,32 +298,15 @@
       "source_sha256": "b8107c120633e20c43373c248f4c15a9f1df6b1855f6029bcfba9276651bb713"
     },
     {
-      "dataset": "PhiBench",
-      "released_group_count": 206,
-      "task": "pocket-conditioned complex prediction",
-      "method": "PhysDock",
-      "selection": "top-5 of 40 generated candidates",
-      "endpoint": "protein-aligned ligand RMSD <2 A",
-      "success_percent": 83.0,
-      "source": "https://doi.org/10.1101/2025.04.28.650887",
-      "indexed_primary_pdf": "https://assets-eu.researchsquare.com/files/rs-6600109/v1_covered_6234323a-a2e0-4a8b-83b6-9deb49eeaae7.pdf?c=1773991336",
-      "source_version": "Research Square preprint rs-6600109 v1",
-      "source_verification": "Direct primary preprint PDF retrieved and byte-hashed; PAL definition and Top-5 contract read on PDF page 6 (printed page 4/29).",
-      "source_sha256": "d66812d01f6ab6ac7fd6dbdd9af2ed6449286621e25cfb7e3434a45aa9759c80"
-    },
-    {
-      "dataset": "PhiBench",
-      "released_group_count": 206,
-      "task": "pocket-conditioned complex prediction",
-      "method": "PhysDock",
-      "selection": "top-5 of 40 generated candidates",
-      "endpoint": "protein-aligned ligand RMSD <2 A and source-reported 18-criterion PoseBusters-valid",
-      "success_percent": 77.7,
-      "source": "https://doi.org/10.1101/2025.04.28.650887",
-      "indexed_primary_pdf": "https://assets-eu.researchsquare.com/files/rs-6600109/v1_covered_6234323a-a2e0-4a8b-83b6-9deb49eeaae7.pdf?c=1773991336",
-      "source_version": "Research Square preprint rs-6600109 v1",
-      "source_verification": "Direct primary preprint PDF retrieved and byte-hashed; PAL definition and Top-5 contract read on PDF page 6 (printed page 4/29).",
-      "source_sha256": "d66812d01f6ab6ac7fd6dbdd9af2ed6449286621e25cfb7e3434a45aa9759c80"
+      "dataset": "FoldBench",
+      "released_group_count": 558,
+      "task": "cofolding",
+      "method": "OpenFold 3 (preview)",
+      "selection": "native ranking",
+      "endpoint": "binding-site-superposed symmetry-corrected LRMSD <2 A and LDDT-PLI >0.8",
+      "success_percent": 44.49,
+      "source": "https://raw.githubusercontent.com/BEAM-Labs/FoldBench/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/README.md",
+      "source_sha256": "b8107c120633e20c43373c248f4c15a9f1df6b1855f6029bcfba9276651bb713"
     },
     {
       "dataset": "OpenBind",
@@ -109,7 +332,7 @@
     }
   ],
   "limitations": {
-    "PhiBench": "The 206 EFF-Dock cases are locally selected from the released archive; identity with the published PhysDock 206 has not been established. PAL means protein-aligned ligand RMSD in the cited preprint. The historical atom correspondence, symmetry policy, 18-criterion PB conjunction and software version are not fully established; these are not equated to the current symmetry-corrected RMSD or 27 checks.",
+    "PhiBench": "The 206 EFF-Dock cases are locally selected from the released archive; identity with the published PhysDock 206 has not been established. PAL means protein-aligned ligand RMSD in the cited preprint. The historical atom correspondence, symmetry policy, 18-criterion PB conjunction and software version are not fully established; these are not equated to the current symmetry-corrected RMSD or 27 checks. Retrieved source Supplementary Table 2 resolves comparator numerators and evaluable denominators (180--206), not correspondence to the local 206-case cohort. Only eight pocket-conditioned rows marked in source Figure 2 are included; sequence-only rows in the same source supplementary table are omitted. Source-reported missing cases are not reclassified or imputed.",
     "FoldBench": "All 558 released interface identities map exactly to each EFF-Dock repeat. The original evaluation pins OpenStructure 2.8.0. The released group does not certify each source model's defined-score denominator; cofolding and fixed-holo redocking remain different tasks and preparation protocols.",
     "OpenBind": "The official 802-complex follow-on subset differs from the primary 925-complex cohort. The source rmsd_valid metric already includes PoseBusters validity. All 925 official IDs map one-to-one to EFF-Dock by case normalization, but metric and preparation equivalence remain unproven."
   },
@@ -130,6 +353,11 @@
       "url": "https://raw.githubusercontent.com/BEAM-Labs/FoldBench/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/environment.yml",
       "sha256": "c2dba7be2891ae96c35f821ae1f53183c5c59d398a74e169224651463e52d1d8",
       "purpose": "Original FoldBench evaluator environment pins OpenStructure 2.8.0, distinct from 2.11.1."
+    },
+    {
+      "url": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
+      "sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
+      "purpose": "PhiBench pocket-conditioned comparator counts and method-specific denominators, Supplementary Table 2; native baseline preparation in Section 5."
     }
   ],
   "openbind_subset_membership": {
@@ -1029,5 +1257,586 @@
       ]
     },
     "scope": "Fixed CCD ideal coordinates locally aligned to observed atoms; observed coordinates preserved. Imputed atoms are not experimentally resolved observations. Cases retained in primary denominators."
+  },
+  "comparison_rows": [
+    {
+      "dataset": "PhiBench",
+      "method": "PhysDock",
+      "evidence": "published",
+      "n": 206,
+      "top_k": 5,
+      "generated_candidates": 40,
+      "rmsd_percent": 83.00970873786407,
+      "combined_percent": 77.66990291262135,
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710"
+    },
+    {
+      "dataset": "PhiBench",
+      "method": "SurfDock",
+      "evidence": "published",
+      "n": 184,
+      "top_k": 5,
+      "generated_candidates": 40,
+      "rmsd_percent": 71.73913043478261,
+      "combined_percent": 71.19565217391305,
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710"
+    },
+    {
+      "dataset": "PhiBench",
+      "method": "Interformer",
+      "evidence": "published",
+      "n": 180,
+      "top_k": 5,
+      "generated_candidates": 40,
+      "rmsd_percent": 68.33333333333333,
+      "combined_percent": 63.333333333333336,
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710"
+    },
+    {
+      "dataset": "PhiBench",
+      "method": "Uni-Mol Docking V2",
+      "evidence": "published",
+      "n": 184,
+      "top_k": 5,
+      "generated_candidates": 40,
+      "rmsd_percent": 53.26086956521739,
+      "combined_percent": 52.17391304347826,
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710"
+    },
+    {
+      "dataset": "PhiBench",
+      "method": "DiffDock-L",
+      "evidence": "published",
+      "n": 186,
+      "top_k": 5,
+      "generated_candidates": 40,
+      "rmsd_percent": 39.784946236559136,
+      "combined_percent": 35.483870967741936,
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710"
+    },
+    {
+      "dataset": "PhiBench",
+      "method": "Glide",
+      "evidence": "published",
+      "n": 185,
+      "top_k": 5,
+      "generated_candidates": 40,
+      "rmsd_percent": 25.405405405405407,
+      "combined_percent": 24.324324324324323,
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710"
+    },
+    {
+      "dataset": "PhiBench",
+      "method": "Vina",
+      "evidence": "published",
+      "n": 198,
+      "top_k": 5,
+      "generated_candidates": 40,
+      "rmsd_percent": 23.737373737373737,
+      "combined_percent": 22.727272727272727,
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710"
+    },
+    {
+      "dataset": "PhiBench",
+      "method": "DiffDock",
+      "evidence": "published",
+      "n": 186,
+      "top_k": 5,
+      "generated_candidates": 40,
+      "rmsd_percent": 30.64516129032258,
+      "combined_percent": 25.806451612903224,
+      "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710"
+    },
+    {
+      "dataset": "PhiBench-derived",
+      "method": "EFF-Dock",
+      "evidence": "saved-pose evaluation",
+      "n": 206,
+      "saved_bank_prefix": 40,
+      "top_k": 5,
+      "rmsd": {
+        "dataset": "phibench",
+        "stage": "refined",
+        "saved_bank_prefix": 40,
+        "top_k": 5,
+        "endpoint": "rmsd_success",
+        "complexes_per_repeat": 206,
+        "mean_percent": 72.49190938511327,
+        "sd_percent": 4.982137319851341,
+        "repeats": [
+          {
+            "repeat": 0,
+            "successes": 152,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 73.7864077669903,
+            "defined_case_rate_percent": 73.7864077669903,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 1,
+            "successes": 138,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 66.99029126213593,
+            "defined_case_rate_percent": 66.99029126213593,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 2,
+            "successes": 158,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 76.69902912621359,
+            "defined_case_rate_percent": 76.69902912621359,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          }
+        ]
+      },
+      "combined": {
+        "dataset": "phibench",
+        "stage": "refined",
+        "saved_bank_prefix": 40,
+        "top_k": 5,
+        "endpoint": "rmsd_pb_success",
+        "complexes_per_repeat": 206,
+        "mean_percent": 70.3883495145631,
+        "sd_percent": 4.780998932910733,
+        "repeats": [
+          {
+            "repeat": 0,
+            "successes": 148,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 71.84466019417475,
+            "defined_case_rate_percent": 71.84466019417475,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 1,
+            "successes": 134,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 65.04854368932038,
+            "defined_case_rate_percent": 65.04854368932038,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 2,
+            "successes": 153,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 74.27184466019418,
+            "defined_case_rate_percent": 74.27184466019418,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          }
+        ]
+      },
+      "source": "published_endpoints.json",
+      "source_sha256": "c2ea5ddaf73016391c35e49d3f159f5d233673235bd50951603b77d74800d08b"
+    },
+    {
+      "dataset": "PhiBench-derived",
+      "method": "EFF-Dock",
+      "evidence": "saved-pose evaluation",
+      "n": 206,
+      "saved_bank_prefix": 100,
+      "top_k": 5,
+      "rmsd": {
+        "dataset": "phibench",
+        "stage": "refined",
+        "saved_bank_prefix": 100,
+        "top_k": 5,
+        "endpoint": "rmsd_success",
+        "complexes_per_repeat": 206,
+        "mean_percent": 78.15533980582525,
+        "sd_percent": 0.4854368932038895,
+        "repeats": [
+          {
+            "repeat": 0,
+            "successes": 161,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 78.15533980582525,
+            "defined_case_rate_percent": 78.15533980582525,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 1,
+            "successes": 160,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 77.66990291262135,
+            "defined_case_rate_percent": 77.66990291262135,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 2,
+            "successes": 162,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 78.64077669902913,
+            "defined_case_rate_percent": 78.64077669902913,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          }
+        ]
+      },
+      "combined": {
+        "dataset": "phibench",
+        "stage": "refined",
+        "saved_bank_prefix": 100,
+        "top_k": 5,
+        "endpoint": "rmsd_pb_success",
+        "complexes_per_repeat": 206,
+        "mean_percent": 76.05177993527508,
+        "sd_percent": 0.5605342419316742,
+        "repeats": [
+          {
+            "repeat": 0,
+            "successes": 156,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 75.72815533980582,
+            "defined_case_rate_percent": 75.72815533980582,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 1,
+            "successes": 156,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 75.72815533980582,
+            "defined_case_rate_percent": 75.72815533980582,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 2,
+            "successes": 158,
+            "all_cases": 206,
+            "determinate_cases": 206,
+            "unresolved_cases": 0,
+            "rate_percent": 76.69902912621359,
+            "defined_case_rate_percent": 76.69902912621359,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          }
+        ]
+      },
+      "source": "published_endpoints.json",
+      "source_sha256": "c2ea5ddaf73016391c35e49d3f159f5d233673235bd50951603b77d74800d08b"
+    },
+    {
+      "dataset": "FoldBench",
+      "released_group_count": 558,
+      "task": "cofolding",
+      "method": "AlphaFold 3",
+      "selection": "native ranking",
+      "endpoint": "binding-site-superposed symmetry-corrected LRMSD <2 A and LDDT-PLI >0.8",
+      "success_percent": 64.9,
+      "source": "https://raw.githubusercontent.com/BEAM-Labs/FoldBench/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/README.md",
+      "source_sha256": "b8107c120633e20c43373c248f4c15a9f1df6b1855f6029bcfba9276651bb713",
+      "evidence": "published",
+      "n_definition": "Released interface group size; source-model evaluable denominators are not established."
+    },
+    {
+      "dataset": "FoldBench",
+      "released_group_count": 558,
+      "task": "cofolding",
+      "method": "Boltz-1",
+      "selection": "native ranking",
+      "endpoint": "binding-site-superposed symmetry-corrected LRMSD <2 A and LDDT-PLI >0.8",
+      "success_percent": 55.04,
+      "source": "https://raw.githubusercontent.com/BEAM-Labs/FoldBench/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/README.md",
+      "source_sha256": "b8107c120633e20c43373c248f4c15a9f1df6b1855f6029bcfba9276651bb713",
+      "evidence": "published",
+      "n_definition": "Released interface group size; source-model evaluable denominators are not established."
+    },
+    {
+      "dataset": "FoldBench",
+      "released_group_count": 558,
+      "task": "cofolding",
+      "method": "Chai-1",
+      "selection": "native ranking",
+      "endpoint": "binding-site-superposed symmetry-corrected LRMSD <2 A and LDDT-PLI >0.8",
+      "success_percent": 51.23,
+      "source": "https://raw.githubusercontent.com/BEAM-Labs/FoldBench/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/README.md",
+      "source_sha256": "b8107c120633e20c43373c248f4c15a9f1df6b1855f6029bcfba9276651bb713",
+      "evidence": "published",
+      "n_definition": "Released interface group size; source-model evaluable denominators are not established."
+    },
+    {
+      "dataset": "FoldBench",
+      "released_group_count": 558,
+      "task": "cofolding",
+      "method": "HelixFold 3",
+      "selection": "native ranking",
+      "endpoint": "binding-site-superposed symmetry-corrected LRMSD <2 A and LDDT-PLI >0.8",
+      "success_percent": 51.82,
+      "source": "https://raw.githubusercontent.com/BEAM-Labs/FoldBench/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/README.md",
+      "source_sha256": "b8107c120633e20c43373c248f4c15a9f1df6b1855f6029bcfba9276651bb713",
+      "evidence": "published",
+      "n_definition": "Released interface group size; source-model evaluable denominators are not established."
+    },
+    {
+      "dataset": "FoldBench",
+      "released_group_count": 558,
+      "task": "cofolding",
+      "method": "Protenix",
+      "selection": "native ranking",
+      "endpoint": "binding-site-superposed symmetry-corrected LRMSD <2 A and LDDT-PLI >0.8",
+      "success_percent": 50.7,
+      "source": "https://raw.githubusercontent.com/BEAM-Labs/FoldBench/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/README.md",
+      "source_sha256": "b8107c120633e20c43373c248f4c15a9f1df6b1855f6029bcfba9276651bb713",
+      "evidence": "published",
+      "n_definition": "Released interface group size; source-model evaluable denominators are not established."
+    },
+    {
+      "dataset": "FoldBench",
+      "released_group_count": 558,
+      "task": "cofolding",
+      "method": "OpenFold 3 (preview)",
+      "selection": "native ranking",
+      "endpoint": "binding-site-superposed symmetry-corrected LRMSD <2 A and LDDT-PLI >0.8",
+      "success_percent": 44.49,
+      "source": "https://raw.githubusercontent.com/BEAM-Labs/FoldBench/4273f6877d82bd0b2fa476d1b2f34d121cbccc70/README.md",
+      "source_sha256": "b8107c120633e20c43373c248f4c15a9f1df6b1855f6029bcfba9276651bb713",
+      "evidence": "published",
+      "n_definition": "Released interface group size; source-model evaluable denominators are not established."
+    },
+    {
+      "dataset": "FoldBench",
+      "method": "EFF-Dock",
+      "task": "supplied-holo redocking",
+      "evidence": "saved-pose evaluation",
+      "rmsd": {
+        "dataset": "foldbench",
+        "stage": "refined",
+        "saved_bank_prefix": 100,
+        "top_k": 1,
+        "endpoint": "rmsd_success",
+        "complexes_per_repeat": 558,
+        "mean_percent": 75.44802867383513,
+        "sd_percent": 0.5376344086021447,
+        "repeats": [
+          {
+            "repeat": 0,
+            "successes": 424,
+            "all_cases": 558,
+            "determinate_cases": 557,
+            "unresolved_cases": 1,
+            "rate_percent": 75.98566308243727,
+            "defined_case_rate_percent": 76.12208258527828,
+            "undefined_pose_count": 1,
+            "partial_coverage_pose_count": 1
+          },
+          {
+            "repeat": 1,
+            "successes": 418,
+            "all_cases": 558,
+            "determinate_cases": 557,
+            "unresolved_cases": 1,
+            "rate_percent": 74.91039426523298,
+            "defined_case_rate_percent": 75.04488330341113,
+            "undefined_pose_count": 1,
+            "partial_coverage_pose_count": 1
+          },
+          {
+            "repeat": 2,
+            "successes": 421,
+            "all_cases": 558,
+            "determinate_cases": 557,
+            "unresolved_cases": 1,
+            "rate_percent": 75.44802867383513,
+            "defined_case_rate_percent": 75.58348294434471,
+            "undefined_pose_count": 1,
+            "partial_coverage_pose_count": 1
+          }
+        ]
+      },
+      "combined": {
+        "dataset": "foldbench",
+        "stage": "refined",
+        "saved_bank_prefix": 100,
+        "top_k": 1,
+        "endpoint": "published_success",
+        "complexes_per_repeat": 558,
+        "mean_percent": 71.38590203106332,
+        "sd_percent": 1.6261239652110193,
+        "repeats": [
+          {
+            "repeat": 0,
+            "successes": 390,
+            "all_cases": 558,
+            "determinate_cases": 558,
+            "unresolved_cases": 0,
+            "rate_percent": 69.89247311827957,
+            "defined_case_rate_percent": 69.89247311827957,
+            "undefined_pose_count": 1,
+            "partial_coverage_pose_count": 1
+          },
+          {
+            "repeat": 1,
+            "successes": 397,
+            "all_cases": 558,
+            "determinate_cases": 558,
+            "unresolved_cases": 0,
+            "rate_percent": 71.14695340501792,
+            "defined_case_rate_percent": 71.14695340501792,
+            "undefined_pose_count": 1,
+            "partial_coverage_pose_count": 1
+          },
+          {
+            "repeat": 2,
+            "successes": 408,
+            "all_cases": 558,
+            "determinate_cases": 558,
+            "unresolved_cases": 0,
+            "rate_percent": 73.11827956989248,
+            "defined_case_rate_percent": 73.11827956989248,
+            "undefined_pose_count": 1,
+            "partial_coverage_pose_count": 1
+          }
+        ]
+      },
+      "source": "published_endpoints.json",
+      "source_sha256": "c2ea5ddaf73016391c35e49d3f159f5d233673235bd50951603b77d74800d08b"
+    },
+    {
+      "dataset": "OpenBind",
+      "method": "EFF-Dock",
+      "task": "supplied-holo redocking",
+      "evidence": "saved-pose evaluation",
+      "rmsd_pb": {
+        "dataset": "openbind",
+        "stage": "refined",
+        "saved_bank_prefix": 100,
+        "top_k": 1,
+        "endpoint": "rmsd_pb_success",
+        "complexes_per_repeat": 802,
+        "mean_percent": 56.35910224438903,
+        "sd_percent": 0.543503608920286,
+        "repeats": [
+          {
+            "repeat": 0,
+            "successes": 447,
+            "all_cases": 802,
+            "determinate_cases": 802,
+            "unresolved_cases": 0,
+            "rate_percent": 55.7356608478803,
+            "defined_case_rate_percent": 55.7356608478803,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 1,
+            "successes": 454,
+            "all_cases": 802,
+            "determinate_cases": 802,
+            "unresolved_cases": 0,
+            "rate_percent": 56.60847880299252,
+            "defined_case_rate_percent": 56.60847880299252,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 2,
+            "successes": 455,
+            "all_cases": 802,
+            "determinate_cases": 802,
+            "unresolved_cases": 0,
+            "rate_percent": 56.733167082294266,
+            "defined_case_rate_percent": 56.733167082294266,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          }
+        ]
+      },
+      "combined": {
+        "dataset": "openbind",
+        "stage": "refined",
+        "saved_bank_prefix": 100,
+        "top_k": 1,
+        "endpoint": "published_success",
+        "complexes_per_repeat": 802,
+        "mean_percent": 48.254364089775564,
+        "sd_percent": 0.7584491933040203,
+        "repeats": [
+          {
+            "repeat": 0,
+            "successes": 380,
+            "all_cases": 802,
+            "determinate_cases": 802,
+            "unresolved_cases": 0,
+            "rate_percent": 47.38154613466334,
+            "defined_case_rate_percent": 47.38154613466334,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 1,
+            "successes": 391,
+            "all_cases": 802,
+            "determinate_cases": 802,
+            "unresolved_cases": 0,
+            "rate_percent": 48.753117206982544,
+            "defined_case_rate_percent": 48.753117206982544,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          },
+          {
+            "repeat": 2,
+            "successes": 390,
+            "all_cases": 802,
+            "determinate_cases": 802,
+            "unresolved_cases": 0,
+            "rate_percent": 48.6284289276808,
+            "defined_case_rate_percent": 48.6284289276808,
+            "undefined_pose_count": 0,
+            "partial_coverage_pose_count": 0
+          }
+        ]
+      },
+      "source": "published_endpoints.json",
+      "source_sha256": "c2ea5ddaf73016391c35e49d3f159f5d233673235bd50951603b77d74800d08b"
+    },
+    {
+      "dataset": "OpenBind",
+      "method": "GNINA",
+      "task": "holo redocking",
+      "evidence": "published",
+      "n": 802,
+      "selection": "top-1",
+      "rmsd_pb_percent": 69.45137157107231,
+      "combined_percent": 66.58354114713218,
+      "source": "https://raw.githubusercontent.com/OpenBind-Consortium/EV-A71_2A_benchmark/be4405f3abdf7a933bc0c70ad14b7c6fd3bc8779/plotting/tables/cofolding_performance_top1.csv",
+      "source_sha256": "b92bc164bbc3a4b5a4158be181be7532e8a63a6773b640ed2d1a8708290a9187"
+    }
+  ],
+  "protocol_notes": {
+    "PhiBench": "All source rows are pocket-conditioned Top-5 of 40; source PB is the reported conjunction, not equated to our 27 checks. EFF-Dock uses refined chirality-filtered selection on its local cohort, symmetry-aware fixed-receptor RMSD, and PB 0.6.5 pass-all. Prefix40 is a restriction of the saved100 bank, not independent generation or equal compute.",
+    "FoldBench": "Published source models predict the receptor and ligand; EFF-Dock is supplied-holo redocking. Same original OST2.8.0 structural conjunction, all558 EFF-Dock identities, but source per-model evaluability/preparation/training exposure not harmonized. Missing source RMSD-only rates remain null, not zero.",
+    "OpenBind": "Official802 follow-on cases; GNINA published holo redocking versus EFF-Dock saved100 Top1. Structural criteria align but preparation, PB implementation and budgets are not all harmonized."
   }
 }
