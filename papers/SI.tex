@@ -101,7 +101,7 @@ For SMILES input, one ETKDGv3 conformer is generated with the protocol-specific 
 Formal charge, stereochemistry, and protonation state are preserved without tautomer or protonation-state enumeration.
 
 The receptor parser removes hydrogens, waters, nucleic acids, and non-primary alternate locations; normalizes supported residue variants; reconstructs standard intra-residue, peptide, and disulfide connectivity; and retains recognized monatomic metals as typed nodes.
-Unsupported nonprotein chemistry either raises an error or, for the specified geometry-only setting, contributes repulsion without attractive interaction typing.
+For all reported refinements and guidance controls, unresolved receptor chemistry contributes bounded repulsion without attractive interaction typing.
 The neural graph uses a normalized receptor crop, whereas the optional guidance calculation uses a larger PDB-derived shell.
 Both receptor and ligand coordinates are translated by $-\mathbf{b}$ so that the pocket center is the origin.
 
@@ -124,19 +124,16 @@ For a fragment-local learned vector \(\mathbf w\), the world-frame injection is
 \end{equation}
 Source-local edge coordinates \(\mathbf R^\top(\mathbf x_j-\mathbf x_i)\) map a world displacement into a local frame.
 
-Evaluation uses the released docking and confidence checkpoints without retraining, with revised local-to-world feature injection and coordinate-to-frame recovery relative to training; these revisions change model computation under fixed weights, including the terminal docking features supplied to the confidence network.
-No new confidence threshold, calibration transform, energy tie-break, or benchmark-dependent policy was introduced.
+Evaluation uses fixed docking and confidence weights with local-to-world feature injection and coordinate-to-frame recovery that differ from training. These conventions also determine the terminal docking features supplied to the confidence network.
 
 Finite network verification used five complexes, three flow times per complex, and four joint rotations per time.
-All 60 tested translation and 60 angular outputs passed the gate \(\|\Delta\|_2\le10^{-4}+10^{-4}\|\text{expected}\|_2\); the maximum relative errors were \(9.2\times10^{-6}\) and \(1.8\times10^{-5}\), respectively.
+All 60 tested translation and 60 angular outputs satisfied the tolerance \(\|\Delta\|_2\le10^{-4}+10^{-4}\|\text{expected}\|_2\); the maximum relative errors were \(9.2\times10^{-6}\) and \(1.8\times10^{-5}\), respectively.
 These core-network tests support covariance under joint world rotations but do not prove exact equivariance of the entire data-preparation, sampling, refinement, and selection pipeline.
-
-The five-benchmark evaluation comprises 6,246 complex--seed executions with seeds 42, 100042, and 200042. No accuracy benefit is attributed specifically to the feature-injection revision. Compared with the archived pipeline, selected RMSD and RMSD--PoseBusters success changed by \(-0.3\) to \(+0.2\) percentage points on Astex, PoseBusters and PhiBench-derived. These are whole-pipeline comparisons: archived backend differences may contribute, the paired percentile intervals are unadjusted, and they do not establish equivalence. FoldBench and OpenBind reused their coordinates, so their unchanged success rates do not test regeneration.
 
 \subsection{Numerical checks for coordinate-only frame recovery}
 \label{si:frame_recovery_checks}
 
-Recovering a rigid-fragment rotation from coordinates is underdetermined for a linear fragment: rotation around its observed axis leaves its atoms unchanged. A Kabsch implementation can therefore return different unobservable twists on different numerical backends. Those twists nevertheless enter the terminal docking features used by a confidence network. This issue concerns reconstruction of a frame from saved coordinates; it does not change the observed candidate coordinates. Choosing a consistent frame convention does not make the frozen network invariant to every unobservable twist.
+Coordinate-based recovery leaves the axial twist of linear fragments undetermined. Although this twist does not change fragment coordinates, it affects terminal docking features and confidence scores; a consistent recovery convention therefore does not establish twist invariance.
 
 Primary measurements use a context-defined recovery convention that leaves the proper Kabsch fit unchanged for templates of numerical rank at least two. Rank is computed from centered-template singular values using a relative tolerance of $10^{-6}$ and an absolute floor of $10^{-12}$. For rank-one fragments, the observed axis is retained, and an atom-indexed, nonparallel template--pose context pair fixes the unobservable twist. When paired context is unavailable, a fixed template-local basis supplies the body direction and posed ligand atoms, followed by receptor atoms, supply its world counterpart. Singleton frames use two nonparallel scene vectors. No global world-axis fallback is used; collapsed or fully collinear inputs are rejected. Anchor indexing is a fixed input convention, not an atom-permutation-invariance claim.
 
@@ -146,7 +143,7 @@ The transformation tests kept the prepared body template, atom order, graph defi
 
 Separately sweeping the unobservable twist through $0^\circ$, $90^\circ$, $180^\circ$ and $270^\circ$ in the three rank-one examples changed predicted RMSD over ranges of $8.5\times10^{-4}$ to $1.5\times10^{-3}\,\angstrom$. Fixing this twist consistently therefore does not make the frozen score invariant to it.
 
-Table~\ref{tab:si_frame_backend} isolates recovery-backend sensitivity on two fixed 100-pose raw and refined banks. Network arithmetic, immutable coordinates, model weights and all other inputs were held on the same A5000 GPU; only frame recovery moved between CPU and GPU. The context-defined convention reduced the measured discrepancy, but this is a numerical verification rather than an accuracy comparison. The confidence weights were trained using historical recovery, so adopting a new convention remains a frozen-feature intervention. Differences between freshly replayed historical scores and archived scores from another GPU persisted; their full cause was not established.
+Table~\ref{tab:si_frame_backend} compares CPU and GPU frame recovery on two fixed 100-pose raw and refined banks. Network arithmetic, coordinates, weights and other inputs were held on the same A5000 GPU. The context-defined convention reduced the measured numerical discrepancy. This tests frame-recovery consistency rather than docking accuracy.
 
 \begin{table}[htbp]
     \centering
@@ -155,7 +152,7 @@ Table~\ref{tab:si_frame_backend} isolates recovery-backend sensitivity on two fi
     \label{tab:si_frame_backend}
     \begin{tabular}{lrrr}
         \toprule
-        Bank & Historical recovery & Context-defined recovery & Same-GPU source replay \\
+        Bank & Kabsch recovery & Context-defined recovery & Same-GPU repeat \\
         \midrule
         OpenBind a71ev2a-x0152a & $9.3\times10^{-3}$ & $5.2\times10^{-6}$ & $5.0\times10^{-6}$ \\
         FoldBench 9ENH, FAD & $1.5\times10^{-3}$ & $1.4\times10^{-6}$ & $1.2\times10^{-6}$ \\
@@ -327,7 +324,6 @@ Raw endpoints are saved before refinement. For a confidence model \(c_\phi\), th
 \end{equation}
 Here \(q_m\) denotes compatibility with the input-defined tetrahedral stereocenters. Ties follow saved candidate order. The unfiltered argmin is reported separately as a diagnostic condition.
 The function \(c_\phi\) is the nonnegative predicted RMSD from Eq.~\eqref{eq:confidence_reported_rmsd}, parameterized by learned weights \(\phi\).
-When confidence ranking is disabled, the specified baseline selector is used.
 Unsupported inputs and sampling exceptions are recorded as complex-level failures.
 
 \section{Equivariant Architecture and Objectives}
@@ -575,13 +571,13 @@ Table~\ref{tab:si_typing} summarizes the interaction types.
 
 \begin{table}[!t]
     \centering
-    \caption{Static interaction typing used by the guidance energy. Incomplete or ambiguous attractive sites are excluded under the fail-closed policy.}
+    \caption{Static interaction typing used by the guidance energy. Incomplete or ambiguous attractive sites are excluded.}
     \label{tab:si_typing}
     \begin{tabular}{p{0.19\linewidth}p{0.72\linewidth}}
         \toprule
         Family & Admission rule \\
         \midrule
-        H-bond ligand & Versioned SMARTS for neutral/cationic N--H, aromatic \(\mathrm{[nH]}\), hydroxyl donors, and N/O acceptors; amide-like acceptor exclusions are explicit.
+        H-bond ligand & SMARTS patterns for neutral/cationic N--H, aromatic \(\mathrm{[nH]}\), hydroxyl donors, and N/O acceptors; amide-like acceptor exclusions are explicit.
         Only N and O participate. \\
         H-bond protein & Complete canonical N/O sites with specified linear, trigonal, or tetrahedral heavy-atom geometry.
         Plain HIS side-chain nitrogens, termini, chain gaps, degree mismatches, and missing neighbors are excluded.
@@ -592,16 +588,13 @@ Table~\ref{tab:si_typing} summarizes the interaction types.
         Formal charge & Ligand carboxylate, guanidinium, and amidinium groups are represented by one equally weighted resonance-group site; remaining nonzero formal charges are atom centered.
         Protein sites are ARG/LYS \(+1\), ASP/GLU \(-1\), and explicitly named HIP \(+1\). \\
         Aromatic systems & Complete aromatic ring systems define centroids and normals for pi stacking and cation--pi geometry. \\
-        Halogen bond & Versioned ligand halogen-donor patterns and receptor acceptor templates provide distance and angular gates. \\
+        Halogen bond & Ligand halogen-donor patterns and receptor acceptor templates provide distance and angular gates. \\
         Metal coordination & Recognized receptor-metal profiles specify admitted ligand donors, coordination geometry, capacity, and repulsion-only fallbacks. \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-The implementation offers a strict \texttt{fail\_closed} receptor policy, but all reported external refinements and guidance controls used the \texttt{geometry\_only} policy.
-Under the strict fail-closed policy, an active cofactor, metal cluster, residue/element mismatch, unsupported nonprotein residue, or partial occupancy raises a structured chemistry error with site provenance.
-The \texttt{geometry\_only} policy retains resolved terms and treats unresolved fixed atoms as bounded repulsive obstacles without assigning hydrogen-bond or charge attraction.
-Malformed parameter tables and non-finite input coordinates are hard failures under both policies.
+All external refinements and guidance controls use the geometry-only receptor policy: unresolved fixed atoms contribute bounded repulsion without hydrogen-bond or charge attraction. Non-finite input coordinates are rejected.
 
 \subsection{Physical energy at fragment interfaces}
 \label{si:guidance_physical}
@@ -630,12 +623,9 @@ The function \(\operatorname{wrap}(\psi)\) returns the representative of angle \
 \end{align}
 In primary measurements, the bond, angle and chiral reference values are obtained from the chemical reference conformer rebuilt using the recorded generation preparation and conformer seed: zero for Astex and PoseBusters, and the per-complex sampling seed for PhiBench-derived, FoldBench and OpenBind. Refinement starts from the actual saved candidate and fixes each fragment's internal coordinates to that candidate. The regenerated conformer parameterizes cut-interface restraints rather than replacing the generated pose.
 
-Refinement and confidence-input templates are checked for identical atom order, chemical identity, coordinates and fragment partition by content hashes. Compatibility with generation is checked by the recorded preparation seed and a whole-ligand heavy-atom RMSD of at most $10^{-3}\,\angstrom$ after independent proper rigid-fragment fits to each saved raw candidate. This coordinate witness is not an original generation-template hash: the latter was not retained. It cannot establish invariance to an alternative fragment body-axis convention. For the three temporal cohorts, unchanged refinement coordinates and all stored energy-reference tensors are verified before reuse. Their refinement solver is not rerun, and the candidate banks are rescored under the corrected frame policy.
-The proper term is deliberately independent of its starting torsion.
-The weights for the retained proper quadruplets around each cut bond sum to one.
-Conjugated or aromatic interfaces use \(n_p=2,\delta_p=\pi\); other cut bonds use \(n_p=3,\delta_p=0\).
-Chiral improper restraints are active in the executed refinement protocol; the separate chemical-constraint auxiliary channel has zero weight.
-The default coefficients are \(k_b=160\), \(k_a=35\), \(k_p^\phi=0.5\), and \(k_\chi=k_{\mathrm{planar}}=12\) in the units listed in Table~\ref{tab:si_physical_parameters}.
+Refinement and confidence use matching conformer templates and fragment partitions. Compatibility with generated poses was checked by independent proper fragment fits, with whole-ligand heavy-atom RMSD at most $10^{-3}\,\angstrom$. Original generation-template hashes were unavailable, so this geometric check does not establish identity of the fragment body-axis convention. Previously refined PhiBench-derived, FoldBench and OpenBind coordinates and energy references were verified unchanged and reused without rerunning refinement; rescoring used the evaluated frame convention.
+
+The proper term is independent of its starting torsion, and the weights around each cut bond sum to one. Conjugated or aromatic interfaces use \(n_p=2,\delta_p=\pi\); other cut bonds use \(n_p=3,\delta_p=0\). Chiral improper restraints are active; the separate chemical-constraint auxiliary channel has zero weight. The coefficients are given in Table~\ref{tab:si_physical_parameters}.
 
 Let \(\mathcal N_{\mathrm{LJ}}\) be the admitted ligand--ligand and protein--ligand nonbonded pairs after topological exclusions.
 For \((i,j)\in\mathcal N_{\mathrm{LJ}}\), \(r_{ij}=\|\mathbf x_i-\mathbf x_j\|_2\), \(s_{ij}\) is the topological scale, and \(x_i,D_i\) are the UFF size and well-depth parameters.
@@ -941,25 +931,20 @@ Starting at iteration 25, a pose stops after five consecutive accepted updates s
     +10^{-3}\max\!\left(1\,\mathrm{kcal\,mol^{-1}},|E_r|\right).
     \label{eq:si_guidance_adaptive_stop}
 \end{equation}
-All 100 candidates are refined independently, with coordinate banks saved at iterations 0, 25, 50, 75, and 100; finite coordinates from early-stopped poses are carried forward.
+All 100 candidates are refined independently; finite coordinates from early-stopped poses define their final output.
 Raw coordinates are retained for paired analysis.
 Refinement is rigid-fragment \(\SE(3)\) descent on \(E_{\mathrm{G}}\) and does not call the docking network, Vina, or another minimizer.
 
 \subsection{Inputs and numerical verification}
 \label{si:guidance_provenance}
 
-The guidance calculation uses receptor coordinates and atom identities, the ligand graph and chemical state, the protocol-specific chemical reference conformer, the supplied pocket and current ligand coordinates. The benchmark refinement driver additionally loads reference coordinates for complete atom mapping and retrospective RMSD diagnostics; those coordinates do not enter the energy, gradients, step acceptance or termination.
+The guidance calculation uses receptor coordinates and atom identities, the ligand graph and chemical state, the protocol-specific chemical reference conformer, the supplied pocket and current ligand coordinates. Reference coordinates are used only for complete atom mapping and retrospective RMSD, not for energy, gradients, step acceptance or termination.
 It does not use the crystal pose, RMSD, benchmark identity, PoseBusters outcome, confidence score, or ranking label.
 The guidance receptor shell is separate from the docking network's \(10\,\angstrom\) pocket crop.
 It contains receptor atoms within \(18\,\angstrom\) of the pocket center.
 Because the largest interaction cutoff is \(10\,\angstrom\), ligand atoms more than \(8\,\angstrom\) from the pocket center can have truncated receptor neighborhoods; these cases are recorded per pose.
 
-For the read-only trace, the pipeline records the coordinate frame, topology and typing summaries, energy components, per-term force norms, fragment-projected directions, strongest typed contacts, and structured chemistry fallbacks.
-For guided sampling and refinement, it additionally records coefficients, accepted step sizes, energy history, convergence status, and raw-to-refined coordinate provenance.
-
-Numerical tests cover finite-difference force signs, \(\SE(3)\) energy invariance, force and projection equivariance, topology exclusions, 1--4 scaling, chirality, periodicity, cutoff behavior, coincident and collinear geometries, and formal-charge conservation.
-These are implementation-consistency tests rather than component ablations or evidence of docking accuracy; this manuscript does not report a separate distribution of numerical residuals for the test suite.
-
+Numerical verification covered finite-difference force signs, rigid-motion energy invariance and force/projection covariance, topology exclusions, 1--4 scaling, chirality, periodicity, cutoffs, degenerate geometries and formal-charge conservation. These checks assess numerical consistency rather than docking accuracy or component contribution.
 
 \section{Data Curation and Training}
 \label{si:data_provenance}
@@ -999,23 +984,23 @@ Missing resolution, real-space correlation coefficient (RSCC), real-space R fact
 \end{table}
 
 Deterministic representative ranking prefers biological assembly 1, followed by more interactions, larger RSCC, smaller RSR, smaller resolution, and stable system and ligand-chain identifiers.
-Of the 50,297 selected records, exactly 50,213 produced processed tensor bundles and 84 were quarantined with a structured missing-input, parsing, featurization, protein-parsing, or fragment-decomposition reason.
+Preprocessing succeeded for 50,213 of the 50,297 selected records. The remaining 84 failed because of missing inputs, parsing, featurization or fragment decomposition.
 
 \subsection{Dataset split}
 
-The immutable sample identity is the PLINDER system ID joined to the ligand-instance chain.
+Each sample is identified by its PLINDER system ID and ligand-instance chain.
 The released docking and confidence pipelines start from the same held-out identity split but apply different input filters.
 Table~\ref{tab:si_split} reports the resulting membership.
 
 \begin{table}[htbp]
     \centering
-    \caption{Membership of the released docking and confidence training pipelines.}
+    \caption{Docking and confidence training-set membership.}
     \label{tab:si_split}
     \begin{tabular}{lrr}
         \toprule
         Quantity & Docking & Confidence \\
         \midrule
-        Preserved training identities & 47,310 & 47,310 \\
+        Pre-filter training identities & 47,310 & 47,310 \\
         Included training samples & 47,277 & 43,092 \\
         Excluded training identities & 33 & 4,218 \\
         Validation samples & 1,076 & 1,035 \\
@@ -1026,14 +1011,9 @@ Table~\ref{tab:si_split} reports the resulting membership.
     \end{tabular}
 \end{table}
 
-The difference between the two training sets arises from pipeline-specific input requirements; neither set contains the other.
-The released docking checkpoint and the sequence-relatedness figures use the 47,277-sample docking set, whereas confidence training uses the 43,092-sample set.
-The public membership package provides sample IDs, exclusion categories, and hashes for these sets.
+Model-specific input requirements produce distinct training memberships; neither set contains the other. Relatedness analyses use the 47,277-sample docking reference, with the 25 confidence-only samples examined separately.
 
-The historical exclusion removed samples only when both their ligand and pocket community matched an external benchmark. Ligand matching was exact; external pocket communities were identified from benchmark PDB hits in the processed pool.
-It reproduces 904 removals using 217 external pocket communities.
-The conjunction does not independently exclude every recurring ligand or homologous pocket. The retained samples can share ligand or sequence similarity with external complexes; these relationships are measured separately below.
-Accordingly, the current sequence-relatedness analysis is reported as a separate measurement rather than as a restatement of the historical exclusion rule.
+External exclusion required both an exact ligand match and membership in a benchmark-associated pocket community, removing 904 samples across 217 communities. It did not independently exclude recurring ligands or homologous pockets; training relatedness was measured separately.
 
 \subsection{Confidence-pose dataset}
 \label{si:confidence_corpus}
@@ -1051,7 +1031,7 @@ The evaluated docking model has three sequential training stages (Table~\ref{tab
 \begin{table}[htbp]
     \centering
     \small
-    \caption{Docking-model training lineage. Update counts are local to each stage; model and EMA states continue across stages. The earlier schedules are supported by retained configurations and matching learning-rate logs.}
+    \caption{Docking-model training stages. Update counts are local to each stage; model and EMA states continue across stages.}
     \label{tab:si_docking_lineage}
     \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}X@{}}
         \toprule
@@ -1064,7 +1044,7 @@ The evaluated docking model has three sequential training stages (Table~\ref{tab
     \end{tabularx}
 \end{table}
 
-The confidence model also has a staged lineage (Table~\ref{tab:si_confidence_lineage}). Its initial checkpoint was selected by the success head, whereas both later internal evaluations rank by predicted RMSD. The terminal state of the symmetry-aware adaptation was used to initialize raw-and-refined training, rather than that adaptation's best intermediate checkpoint. The final run evaluated up to 100 candidates for each of 1,035 validation complexes and selected the 70,000-update checkpoint.
+The confidence model was also trained in stages (Table~\ref{tab:si_confidence_lineage}). Its initial checkpoint was selected by the success head, whereas both later internal evaluations rank by predicted RMSD. The terminal state of the symmetry-aware adaptation was used to initialize raw-and-refined training, rather than that adaptation's best intermediate checkpoint. The final run evaluated up to 100 candidates for each of 1,035 validation complexes and selected the 70,000-update checkpoint.
 
 \begin{table}[htbp]
     \centering
@@ -1082,7 +1062,7 @@ The confidence model also has a staged lineage (Table~\ref{tab:si_confidence_lin
     \end{tabularx}
 \end{table}
 
-The reported membership inventories describe the retained loaders. Earlier docking logs report the same training and validation counts, but an immutable identity-level union of all ancestral exposures was not reconstructed. Nor was inclusion of every initial-ranker training example in the later confidence inventory established. Consequently, the relatedness analyses do not establish exclusion of external examples throughout the complete training lineage.
+Membership inventories cover the docking and confidence training sets, not a reconstructed union of all ancestral training exposures. Inclusion of every initial-ranker example in the later inventory was not established; the relatedness analysis therefore cannot certify exclusion throughout the complete training history.
 
 \begin{table}[htbp]
     \centering
@@ -1117,13 +1097,6 @@ For internal model selection, let \(\mathcal V_{1035}\) be the fixed set of 1,03
 is maximized, where \(\widehat r_{cm}\) is predicted RMSD and \(r_{cm}\) is the symmetry-aware validation RMSD.
 The checkpoint maximizing this fixed internal-validation metric was released; it produced 622/1,035 (60.10\%) top-1 successes on that bank.
 External benchmark outcomes do not enter this selection.
-
-\subsection{Public provenance and figure inputs}
-\label{si:public_provenance}
-
-The training-membership package contains the docking and confidence sample IDs, pipeline-specific exclusions, intersections, and integrity hashes.
-Numerical figure inputs and analysis code include inference settings, selected-pose outcomes, confidence diagnostics, training relatedness and resource measurements. Model and evaluation metadata identify the executed coordinate-to-feature conventions.
-These tables are reporting artifacts rather than model inputs: benchmark labels, RMSD values, PoseBusters outcomes, and relatedness annotations are not read during pose generation, confidence scoring, guidance, or refinement.
 
 \section{Evaluation Details}
 \label{si:evaluation_contract}
@@ -1258,7 +1231,6 @@ Released after 30 June 2024 & 66 & $69.7\pm1.5$ & $68.2\pm1.5$ & $71.2\pm1.5$ & 
 \end{table}
 Native conjunctions are determined for every case in all four strata. Native RMSD alone is unassigned for one accession-shared interface in each repeat; its conjunction is determined by the known LDDT-PLI failure. Accession sharing does not establish identity of the chain--ligand complex, and nonsharing does not establish independence from all predecessor training exposure.
 
-
 \subsection{Baseline protocols}
 
 The Astex/PoseBusters comparison includes EFF-Dock, five locally run supplied-pocket learned or hybrid methods, and two published classical baselines (Table~\ref{tab:si_baseline_arms}) \citep{prat2025sigmadock,plainer2023diffdockpocket,broster2026rldiff,zhu2024diffbindfr,cao2025surfdock,trott2010vina,eberhardt2021vina,mcnutt2025gnina,buttenschoen2024posebusters}.
@@ -1329,9 +1301,9 @@ Ligand-binding chains in the training-relatedness analysis are defined by protei
 Maximum sequence identity is query-normalized: identical known residues under one-to-one chain assignments are divided by the total observed query binding-chain length, including unaligned residues and unmatched query chains.
 Exact ligand identity uses canonical heavy-atom isomeric SMILES with explicit-hydrogen normalization; non-identical ligands are compared by radius-2, 2,048-bit Morgan-fingerprint Tanimoto similarity without chirality \citep{rogers2010ecfp,landrum2024rdkit}.
 All relatedness panels use the same 47,277-member docking-training reference; each metric uses its available, parseable ligand or chain records. Unparseable ligands are not certified as negative matches.
-The figures describe overlap with this docking-training set. A separate audit adds the 25 retained confidence-training identities absent from it, giving a final-loader union of 47,302 samples (Table~\ref{tab:si_confidence_only_overlap}). Neither analysis reconstructs the complete ancestral-checkpoint lineage or establishes causal memorization.
+The figures describe overlap with this docking-training set. An additional comparison includes the 25 confidence-training identities absent from it, giving a combined training set of 47,302 samples (Table~\ref{tab:si_confidence_only_overlap}). Neither analysis reconstructs the complete ancestral-checkpoint lineage or establishes causal memorization.
 
-Adding these 25 samples changed neither exact ligand matches nor maximum Morgan Tanimoto values for any of the 2,082 external complexes. Two docking-validation queries had Tanimoto increases from 0.889 to 1.0 without an exact ligand match; both were already outside the stringent subset. Sequence upper bounds used annotated reference length or, where necessary, standard-residue longest-common-subsequence counts. The latter bound literal identities in any order-preserving gapped alignment. We maximized them over one-to-one chain assignments under the existing rule, retained the full query-length denominator, and included all annotated reference protein chains as a superset of contact-qualified chains. Using the frozen sequence records, these bounds certified unchanged maximum sequence identity for all external complexes and 1,075 of 1,076 docking-validation queries. They also certified unchanged membership of the same 22 external stringent-subset complexes and 448 validation queries. The remaining validation query has an identity interval of 13.51--14.41\%, entirely below the 30\% threshold. These maximum-identity statements use the existing metric, in which unknown residues do not count as identities. Five added samples contain ten unknown-residue chain positions; a separate conservative bound allowing each such position to match any query residue also certified unchanged stringent membership for all 3,158 queries. This sensitivity check concerns unknown residues in the added samples. It does not resolve their identities, unknown residues in the older reference, sequence-version differences or ancestral exposure.
+Adding the 25 confidence-only samples left external exact ligand matches, Morgan Tanimoto maxima and stringent-subset membership unchanged (Table~\ref{tab:si_confidence_only_overlap}). Conservative sequence bounds preserved external maximum identities and 1,075 of 1,076 validation maxima. The remaining validation identity was bounded at 13.51--14.41\%, below the 30\% threshold. Bounds based on reference-chain lengths or standard-residue longest common subsequences were maximized over one-to-one chain assignments with the full query-length denominator. All annotated reference chains enter the bounds as a superset of contact-qualified chains. The reported identity metric counts unknown residues as non-identities; allowing unknown residues in the added samples to match any query residue also preserved stringent membership. These bounds do not resolve unknown residues, sequence-version differences or ancestral training exposure.
 
 \begin{table}[htbp]
     \centering
@@ -1388,23 +1360,21 @@ The cumulative-ranking and generation-prefix analyses in Figs.~\ref{fig:si-pose-
 
 \subsection{Resource measurements}
 
-The released docking and confidence checkpoints contain 5,719,970 and 9,403,274 parameters, respectively.
-The initial candidate-acquisition campaign, before the downstream conformer-template and frame-recovery corrections, recorded mean pipeline times of 141.7, 136.8, 138.0, 119.9, and 98.8 seconds per complex for Astex, PoseBusters, PhiBench-derived, FoldBench, and OpenBind, respectively.
-The corresponding initial generation/evaluation-process CUDA allocated peaks are 11.9, 16.7, 17.3, 17.1, and 11.8 GiB.
-These measurements mix RTX A5000, RTX 6000 Ada, and RTX PRO 6000 backends and are descriptive rather than a controlled hardware benchmark. They do not include the separately re-executed downstream correction stages and cannot be used as the end-to-end cost of the corrected primary pipeline.
-A complete interruption-aware training wall-time ledger is unavailable, so optimization schedules are not converted to elapsed training time.
+The docking model has 5,719,970 parameters; the confidence model has 9,403,274.
 
-\begin{figure}[p]
+Candidate-acquisition runs took mean wall times of 141.7, 136.8, 138.0, 119.9 and 98.8 seconds per complex on Astex, PoseBusters, PhiBench-derived, FoldBench and OpenBind. The corresponding allocated CUDA memory peaks were 11.9, 16.7, 17.3, 17.1 and 11.8 GiB. Profiling used mixed RTX A5000, RTX 6000 Ada and RTX PRO 6000 devices. Recorded times include the original refinement and confidence scoring but exclude subsequent refinement and rescoring passes. These values do not estimate the end-to-end cost of the primary protocol or support a controlled hardware comparison.
+
+\begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth,height=0.42\textheight,keepaspectratio]{historical_runtime.pdf}
-    \caption{\textbf{Initial candidate-acquisition pipeline runtime.} Mean wall time per complex for the unguided 100-pose, 10-step evaluation. These original executions used the corrected orientation operator before the downstream conformer-template and frame-recovery corrections. Runtime includes setup, generation, the original refinement and confidence scoring, and I/O; it excludes separately executed official PoseBusters evaluation and the later correction stages. Whiskers show sample SD across three fixed-weight inference repeats. Mixed devices and cohort-specific process profiles preclude a controlled speed comparison.}
+    \caption{\textbf{Initial candidate-acquisition pipeline runtime.} Mean wall time per complex for the unguided 100-pose, 10-step evaluation. Runtime covers setup, generation, original refinement and confidence scoring, and I/O. It excludes official PoseBusters evaluation and subsequent refinement and rescoring passes, so it is not the end-to-end runtime of the primary results. Whiskers show sample SD across three fixed-weight inference repeats. Mixed devices and cohort-specific process profiles preclude a controlled speed comparison.}
     \label{fig:si-runtime}
 \end{figure}
 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.42\textheight,keepaspectratio]{generation_memory.pdf}
-    \caption{\textbf{Initial pose-generation process memory.} Maximum CUDA allocated-memory peak across shards and three repeats of the initial unguided 100-pose, 10-step evaluation. This is the original generation/evaluation process allocator peak, not reserved memory or a whole-pipeline peak. Astex and PoseBusters used candidate-only generation processes, whereas PhiBench-derived, FoldBench and OpenBind processes included initial confidence scoring. The later correction stages are excluded. Mixed devices and these different process profiles preclude a controlled comparison of sampling-only memory.}
+    \caption{\textbf{Initial pose-generation process memory.} Maximum CUDA allocated-memory peak across three repeats of the unguided 100-pose, 10-step evaluation. This is the original generation/evaluation process allocator peak, not reserved memory or a whole-pipeline peak. Astex and PoseBusters used candidate-only generation processes, whereas PhiBench-derived, FoldBench and OpenBind processes included initial confidence scoring. Separate post-generation refinement and rescoring processes are excluded. Mixed devices and these different process profiles preclude a controlled comparison of sampling-only memory.}
     \label{fig:si-generation-memory}
 \end{figure}
 
@@ -1552,7 +1522,7 @@ Fig.~\ref{fig:selection-bottlenecks} partitions outcomes using the same effectiv
 
 The sensitivity protocol in Online Methods crosses five crop radii with three center-jitter levels at prior scale \(2\,\angstrom\), and three prior scales with the same jitter levels at a \(10\,\angstrom\) crop. Three grid cells are shared. Four candidate-budget/guidance cells include the reused primary baseline, giving 24 unique conditions in total. The same three inference seeds are used for each complex. This analysis refines and rescores saved candidate banks from those prespecified generation conditions; it does not generate additional candidates. Raw and refined banks are scored with the actual source prior scale, which also enters the docking features recomputed for confidence. Neither refinement nor confidence scoring receives the perturbed center or generation crop: both retain the original center and a \(10\,\angstrom\) crop. These experiments therefore do not quantify end-to-end performance under a wrongly supplied pocket.
 
-Paired conditions use the same seeds and fragment inventories. A complete prior audit found identical translations; backend-dependent quaternion roundoff produced initial-rotation differences of at most \(2.81\times10^{-7}\) radians. This does not imply bitwise initial-pose identity across CPU backends or hardware-invariant predictions. The jitter generator uses a random stream independent of the pose prior; within each complex and repeat, the jitter levels scale the same perturbation vector. Separate 40- and 100-pose executions are not treated as nested banks.
+Paired conditions use the same seeds, fragment inventories and prior-draw construction. The jitter stream is independent of the pose prior; within each complex and repeat, jitter levels scale the same perturbation vector. Translation draws were identical; backend quaternion roundoff produced initial-rotation differences of at most \(2.81\times10^{-7}\) radians, without bitwise prior identity across backends. The 40- and 100-pose budgets are generated separately and are not nested banks.
 
 Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift}. With 100 poses and ten steps, guided RMSD--PoseBusters success was \(78.4\pm1.8\%\) on Astex versus \(80.0\pm0.0\%\) without guidance, and \(79.4\pm1.3\%\) on PoseBusters versus \(79.1\pm0.2\%\). With 40 poses and 25 steps, unguided/guided success was \(78.0/78.0\%\) on Astex and \(76.7/77.6\%\) on PoseBusters. Guided raw-bank mean success was higher in all four cohort/budget comparisons; the refined-bank differences were smaller and had mixed signs. These descriptive controls do not select guidance as a primary setting.
 

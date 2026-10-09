@@ -59,7 +59,6 @@ Jaemin Sim\textsuperscript{1} and Juyong Lee\textsuperscript{1,2,3,4,*}\\[0.75em
 Protein--ligand docking requires accurate candidate generation, physically plausible coordinates and reliable pose selection. We present \method, a fixed-receptor, supplied-pocket method that learns a flow over the translations and rotations of rigid ligand fragments. An equivariant protein--ligand graph network predicts atom-wise vectors that are projected onto fragment motion, a separate network ranks candidates, and a differentiable interaction energy refines their geometry. Across five reference-pocket redocking cohorts, refined 100-pose banks contained a candidate with RMSD below \(2\,\angstrom\) for 87.9--96.5\% of complexes. Refinement followed by rescoring increased selected-pose RMSD--PoseBusters success by 15.7--23.2 percentage points under the primary chirality-filtered selector (21.7--26.5 without filtering), giving success rates of 53.2--80.0\%. In 12.4--34.4\% of complexes, the eligible bank contained an RMSD-successful candidate but the selected pose was not RMSD-successful. These analyses distinguish candidate availability, coordinate validity and ranking loss, while pocket-center perturbations expose generation-input sensitivity with fixed downstream spatial context.
 \end{abstract}
 
-
 \label{sec:introduction}
 
 The three-dimensional pose of a small molecule determines its protein contacts and shapes subsequent structure--activity analysis.
@@ -108,8 +107,6 @@ A shared \(\SE(3)\)-equivariant trunk and fragment-wise Newton--Euler readout de
 
 Here we evaluate candidate availability, physical validity and pose selection separately across five reference-pocket redocking cohorts. The experiments assess the resulting pipeline rather than isolating the causal contribution of each architectural component.
 
-
-
 \FloatBarrier
 
 \section{Results}
@@ -119,7 +116,7 @@ Here we evaluate candidate availability, physical validity and pose selection se
 
 \method represents a ligand as rigid components obtained by cutting a restricted set of rotatable bonds. A heterogeneous protein--ligand graph conditions a flow over the fragments' translations and rotations (Fig.~\ref{fig:workflow-overview}). An equivariant network predicts one vector per ligand atom; a least-squares rigid-motion projection converts these vectors to fragment velocities (Fig.~\ref{fig:model-architecture}). A separate network predicts a within-bank pose-ranking score. Generated candidates are refined by bounded descent on a differentiable geometric interaction energy and then ranked again. The energy supplies coordinate gradients independently of the learned vector field; it is neither an affinity predictor nor a free-energy model.
 
-The evaluated pipeline uses a fixed holo receptor, a reference-derived pocket, 100 candidates and ten integration steps. Both networks are held fixed across three inference seeds. These repeats quantify variation in the executed inference protocol and do not represent independent model training. Evaluation revises local-to-world feature injection and coordinate-to-frame recovery relative to training without retraining either network. Compared with the archived pipeline, selected RMSD and RMSD--PoseBusters rates changed by \(-0.3\) to \(+0.2\) percentage points on Astex, PoseBusters and PhiBench-derived; these comparisons do not isolate a component effect (Supplementary Information, Sec.~S1.2). The complete input and coordinate conventions are specified in Online Methods.
+The evaluation uses a fixed holo receptor, a reference-derived pocket, 100 candidates and ten integration steps. Three inference repeats use the same docking and confidence weights. The evaluated coordinate-to-feature conventions and their differences from training are specified in Online Methods and Supplementary Information, Secs.~S1.2--S1.3.
 
 \begin{figure}[!htbp]
     \centering
@@ -187,8 +184,6 @@ Refinement reduced selected-pose failures associated with bond geometry, interna
 The matched-candidate panels separate same-index fail-to-pass and pass-to-fail transitions from changes caused by selecting a different pose after refinement.
 Because matched pairs exist only for candidates with saved official evaluations at both stages, these transitions diagnose the evaluated subset rather than the complete candidate banks.
 
-
-
 \FloatBarrier
 
 \subsection{Confidence ranking and selection headroom}
@@ -230,8 +225,6 @@ Ranking failure was larger, ranging from 12.4\% on PoseBusters to 34.4\% on Open
 Within the refined banks, RMSD-based ranking failure exceeds chirality exclusion. Because PoseBusters was not evaluated for every candidate, this gap does not quantify attainable improvement in RMSD--PoseBusters success.
 The regret curves in Supplementary Fig.~S18B measure loss relative to the best RMSD in the same effective candidate set available to the deployed selector.
 
-
-
 Training-set relatedness is examined in Supplementary Figs.~S6--S8.
 Sequence and ligand overlap differed substantially among cohorts, but neither exact ligand matches nor sequence-identity strata showed a consistent association with docking success.
 These analyses qualify claims of prospective generalization without identifying a single overlap measure that explains the benchmark results.
@@ -257,60 +250,28 @@ Refinement and confidence scoring retained the original unperturbed center and a
 \section{Discussion}
 \label{sec:discussion}
 
-The experiments separate two main sources of error.
-Without chirality filtering, refinement followed by rescoring raised mean RMSD--PoseBusters success by 21.7--26.5 percentage points while mean RMSD-only selected-pose success was 1.0--3.7 points higher. Under the primary chirality-filtered selector, the RMSD--PoseBusters gain was 15.7--23.2 points. Matched-index analyses support geometric repair within the evaluated subset, whereas the aggregate change also includes reselection. After refinement, the RMSD-only oracle--top-1 gap was largest on PhiBench-derived and OpenBind. This identifies ranking loss within the tested candidate banks, without establishing that every unselected near-native candidate is physically valid.
+The results identify coordinate validity and pose selection as distinct limitations. Refinement and rescoring increased RMSD--PoseBusters success substantially, while the smaller change in RMSD-only success indicates that geometric validity accounts for much of the gain. Matched-candidate analyses support coordinate repair, whereas aggregate gains also include reselection. The remaining RMSD-only oracle--top-1 gap identifies ranking loss without establishing that every unselected near-native pose is physically valid.
 
-Candidate density helps explain the cohort differences.
-Near-native poses were common in the Astex and PoseBusters banks, but only 6.3\% of OpenBind candidates were near-native despite an 87.9\% oracle rate.
-Sparse banks are more sensitive to ranking errors, and adding candidates can worsen top-1 when an incorrect pose is promoted.
-Flexible and highly fragmented ligands showed the same pattern more often, although the smallest strata were noisy.
+Candidate density helps explain differences among cohorts. Only 6.3\% of OpenBind candidates were near-native, despite an 87.9\% full-bank oracle rate. Sparse banks and complex ligands were more susceptible to ranking loss, and adding candidates could reduce top-1 accuracy when an incorrect pose was promoted. The eligibility-aware analysis confirms that ranking loss was larger than chirality exclusion (Supplementary Fig.~S18).
 
-The eligibility-aware decomposition confirms that chirality exclusion is rare, whereas ranking failure remains substantial when an eligible near-native candidate exists (Supplementary Fig.~S18).
+Training relatedness showed no consistent monotonic association with success across cohorts. However, cohort composition, sparse strata and incomplete ancestral training-exposure records limit what these descriptive comparisons can establish.
 
-Training overlap varied widely across cohorts.
-Exact ligand matches were associated with higher success in PhiBench-derived and FoldBench but lower success in Astex, PoseBusters, and OpenBind, and sequence-identity bins showed no consistent trend.
-We did not observe a consistent monotonic relationship between the measured relatedness strata and success. Cohort composition, sparse strata and incomplete ancestral-checkpoint exposure records prevent these descriptive analyses from excluding training-set effects.
+\method assumes a prepared fixed receptor, one ligand chemical state and conformer, and a supplied pocket center. Receptor flexibility, pocket discovery, water rearrangement, ligand-state enumeration and covalent docking remain outside the evaluated scope. Support for selected monatomic metals does not establish general coordination-chemistry modeling. Unsupported cofactors, metal clusters and macrocycles near the fragmentation boundary also remain outside the demonstrated scope.
 
+Training pocket centers and fragment templates were derived from crystal complexes. The center-perturbation experiments kept downstream refinement and ranking context fixed, so they do not establish complete-pipeline wrong-pocket robustness. Starting-conformer sensitivity was not systematically evaluated, and rigid-fragment motion cannot repair intrafragment errors. Fragmentation depends on atom order and uses soft cut-bond closure constraints.
 
-\method assumes a prepared, fixed receptor, one ligand state and conformer, and a supplied pocket center.
-It does not model pocket discovery, receptor motion, water rearrangement, ligand-state enumeration, binding, or affinity.
-The receptor parser and guidance model support a restricted set of recognized monatomic-metal profiles, but this does not constitute general coordination-chemistry modeling.
-Unsupported cofactors or metal clusters, macrocycles near the fragmentation boundary, and covalent complexes remain outside the demonstrated scope.
+The cohorts are reference-pocket redocking sets rather than prospective target-discovery benchmarks. Astex and PoseBusters were repeatedly used during development, PhiBench-derived and FoldBench adapt their source tasks, and OpenBind samples one protease family and includes two noncovalent approximations of covalent systems. Training relatedness remains substantial: all OpenBind complexes fall in the 90--100\% sequence-identity bin, and 341 of 558 FoldBench complexes share a training PDB accession. Accession sharing does not imply the same protein--ligand complex. Only 22 external complexes met the simultaneous sequence-identity, ligand-similarity and exact-match restrictions. These evaluations therefore provide limited evidence for generalization to unrelated targets.
 
-Training pocket centers and fragment templates came from crystal complexes.
-Generation was tested with perturbed centers on Astex and PoseBusters while refinement and ranking retained the original center; complete-pipeline wrong-pocket robustness was not tested. Sensitivity to the starting ligand conformer was not systematically evaluated. Rigid-fragment motion cannot correct errors within a fragment.
-The greedy fragmentation procedure can also depend on atom order and uses soft, rather than exact, cut-bond closure.
+Component ablations are needed to distinguish the contributions of fragmentation, higher-order features, Newton--Euler readout, auxiliary losses and dynamic contacts. Confidence diagnostics quantify ranking and empirical reliability within the evaluated banks, without establishing calibration for new candidate-generation distributions. The three inference repeats describe stochastic variation under fixed trained weights, rather than retraining variability or target-population uncertainty.
 
-The external cohorts are not prospective target-discovery benchmarks.
-Astex and PoseBusters were used repeatedly during development, the PhiBench-derived and FoldBench cohorts are task adaptations, and OpenBind is concentrated in one protease family, with two flagged noncovalent approximations of covalent systems. These cases do not constitute covalent-docking validation.
-Sequence and ligand relatedness to docking training data is high in parts of the evaluation set, including the highest sequence-identity bin for all OpenBind complexes and substantial same-sample ligand--sequence overlap in FoldBench. In addition, 341 of 558 FoldBench complexes (61.1\%) share a PDB accession with a docking-training sample; accession sharing alone does not establish identity of the protein--ligand complex.
-The relatedness analysis does not reveal a monotonic association with success, but it also does not establish independence from training exposure or broad target-family generalization.
+Evaluation changes coordinate-to-feature handling under fixed trained weights (Supplementary Information, Secs.~S1.2--S1.3). Finite tests support covariance conditional on a fixed prepared body-coordinate convention, but do not establish invariance to supplied-conformer reorientation or unobservable fragment twist, or exact equivariance of the complete pipeline.
 
-The experiments do not isolate the contribution of fragmentation, higher-order features, Newton--Euler readout, auxiliary losses or dynamic contacts.
-The confidence diagnostics quantify rank correlation, near-native discrimination, regret, and empirical reliability within the evaluated banks, but they do not establish calibration under new candidate-generation distributions.
-The reported standard deviations describe three inference repeats on fixed cohorts, including conformer variation only where it was part of the executed protocol. They do not represent variability across retrained models or uncertainty over target populations. Only 22 distinct complexes satisfied the joint sequence-identity, ligand-similarity and exact-match restrictions, so the stringent analysis provides limited evidence about generalization.
+The interaction energy is a geometric refinement model, and the confidence score ranks poses within a candidate bank; neither predicts binding free energy or affinity. RMSD and PoseBusters assess pose accuracy and common coordinate errors, but do not establish binding or identify every valid binding mode.
 
-The evaluated pipeline uses fixed trained weights with revised coordinate-to-feature handling, as documented in Supplementary Information, Sec.~S1.2.
-Coordinate-only rescoring uses a scene-defined frame convention for linear fragments. Finite checks found small rigid-rotation and backend residuals under this convention; manually changing unobservable fragment twist still changes the frozen network's predictions.
-The finite network rotation tests do not prove exact equivariance of the complete preparation, sampling, refinement, and selection pipeline.
-These tests hold the prepared local template fixed. They do not establish invariance to reorienting a supplied conformer before preprocessing, which changes its fragment body-coordinate convention; training-time local-coordinate rotation augmentation does not provide an exact architectural guarantee for that separate transformation.
-
-The interaction energy is a geometric refinement model, not a free-energy function.
-The confidence score is used for ranking within a pose bank and is not calibrated across datasets or candidate-generation distributions.
-RMSD and PoseBusters capture pose accuracy and common coordinate errors, but they do not establish binding or identify every valid binding mode.
-
-
-\method models ligand flexibility with rigid fragments and learns their pocket-conditioned motion using \(\SE(3)\)-equivariant flow matching.
-Refinement and rescoring improved selected-pose physical validity, while the RMSD-only oracle gap exposed substantial remaining ranking loss within the tested candidate banks.
-Across the tested supplied-pocket benchmarks, the method produced high candidate coverage with a 100-pose budget.
-Future work should improve pose selection and extend the model to receptor flexibility and broader input preparation.
+\method combines rigid-fragment flow matching with geometric refinement and confidence ranking. The evaluated 100-pose protocol provides high near-native coverage, while the remaining selection loss motivates better ranking and broader validation of receptor and ligand preparation.
 
 \section{Online Methods}\label{sec:online-methods}
 \label{sec:method}
-
-Bold symbols denote vector-, matrix-, or structured-state-valued quantities, with each role identified at first use; unbold italic symbols denote scalars unless stated otherwise.
-The symbols \(\|\cdot\|_2\), \((\cdot)^\top\), \((\cdot)^{-1}\), \(\times\), \(\odot\), and \((\cdot)^+\) denote the Euclidean norm, transpose, type-appropriate inverse or reciprocal, three-dimensional cross product, channel-wise multiplication, and the mode-truncated spectral pseudoinverse defined for each inertia operator, respectively.
-For a finite set \(\mathcal{S}\), \(|\mathcal{S}|\) denotes its cardinality, \(\mathbf{0}\) is the dimension-compatible zero vector, and \(\mathbf{I}_3\) denotes the \(3\times3\) identity matrix.
 
 \subsection{Coordinate convention and evaluated weights}
 \label{sec:orientation_convention}
@@ -470,7 +431,7 @@ The final continuation samples flow time from an 80\% base distribution, a 10\% 
 At inference, sampled fragment priors are integrated from \(t=0\) to \(1\) using 10 late-biased Euler intervals in the primary protocol.
 For interval width \(\Delta t\), translations receive additive increments and rotations are advanced by left multiplication with \(\operatorname{Exp}(\Delta t\,\widetilde{\boldsymbol{\omega}}_k)\), where the tilde denotes the guided field when guidance is enabled.
 Atom coordinates and dynamic protein--ligand contacts are rebuilt before every field evaluation.
-Candidate generation, raw-output preservation, and failure semantics are specified in the \sisection{S2.2}.
+The sampling schedule and candidate selection are specified in the \sisection{S2.2}.
 
 \subsection{Confidence-based pose selection}
 \label{sec:confidence}
@@ -494,12 +455,8 @@ Here \(q_m\) denotes compatibility with the input-defined tetrahedral stereocent
 The confidence network's nonnegative predicted-RMSD score is \(c_\phi\), with learned parameters \(\phi\); \(m^\star\) is the selected candidate index.
 The prior scale enters this score through the recomputed docking representations.
 The score is interpreted only as a within-candidate-set ranking signal and not as calibrated RMSD, uncertainty, binding probability, or affinity.
-The energy-restraint reference and confidence-input template are rebuilt using the recorded generation preparation and conformer seed. Refinement preserves each saved candidate's fragment-internal coordinates. For rescoring, candidate coordinates are mapped to fragment frames by proper Kabsch fitting for templates of rank at least two and an input-indexed, scene-defined convention for lower-rank fragments. This resolves the recovery convention without making the frozen network invariant to unobservable fragment twist; finite numerical checks and their limits are reported in the \sisection{S1.3}.
+Energy restraints and confidence features use conformers prepared by the same procedure and seed as pose generation. Refinement preserves each saved candidate's fragment-internal coordinates. For rescoring, candidate coordinates are mapped to fragment frames by proper Kabsch fitting for templates of rank at least two and an input-indexed, scene-defined convention for lower-rank fragments. This resolves the recovery convention without making the frozen network invariant to unobservable fragment twist; finite numerical checks and their limits are reported in the \sisection{S1.3}.
 The complete readout and confidence objective are given in the \sisection{S4}.
-
-
-
-
 
 \FloatBarrier
 
@@ -537,7 +494,6 @@ The translational and angular guidance directions are
     \label{eq:guidance_projection}
 \end{equation}
 Here \(\mathbf{d}^{T}_k\) and \(\mathbf{d}^{\omega}_k\) are guidance directions, \(\mathbf{I}_k^+\) is the mass-inertia truncated pseudoinverse, and \(\mathbf{T}_k-\mathbf{c}_k\) corrects for the offset between the fragment's geometric-centroid state origin and its center of mass.
-In read-only mode, the energy components and projected directions are recorded as a guidance trace and coordinates are unchanged.
 For guidance experiments, let \((\Delta\mathbf v_k,\Delta\boldsymbol\omega_k)\) denote the mass--inertia directions after RMS matching to the learned atom velocity, late-time interval ramping, and the translation, rotation, and atom-displacement caps.  The guided field is
 \begin{equation}
     \widetilde{\mathbf v}_k
@@ -549,7 +505,7 @@ For guidance experiments, let \((\Delta\mathbf v_k,\Delta\boldsymbol\omega_k)\) 
 \end{equation}
 where \(\eta\) controls the pre-cap guidance strength; the exact interval average, normalization, zero-direction rule, and caps are given in the \sisection{S5.9}.
 This inference-time modification is conceptually related to guidance of flow-matching vector fields, although the normalization and fragment projection used here are method specific \citep{feng2025flowguidance}.
-In the optional post-sampling refinement mode, a saved candidate is updated only on the fragment state.  At refinement iteration \(r\),
+Post-sampling refinement updates only the fragment state of each candidate.  At refinement iteration \(r\),
 \begin{equation}
     \mathbf{T}_k^{(r+1)}
     =\mathbf{T}_k^{(r)}+\alpha_r\bar{\mathbf{d}}_k^T,
@@ -561,8 +517,7 @@ In the optional post-sampling refinement mode, a saved candidate is updated only
 \end{equation}
 Here \((\bar{\mathbf d}^T,\bar{\mathbf d}^\omega)=\operatorname{Cap}(\mathbf d^T,\mathbf d^\omega)\) are capped increments and \(\alpha_r\) is the accepted line-search step size. The cap first bounds each fragment translation and rotation separately, then jointly rescales both until the reconstructed atom displacement meets its bound.  Writing \(E_r=E_{\mathrm G}(\mathbf{x}^{(r)})\), the proposed translation, rotation, and induced atom displacement are bounded and \(\alpha_r\) is reduced by monotone backtracking until a finite non-increasing guidance energy is obtained.
 The refinement is bounded and stops on convergence, line-search failure, or a sustained energy plateau; the numerical safeguards and termination criteria are given in the \sisection{S5.10}.
-Raw candidates are preserved, and refined coordinates are stored as a post-processing branch.
-The learned network parameters remain unchanged in all three modes.
+Raw and refined candidates are compared with unchanged network parameters.
 
 The guidance subsystem uses a typed \(18\,\angstrom\) receptor shell, which can expose coordinates outside the \(10\,\angstrom\) neural crop.
 This shell is not an additional neural input.
@@ -574,23 +529,16 @@ Full typing rules, energy equations, mass--inertia projection, refinement safegu
 \label{sec:data_curation}
 \label{sec:split_boundary}
 
-Training data were derived from PLINDER 2024-06/v2 \citep{durairaj2024plinder}.
-The ordered curation procedure removes invalid, covalent, and ion-like ligands; applies interaction, experimental-quality, ligand-resolution, contact, and size criteria; and selects deterministic representatives by complex identity, ligand identity, and pocket70 community.
-Of 1,357,906 indexed rows, 50,297 complex--ligand records remained after filtering and deduplication, and 50,213 were successfully preprocessed.
-The complete funnel, thresholds, missing-value policy, and 84 quarantined failures are reported in the \sisection{S6}.
+Training data were derived from PLINDER 2024-06/v2 \citep{durairaj2024plinder}. Curation applies ligand validity, covalency, interaction, experimental-quality, resolution, contact and size criteria, followed by deterministic representative selection within ligand and pocket-community groups. The filters and cohort counts are detailed in the \sisection{S6}.
 
-The docking continuation uses 47,277 training samples after input filtering, with 1,076 held-out identities.
-The confidence pipeline retains 43,092 training and 1,035 validation samples after its own input filters.
-The training sets share 43,067 sample IDs, with 4,210 docking-only and 25 confidence-only entries; neither is a subset of the other.
+After model-specific input filtering, docking uses 47,277 training and 1,076 validation samples, while confidence uses 43,092 training and 1,035 validation samples. The sets have 43,067 shared training IDs; their differing input requirements are detailed in the \sisection{S6}.
 
-The historical external exclusion removed samples only when an exact ligand match and membership in an external pocket-community set occurred together.
-This procedure removed 904 samples; it does not enforce independent ligand or protein novelty, and broader sequence or ligand relatedness remains in the evaluation cohorts.
-Public membership lists record the included IDs, exclusion reasons, and set hashes; detailed accounting is given in the \sisection{S6}.
+External exclusion required both an exact ligand match and membership in a benchmark-associated pocket community, removing 904 samples. This rule does not independently exclude recurring ligands or homologous proteins; training relatedness is measured separately.
 
 \subsection{Evaluation scope}
 \label{sec:information_boundary}
 
-Row-level splits can share repeated ligands or homologous proteins, so released-set relatedness is measured explicitly rather than inferred from split labels \citep{durairaj2024plinder,corso2024dockgen,morehead2026posebench,skrinjar2026generalization}.
+Row-level splits can share repeated ligands or homologous proteins, so training-set relatedness is measured explicitly rather than inferred from split labels \citep{durairaj2024plinder,corso2024dockgen,morehead2026posebench,skrinjar2026generalization}.
 For each external cohort, we report the receptor state, pocket source, ligand preparation, candidate budget, and selector.
 Astex and PoseBusters were used during development and are treated as descriptive benchmarks.
 
@@ -603,12 +551,7 @@ Raw coordinates are saved before refinement.
 \label{sec:geometry_training}
 \label{sec:confidence_training}
 
-The docking model was trained sequentially for 200,000 base updates, 100,000 geometry-fine-tuning updates and 50,000 early-time-replay updates. The first two stages used global batch size 256; the final stage used 64. Optimizer and scheduler states were reset between stages, while model and available EMA states were retained. The geometry-stage initializer was selected by median ligand RMSD on internal validation rollouts, and the evaluated weights are the prespecified terminal EMA of the final continuation. This continuation used AdamW with global batch size 64 across four GPUs, peak learning rate \(2\times10^{-5}\), weight decay 0.01, gradient clipping at 1.0 and EMA decay 0.999 \citep{loshchilov2019decoupled}. The learning rate warmed up for 1,000 updates, remained constant through update 40,000 and decayed by cosine scheduling to \(2\times10^{-6}\) over the final 10,000 updates.
-The confidence model was initialized through two preceding training stages. An initial model trained on 4,096 complexes was selected at update 42,500 by success-head-ranked accuracy on a 256-complex internal-validation subset. It initialized a 50,000-update symmetry-aware adaptation, whose terminal state initialized the subsequent raw-and-refined training run. The evaluated weights were selected at update 70,000 of that 100,000-update continuation, using predicted-RMSD ranking.
-Its released checkpoint was selected by confidence-ranked top-1 RMSD success on the fixed 1,035-complex internal validation bank.
-The final docking and confidence checkpoints were selected by the specified internal-validation rules, rather than their external benchmark results. Earlier development and checkpoint lineage are described in the \sisection{S6.4}.
-Both released checkpoints are fixed throughout evaluation; terminal docking features are recomputed separately for confidence scoring.
-Confidence-model construction, pose-bank composition, and internal selection are detailed in the \sisection{S4} and \sisection{S6.4}.
+The docking model was trained for 200,000 base updates, 100,000 geometry-fine-tuning updates and 50,000 early-time-replay updates, with global batch sizes of 256, 256 and 64. The final stage used AdamW with peak learning rate \(2\times10^{-5}\), weight decay 0.01, gradient clipping at 1.0 and EMA decay 0.999 \citep{loshchilov2019decoupled}; its terminal EMA was evaluated. The confidence model was trained on raw and refined poses and selected at update 70,000 by predicted-RMSD-ranked top-1 success on 1,035 internal-validation complexes. Training stages, initialization, optimization schedules and selection criteria are specified in the \sisection{S6.4}. External benchmark results did not select the evaluated checkpoints.
 
 \subsection{Benchmarks and comparison protocol}
 \label{sec:evaluation_tasks}
@@ -628,7 +571,7 @@ Each cohort uses the same trained weights with inference seeds 42, 100042 and 20
 Candidates are scored before and after bounded refinement.
 The primary selector removes chirality-mismatched candidates and then chooses the lowest predicted symmetry-aware RMSD; if none passes the chirality screen, it uses the unfiltered ranking.
 Failed complexes remain in the cohort denominator.
-Supplementary Figs.~S4 and S5 report runtime and generation-process memory for the initial candidate-acquisition campaign; these measurements exclude the separately executed downstream correction stages. Sensitivity to generation inputs is analyzed in Fig.~\ref{fig:pocket-sensitivity}; supplementary guidance controls are described below.
+Supplementary Figs.~S4 and S5 report runtime and generation-process memory for the candidate-acquisition runs, including their original refinement and confidence scoring but excluding subsequent refinement and rescoring passes. These are not end-to-end timings of the primary evaluation. Sensitivity to generation inputs is analyzed in Fig.~\ref{fig:pocket-sensitivity}; supplementary guidance controls are described below.
 
 \subsection{Generation-input sensitivity and guidance controls}
 
@@ -649,7 +592,6 @@ Error bars are sample standard deviations across the three repeats unless stated
 Supplementary Figs.~S9 and S14 use paired 95\% bootstrap intervals.
 Further evaluation details are given in the \sisection{S7}.
 
-
 \subsection{Use of automated tools}
 
 OpenAI Codex and Anthropic Claude were used to assist with code review, analysis-script development, manuscript drafting, consistency checks and language editing.
@@ -658,10 +600,7 @@ These tools are not authors.
 
 \section*{Data and Code Availability}
 
-PLINDER, Astex, PoseBusters, PhiBench, FoldBench, and OpenBind structures remain governed by their original distribution terms; this manuscript does not redistribute them.
-Source code, released weights, benchmark summaries, and reproducibility instructions are available from the \href{https://github.com/eightmm/EFF-Dock}{public EFF-Dock repository}.
-Training membership lists, exclusion reasons, numerical figure inputs and analysis code are provided alongside model and evaluation provenance.
-Coordinate-level evaluation materials that are not already included in the public result tables will be distributed only where permitted by the licenses and redistribution terms of the underlying benchmark resources.
+Source code, model weights, training-membership lists, numerical source data and analysis scripts are available at \href{https://github.com/eightmm/EFF-Dock}{https://github.com/eightmm/EFF-Dock}. Benchmark structures remain subject to their original distribution and redistribution terms.
 
 \section*{Author Contributions}
 
@@ -675,7 +614,7 @@ J.L.'s affiliation with Arontier Co. is disclosed in the author information.
 
 \section*{Supplementary Information}
 
-The Supplementary Information specifies inputs and pockets (Section~S1), fragmentation and sampling (S2), architecture and objectives (S3), confidence scoring (S4), energy and refinement (S5), data curation and training (S6), and evaluation (S7).
+Supplementary methods and analyses are provided in the accompanying Supplementary Information.
 
 \bibliographystyle{unsrt}
 \bibliography{references}

@@ -92,7 +92,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [historical_runtime.pdf](assets/historical_runtime.pdf)
 
 ```latex
-\caption{\textbf{Initial candidate-acquisition pipeline runtime.} Mean wall time per complex for the unguided 100-pose, 10-step evaluation. These original executions used the corrected orientation operator before the downstream conformer-template and frame-recovery corrections. Runtime includes setup, generation, the original refinement and confidence scoring, and I/O; it excludes separately executed official PoseBusters evaluation and the later correction stages. Whiskers show sample SD across three fixed-weight inference repeats. Mixed devices and cohort-specific process profiles preclude a controlled speed comparison.}
+\caption{\textbf{Initial candidate-acquisition pipeline runtime.} Mean wall time per complex for the unguided 100-pose, 10-step evaluation. Runtime covers setup, generation, original refinement and confidence scoring, and I/O. It excludes official PoseBusters evaluation and subsequent refinement and rescoring passes, so it is not the end-to-end runtime of the primary results. Whiskers show sample SD across three fixed-weight inference repeats. Mixed devices and cohort-specific process profiles preclude a controlled speed comparison.}
 \label{fig:si-runtime}
 ```
 
@@ -101,7 +101,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [generation_memory.pdf](assets/generation_memory.pdf)
 
 ```latex
-\caption{\textbf{Initial pose-generation process memory.} Maximum CUDA allocated-memory peak across shards and three repeats of the initial unguided 100-pose, 10-step evaluation. This is the original generation/evaluation process allocator peak, not reserved memory or a whole-pipeline peak. Astex and PoseBusters used candidate-only generation processes, whereas PhiBench-derived, FoldBench and OpenBind processes included initial confidence scoring. The later correction stages are excluded. Mixed devices and these different process profiles preclude a controlled comparison of sampling-only memory.}
+\caption{\textbf{Initial pose-generation process memory.} Maximum CUDA allocated-memory peak across three repeats of the unguided 100-pose, 10-step evaluation. This is the original generation/evaluation process allocator peak, not reserved memory or a whole-pipeline peak. Astex and PoseBusters used candidate-only generation processes, whereas PhiBench-derived, FoldBench and OpenBind processes included initial confidence scoring. Separate post-generation refinement and rescoring processes are excluded. Mixed devices and these different process profiles preclude a controlled comparison of sampling-only memory.}
 \label{fig:si-generation-memory}
 ```
 
