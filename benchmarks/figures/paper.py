@@ -150,7 +150,7 @@ def curve_panel(ax, row, specs, *, show_markers=True):
 
 def comparison(data, out):
     rows = data["rows"]
-    fig, axes = plt.subplots(1, 2, figsize=(12, 6.2), sharex=True, layout="constrained")
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 5.4), sharex=True, layout="constrained")
     for i, (ax, dataset, name) in enumerate(
         zip(axes, ("astex", "posebusters"), ("Astex Diverse Set", "PoseBusters v2"), strict=True)
     ):
