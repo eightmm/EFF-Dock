@@ -1440,7 +1440,7 @@ Runtime and memory measurements are shown in Figs.~\ref{fig:si-runtime} and \ref
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.42\textheight,keepaspectratio]{generation_memory.pdf}
-    \caption{\textbf{Initial pose-generation process memory.} Maximum CUDA allocated-memory peak across three repeats of the unguided 100-pose, 10-step evaluation. This is the original generation/evaluation process allocator peak, not reserved memory or a whole-pipeline peak. Astex and PoseBusters used candidate-only generation processes, whereas PhiBench-derived, FoldBench and OpenBind processes included initial confidence scoring. Separate post-generation refinement and rescoring processes are excluded. Mixed devices and these different process profiles preclude a controlled comparison of sampling-only memory.}
+    \caption{\textbf{Initial pose-generation process memory.} Maximum CUDA allocated-memory peak across three repeats of the unguided 100-pose, 10-step evaluation. This is the original generation/evaluation process allocator peak, not reserved memory or a whole-pipeline peak. Astex Diverse Set and PoseBusters v2 used candidate-only generation processes, whereas PhiBench-derived, FoldBench and OpenBind processes included initial confidence scoring. Separate post-generation refinement and rescoring processes are excluded. Mixed devices and these different process profiles preclude a controlled comparison of sampling-only memory.}
     \label{fig:si-generation-memory}
 \end{figure}
 
@@ -1461,14 +1461,14 @@ In the overlap legend, same-sample means an observed exact ligand match and bind
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{ligand_similarity.pdf}
-    \caption{\textbf{Training-ligand relatedness and stratified docking performance.} (A) Exact heavy-isomeric ligand identity and nearest training-ligand Morgan-fingerprint Tanimoto similarity relative to the 47,277 executed docking-training samples. (B) \method RMSD--PoseBusters success with and without an observed exact ligand match. Bars show mean \(\pm\) sample SD across three repeats; group differences are descriptive and confounded by cohort composition.}
+    \caption{\textbf{Training-ligand relatedness and stratified docking performance.} (A) Exact heavy-isomeric ligand identity and nearest training-ligand Morgan-fingerprint Tanimoto similarity relative to the 47,277 executed docking-training samples. T denotes nearest-neighbour Tanimoto similarity. (B) \method RMSD--PoseBusters success with and without an observed exact ligand match; numbers at the base of the bars are group sizes. Bars show mean \(\pm\) sample SD across three repeats; group differences are descriptive and confounded by cohort composition.}
     \label{fig:si-relatedness-ligand}
 \end{figure}
 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.68\textheight,keepaspectratio]{sequence_similarity.pdf}
-    \caption{\textbf{Docking performance by training-set sequence identity.} Strata use maximum query-normalized binding-chain identity to the docking-training set. Solid bars show RMSD--PoseBusters success; hatching extends to RMSD-only success. Bars and whiskers show three-repeat means and sample SD; labels give stratum sizes, including empty and sparse groups.}
+    \caption{\textbf{Docking performance by training-set sequence identity.} Strata use maximum query-normalized binding-chain identity to the docking-training set. Solid bars show RMSD--PoseBusters success, coloured by identity stratum (the dark legend patch denotes solid fill); hatching extends to RMSD-only success. Bars and whiskers show three-repeat means and sample SD; labels give stratum sizes, including empty and sparse groups.}
     \label{fig:si-relatedness-sequence}
 \end{figure}
 
@@ -1488,14 +1488,14 @@ Figs.~\ref{fig:si-paired-effects}--\ref{fig:si-complexity-failures} separate the
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.56\textheight,keepaspectratio]{candidate_ranking.pdf}
-    \caption{\textbf{Confidence selection and near-native candidate density.} (A) Top-1, top-5, and oracle-100 RMSD success for refined unguided banks. (B) Fraction of individual refined candidates with RMSD \(<2\,\angstrom\). Bars show mean \(\pm\) sample SD across three repeats. Panel A is measured per complex, whereas panel B is measured per candidate.}
+    \caption{\textbf{Confidence selection and near-native candidate density.} (A) Unfiltered confidence top-1, top-5, and oracle-100 RMSD success for refined unguided banks; the primary chirality-filtered top-1 values are given in Fig.~\ref{fig:si-stringent-slices}. (B) Fraction of individual refined candidates with RMSD \(<2\,\angstrom\). Bars show mean \(\pm\) sample SD across three repeats. Panel A is measured per complex, whereas panel B is measured per candidate.}
     \label{fig:si-selection-density}
 \end{figure}
 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.76\textheight,keepaspectratio]{complexity_failures.pdf}
-    \caption{\textbf{Descriptive failure decomposition across ligand-complexity strata.} \method, refined, chirality-filtered outcomes are partitioned into no RMSD-successful candidate, an available successful candidate not selected, selected RMSD success with PoseBusters failure, or RMSD--PoseBusters success. The fractions are the algebraic decomposition \(100-O\), \(O-T\), \(T-J\), and \(J\) of oracle coverage \(O\), selected RMSD success \(T\), and RMSD--PoseBusters success \(J\). The \(100-O\) category denotes absence of an RMSD-successful candidate after refinement. The \(O-T\) category combines chirality exclusion and ranking loss, which main Fig.~5C separates.}
+    \caption{\textbf{Descriptive failure decomposition across ligand-complexity strata.} \method, refined, chirality-filtered outcomes are partitioned into no RMSD-successful candidate, an available successful candidate not selected, selected RMSD success with PoseBusters failure, or RMSD--PoseBusters success. The fractions are the algebraic decomposition \(100-O\), \(O-T\), \(T-J\), and \(J\) of oracle coverage \(O\), selected RMSD success \(T\), and RMSD--PoseBusters success \(J\). The \(100-O\) category denotes absence of an RMSD-successful candidate after refinement. The \(O-T\) category combines chirality exclusion and ranking loss, which main Fig.~5C separates. The legend label ``near-native pose generation failure'' denotes this \(100-O\) category; dashes mark empty strata, and strata with fewer than five complexes are too sparse for interpretation.}
     \label{fig:si-complexity-failures}
 \end{figure}
 
@@ -1510,14 +1510,14 @@ Probability bins have boundaries 0.1, 0.2, \(\ldots\), 0.9; predicted-RMSD bins 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{confidence_reliability.pdf}
-    \caption{\textbf{Reliability of saved confidence predictions and candidate-density dependence.} \method refined candidates are pooled across three repeats. (A) Empirical near-native fraction versus the saved success-head probability. (B) Mean observed versus predicted RMSD in fixed predicted-RMSD bins. No recalibration is fitted. (C) Primary chirality-filtered top-1 success versus the number of near-native candidates in the 100-pose bank. Candidate observations within complexes are correlated, and the production selector uses predicted RMSD rather than the auxiliary probability head.}
+    \caption{\textbf{Reliability of saved confidence predictions and candidate-density dependence.} \method refined candidates are pooled across three repeats. (A) Empirical near-native fraction versus the saved success-head probability. (B) Mean observed versus predicted RMSD in fixed predicted-RMSD bins. No recalibration is fitted. (C) Primary chirality-filtered top-1 RMSD success versus the number of near-native candidates in the 100-pose bank; whiskers show sample SD across three repeats. Candidate observations within complexes are correlated, and the production selector uses predicted RMSD rather than the auxiliary probability head.}
     \label{fig:si-confidence-reliability}
 \end{figure}
 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.58\textheight,keepaspectratio]{stringent_subset.pdf}
-    \caption{\textbf{Performance under simultaneous sequence and ligand restrictions.} The fixed subset requires maximum training-relative binding-chain identity \(<30\%\), Morgan Tanimoto \(<0.5\), and no observed exact training-ligand match. Selected RMSD and RMSD--PoseBusters success and full-bank RMSD oracle are shown for EFF-Dock. Remaining counts are 2, 4, 7, 9 and 0 for Astex, PoseBusters, PhiBench-derived, FoldBench and OpenBind, respectively; the slices are descriptive.}
+    \caption{\textbf{Performance under simultaneous sequence and ligand restrictions.} The fixed subset requires maximum training-relative binding-chain identity \(<30\%\), Morgan Tanimoto \(<0.5\), and no observed exact training-ligand match. Selected RMSD and RMSD--PoseBusters success and full-bank RMSD oracle are shown for EFF-Dock. Blue bars show all complexes and green bars the stringent subset. Remaining counts are 2, 4, 7, 9 and 0 for Astex Diverse Set, PoseBusters v2, PhiBench-derived, FoldBench and OpenBind, respectively; the slices are descriptive.}
     \label{fig:si-stringent-slices}
 \end{figure}
 
@@ -1530,7 +1530,7 @@ Fig.~\ref{fig:si-baseline-differences} reports paired uncertainty for the locall
 \begin{figure}[p]
     \centering
     \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{baseline_uncertainty.pdf}
-    \caption{\textbf{Paired uncertainty relative to locally executed baselines.} \method minus baseline percentage-point differences are shown for RMSD success and same-selected-pose RMSD--PoseBusters success on (A) Astex and (B) PoseBusters. Intervals are 2,000-draw percentile 95\% paired bootstrap intervals over exact PDB-accession groups; every retained complex has a distinct accession in these cohorts. Literature-only rows are excluded. Positive values favor EFF-Dock, but differing budgets and native selectors prevent an equal-compute superiority claim.}
+    \caption{\textbf{Paired uncertainty relative to locally executed baselines.} \method minus baseline percentage-point differences are shown for RMSD success and same-selected-pose RMSD--PoseBusters success (legend: PB-valid success) on (A) Astex Diverse Set and (B) PoseBusters v2. Intervals are 2,000-draw percentile 95\% paired bootstrap intervals over exact PDB-accession groups; every retained complex has a distinct accession in these cohorts. Literature-only rows are excluded. Positive values favor EFF-Dock, but differing budgets and native selectors prevent an equal-compute superiority claim.}
     \label{fig:si-baseline-differences}
 \end{figure}
 
@@ -1550,7 +1550,7 @@ Physical-validity failures are reported in Fig.~\ref{fig:pb-failure-profiles}. R
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth,height=0.76\textheight,keepaspectratio]{physical_validity.pdf}
-    \caption{\textbf{Physical-validity failures before and after refinement.} (A,B) Heatmaps report failure percentages among the primary selected raw and refined poses; the selected candidate may differ between stages. (C,D) Fail-to-pass and pass-to-fail percentages use candidate indices with saved official PoseBusters evaluations at both stages. Rows summarize bond geometry, internal clash, receptor clash, stereochemistry, ring planarity, internal energy, and all 27 non-RMSD checks. Categories overlap, and the matched subset is selection biased.}
+    \caption{\textbf{Physical-validity failures before and after refinement.} (A,B) Heatmaps report failure percentages among the primary selected raw and refined poses; the selected candidate may differ between stages. (C,D) Fail-to-pass and pass-to-fail percentages use candidate indices with saved official PoseBusters evaluations at both stages. Rows summarize bond geometry, internal clash, receptor clash, stereochemistry, ring planarity, internal energy, and all 27 non-RMSD checks. Categories overlap, and the matched subset is selection biased; its fail-to-pass rates therefore differ from the all-candidate transitions in Sec.~\ref{si:all_candidate_pb}. The colour scale gives percentages for all four panels.}
     \label{fig:pb-failure-profiles}
 \end{figure}
 
@@ -1638,7 +1638,7 @@ Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=\linewidth,height=0.64\textheight,keepaspectratio]{guidance_budget.pdf}
-    \caption{\textbf{Guidance and candidate allocation at a fixed learned pose-step count.} (A) Astex Diverse Set (85 complexes) and (B) PoseBusters v2 (308 complexes). Each 100-pose/ten-step or 40-pose/25-step condition uses 1,000 learned pose-steps, with unguided generation or normalized energy guidance of strength \(\eta=2\). Raw and refined banks use the input-chirality-filtered minimum-predicted-RMSD selector, with an unfiltered fallback. Solid segments show RMSD and PoseBusters success; hatched extensions show RMSD-successful but PB-invalid outcomes. Bars and whiskers show the mean and sample SD over three inference seeds. Guided and unguided initial draws are paired within each budget; the two budgets are separately executed. Equal pose-step counts are not equal-runtime comparisons.}
+    \caption{\textbf{Guidance and candidate allocation at a fixed learned pose-step count.} (A) Astex Diverse Set (85 complexes) and (B) PoseBusters v2 (308 complexes). N denotes poses and S integration steps. Each 100-pose/ten-step (N100/S10) or 40-pose/25-step (N40/S25) condition uses 1,000 learned pose-steps, with unguided generation or normalized energy guidance of strength \(\eta=2\). Raw and refined banks use the input-chirality-filtered minimum-predicted-RMSD selector, with an unfiltered fallback. Solid segments show RMSD and PoseBusters success; hatched extensions show RMSD-successful but PB-invalid outcomes. Bars and whiskers show the mean and sample SD over three inference seeds. Guided and unguided initial draws are paired within each budget; the two budgets are separately executed. Equal pose-step counts are not equal-runtime comparisons.}
     \label{fig:si-guidance-budget}
 \end{figure}
 
@@ -1646,7 +1646,7 @@ Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\linewidth,height=0.70\textheight,keepaspectratio]{saved_endpoint_analysis.pdf}
-\caption{\textbf{Benchmark-specific evaluation of saved candidates.} Supplementary endpoint analyses of saved EFF-Dock candidates. (A) Top-1 and Top-5 fixed-receptor symmetry-corrected RMSD success (\(<2\,\angstrom\)), with and without all 27 non-RMSD PoseBusters checks, in the locally selected PhiBench-derived cohort. This is not asserted to reproduce the native PhysDock PAL-RMSD, cohort or 18-check conjunction. (B) Raw and refined Top-1 BiSyRMSD (\(<2\,\angstrom\)), LDDT-PLI (\(>0.8\)), and their same-pose conjunction on all 558 FoldBench interfaces using OpenStructure 2.8.0. The supplied holo receptor makes this a redocking evaluation rather than the source cofolding task. (C) Top-1/5/25 on the official 802 OpenBind follow-on IDs, using OpenStructure 2.11.1 BiSyRMSD \(\le2\,\angstrom\), PoseBusters 0.6.5, and the additional same-pose LDDT-PLI \(\ge0.8\) criterion. A and C use refined banks and the frozen chirality-filtered confidence selector, including its no-eligible-candidate fallback. Hatching denotes RMSD-successful but PB-invalid cases. 40-prefix and 25-prefix restrict the original saved N100 banks before selection; they do not represent fresh smaller-budget generation or equal compute. Numbers in A and C give RMSD--PoseBusters success; numbers in B give the corresponding criterion. Bars and error lines show means and sample standard deviations across three fixed-weight inference repeats. Rates retain the entire cohort denominator; endpoint-specific determinate denominators and unresolved counts are provided in the source data. Native preparation differences remain.}
+\caption{\textbf{Benchmark-specific evaluation of saved candidates.} Supplementary endpoint analyses of saved EFF-Dock candidates; all panels show success rates in percent. (A) Top-1 and Top-5 fixed-receptor symmetry-corrected RMSD success (\(<2\,\angstrom\)), with and without all 27 non-RMSD PoseBusters checks, in the locally selected PhiBench-derived cohort. This is not asserted to reproduce the native PhysDock PAL-RMSD, cohort or 18-check conjunction. (B) Raw and refined Top-1 BiSyRMSD (\(<2\,\angstrom\)), LDDT-PLI (\(>0.8\)), and their same-pose conjunction on all 558 FoldBench interfaces using OpenStructure 2.8.0. The supplied holo receptor makes this a redocking evaluation rather than the source cofolding task. (C) Top-1/5/25 on the official 802 OpenBind follow-on IDs, using OpenStructure 2.11.1 BiSyRMSD \(\le2\,\angstrom\), PoseBusters 0.6.5, and the additional same-pose LDDT-PLI \(\ge0.8\) criterion. A and C use refined banks and the frozen chirality-filtered confidence selector, including its no-eligible-candidate fallback. Hatching denotes RMSD-successful but PB-invalid cases. 40-prefix and 25-prefix restrict the original saved N100 banks before selection; they do not represent fresh smaller-budget generation or equal compute. Numbers in A and C give RMSD--PoseBusters success; numbers in B give the corresponding criterion. Bars and error lines show means and sample standard deviations across three fixed-weight inference repeats. Rates retain the entire cohort denominator; endpoint-specific determinate denominators and unresolved counts are provided in the source data. Native preparation differences remain.}
 \label{fig:si-native-endpoints}
 \end{figure}
 
