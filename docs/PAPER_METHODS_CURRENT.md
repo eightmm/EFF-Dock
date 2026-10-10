@@ -1,8 +1,8 @@
 # Current manuscript methods
 
-The canonical manuscript [Methods](../papers/main.tex) and
-[Supplementary Information](../papers/SI.tex) define the current scientific
-protocols and equations. [Figure captions](../papers/figure_captions.md)
+The canonical manuscript Methods and
+Supplementary Information define the current scientific
+protocols and equations. Figure captions
 specify each reported condition. This overview and the
 [implementation notes](methods/README.md) describe the released pair and its
 source code; they are not separate versions of the manuscript.

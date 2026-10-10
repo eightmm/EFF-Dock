@@ -7,8 +7,8 @@ Implementation: [sampler](../../src/effdock/inference/sampler.py),
 [interaction energy](../../src/effdock/guidance/interaction.py), and
 [force projection](../../src/effdock/guidance/runtime.py).
 Current result conditions are defined by the canonical
-[Supplementary Information](../../papers/SI.tex) and
-[figure captions](../../papers/figure_captions.md).
+Supplementary Information and
+figure captions.
 
 ## 1. Fixed sampler
 

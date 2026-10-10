@@ -66,7 +66,7 @@ to match the published PhiBench cohort or PAL-RMSD endpoint. The FoldBench row
 uses fixed-receptor RMSD rather than the native cofolding endpoint. OpenBind
 contains all 925 local cases; the separate benchmark-specific analysis uses the
 official 802-case follow-on subset. Those endpoint analyses and their protocol
-limitations are in the [Supplementary Information](../papers/SI.tex).
+limitations are in the Supplementary Information.
 
 Raw/refined and chirality-selection results are reported separately in
 Supplementary Figure S9. U70k was selected on internal validation; external
@@ -86,7 +86,7 @@ postprocessing stages, rather than implicit operations in the public `dock()` AP
 Exact [training membership](../benchmarks/inputs/training_membership/README.md),
 [method equations](../docs/methods/05_confidence_model_and_loss.md),
 [training settings](../docs/methods/06_training_and_checkpoint_selection.md), and
-[current manuscript results](../papers/main.tex) are public. The
+the manuscript Source Data in [`papers/data`](../papers/data) are public. The
 43,092 confidence training IDs and 47,277 docking IDs are independently filtered
 sets sharing 43,067 IDs, not a nested pair.
 

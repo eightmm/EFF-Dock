@@ -2,8 +2,8 @@
 
 This document describes the earlier saved-bank figure release. Its tables and
 case selections have not been refreshed for the corrected generation-reference
-and confidence-frame evaluation. Use the [canonical article](../../papers/main.pdf),
-[Supplementary Information](../../papers/SI.pdf) and [Source Data guide](../../papers/data/README.md)
+and confidence-frame evaluation. Use the canonical article,
+Supplementary Information and [Source Data guide](../../papers/data/README.md)
 for the current manuscript results. Retaining this document supports interpretation
 and reproduction of the historical tables; its values are not current submission results.
 

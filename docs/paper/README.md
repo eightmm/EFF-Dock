@@ -1,14 +1,7 @@
 # Manuscript materials
 
-The article, Supplementary Information, figures and numerical Source Data now
-live in the canonical [`papers`](../../papers) directory.
-
-- [Article PDF](../../papers/main.pdf)
-- [Supplementary PDF](../../papers/SI.pdf)
-- [Figure captions](../../papers/figure_captions.md)
-- [Prism authoring ZIP](../../papers/Prism.zip)
-
-Use the figure numbering and captions in those canonical manuscript files.
+The accompanying manuscript is under review and is not distributed in this
+repository. Its numerical Source Data are in [`papers/data`](../../papers/data).
 
 Recompute the benchmark-specific rates and sample SD from the released case
 outcomes, including both-metric-assigned conditional denominators:

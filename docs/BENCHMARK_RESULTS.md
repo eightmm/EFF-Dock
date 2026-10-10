@@ -1,11 +1,11 @@
 # Benchmark results
 
-The canonical [article](../papers/main.tex),
-[Supplementary Information](../papers/SI.tex) and
+The canonical article,
+Supplementary Information and
 [numerical Source Data](../papers/data) contain the manuscript results and
 evaluation definitions. A compact primary-result table is in the
 [repository README](../README.md#main-results).
-[Figure captions](../papers/figure_captions.md) specify the protocol for each panel.
+Figure captions specify the protocol for each panel.
 
 ## Primary protocol
 

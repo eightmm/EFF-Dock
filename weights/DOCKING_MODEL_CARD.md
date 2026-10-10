@@ -32,7 +32,7 @@ The manuscript evaluation keeps these weights frozen and explicitly uses `rw`
 angular features, generation-consistent ligand references, and `contextual_v1`
 confidence frames. Current external results are in the
 [paired confidence model card](CONFIDENCE_MODEL_CARD.md) and
-[Supplementary Information](../papers/SI.tex). They do not establish a causal
+Supplementary Information. They do not establish a causal
 benefit of individual architecture components or of the original fine-tuning intervention.
 
 ## Limitations
@@ -48,5 +48,5 @@ benefit of individual architecture components or of the original fine-tuning int
 Exact sample IDs, exclusions and hashes are in
 [training membership](../benchmarks/inputs/training_membership/README.md).
 The public [training specification](../docs/methods/06_training_and_checkpoint_selection.md)
-and [current manuscript](../papers/main.tex) separate this
+and current manuscript separate this
 checkpoint's provenance from later three-repeat external characterization.

@@ -2,15 +2,10 @@
 
 ## Manuscript drafting materials
 
-- [Article](../papers/main.tex) and [compiled PDF](../papers/main.pdf)
-- [Supplementary Information](../papers/SI.tex) and [compiled PDF](../papers/SI.pdf)
-- [Figure PDFs](../papers/assets) and [LaTeX captions](../papers/figure_captions.md)
 - [Numerical Source Data](../papers/data)
-- [Prism authoring ZIP](../papers/Prism.zip)
 
-The canonical files live in `papers`; figure numbering follows the article and
-Supplementary Information. These are working manuscript materials, not a
-published paper.
+The accompanying manuscript is under review and is not distributed in this
+repository; its numerical Source Data are released in `papers/data`.
 
 ## Model and evaluation
 

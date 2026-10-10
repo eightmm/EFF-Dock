@@ -128,8 +128,7 @@ coordinate conventions documented in the [model contract](docs/MODEL.md).
 | FoldBench-Pocket | 558 | 75.27 ± 0.54 | 96.54 ± 0.10 | 73.78 ± 0.63 |
 | OpenBind | 925 | 53.19 ± 0.56 | 99.68 ± 0.19 | 53.19 ± 0.56 |
 
-Postprocessing and metric definitions are in the
-[Supplementary Information](papers/SI.tex).
+Postprocessing and metric definitions are given in the Supplementary Information of the accompanying manuscript.
 
 These are supplied-pocket redocking results, not blind docking or prospective
 screening. Astex, PoseBusters, and the temporal cohorts were inspected during
@@ -140,19 +139,13 @@ single-protease auxiliary cohort.
 
 FoldBench-Pocket uses holo-receptor, crystal-pocket redocking targets, rather
 than the native FoldBench cofolding task. Benchmark conditions, preparation differences and comparison endpoints
-are documented in the [Supplementary Information](papers/SI.tex).
+are documented in the Supplementary Information of the accompanying manuscript.
 
 ## Manuscript materials
 
-The canonical article and Supplementary Information are maintained in
-[`papers`](papers). These are manuscript drafting materials, not a published paper.
-
-- [Article LaTeX](papers/main.tex) and [compiled article PDF](papers/main.pdf)
-- [Supplementary LaTeX](papers/SI.tex) and [compiled Supplementary PDF](papers/SI.pdf)
-- [Bibliography](papers/references.bib)
-- [Figure PDFs](papers/assets) and [figure captions](papers/figure_captions.md)
-- [Numerical Source Data](papers/data)
-- [Prism authoring ZIP](papers/Prism.zip)
+The accompanying manuscript is under review and is not distributed in this
+repository. The [numerical Source Data](papers/data) for its figures and tables
+are released here.
 
 The figure captions and numerical data specify the evaluated protocols and
 which analyses use stored candidate restrictions. [Training membership and

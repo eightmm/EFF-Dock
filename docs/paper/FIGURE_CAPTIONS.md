@@ -2,7 +2,7 @@
 
 These captions belong to the earlier figure release and retain its original
 page numbers, case selections and measurements. The current article and
-Supplementary Information use the [canonical captions](../../papers/figure_captions.md)
+Supplementary Information use the canonical captions
 and figure numbering in [papers/](../../papers). Use those files for manuscript
 writing; the captions below document the historical rendering inputs.
 

@@ -10,7 +10,7 @@ for commands and released checkpoint identities.
 | Released weights | `verify_release.py`, `export_ema_inference_checkpoint.py` |
 | Confidence banks | `prepare_s50_confidence_training_bank.py`, `refine_s50_confidence_pose_bank.py`, `materialize_s50_refined_confidence_bank.py` |
 | Temporal evaluation | `run_external_temporal_benchmark_shard.py`, `report_external_temporal_benchmark.py` |
-| Current manuscript figures and captions | [`papers/`](../papers), [`figure_captions.md`](../papers/figure_captions.md) |
+| Manuscript Source Data | [`papers/data/`](../papers/data) |
 | Current saved-endpoint aggregation | `uv run python -m benchmarks.analysis.published_endpoints` |
 | Earlier figure reproduction | `uv run python -m benchmarks.figures.paper` (earlier public numerical inputs) |
 | Saved-bank analysis | `paper_results.py`, `collect_paper_*`, `paper_*_figures.py` (separate local pose banks) |

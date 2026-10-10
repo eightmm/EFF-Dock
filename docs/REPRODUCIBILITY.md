@@ -62,7 +62,7 @@ a reproduction of those checkpoint inventories.
 
 The current article, Supplementary Information, figure PDFs and numerical
 Source Data are kept together in [`papers/`](../papers). Use the
-[canonical captions](../papers/figure_captions.md) for figure numbering and
+canonical captions for figure numbering and
 endpoint definitions. The [saved-endpoint verifier](../benchmarks/analysis/published_endpoints.py)
 recomputes the released benchmark-specific aggregate rates and sample SD without
 structures or weights:
@@ -85,7 +85,7 @@ uv run python -m benchmarks.figures.paper --output outputs/paper_figures
 This produces individual PDFs/PNGs and `source_data.csv` from those earlier
 inputs; it does not reproduce the current corrected manuscript measurements or
 rerun scientific evaluations. Use the canonical manuscript files and
-`papers/Prism.zip` for paper writing; the superseded drafting bundle has been
+the manuscript bundle for paper writing; the superseded drafting bundle has been
 removed.
 
 GPU work runs through the project Slurm scripts. `confidence_prepare.sbatch`

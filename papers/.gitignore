@@ -1,1 +1,21 @@
 /cover_letter.md
+
+# Manuscript under review: kept locally, not distributed in the repository.
+/main.tex
+/SI.tex
+/references.bib
+/main.pdf
+/SI.pdf
+/Prism.zip
+/README_PRISM.md
+/figure_captions.md
+/assets/
+
+# LaTeX compilation intermediates.
+/*.aux
+/*.bbl
+/*.blg
+/*.fls
+/*.fdb_latexmk
+/*.synctex.gz
+/*.log

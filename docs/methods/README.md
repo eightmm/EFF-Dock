@@ -16,8 +16,8 @@ not a claim that every historical checkpoint has the same schema.
 | [`06_training_and_checkpoint_selection.md`](06_training_and_checkpoint_selection.md) | Which data, optimization, and internal selection rules produced the released pair? |
 | [`07_inference_and_evaluation.md`](07_inference_and_evaluation.md) | What exact inference contract and endpoints define paper results? |
 
-The canonical [article Methods](../../papers/main.tex) and
-[Supplementary Information](../../papers/SI.tex) provide the manuscript LaTeX.
+The canonical article Methods and
+Supplementary Information provide the manuscript LaTeX.
 [Training membership](../../benchmarks/inputs/training_membership/README.md)
 and [manuscript source data](../../papers/data) provide the sample inventories
 and numerical evidence. The inference document includes

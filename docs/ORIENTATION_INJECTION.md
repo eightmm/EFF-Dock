@@ -38,4 +38,4 @@ Use `--orientation-injection rw` together with `--confidence-frame-policy contex
 
 These statements concern joint rigid transformations with a fixed prepared fragment-local template. Scene-defined recovery does not make the network invariant to every unobservable fragment twist or to reorienting the local template itself. Finite rotation and backend checks do not prove exact equivariance of the entire preparation, sampling, refinement and selection pipeline.
 
-The canonical [manuscript](../papers/main.tex) and [Supplementary Information](../papers/SI.tex) separate orientation-map controls, preparation changes and frame-recovery checks. Historical diagnostic outcomes remain in Git history and the retained numerical provenance, rather than serving as the current primary benchmark table.
+The canonical manuscript and Supplementary Information separate orientation-map controls, preparation changes and frame-recovery checks. Historical diagnostic outcomes remain in Git history and the retained numerical provenance, rather than serving as the current primary benchmark table.
