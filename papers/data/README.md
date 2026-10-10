@@ -1,7 +1,7 @@
 # Numerical data accompanying EFF-Dock
 
-Use the endpoint definitions in [the article](../main.tex), [Supplementary
-Information](../SI.tex) and [figure captions](../figure_captions.md) when
+Use the endpoint definitions in the article, Supplementary
+Information and figure captions when
 interpreting these files. Rates are percentages; rate differences are percentage
 points. Means and sample standard deviations summarize three inference repeats
 of frozen networks, rather than three independently trained models.
