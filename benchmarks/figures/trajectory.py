@@ -211,9 +211,9 @@ def render(out):
                 f"$t = {row['times'][index]:.2f}$",
                 loc="left",
                 weight="bold",
-                fontsize=12,
+                fontsize=20,
             )
-        fig.subplots_adjust(left=0.01, right=0.99, top=0.88, bottom=0.03, wspace=0.04)
+        fig.subplots_adjust(left=0.01, right=0.99, top=0.84, bottom=0.03, wspace=0.04)
         save(fig, out, "S10_fragment_trajectory", dpi=400)
 
 
