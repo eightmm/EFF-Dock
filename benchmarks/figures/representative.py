@@ -855,7 +855,8 @@ def compose(row):
     ):
         selected = candidate["selected"]
         molecular_panel(px, y, pixels, crop, "#78B9A5" if selected else "none")
-        score_top = y + fh
+        # The selected panel's frame line runs along the top; keep its labels inside.
+        score_top = y + fh - (0.35 if selected else 0.0)
         fig.text(
             (px + (3.2 if selected else 0.9)) / width,
             (score_top - annotation_height / 2) / height,
