@@ -1423,10 +1423,12 @@ The cumulative-ranking and generation-prefix analyses in Figs.~\ref{fig:si-pose-
 
 \subsection{Resource measurements}
 
+On a single RTX PRO 6000 Blackwell Max-Q GPU, the complete primary protocol for Astex repeat 0 required 8.8\,s per complex for ligand preparation and 100-pose, ten-step generation (single 85-complex process including model loading), a mean of 81.7\,s (median 85.8\,s) for refinement and 9.5\,s (median 9.6\,s) for confidence scoring of the raw and refined banks, or about 100\,s per complex in total. These measurements reran refinement and scoring on the saved raw banks in a separate output location and did not replace any reported outcome; the same candidate was ranked first in 84 of 85 refined banks, the remaining difference reflecting cross-device numerical variation.
+
 The docking model has 5,719,970 parameters; the confidence model has 9,403,274.
 Runtime is measured in wall-clock seconds per complex; memory is CUDA allocated memory in GiB (\(2^{30}\) bytes).
 
-Runtime and memory measurements are shown in Figs.~\ref{fig:si-runtime} and \ref{fig:si-generation-memory}. Profiling used mixed RTX A5000, RTX 6000 Ada and RTX PRO 6000 devices. Recorded times include the original refinement and confidence scoring but exclude subsequent refinement and rescoring passes; they do not estimate the end-to-end cost of the primary protocol or support a controlled hardware comparison.
+Runtime and memory measurements are shown in Figs.~\ref{fig:si-runtime} and \ref{fig:si-generation-memory}. Profiling used mixed RTX A5000, RTX 6000 Ada and RTX PRO 6000 devices. Recorded times include the original refinement and confidence scoring but exclude subsequent refinement and rescoring passes; the single-device stage costs above, rather than these profiles, describe the primary protocol, and the profiles do not support a controlled hardware comparison.
 
 \begin{figure}[!htbp]
     \centering

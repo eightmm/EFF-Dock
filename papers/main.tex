@@ -78,7 +78,7 @@ Here we present \method, a supplied-pocket docking pipeline designed so that eac
 
 \method represents a ligand as rigid components obtained by cutting a restricted set of rotatable bonds. A heterogeneous protein--ligand graph conditions a flow over the fragments' translations and rotations (Fig.~\ref{fig:workflow-overview}). An equivariant network predicts one vector per ligand atom; a least-squares rigid-motion projection converts these vectors to fragment velocities (Fig.~\ref{fig:model-architecture}). A separate network scores candidates for ranking within the set generated for each complex, termed a candidate bank. Generated candidates are refined by bounded descent on a differentiable geometric interaction energy and then ranked again. The energy supplies coordinate gradients independently of the learned vector field; it is neither an affinity predictor nor a free-energy model.
 
-Evaluation uses a fixed holo receptor, a reference-derived pocket, 100 candidates and ten integration steps, with three repeats of the same trained weights. Online Methods and Supplementary Information, Secs.~S1.2--S1.3 specify the evaluated coordinate-to-feature conventions and their differences from training.
+Evaluation uses a fixed holo receptor, a reference-derived pocket, 100 candidates and ten integration steps, with three repeats of the same trained weights. On a single RTX PRO 6000 GPU, the complete primary protocol took about 100\,s per Astex complex: 8.8\,s to prepare the ligand and generate 100 candidates, 81.7\,s for refinement and 9.5\,s for confidence scoring of the raw and refined banks. Online Methods and Supplementary Information, Secs.~S1.2--S1.3 specify the evaluated coordinate-to-feature conventions and their differences from training.
 
 \begin{figure}[!htbp]
     \centering
@@ -503,7 +503,7 @@ Each cohort uses the same trained weights with inference seeds 42, 100042 and 20
 Candidates are scored before and after bounded refinement.
 The primary selector removes chirality-mismatched candidates and then chooses the lowest predicted symmetry-aware RMSD; if none passes the chirality screen, it uses the unfiltered ranking.
 Failed complexes remain in the cohort denominator.
-Supplementary Figs.~S4 and S5 report runtime and generation-process memory for the candidate-acquisition runs, including their original refinement and confidence scoring but excluding subsequent refinement and rescoring passes. Their scope is initial candidate acquisition, as defined in the figure captions. Sensitivity to generation inputs is analyzed in Fig.~\ref{fig:pocket-sensitivity}; supplementary guidance controls are described below.
+Stage costs of the primary protocol were measured on one RTX PRO 6000 Blackwell Max-Q GPU for Astex repeat 0: generation was timed as total wall time of a single 85-complex process divided by 85, including model loading, ligand preparation and output, and refinement and confidence scoring were timed per complex in separate processes, each with one or two CPU threads. Supplementary Figs.~S4 and S5 additionally report runtime and memory of the original multi-GPU candidate-acquisition runs, which exclude the later refinement and rescoring passes used for the reported evaluation. Sensitivity to generation inputs is analyzed in Fig.~\ref{fig:pocket-sensitivity}; supplementary guidance controls are described below.
 
 \subsection{Generation-input sensitivity and guidance controls}
 
