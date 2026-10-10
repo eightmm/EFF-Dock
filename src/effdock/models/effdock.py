@@ -647,6 +647,10 @@ class EFFDock(nn.Module):
         contact_cutoff: Dynamic protein-ligand contact edge cutoff (0 = disabled).
         orientation_injection: ``rw`` mixes columns of the active local-to-world
             rotation. ``legacy_rt_w`` reproduces historical weights' operator.
+        readout: ``newton_euler`` aggregates atom vectors into fragment motion.
+            ``fragment_direct`` is the ablation that predicts translation (1o)
+            and angular velocity (1e) directly from fragment-node features,
+            projected onto the same observable rotation subspace.
     """
 
     def __init__(
@@ -663,8 +667,12 @@ class EFFDock(nn.Module):
         dropout: float = 0.0,
         contact_cutoff: float = 0.0,
         orientation_injection: str = "legacy_rt_w",
+        readout: str = "newton_euler",
     ) -> None:
         super().__init__()
+        if readout not in ("newton_euler", "fragment_direct"):
+            raise ValueError(f"unknown readout: {readout}")
+        self.readout = readout
         self.hidden_dim = hidden_dim
         self.hidden_vec_dim = hidden_vec_dim
         self.l2_dim = l2_dim
@@ -744,12 +752,17 @@ class EFFDock(nn.Module):
         node_irreps = _build_node_irreps(hidden_dim, hidden_vec_dim, l2_dim, l2o_dim)
         head_irreps = _build_node_irreps(hidden_dim // 2, hidden_vec_dim, l2_dim, l2o_dim)
 
+        # The fragment_direct ablation keeps the same head structure but reads
+        # fragment nodes and emits translation (1o) plus angular velocity (1e).
+        out_irreps = cue.Irreps(
+            "O3", "1x1o" if readout == "newton_euler" else "1x1o + 1x1e"
+        )
         self.atom_head_pre = cuet.Linear(
             node_irreps, head_irreps, layout=cue.mul_ir, method="fused_tp"
         )
         self.atom_head_act = EquivariantActivation(head_irreps)
         self.f_atom_linear = cuet.Linear(
-            head_irreps, cue.Irreps("O3", "1x1o"), layout=cue.mul_ir, method="fused_tp"
+            head_irreps, out_irreps, layout=cue.mul_ir, method="fused_tp"
         )
 
         # Self-TP head: transfers l=2 (and other non-l=1) directional info into
@@ -763,7 +776,7 @@ class EFFDock(nn.Module):
         self.f_atom_self_tp = cuet.FullyConnectedTensorProduct(
             head_irreps,
             head_irreps,
-            cue.Irreps("O3", "1x1o"),
+            out_irreps,
             layout_in1=cue.mul_ir,
             layout_in2=cue.mul_ir,
             layout_out=cue.mul_ir,
@@ -923,6 +936,24 @@ class EFFDock(nn.Module):
 
         # --- Output: atom forces → Newton-Euler aggregation ---
         atom_idx = (node_type == NTYPE_LIG_ATOM).nonzero(as_tuple=True)[0]
+
+        if self.readout == "fragment_direct":
+            h_frag_head = self.atom_head_act(self.atom_head_pre(h[frag_idx]))
+            out = self.f_atom_linear(h_frag_head) + self.f_atom_self_tp(h_frag_head, h_frag_head)
+            # Zero atom vectors still yield the inertia eigenspace projection.
+            _, _, P_observable = newton_euler_aggregate(
+                torch.zeros_like(coords[atom_idx]),
+                coords[atom_idx],
+                batch["T_frag"],
+                batch["frag_id_for_atoms"],
+                n_frag,
+                frag_sizes,
+            )
+            omega_pred = torch.einsum("nij,nj->ni", P_observable, out[:, 3:6])
+            result = {"v_pred": out[:, 0:3], "omega_pred": omega_pred, "P_observable": P_observable}
+            if return_hidden:
+                result["h"] = h
+            return result
 
         h_atom_head = self.atom_head_pre(h[atom_idx])
         h_atom_head = self.atom_head_act(h_atom_head)

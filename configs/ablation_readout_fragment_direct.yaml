@@ -1,0 +1,85 @@
+# Matched readout ablation (single GPU, global batch 16, 100k updates, from scratch).
+# Arms differ only in model.readout; all data, schedule and seeds are shared.
+model:
+  model_type: unified
+  orientation_injection: rw
+  hidden_dim: 384
+  hidden_vec_dim: 32
+  l2_dim: 16
+  l2o_dim: 16
+  num_layers: 6
+  n_rbf: 32
+  t_emb_dim: 128
+  sh_lmax: 2
+  dropout: 0.1
+  contact_cutoff: 5.0
+  readout: fragment_direct
+data:
+  data_dir: data/plinder_processed
+  split_file: data/splits/plinder.json
+  min_atoms: 5
+  max_atoms: 120
+  max_frags: 30
+  min_protein_res: 50
+  pocket_cutoff: 8.0
+  pocket_jitter_sigma: 2.0
+  pocket_cutoff_noise: 0.0
+  prior_sigma: 1.0
+  pocket_cutoff_range:
+  - 6.0
+  - 12.0
+  prior_sigma_values:
+  - 0.5
+  - 1.0
+  - 2.0
+  - 3.0
+  - 4.0
+  prior_sigma_weights:
+  - 0.1
+  - 0.25
+  - 0.3
+  - 0.25
+  - 0.1
+  prior_sigma_range: null
+  prior_sigma_log_uniform: true
+  time_distribution: simplefold
+  rotation_augmentation: ligand_uniform
+  deterministic: false
+  num_workers: 6
+  receptor_aug_prob: 0.0
+  alt_receptor_root: data/plinder_processed/_alt_proteins
+  alt_receptor_mapping: data/plinder_processed/alt_receptor_mapping.json
+training:
+  max_steps: 100000
+  batch_size: 16
+  gradient_accumulation_steps: 1
+  size_aware_batches: true
+  size_aware_bucket_mult: 16
+  use_muon: false
+  muon_lr: 0.02
+  lr: 0.0003
+  weight_decay: 0.01
+  omega_weight: 8.0
+  atom_aux_weight: 0.3
+  dg_weight: 3.0
+  max_grad_norm: 1.0
+  scheduler_type: warmup_stable_cosine
+  warmup_ratio: 0.02
+  cooldown_ratio: 0.5
+  min_lr_ratio: 0.05
+  seed: 42
+  use_ema: true
+  ema_decay: 0.999
+  use_time_weighting: false
+logging:
+  use_wandb: false
+  wandb_project: eff-dock
+  wandb_run_name: readout-ablation-fragment_direct
+  log_every: 5
+  val_every: 5000
+  rollout_every: 10000
+  rollout_steps: 20
+  rollout_time_schedule: late
+  rollout_schedule_power: 3.0
+  rollout_max_samples: 0
+  output_dir: outputs/readout-ablation/fragment_direct
