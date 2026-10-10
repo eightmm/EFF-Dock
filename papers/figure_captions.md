@@ -9,7 +9,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [Fig1.pdf](assets/Fig1.pdf)
 
 ```latex
-\caption{\textbf{Overview of the \method docking pipeline.} A prepared receptor, ligand chemical state and conformer, and supplied pocket center define the input. Rigid ligand fragments follow the learned \(\SE(3)\) flow and bounded energy refinement. The illustrated seed-42 trajectory is a prespecified one-pose example from a supplied conformer. Confidence ranking uses a separate 100-pose benchmark bank prepared from SMILES. Ranks use predicted RMSD (pRMSD); displayed RMSD and crystal overlays are retrospective evaluations. The checkmark identifies the selected candidate and crosses unselected examples.}
+\caption{\textbf{Overview of the \method pipeline, illustrated on Astex complex 1T46.} Input: a prepared receptor, the ligand and a supplied pocket center; the ligand is cut into rigid fragments (colors). Pose generation: fragments move along the learned \(\SE(3)\) flow from a random prior (\(t=0\)) to a predicted pose (\(t=1\)); one prespecified trajectory (seed 42) from the supplied conformer is shown, whereas the benchmark bank uses a conformer generated from SMILES. Pose refinement: bounded descent on the geometric interaction energy for the same pose. Confidence ranking: candidates from the separately generated 100-pose benchmark bank are ordered by predicted RMSD (pRMSD), and the top-ranked candidate (check mark) is selected. RMSD values and crystal overlays (orange) are retrospective and are not available to the method.}
 \label{fig:workflow-overview}
 ```
 
@@ -18,7 +18,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [Fig2.pdf](assets/Fig2.pdf)
 
 ```latex
-\caption{\textbf{Docking and confidence architectures.} (A) The docking network applies six conditioned equivariant interaction layers and converts ligand-atom features to fragment translation and angular velocities with the Newton--Euler readout. For each candidate, terminal docking features are recomputed at \(t=1\) with its source prior scale. The confidence network combines these with a new embedding, applies four interaction layers with zero conditioning vector \(c=0\), invariantizes the resulting features, and predicts pose-level RMSD and success scores from global and contact-aware summaries. (B) Each interaction layer contains normalization, equivariant convolution, post-convolution transformation, a residual connection, and adaptive layer normalization. (C) The equivariant convolution uses radial and gating networks, shared tensor products through \(\ell\le2\), distance decay, and gate-normalized aggregation with invariant nonscalar rescaling. (D) Scalar and nonscalar channels use type-appropriate adaptive normalization and equivariant activation. Detailed tensor definitions are provided in Supplementary Information, Sec.~S3.}
+\caption{\textbf{Docking and confidence architectures.} (A) The docking network applies six conditioned equivariant interaction layers and converts ligand-atom features to fragment translation and angular velocities with the Newton--Euler readout. For each candidate, terminal docking features are recomputed at \(t=1\) using the translation-prior standard deviation used to generate it. The confidence network combines these with a new embedding, applies four interaction layers with zero conditioning vector \(c=0\), converts the resulting features into rotation-invariant quantities, and predicts pose-level RMSD and success scores from global and contact-aware summaries. (B) Each interaction layer contains normalization, equivariant convolution, post-convolution transformation, a residual connection, and adaptive layer normalization. (C) The equivariant convolution uses radial and gating networks, shared tensor products through \(\ell\le2\), distance decay, and gate-normalized aggregation with invariant nonscalar rescaling. (D) Scalar and nonscalar channels use type-appropriate adaptive normalization and equivariant activation. Detailed tensor definitions are provided in Supplementary Information, Sec.~S3.}
 \label{fig:model-architecture}
 ```
 
@@ -45,7 +45,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [confidence_diagnostics.pdf](assets/confidence_diagnostics.pdf)
 
 ```latex
-\caption{\textbf{Confidence ranking and remaining selection loss.} (A) Within-complex Spearman correlation between predicted and observed RMSD for raw and refined banks. (B) Refined-bank AUROC and average precision for strict RMSD \(<2\,\angstrom\) labels; single-class banks are excluded. (C) Median selected-minus-full-oracle RMSD regret. (D) Selected top-1 success conditional on the full bank containing a near-native candidate. Panels C and D use the primary chirality-filtered selector, so their loss can include eligibility exclusions. Bars show three-repeat means and sample SD.}
+\caption{\textbf{Confidence ranking and selection headroom.} (A) Within-complex Spearman correlation between predicted and observed RMSD for raw and refined banks. (B) Refined-bank AUROC and average precision for RMSD \(<2\,\angstrom\) labels; banks containing only one class are excluded. (C) Partition of refined primary outcomes: no RMSD-successful candidate in the bank; all such candidates excluded by the chirality screen; an eligible RMSD-successful candidate not selected (ranking failure); the selected RMSD-successful pose fails PoseBusters; or RMSD--PoseBusters success. Candidate success in C is defined by RMSD alone. (D) For Astex and PoseBusters v2, selected-pose RMSD--PoseBusters success compared with the joint oracle (any candidate with RMSD \(<2\,\angstrom\) passing all PoseBusters checks) and the RMSD-only oracle, from official checks on every refined candidate. Bars show three-repeat means and sample SD.}
 \label{fig:confidence-diagnostics}
 ```
 
@@ -54,7 +54,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [pocket_prior.pdf](assets/pocket_prior.pdf)
 
 ```latex
-\caption{\textbf{Sensitivity to supplied-pocket radius, center error and translation-prior scale.} (A,B) Joint selected-pose RMSD \(<2\,\angstrom\) and PoseBusters success across generation crop radii at prior scale \(2\,\angstrom\), for Astex Diverse Set (85 complexes) and PoseBusters v2 (308 complexes). (C,D) Prior-scale dependence at a \(10\,\angstrom\) generation crop on the same cohorts. Rows vary Gaussian center error, with standard deviation reported per Cartesian axis. Cells show three-inference-seed means. All conditions use unguided 100-pose, ten-step generation, energy refinement and chirality-filtered confidence ranking. Refinement and ranking retain the original center and \(10\,\angstrom\) crop; terminal docking features used for confidence retain the generation prior scale. The grid isolates the crop and prior axes rather than crossing every pair. Downstream spatial context is fixed; prior-scale effects include sampling and terminal feature extraction.}
+\caption{\textbf{Sensitivity to supplied-pocket radius, center error and translation-prior scale.} (A,B) Joint selected-pose RMSD \(<2\,\angstrom\) and PoseBusters success across generation crop radii at prior scale \(2\,\angstrom\), for Astex Diverse Set (85 complexes) and PoseBusters v2 (308 complexes). (C,D) Prior-scale dependence at a \(10\,\angstrom\) generation crop on the same cohorts. Rows vary Gaussian center error, with standard deviation reported per Cartesian axis. Cells show three-inference-seed means. All conditions use unguided 100-pose, ten-step generation, energy refinement and chirality-filtered confidence ranking. Refinement and ranking retain the original center, the refinement energy shell and the \(10\,\angstrom\) scoring crop. Terminal docking features used for confidence are recomputed with the translation-prior scale used to generate each candidate. The grid isolates the crop and prior axes rather than crossing every pair. Downstream spatial context is fixed; prior-scale effects include sampling and terminal feature extraction.}
 \label{fig:pocket-sensitivity}
 ```
 
@@ -155,7 +155,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [complexity_failures.pdf](assets/complexity_failures.pdf)
 
 ```latex
-\caption{\textbf{Descriptive failure decomposition across ligand-complexity strata.} \method, refined, chirality-filtered outcomes are partitioned into no RMSD-successful candidate, an available successful candidate not selected, selected RMSD success with PoseBusters failure, or RMSD--PoseBusters success. The fractions are the algebraic decomposition \(100-O\), \(O-T\), \(T-J\), and \(J\) of oracle coverage \(O\), selected RMSD success \(T\), and RMSD--PoseBusters success \(J\). Generation failure refers to the refined bank and does not isolate the sampler.}
+\caption{\textbf{Descriptive failure decomposition across ligand-complexity strata.} \method, refined, chirality-filtered outcomes are partitioned into no RMSD-successful candidate, an available successful candidate not selected, selected RMSD success with PoseBusters failure, or RMSD--PoseBusters success. The fractions are the algebraic decomposition \(100-O\), \(O-T\), \(T-J\), and \(J\) of oracle coverage \(O\), selected RMSD success \(T\), and RMSD--PoseBusters success \(J\). The \(100-O\) category denotes absence of an RMSD-successful candidate after refinement. The \(O-T\) category combines chirality exclusion and ranking loss, which main Fig.~5C separates.}
 \label{fig:si-complexity-failures}
 ```
 
@@ -191,7 +191,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [fragment_trajectory.pdf](assets/fragment_trajectory.pdf)
 
 ```latex
-\caption{\textbf{Fragment motion along a saved ODE trajectory.} Astex 1T46--STI at five saved flow times in a fixed receptor frame. Colors track six rigid fragments; omission of early interfragment bonds is a display convention. Dimensionless flow time describes generation, separate from refinement. This prespecified seed-42, unguided one-pose illustration is separate from the 100-pose benchmark banks.}
+\caption{\textbf{Fragment motion along a saved ODE trajectory.} Astex 1T46--STI at five saved flow times in a fixed receptor frame. Colors track six rigid fragments; omission of early interfragment bonds is a display convention. Dimensionless flow time describes generation, separate from refinement. This prespecified seed-42, unguided one-pose illustration starts from the supplied conformer and is separate from the 100-pose benchmark banks, which use conformers generated from SMILES.}
 \label{fig:si-generation-trajectory}
 ```
 
@@ -216,10 +216,10 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 
 ### Figure S18
 
-- [selector_bottleneck.pdf](assets/selector_bottleneck.pdf)
+- [selection_regret.pdf](assets/selection_regret.pdf)
 
 ```latex
-\caption{\textbf{Eligibility-aware selection bottlenecks and regret.} \method results use refined 100-pose banks and the frozen chirality-filtered confidence selector. (A) Mutually exclusive outcomes separate absence of an RMSD-successful candidate, chirality exclusion, ranking failure within the effective eligible set, selected-pose PoseBusters failure, and RMSD--PoseBusters success. The ``generation failure'' category refers to the refined bank and does not isolate the initial sampler. If no candidate passes the mask, the effective set follows the actual unfiltered fallback. (B) Cumulative selected-pose RMSD regret relative to the minimum RMSD in that same effective set. Reference RMSD is used only for retrospective analysis, and PoseBusters validity is known only for selected poses.}
+\caption{\textbf{Selection regret and conditional top-1 success.} \method results use the primary chirality-filtered confidence selector. (A) Median selected-minus-full-bank-oracle RMSD regret for raw and refined banks. (B) Selected top-1 RMSD success among complexes whose full bank contains an RMSD-successful candidate. Losses in A and B can include chirality-eligibility exclusions. (C) Cumulative refined selected-pose RMSD regret relative to the minimum RMSD within the same effective eligible set, including the unfiltered fallback when no candidate passes the mask. The corresponding outcome partition is shown in main Fig.~5C. Reference RMSD is used only for retrospective analysis. Bars show three-repeat means and sample SD.}
 \label{fig:selection-bottlenecks}
 ```
 
