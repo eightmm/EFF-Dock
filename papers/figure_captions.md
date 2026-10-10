@@ -27,7 +27,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [model_comparison.pdf](assets/model_comparison.pdf)
 
 ```latex
-\caption{\textbf{External docking performance on supplied-pocket benchmarks.} (A) Astex Diverse Set (85 complexes) and (B) PoseBusters v2 (308 complexes). Solid bars show RMSD \(<2\,\angstrom\) and PoseBusters success; hatched segments complete RMSD-only success. Local results are means with sample SD across three repeats. EFF-Dock uses 100 poses, 10 sampling steps, refinement, and chirality-filtered confidence selection. GOLD and AutoDock Vina are literature values; the remaining methods use their native sampling and ranking protocols. DiffDock-Pocket uses a holo-aligned predicted receptor; DiffBindFR samples pocket side-chain torsions on a fixed backbone and uses cognate-ligand coordinates in its upstream scoring graph; its selected ligand poses are evaluated against the common frozen holo receptor. Budgets, receptor preparation, selectors and evaluation versions differ, so these are protocol-conditioned comparisons.}
+\caption{\textbf{External docking performance on supplied-pocket benchmarks.} (A) Astex Diverse Set (85 complexes) and (B) PoseBusters v2 (308 complexes). Solid bars show RMSD \(<2\,\angstrom\) and PoseBusters success; hatched segments complete RMSD-only success. Local results are means with sample SD across three repeats; EFF-Dock repeats share one starting conformer, so their SD excludes conformer variation. EFF-Dock uses 100 poses, 10 sampling steps, refinement, and chirality-filtered confidence selection. GOLD and AutoDock Vina are literature values; the remaining methods use their native sampling and ranking protocols. DiffDock-Pocket uses a holo-aligned predicted receptor; DiffBindFR samples pocket side-chain torsions on a fixed backbone and uses cognate-ligand coordinates in its upstream scoring graph; its selected ligand poses are evaluated against the common frozen holo receptor. Budgets, receptor preparation, selectors and evaluation versions differ, so these are protocol-conditioned comparisons.}
 \label{fig:benchmark-comparison}
 ```
 
@@ -36,7 +36,7 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 - [refinement_chirality.pdf](assets/refinement_chirality.pdf)
 
 ```latex
-\caption{\textbf{Effects of refinement and chirality-aware selection.} \method results are shown for Astex, PoseBusters v2, PhiBench-derived, FoldBench, and OpenBind using the frozen released weights and unguided 100-pose, 10-step sampling. Raw and refined banks are ranked with or without the chirality filter. Solid bars show RMSD and PoseBusters success; hatched segments complete RMSD-only success. Bars and error bars are the mean and sample SD across three repeats on fixed cohorts.}
+\caption{\textbf{Effects of refinement and chirality-aware selection.} \method results are shown for Astex, PoseBusters v2, PhiBench-derived, FoldBench, and OpenBind using the frozen released weights and unguided 100-pose, 10-step sampling. Raw and refined banks are ranked with or without the chirality filter. Solid bars show RMSD and PoseBusters success; hatched segments complete RMSD-only success. Bars and error bars are the mean and sample SD across three repeats on fixed cohorts; for Astex and PoseBusters v2 the repeats share one starting conformer, whereas for the other cohorts the conformer varies with the repeat.}
 \label{fig:refinement-selection}
 ```
 
@@ -239,4 +239,13 @@ Captions below are extracted from the canonical LaTeX manuscript. Keep the LaTeX
 ```latex
 \caption{\textbf{Benchmark-specific evaluation of saved candidates.} Supplementary endpoint analyses of saved EFF-Dock candidates. (A) Top-1 and Top-5 fixed-receptor symmetry-corrected RMSD success (\(<2\,\angstrom\)), with and without all 27 non-RMSD PoseBusters checks, in the locally selected PhiBench-derived cohort. This is not asserted to reproduce the native PhysDock PAL-RMSD, cohort or 18-check conjunction. (B) Raw and refined Top-1 BiSyRMSD (\(<2\,\angstrom\)), LDDT-PLI (\(>0.8\)), and their same-pose conjunction on all 558 FoldBench interfaces using OpenStructure 2.8.0. The supplied holo receptor makes this a redocking evaluation rather than the source cofolding task. (C) Top-1/5/25 on the official 802 OpenBind follow-on IDs, using OpenStructure 2.11.1 BiSyRMSD \(\le2\,\angstrom\), PoseBusters 0.6.5, and the additional same-pose LDDT-PLI \(\ge0.8\) criterion. A and C use refined banks and the frozen chirality-filtered confidence selector, including its no-eligible-candidate fallback. Hatching denotes RMSD-successful but PB-invalid cases. 40-prefix and 25-prefix restrict the original saved N100 banks before selection; they do not represent fresh smaller-budget generation or equal compute. Numbers in A and C give RMSD--PoseBusters success; numbers in B give the corresponding criterion. Bars and error lines show means and sample standard deviations across three fixed-weight inference repeats. Rates retain the entire cohort denominator; endpoint-specific determinate denominators and unresolved counts are provided in the source data. Native preparation differences remain.}
 \label{fig:si-native-endpoints}
+```
+
+### Figure S21
+
+- [readout_ablation.pdf](assets/readout_ablation.pdf)
+
+```latex
+\caption{\textbf{Matched readout ablation.} Two docking models trained from scratch for 100,000 updates with a global batch of 16 complexes differ only in the output head: the Newton--Euler least-squares readout of atom vectors or a direct fragment readout. (A) Internal-validation rollout success (single sample, 20 steps, 1,076 complexes) every 10,000 updates using the EMA weights. (B,C) Unrefined 100-pose, ten-step banks on Astex Diverse Set and PoseBusters v2 at the terminal checkpoint: RMSD \(<2\,\angstrom\) oracle coverage among the first 10 and all 100 generated candidates and the mean fraction of near-native candidates. One training seed per arm; no refinement or confidence ranking.}
+\label{fig:readout-ablation}
 ```
