@@ -222,8 +222,10 @@ def comparison(data, out):
                 hatch="////",
                 label="RMSD < 2 Å & PB-invalid",
             ),
+            Patch(facecolor="#E8B395", label="Literature, PB-valid"),
+            Patch(facecolor="#FBF0EA", edgecolor="#E8B395", hatch="////", label="Literature, PB-invalid"),
         ],
-        ncol=2,
+        ncol=4,
         loc="outside lower center",
         frameon=False,
     )

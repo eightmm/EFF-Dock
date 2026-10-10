@@ -32,7 +32,7 @@ def success_labels(
         ax.annotate(
             f"{rmsd:.1f}",
             (upper, position),
-            xytext=(4, 0),
+            xytext=(6, 0),
             textcoords="offset points",
             ha="left",
             va="center",
@@ -40,11 +40,12 @@ def success_labels(
             color=DARK,
             zorder=5,
         )
+        short = valid < 20
         ax.text(
-            max(valid / 2, valid - (valid_sd or 0) - 3),
+            valid + (valid_sd or 0) + 1.5 if short else max(valid / 2, valid - (valid_sd or 0) - 3),
             position,
             f"{valid:.1f}",
-            ha="right",
+            ha="left" if short else "right",
             va="center",
             fontsize=8.5,
             color=DARK,

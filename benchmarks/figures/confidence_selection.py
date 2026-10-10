@@ -29,10 +29,10 @@ NAMES = {
 COLORS = ["#8FB9D8", "#E8B395", "#9AC9B4", "#B8A6CE", "#C7BD8C"]
 DARK = "#41434A"
 STATES = [
-    ("generation_failure", "No RMSD-successful candidate", "#B9BEC7"),
-    ("chirality_exclusion", "Chirality exclusion", "#D9A9B5"),
+    ("generation_failure", "No RMSD-successful candidate", "#7F8792"),
+    ("chirality_exclusion", "Chirality exclusion", "#C0504D"),
     ("ranking_failure", "Ranking failure", "#E8B395"),
-    ("pb_failure", "PoseBusters failure", "#C9B7DE"),
+    ("pb_failure", "PoseBusters failure", "#7E57C2"),
     ("success", "RMSD–PoseBusters success", "#9AC9B4"),
 ]
 
@@ -44,9 +44,9 @@ def panel(ax, letter, title):
 
 
 def xticks(ax, keys):
-    short = {"astex": "Astex\nDiverse Set", "posebusters": "PoseBusters\nv2",
+    short = {"astex": "Astex", "posebusters": "PoseBusters\nv2",
              "phibench": "PhiBench-\nderived", "foldbench": "FoldBench", "openbind": "OpenBind"}
-    ax.set_xticks(np.arange(len(keys)), [short[k] for k in keys], fontsize=8)
+    ax.set_xticks(np.arange(len(keys)), [short[k] for k in keys], fontsize=7.5)
 
 
 def bars(ax, groups, series, ylabel, digits):
@@ -57,7 +57,7 @@ def bars(ax, groups, series, ylabel, digits):
         ax.bar(positions, [r["mean"] for r in rows], width * 0.94, color=COLORS[j], label=label,
                yerr=[r["sd"] or 0 for r in rows], error_kw={"ecolor": DARK, "capsize": 3, "elinewidth": 1.2})
         for position, r in zip(positions, rows, strict=True):
-            mean_label(ax, position, r["mean"], r["sd"], digits=digits, fontsize=8)
+            mean_label(ax, position, r["mean"], r["sd"], digits=digits, fontsize=7)
     ax.set_ylabel(ylabel)
     ax.legend(frameon=False, fontsize=9, ncol=len(series), loc="upper right")
 
@@ -67,7 +67,7 @@ def render(out):
     joint = json.loads((DATA / "all_candidate_pb.json").read_text())["datasets"]
     conf = {(r["dataset"], r["stage"]): r for r in values["evidence"]["confidence"]}
     keys = list(NAMES)
-    fig, axes = plt.subplots(2, 2, figsize=(12.5, 8.2))
+    fig, axes = plt.subplots(2, 2, figsize=(9.4, 7.0))
 
     ax = axes[0, 0]
     panel(ax, "A", "Within-bank ranking")
@@ -79,7 +79,7 @@ def render(out):
     panel(ax, "B", "Near-native discrimination (refined)")
     bars(ax, keys, [(name, [conf[k, "refined"][m] for k in keys])
                     for name, m in (("AUROC", "auroc"), ("Average precision", "average_precision"))],
-         "Macro score", 2)
+         "Mean per-bank score", 2)
     ax.set_ylim(0, 1.2), ax.set_yticks([0, 0.25, 0.5, 0.75, 1]), xticks(ax, keys)
 
     ax = axes[1, 0]
@@ -92,7 +92,8 @@ def render(out):
         ax.bar(x, heights, 0.62, bottom=bottom, color=color, label=label, edgecolor="white", linewidth=0.6)
         for xi, b, h in zip(x, bottom, heights, strict=True):
             if h >= 6:
-                ax.text(xi, b + h / 2, f"{h:.1f}", ha="center", va="center", fontsize=8, color=DARK)
+                ax.text(xi, b + h / 2, f"{h:.1f}", ha="center", va="center", fontsize=8,
+                        color="white" if state in ("generation_failure", "pb_failure") else DARK)
         bottom += heights
     ax.set_ylabel("Complexes (%)"), ax.set_ylim(0, 100), xticks(ax, keys)
     ax.legend(frameon=False, fontsize=8, ncol=2, loc="upper center", bbox_to_anchor=(0.5, -0.17))
@@ -119,7 +120,7 @@ def render(out):
                        Patch(facecolor=COLORS[0], label="Joint oracle (RMSD & PB)"),
                        Patch(facecolor="white", edgecolor=DARK, hatch="//", label="RMSD-only oracle")],
               frameon=False, fontsize=8, ncol=2, loc="upper center", bbox_to_anchor=(0.5, -0.17))
-    fig.subplots_adjust(wspace=0.22, hspace=0.62)
+    fig.subplots_adjust(wspace=0.26, hspace=0.66)
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, bbox_inches="tight", metadata={"CreationDate": None, "ModDate": None})
     fig.savefig(out.with_suffix(".png"), dpi=170, bbox_inches="tight")
