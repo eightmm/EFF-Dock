@@ -1,0 +1,446 @@
+{
+ "device": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+ "cohort": "Astex Diverse Set, repeat 0 (85 complexes)",
+ "generation": {
+  "definition": "Total wall time of one 85-complex process (model loading, ligand preparation, 100-pose ten-step sampling, RMSD bookkeeping, output) divided by 85",
+  "total_s": 751.693864107132,
+  "per_complex_s": 8.843457224789788
+ },
+ "refinement": {
+  "mean_s": 81.66949535812634,
+  "median_s": 85.84807025099872
+ },
+ "confidence_scoring": {
+  "definition": "Raw and refined banks, including terminal docking-feature recomputation",
+  "mean_s": 9.527109172212317,
+  "median_s": 9.581949857994914
+ },
+ "per_complex": [
+  {
+   "id": "1g9v",
+   "refinement_s": 104.77568093698937,
+   "confidence_scoring_s": 10.291609890991822
+  },
+  {
+   "id": "1gkc",
+   "refinement_s": 90.99789519899059,
+   "confidence_scoring_s": 10.742265397973824
+  },
+  {
+   "id": "1gm8",
+   "refinement_s": 90.94525449798675,
+   "confidence_scoring_s": 10.328945453977212
+  },
+  {
+   "id": "1gpk",
+   "refinement_s": 32.21021856501466,
+   "confidence_scoring_s": 9.077973691979423
+  },
+  {
+   "id": "1hnn",
+   "refinement_s": 41.046652466990054,
+   "confidence_scoring_s": 9.159444957971573
+  },
+  {
+   "id": "1hp0",
+   "refinement_s": 85.7602975179907,
+   "confidence_scoring_s": 8.436946886999067
+  },
+  {
+   "id": "1hq2",
+   "refinement_s": 89.02217939897673,
+   "confidence_scoring_s": 8.993306262011174
+  },
+  {
+   "id": "1hvy",
+   "refinement_s": 89.94026664196281,
+   "confidence_scoring_s": 10.052574453002308
+  },
+  {
+   "id": "1hwi",
+   "refinement_s": 93.53851240396034,
+   "confidence_scoring_s": 9.133737844997086
+  },
+  {
+   "id": "1hww",
+   "refinement_s": 25.596704185998533,
+   "confidence_scoring_s": 8.575884851976298
+  },
+  {
+   "id": "1ia1",
+   "refinement_s": 61.97433749696938,
+   "confidence_scoring_s": 7.446856399998069
+  },
+  {
+   "id": "1ig3",
+   "refinement_s": 83.47499945899472,
+   "confidence_scoring_s": 9.443554103956558
+  },
+  {
+   "id": "1j3j",
+   "refinement_s": 87.7422754340223,
+   "confidence_scoring_s": 10.111443454981782
+  },
+  {
+   "id": "1jd0",
+   "refinement_s": 60.46239799296018,
+   "confidence_scoring_s": 10.239919389015995
+  },
+  {
+   "id": "1jje",
+   "refinement_s": 91.0051166539779,
+   "confidence_scoring_s": 10.943903745035641
+  },
+  {
+   "id": "1jla",
+   "refinement_s": 93.29080377297942,
+   "confidence_scoring_s": 10.841485864017159
+  },
+  {
+   "id": "1k3u",
+   "refinement_s": 81.56286005600123,
+   "confidence_scoring_s": 11.08904936799081
+  },
+  {
+   "id": "1ke5",
+   "refinement_s": 60.034067241998855,
+   "confidence_scoring_s": 7.567847342987079
+  },
+  {
+   "id": "1kzk",
+   "refinement_s": 94.72745735099306,
+   "confidence_scoring_s": 10.94651567999972
+  },
+  {
+   "id": "1l2s",
+   "refinement_s": 85.54463244997896,
+   "confidence_scoring_s": 8.887058735010214
+  },
+  {
+   "id": "1l7f",
+   "refinement_s": 82.76404986798298,
+   "confidence_scoring_s": 9.717747651971877
+  },
+  {
+   "id": "1lpz",
+   "refinement_s": 88.00670446397271,
+   "confidence_scoring_s": 9.769491047016345
+  },
+  {
+   "id": "1lrh",
+   "refinement_s": 68.7911338720005,
+   "confidence_scoring_s": 7.74112032802077
+  },
+  {
+   "id": "1m2z",
+   "refinement_s": 77.23075402295217,
+   "confidence_scoring_s": 8.533059453009628
+  },
+  {
+   "id": "1meh",
+   "refinement_s": 96.6635483680293,
+   "confidence_scoring_s": 9.645236675045453
+  },
+  {
+   "id": "1mmv",
+   "refinement_s": 86.1124141929904,
+   "confidence_scoring_s": 10.246569790004287
+  },
+  {
+   "id": "1mzc",
+   "refinement_s": 91.75523357000202,
+   "confidence_scoring_s": 8.884389162994921
+  },
+  {
+   "id": "1n1m",
+   "refinement_s": 86.83026542200241,
+   "confidence_scoring_s": 9.168276479002088
+  },
+  {
+   "id": "1n2j",
+   "refinement_s": 81.60500862100162,
+   "confidence_scoring_s": 9.278360155993141
+  },
+  {
+   "id": "1n2v",
+   "refinement_s": 68.97243113600416,
+   "confidence_scoring_s": 9.116533841995988
+  },
+  {
+   "id": "1n46",
+   "refinement_s": 88.28191724501085,
+   "confidence_scoring_s": 9.95103779801866
+  },
+  {
+   "id": "1nav",
+   "refinement_s": 78.73131534899585,
+   "confidence_scoring_s": 9.921880520996638
+  },
+  {
+   "id": "1of1",
+   "refinement_s": 81.18785263499012,
+   "confidence_scoring_s": 9.574511258048005
+  },
+  {
+   "id": "1of6",
+   "refinement_s": 90.11203859897796,
+   "confidence_scoring_s": 9.409807088028174
+  },
+  {
+   "id": "1opk",
+   "refinement_s": 68.78737636102596,
+   "confidence_scoring_s": 10.657388105988503
+  },
+  {
+   "id": "1oq5",
+   "refinement_s": 87.40001237898832,
+   "confidence_scoring_s": 9.752921174978837
+  },
+  {
+   "id": "1owe",
+   "refinement_s": 76.1667986389948,
+   "confidence_scoring_s": 9.242192003992386
+  },
+  {
+   "id": "1oyt",
+   "refinement_s": 83.10303086799104,
+   "confidence_scoring_s": 8.25433707702905
+  },
+  {
+   "id": "1p2y",
+   "refinement_s": 78.86538230400765,
+   "confidence_scoring_s": 8.977241432992741
+  },
+  {
+   "id": "1p62",
+   "refinement_s": 92.49660828401102,
+   "confidence_scoring_s": 9.323137019993737
+  },
+  {
+   "id": "1pmn",
+   "refinement_s": 82.22271288698539,
+   "confidence_scoring_s": 8.883442345017102
+  },
+  {
+   "id": "1q1g",
+   "refinement_s": 85.70655446400633,
+   "confidence_scoring_s": 8.639230286993552
+  },
+  {
+   "id": "1q41",
+   "refinement_s": 32.93948233599076,
+   "confidence_scoring_s": 8.341736777045298
+  },
+  {
+   "id": "1q4g",
+   "refinement_s": 75.22471970296465,
+   "confidence_scoring_s": 8.48947946500266
+  },
+  {
+   "id": "1r1h",
+   "refinement_s": 84.7531215500203,
+   "confidence_scoring_s": 11.39185825100867
+  },
+  {
+   "id": "1r55",
+   "refinement_s": 95.78282933798619,
+   "confidence_scoring_s": 10.082792551023886
+  },
+  {
+   "id": "1r58",
+   "refinement_s": 87.1929688960081,
+   "confidence_scoring_s": 9.636822442000266
+  },
+  {
+   "id": "1r9o",
+   "refinement_s": 86.41030952404253,
+   "confidence_scoring_s": 10.190282521944027
+  },
+  {
+   "id": "1s19",
+   "refinement_s": 94.08355511899572,
+   "confidence_scoring_s": 10.117774913960602
+  },
+  {
+   "id": "1s3v",
+   "refinement_s": 84.79358438705094,
+   "confidence_scoring_s": 11.079821845982224
+  },
+  {
+   "id": "1sg0",
+   "refinement_s": 80.7339687650092,
+   "confidence_scoring_s": 9.010256185021717
+  },
+  {
+   "id": "1sj0",
+   "refinement_s": 95.43225459801033,
+   "confidence_scoring_s": 9.72191683301935
+  },
+  {
+   "id": "1sq5",
+   "refinement_s": 91.71886790602002,
+   "confidence_scoring_s": 9.182679146004375
+  },
+  {
+   "id": "1sqn",
+   "refinement_s": 85.84807025099872,
+   "confidence_scoring_s": 8.068560261977836
+  },
+  {
+   "id": "1t40",
+   "refinement_s": 94.54350745503325,
+   "confidence_scoring_s": 10.122759861056693
+  },
+  {
+   "id": "1t46",
+   "refinement_s": 85.87211554101668,
+   "confidence_scoring_s": 9.97178282495588
+  },
+  {
+   "id": "1t9b",
+   "refinement_s": 83.32782826799667,
+   "confidence_scoring_s": 8.660341317008715
+  },
+  {
+   "id": "1tow",
+   "refinement_s": 74.58461203199113,
+   "confidence_scoring_s": 8.827867476968095
+  },
+  {
+   "id": "1tt1",
+   "refinement_s": 76.01909974298906,
+   "confidence_scoring_s": 9.713958795997314
+  },
+  {
+   "id": "1tz8",
+   "refinement_s": 84.34810215199832,
+   "confidence_scoring_s": 8.321706211019773
+  },
+  {
+   "id": "1u1c",
+   "refinement_s": 101.37958582898136,
+   "confidence_scoring_s": 9.5345528019825
+  },
+  {
+   "id": "1u4d",
+   "refinement_s": 29.891170156013686,
+   "confidence_scoring_s": 8.506439149030484
+  },
+  {
+   "id": "1uml",
+   "refinement_s": 83.29854369000532,
+   "confidence_scoring_s": 11.350515661004465
+  },
+  {
+   "id": "1unl",
+   "refinement_s": 97.19121792499209,
+   "confidence_scoring_s": 10.629375270975288
+  },
+  {
+   "id": "1uou",
+   "refinement_s": 74.20980140799657,
+   "confidence_scoring_s": 7.566957584989723
+  },
+  {
+   "id": "1v0p",
+   "refinement_s": 85.77043388201855,
+   "confidence_scoring_s": 11.557310339005198
+  },
+  {
+   "id": "1v48",
+   "refinement_s": 92.61272778501734,
+   "confidence_scoring_s": 9.607377031003125
+  },
+  {
+   "id": "1v4s",
+   "refinement_s": 88.05022217199439,
+   "confidence_scoring_s": 9.251480378967244
+  },
+  {
+   "id": "1vcj",
+   "refinement_s": 87.82337291102158,
+   "confidence_scoring_s": 10.416654733999167
+  },
+  {
+   "id": "1w1p",
+   "refinement_s": 29.667134991963394,
+   "confidence_scoring_s": 8.759998755005654
+  },
+  {
+   "id": "1w2g",
+   "refinement_s": 86.72792241902789,
+   "confidence_scoring_s": 9.287543738028035
+  },
+  {
+   "id": "1x8x",
+   "refinement_s": 73.27205534500536,
+   "confidence_scoring_s": 9.060311596025713
+  },
+  {
+   "id": "1xm6",
+   "refinement_s": 102.10665022896137,
+   "confidence_scoring_s": 9.60637215001043
+  },
+  {
+   "id": "1xoq",
+   "refinement_s": 87.22182049497496,
+   "confidence_scoring_s": 9.6103580390336
+  },
+  {
+   "id": "1xoz",
+   "refinement_s": 77.24591940804385,
+   "confidence_scoring_s": 8.754254009982105
+  },
+  {
+   "id": "1y6b",
+   "refinement_s": 94.29961644101422,
+   "confidence_scoring_s": 10.432477132009808
+  },
+  {
+   "id": "1ygc",
+   "refinement_s": 86.0656995899626,
+   "confidence_scoring_s": 9.766493756033015
+  },
+  {
+   "id": "1yqy",
+   "refinement_s": 86.13833975396119,
+   "confidence_scoring_s": 9.772876080998685
+  },
+  {
+   "id": "1yv3",
+   "refinement_s": 86.21625403000508,
+   "confidence_scoring_s": 8.80963440897176
+  },
+  {
+   "id": "1yvf",
+   "refinement_s": 85.3322809439851,
+   "confidence_scoring_s": 9.758219228009693
+  },
+  {
+   "id": "1ywr",
+   "refinement_s": 83.4555115600233,
+   "confidence_scoring_s": 10.112714811984915
+  },
+  {
+   "id": "1z95",
+   "refinement_s": 102.90130810398841,
+   "confidence_scoring_s": 10.398220992006827
+  },
+  {
+   "id": "2bm2",
+   "refinement_s": 81.85888548695948,
+   "confidence_scoring_s": 9.581949857994914
+  },
+  {
+   "id": "2br1",
+   "refinement_s": 88.06262796605006,
+   "confidence_scoring_s": 9.007481674023438
+  },
+  {
+   "id": "2bsm",
+   "refinement_s": 92.05325207998976,
+   "confidence_scoring_s": 10.734078303969
+  }
+ ],
+ "scope": "Measurement-only rerun of refinement and scoring on saved raw banks; no reported outcome replaced."
+}
