@@ -120,7 +120,7 @@ def render(out):
                        Patch(facecolor=COLORS[0], label="Joint oracle (RMSD & PB)"),
                        Patch(facecolor="white", edgecolor=DARK, hatch="//", label="RMSD-only oracle")],
               frameon=False, fontsize=8, ncol=2, loc="upper center", bbox_to_anchor=(0.5, -0.17))
-    fig.subplots_adjust(wspace=0.26, hspace=0.66)
+    fig.subplots_adjust(wspace=0.26, hspace=0.42)
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, bbox_inches="tight", metadata={"CreationDate": None, "ModDate": None})
     fig.savefig(out.with_suffix(".png"), dpi=170, bbox_inches="tight")

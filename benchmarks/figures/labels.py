@@ -40,12 +40,13 @@ def success_labels(
             color=DARK,
             zorder=5,
         )
+        # Short bars centre the label inside the bar, clear of both error bars.
         short = valid < 20
         ax.text(
-            valid + (valid_sd or 0) + 1.5 if short else max(valid / 2, valid - (valid_sd or 0) - 3),
+            valid / 2 if short else max(valid / 2, valid - (valid_sd or 0) - 3),
             position,
             f"{valid:.1f}",
-            ha="left" if short else "right",
+            ha="center" if short else "right",
             va="center",
             fontsize=8.5,
             color=DARK,
