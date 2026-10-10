@@ -1649,6 +1649,18 @@ Guidance controls add the capped energy drift in Eq.~\eqref{eq:si_guidance_drift
 \end{figure}
 
 \clearpage
+\subsection{Readout ablation}
+\label{si:readout_ablation}
+
+Fig.~\ref{fig:readout-ablation} reports the matched readout ablation described in Online Methods. Both arms were trained from scratch with identical data, configuration, seed, schedule and GPU type and evaluated at the terminal EMA checkpoint, as fixed before training. The direct arm reads fragment-node features with the same head structure and emits one polar translational and one axial angular vector per fragment, projected onto the observable subspace. Internal-validation rollout success was 11.1\% and 10.8\% (paired difference +0.3 percentage points; 95\% interval \(-0.8\) to +1.4). In unrefined Astex banks, oracle@100 was 89.4\% and 91.8\% (\(-2.4\); \(-5.9\) to 0.0) and oracle@10 51.8\% and 50.6\% (+1.2; \(-4.7\) to +7.1); in PoseBusters v2 banks, oracle@100 was 88.3\% and 87.0\% (+1.3; \(-1.0\) to +3.9) and oracle@10 53.2\% and 52.3\% (+1.0; \(-3.2\) to +5.2). Intervals are complex-level paired bootstrap intervals and do not include training-seed variation. Both reduced-budget models remain below the released model, whose raw-bank oracle@100 was 96.9\% on Astex and 94.6\% on PoseBusters v2, so these results compare readouts rather than estimating production performance.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\linewidth,keepaspectratio]{readout_ablation.pdf}
+    \caption{\textbf{Matched readout ablation.} Two docking models trained from scratch for 100,000 updates with a global batch of 16 complexes differ only in the output head: the Newton--Euler least-squares readout of atom vectors or a direct fragment readout. (A) Internal-validation rollout success (single sample, 20 steps, 1,076 complexes) every 10,000 updates using the EMA weights. (B,C) Unrefined 100-pose, ten-step banks on Astex Diverse Set and PoseBusters v2 at the terminal checkpoint: RMSD \(<2\,\angstrom\) oracle coverage among the first 10 and all 100 generated candidates and the mean fraction of near-native candidates. One training seed per arm; no refinement or confidence ranking.}
+    \label{fig:readout-ablation}
+\end{figure}
+
 \bibliographystyle{unsrt}
 \bibliography{references}
 

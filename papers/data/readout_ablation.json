@@ -1,0 +1,202 @@
+{
+ "protocol": "Matched from-scratch training, 100,000 updates, global batch 16; terminal EMA; see main-text Methods (Readout ablation).",
+ "parameters": {
+  "newton_euler": 5719970,
+  "fragment_direct": 5736898
+ },
+ "curves": {
+  "newton_euler": [
+   {
+    "step": 10000,
+    "median_rmsd": 5.69,
+    "success_2A": 5.2
+   },
+   {
+    "step": 20000,
+    "median_rmsd": 5.67,
+    "success_2A": 5.9
+   },
+   {
+    "step": 30000,
+    "median_rmsd": 5.51,
+    "success_2A": 6.7
+   },
+   {
+    "step": 40000,
+    "median_rmsd": 5.25,
+    "success_2A": 7.8
+   },
+   {
+    "step": 50000,
+    "median_rmsd": 5.2,
+    "success_2A": 8.4
+   },
+   {
+    "step": 60000,
+    "median_rmsd": 5.12,
+    "success_2A": 9.0
+   },
+   {
+    "step": 70000,
+    "median_rmsd": 5.01,
+    "success_2A": 9.7
+   },
+   {
+    "step": 80000,
+    "median_rmsd": 4.97,
+    "success_2A": 10.5
+   },
+   {
+    "step": 90000,
+    "median_rmsd": 4.93,
+    "success_2A": 10.9
+   },
+   {
+    "step": 100000,
+    "median_rmsd": 4.94,
+    "success_2A": 11.1
+   }
+  ],
+  "fragment_direct": [
+   {
+    "step": 10000,
+    "median_rmsd": 5.77,
+    "success_2A": 5.2
+   },
+   {
+    "step": 20000,
+    "median_rmsd": 5.64,
+    "success_2A": 6.0
+   },
+   {
+    "step": 30000,
+    "median_rmsd": 5.5,
+    "success_2A": 7.2
+   },
+   {
+    "step": 40000,
+    "median_rmsd": 5.28,
+    "success_2A": 8.4
+   },
+   {
+    "step": 50000,
+    "median_rmsd": 5.15,
+    "success_2A": 9.1
+   },
+   {
+    "step": 60000,
+    "median_rmsd": 5.12,
+    "success_2A": 9.3
+   },
+   {
+    "step": 70000,
+    "median_rmsd": 5.04,
+    "success_2A": 9.7
+   },
+   {
+    "step": 80000,
+    "median_rmsd": 4.97,
+    "success_2A": 10.7
+   },
+   {
+    "step": 90000,
+    "median_rmsd": 4.83,
+    "success_2A": 10.7
+   },
+   {
+    "step": 100000,
+    "median_rmsd": 4.79,
+    "success_2A": 10.8
+   }
+  ]
+ },
+ "report": {
+  "protocol": "docs/READOUT_ABLATION_PROTOCOL.md",
+  "arms": {
+   "newton_euler": {
+    "val_success_2A": 11.059479415416718,
+    "val_median_rmsd": 4.944386959075928,
+    "astex": {
+     "oracle100": 89.41176470588236,
+     "oracle10": 51.76470588235295,
+     "median_min_rmsd": 1.0625590396783378,
+     "candidate_lt2": 12.705882352941176
+    },
+    "posebusters": {
+     "oracle100": 88.31168831168831,
+     "oracle10": 53.246753246753244,
+     "median_min_rmsd": 1.1313332591904834,
+     "candidate_lt2": 13.2987012987013
+    }
+   },
+   "fragment_direct": {
+    "val_success_2A": 10.780669003725052,
+    "val_median_rmsd": 4.791615962982178,
+    "astex": {
+     "oracle100": 91.76470588235294,
+     "oracle10": 50.588235294117645,
+     "median_min_rmsd": 0.9855710772236032,
+     "candidate_lt2": 12.2
+    },
+    "posebusters": {
+     "oracle100": 87.01298701298701,
+     "oracle10": 52.27272727272727,
+     "median_min_rmsd": 1.125014030057195,
+     "candidate_lt2": 13.142857142857142
+    }
+   }
+  },
+  "paired": {
+   "val_success_2A_pp": {
+    "diff": 0.2788104089219326,
+    "ci95": [
+     -0.8364312267657992,
+     1.3940520446096643
+    ]
+   },
+   "astex_oracle100_pp": {
+    "diff": -2.35294117647058,
+    "ci95": [
+     -5.882352941176472,
+     0.0
+    ]
+   },
+   "astex_oracle10_pp": {
+    "diff": 1.176470588235301,
+    "ci95": [
+     -4.705882352941177,
+     7.058823529411767
+    ]
+   },
+   "astex_candidate_lt2_pp": {
+    "diff": 0.5058823529411755,
+    "ci95": [
+     -0.29411764705882526,
+     1.3294117647058816
+    ]
+   },
+   "posebusters_oracle100_pp": {
+    "diff": 1.2987012987012991,
+    "ci95": [
+     -0.9740259740259827,
+     3.8961038961038974
+    ]
+   },
+   "posebusters_oracle10_pp": {
+    "diff": 0.9740259740259716,
+    "ci95": [
+     -3.2467532467532423,
+     5.1948051948051965
+    ]
+   },
+   "posebusters_candidate_lt2_pp": {
+    "diff": 0.15584415584415645,
+    "ci95": [
+     -0.23701298701298834,
+     0.5584415584415581
+    ]
+   }
+  }
+ },
+ "note": "Paired bootstrap intervals (10,000 complex-level resamples) describe evaluation uncertainty only; one training seed per arm."
+}

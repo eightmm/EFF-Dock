@@ -56,8 +56,7 @@ Jaemin Sim\textsuperscript{1} and Juyong Lee\textsuperscript{1,2,3,4,*}\\[0.75em
 \maketitle
 
 \begin{abstract}
-Protein--ligand docking must generate a near-native pose, keep it physically valid and select it from many candidates, yet benchmarks usually report only the selected pose. We present \method, a supplied-pocket method that learns an \(\SE(3)\)-equivariant flow over rigid ligand fragments, converts predicted atom vectors into fragment motion with a least-squares Newton--Euler readout, and adds bounded energy refinement and confidence ranking. Across five redocking cohorts, 100-pose banks contained an RMSD \(<2\,\angstrom\) candidate for 88--97\% of complexes, and selected poses reached 53--80\% RMSD--PoseBusters success, comparable to the strongest baseline on PoseBusters v2. Official checks on all 235,800 Astex and PoseBusters v2 candidates showed that refinement raised candidate validity from 24--27\% to 88\%, whereas a valid near-native candidate went unselected for 14\% of complexes, two-thirds or more of remaining failures. %E2ABS
-Candidate selection, not generation, limits this pipeline.
+Protein--ligand docking must generate a near-native pose, keep it physically valid and select it from many candidates, yet benchmarks usually report only the selected pose. We present \method, a supplied-pocket method that learns an \(\SE(3)\)-equivariant flow over rigid ligand fragments, followed by bounded energy refinement and confidence ranking. Across five redocking cohorts, 100-pose banks contained an RMSD \(<2\,\angstrom\) candidate for 88--97\% of complexes, and selected poses reached 53--80\% RMSD--PoseBusters success, comparable to the strongest baseline on PoseBusters v2. Official checks on all 235,800 Astex and PoseBusters v2 candidates showed that refinement raised candidate validity from 24--27\% to 88\%, whereas a valid near-native candidate went unselected for 14\% of complexes, two-thirds or more of remaining failures. A matched ablation found no clear advantage of a least-squares Newton--Euler readout over direct fragment prediction. Candidate selection, not generation, limits this pipeline.
 \end{abstract}
 
 \label{sec:introduction}
@@ -119,6 +118,10 @@ Supplementary Table~S15 and Fig.~S20 extend the comparison to PhiBench-derived, 
 \end{figure}
 
 \FloatBarrier
+
+\subsection{Newton--Euler readout ablation}
+
+To test whether the least-squares Newton--Euler readout contributes to candidate generation, we trained two docking models from scratch that differed only in the output head: the Newton--Euler readout, and a direct readout that predicts each fragment's translational and angular velocity from its node features (Methods). Under this matched, reduced budget, about 2\% of the training samples seen by the released model, the two readouts performed similarly throughout training (Supplementary Fig.~S21). At the terminal checkpoint, internal-validation rollout success was 11.1\% with the Newton--Euler readout and 10.8\% with the direct readout (paired difference +0.3 percentage points; 95\% interval \(-0.8\) to +1.4). In unrefined 100-pose banks, oracle coverage was 89.4\% versus 91.8\% on Astex (\(-2.4\) points; \(-5.9\) to 0.0) and 88.3\% versus 87.0\% on PoseBusters v2 (+1.3 points; \(-1.0\) to +3.9). We found no clear advantage for the least-squares readout under this protocol. The experiment does not establish equivalence and does not assess production-scale training, the ranked pipeline or variability across training seeds.
 
 \subsection{Refinement and chirality-aware selection}
 
@@ -189,7 +192,7 @@ Refinement and confidence scoring retained the original unperturbed center in al
 
 Measuring candidate generation, coordinate validity and selection on the same banks locates where this docking pipeline loses accuracy. Absence of an RMSD-successful candidate was a minority failure mode in the evaluated refined banks: refined 100-pose banks contained an RMSD-successful candidate for 87.9--96.5\% of complexes, and on Astex and PoseBusters v2 a candidate that was also physically valid for 94.1\% and 93.1\%. Refinement accounted for most of the observed PoseBusters-validity gain. Fewer than one in three raw candidates passed PoseBusters, whereas bounded refinement made 88\% pass, with relatively few candidates crossing the RMSD-success threshold in either direction. Selection accounted for most of the remaining failures, 71\% and 66\% of failures on Astex and PoseBusters v2: a valid near-native candidate was available but not selected for about one in seven Astex and PoseBusters v2 complexes, roughly twice the fraction that lacked one.
 
-% E2_PARAGRAPH
+The readout ablation qualifies the architectural interpretation. A direct fragment readout matched the Newton--Euler readout under equal reduced-budget training, so the accuracy reported here should be attributed to the fragment flow, refinement and ranking pipeline as a whole rather than to the least-squares readout. The readout remains a convenient construction: it acts on per-atom vectors, assigns no angular velocity to unobservable rotation axes, and gives each fragment velocity an explicit rigid-body interpretation, but these properties did not translate into measurably better candidates in this experiment.
 
 Two features of the ranking loss indicate where improvement is likely. Loss was largest where near-native candidates were sparse, as on OpenBind, and for larger, more flexible ligands, whose banks retained high oracle coverage. In nested generation prefixes, adding candidates never reduced oracle coverage but could reduce top-1 success when the ranker promoted an incorrect new pose. Confidence models for docking should therefore be evaluated not only by discrimination within a fixed bank but also by their stability as the bank grows, and the joint oracle gives the headroom against which such improvements can be measured.
 
