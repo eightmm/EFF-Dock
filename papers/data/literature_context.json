@@ -15,7 +15,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 83.0097
     },
     {
       "dataset": "PhiBench",
@@ -30,7 +31,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 77.6699
     },
     {
       "dataset": "PhiBench",
@@ -45,7 +47,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 64.0777
     },
     {
       "dataset": "PhiBench",
@@ -60,7 +63,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 63.5922
     },
     {
       "dataset": "PhiBench",
@@ -75,7 +79,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 59.7087
     },
     {
       "dataset": "PhiBench",
@@ -90,7 +95,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 55.3398
     },
     {
       "dataset": "PhiBench",
@@ -105,7 +111,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 47.5728
     },
     {
       "dataset": "PhiBench",
@@ -120,7 +127,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 46.6019
     },
     {
       "dataset": "PhiBench",
@@ -135,7 +143,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 35.9223
     },
     {
       "dataset": "PhiBench",
@@ -150,7 +159,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 32.0388
     },
     {
       "dataset": "PhiBench",
@@ -165,7 +175,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 22.8155
     },
     {
       "dataset": "PhiBench",
@@ -180,7 +191,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 21.8447
     },
     {
       "dataset": "PhiBench",
@@ -195,7 +207,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 22.8155
     },
     {
       "dataset": "PhiBench",
@@ -210,7 +223,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 21.8447
     },
     {
       "dataset": "PhiBench",
@@ -225,7 +239,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 27.6699
     },
     {
       "dataset": "PhiBench",
@@ -240,7 +255,8 @@
       "source": "https://assets-eu.researchsquare.com/files/rs-6600109/v1/7a2257127f9a0844b44586e0.pdf",
       "source_sha256": "422317a69923ef44d94cc621285a217d6695d73c76bb3bd3f27aee660f36e710",
       "source_version": "Research Square rs-6600109 v1 Supplementary Table 2, printed page 20/37",
-      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction."
+      "source_verification": "Exact success numerators and method-specific denominators extracted from the primary supplementary table; pocket arm confirmed against primary Figure 2. Source PB-valid column is interpreted with the main-text same-pose PAL-RMSD/PB conjunction.",
+      "success_percent_over_all_206": 23.301
     },
     {
       "dataset": "FoldBench",
