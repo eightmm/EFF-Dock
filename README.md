@@ -55,8 +55,11 @@ RMSD. Click a view to enlarge it. [Animation details and provenance](docs/assets
 
 ## Install
 
-The supported environment is Linux, Python 3.12 and an NVIDIA GPU/driver
-compatible with CUDA 13.0. Install [uv](https://docs.astral.sh/uv/) and
+The accelerated environment is Linux, Python 3.12 and an NVIDIA GPU/driver
+compatible with CUDA 13.0. Apple Silicon Macs support inference, single-device
+training and evaluation with native PyTorch. MPS is selected automatically
+when available, with CPU as a fallback; multi-process training remains
+CUDA-only. Install [uv](https://docs.astral.sh/uv/) and
 [Git LFS](https://git-lfs.com/) first. The Python version and dependencies are
 pinned in `.python-version` and `uv.lock`.
 
@@ -68,6 +71,16 @@ git lfs pull
 uv sync --frozen --python 3.12
 uv run python scripts/verify_release.py
 ```
+
+On Apple Silicon, use the same `uv sync --frozen --python 3.12` command. The
+lockfile selects macOS PyTorch and skips Linux-only CUDA and PyG extension
+wheels. Use `--device mps` to request Apple GPU inference explicitly, or
+`--device cpu` if an operation is unsupported by your installed PyTorch MPS
+backend. For docking and evaluation, omit `--device` to select the available
+backend automatically. For training use `uv run eff-dock train --device mps`;
+confidence training also accepts `--device mps`. Training on a Mac runs in
+float32 and can be much slower than the CUDA setup. Distributed training and
+the retained large-scale benchmark shard scripts remain Linux/CUDA workflows.
 
 The LFS download contains approximately 100 MB of model files. If cloning was
 done with LFS downloads disabled, `git lfs pull` replaces the pointer files
@@ -89,7 +102,6 @@ uv run eff-dock dock \
   --confidence-frame-policy contextual_v1 \
   --rank-by confidence \
   --no-score \
-  --device cuda \
   --seed 42 \
   --output-dir outputs/docked
 ```
@@ -114,9 +126,10 @@ For a small installation check using a synthetic receptor and one pose:
 uv run python scripts/verify_release.py --smoke
 ```
 
-This check requires an available CUDA GPU and exercises preparation, sampling,
-confidence scoring and SDF export with the released checkpoints. It is not an
-accuracy benchmark; the command without `--smoke` only loads the models on CPU.
+This check chooses CUDA, MPS or CPU automatically (or accepts `--device cpu`)
+and exercises preparation, sampling, confidence scoring and SDF export with
+the released checkpoints. It is not an accuracy benchmark; the command without
+`--smoke` only loads the models on CPU.
 
 <details>
 <summary>Python API</summary>
@@ -134,7 +147,6 @@ dock(DockingOptions(
     confidence_frame_policy="contextual_v1",
     rank_by="confidence",
     score=False,
-    device="cuda",
     seed=42,
     out_dir=Path("outputs/docked"),
 ))

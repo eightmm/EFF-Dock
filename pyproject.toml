@@ -17,6 +17,7 @@ classifiers = [
     "Environment :: GPU :: NVIDIA CUDA :: 13",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
+    "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -26,7 +27,7 @@ classifiers = [
 dependencies = [
     "biopython==1.87",
     "cuequivariance==0.9.0",
-    "cuequivariance-ops-torch-cu13==0.9.0",
+    "cuequivariance-ops-torch-cu13==0.9.0; sys_platform == 'linux'",
     "cuequivariance-torch==0.9.0",
     "e3nn==0.6.0",
     "einops==0.8.2",
@@ -42,10 +43,10 @@ dependencies = [
     "rdkit==2025.9.5",
     "scipy==1.17.1",
     "torch==2.10.0",
-    "torch-cluster==1.6.3+pt210cu130",
-    "torch-geometric==2.7.0",
-    "torch-scatter==2.1.2+pt210cu130",
-    "torch-sparse==0.6.18+pt210cu130",
+    "torch-cluster==1.6.3+pt210cu130; sys_platform == 'linux'",
+    "torch-geometric==2.7.0; sys_platform == 'linux'",
+    "torch-scatter==2.1.2+pt210cu130; sys_platform == 'linux'",
+    "torch-sparse==0.6.18+pt210cu130; sys_platform == 'linux'",
     "tqdm==4.67.3",
     "wandb==0.25.0",
 ]
@@ -93,7 +94,7 @@ url = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 [tool.uv.sources]
-torch = { index = "pytorch" }
+torch = [{ index = "pytorch", marker = "sys_platform == 'linux'" }]
 
 [tool.ruff]
 line-length = 100

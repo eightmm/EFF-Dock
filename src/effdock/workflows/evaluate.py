@@ -18,6 +18,7 @@ from rdkit import Chem
 
 from effdock.checkpoint import ORIENTATION_INJECTIONS, checkpoint_orientation_injection
 from effdock.confidence.features import FRAME_RECOVERY_POLICIES
+from effdock.device import resolve_device
 from effdock.evaluation.benchmark import (
     apply_refinement,
     compute_pose_rmsd_with_method,
@@ -30,6 +31,7 @@ from effdock.evaluation.benchmark import (
 from effdock.evaluation.benchmark import (
     load_ligand as load_ref_ligand,
 )
+from effdock.evaluation.interaction_recovery import interaction_recovery
 from effdock.evaluation.pose_scoring import build_protein_vina_inputs, score_poses
 from effdock.evaluation.pose_validity import check_validity, ligand_bounds, vdw_radii
 from effdock.guidance.feynman_kac import (
@@ -1217,6 +1219,33 @@ def evaluate_one(
             ]
         confidence_score_ledger = confidence_score_ledger_json(confidence_scores)
 
+    interaction_recovery_by_selector: dict[str, dict | None] = {}
+    interaction_recovery_unavailable_reason = ""
+    if mapping_metadata["accepted"]:
+        input_to_ref = dict(zip(dock_idx, ref_idx, strict=True))
+        ref_pos_in_input = torch.empty((mol_in.GetNumAtoms(), 3), dtype=torch.float32)
+        for input_idx, ref_atom_idx in input_to_ref.items():
+            ref_pos_in_input[input_idx] = ref_pos_abs[ref_atom_idx]
+        pocket_center_abs = meta["pocket_center"].cpu()
+        metrics_by_pose: dict[int, dict | None] = {}
+        for selector, index in selector_indices.items():
+            if index not in metrics_by_pose:
+                try:
+                    metrics_by_pose[index] = interaction_recovery(
+                        mol_in,
+                        poses[index] + pocket_center_abs,
+                        ref_pos_in_input,
+                        item.protein,
+                    )
+                except ValueError as exc:
+                    metrics_by_pose[index] = None
+                    interaction_recovery_unavailable_reason = str(exc)
+            interaction_recovery_by_selector[selector] = metrics_by_pose[index]
+    else:
+        interaction_recovery_unavailable_reason = (
+            "incomplete_or_connectivity_mismatched_ligand_mapping"
+        )
+
     absolute_poses = [pose.cpu() + meta["pocket_center"].cpu() for pose in poses]
     prot = build_protein_vina_inputs(
         item.protein,
@@ -1363,6 +1392,13 @@ def evaluate_one(
         "oracle_rmsd": float(rmsds[oracle_i]),
         "candidate_rmsds_json": _canonical_json([float(rmsd) for rmsd in rmsds]),
         "candidate_rmsd_method_json": _canonical_json(rmsd_methods),
+        "interaction_recovery_contract": "distance_fingerprint_v1",
+        "interaction_recovery_available": bool(interaction_recovery_by_selector)
+        and all(value is not None for value in interaction_recovery_by_selector.values()),
+        "interaction_recovery_unavailable_reason": interaction_recovery_unavailable_reason,
+        "interaction_recovery_by_selector_json": _canonical_json(
+            interaction_recovery_by_selector
+        ),
         "num_mapped_index_rmsd_fallback_candidates": sum(
             method == "mapped_index_fallback" for method in rmsd_methods
         ),
@@ -1980,7 +2016,7 @@ def main(argv: list[str] | None = None) -> None:
     if not complexes:
         raise SystemExit(f"No complexes found in {args.data_dir}")
 
-    device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    device = resolve_device(args.device)
     model, cfg, ckpt = load_model(
         args.config, args.checkpoint, device, orientation_injection=args.orientation_injection
     )

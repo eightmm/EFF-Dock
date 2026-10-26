@@ -7,6 +7,7 @@ import math
 import os
 import random
 import time
+from contextlib import nullcontext
 from datetime import timedelta
 from pathlib import Path
 
@@ -26,6 +27,7 @@ from effdock.checkpoint import (
     load_portable_model_state,
 )
 from effdock.data.dataset import EFFDockDataset, effdock_collate
+from effdock.device import move_module_to_device, resolve_device
 from effdock.geometry.flow_matching import integrate_se3_step, sample_prior_poses
 from effdock.geometry.se3 import quaternion_to_matrix
 from effdock.models.effdock import EFFDock
@@ -43,6 +45,8 @@ def setup_ddp() -> tuple[int, int, int]:
     # When scripts/train.py masks CUDA_VISIBLE_DEVICES per rank (workaround for
     # cuEquivariance DDP), each process only sees one GPU as cuda:0.
     if world_size > 1:
+        if not torch.cuda.is_available():
+            raise RuntimeError("Multi-process training currently requires CUDA.")
         cuda_idx = 0 if torch.cuda.device_count() == 1 else local_rank
         torch.cuda.set_device(cuda_idx)
         timeout_minutes = int(os.environ.get("EFFDOCK_DDP_TIMEOUT_MIN", "10"))
@@ -50,6 +54,13 @@ def setup_ddp() -> tuple[int, int, int]:
             raise ValueError("EFFDOCK_DDP_TIMEOUT_MIN must be positive")
         dist.init_process_group(backend="nccl", timeout=timedelta(minutes=timeout_minutes))
     return rank, local_rank, world_size
+
+
+def _training_autocast(device: torch.device, dtype: torch.dtype, enabled: bool):
+    """Use mixed precision only on CUDA; CPU and MPS train in float32."""
+    if device.type != "cuda" or not enabled:
+        return nullcontext()
+    return torch.autocast(device_type="cuda", dtype=dtype)
 
 
 def cleanup_ddp(world_size: int) -> None:
@@ -312,12 +323,13 @@ class Trainer:
         self.cfg = cfg
         self.rank, self.local_rank, self.world_size = setup_ddp()
         # cuda:0 inside each rank (per-rank CUDA_VISIBLE_DEVICES) or local_rank
-        # when unmasked (e.g. single-process run with all GPUs visible).
-        if torch.cuda.is_available():
-            cuda_idx = 0 if torch.cuda.device_count() == 1 else self.local_rank
-            self.device = torch.device(f"cuda:{cuda_idx}")
-        else:
-            self.device = torch.device("cpu")
+        # when unmasked; otherwise use MPS when available, then CPU.
+        requested_device = cfg["training"].get("device")
+        if requested_device is None and self.world_size > 1:
+            requested_device = f"cuda:{0 if torch.cuda.device_count() == 1 else self.local_rank}"
+        self.device = resolve_device(requested_device)
+        if self.world_size > 1 and self.device.type != "cuda":
+            raise RuntimeError("Multi-process training currently requires CUDA.")
         self.is_main = self.rank == 0
 
         torch.manual_seed(cfg["training"].get("seed", 42))
@@ -336,7 +348,10 @@ class Trainer:
         # Model
         cfg["model"].setdefault("orientation_injection", "legacy_rt_w")
         model_kwargs = {k: v for k, v in cfg["model"].items() if k != "model_type"}
-        self.model = EFFDock(**model_kwargs).to(self.device)
+        from effdock.models.equivariant import linear_method_for_device
+
+        with linear_method_for_device(self.device):
+            self.model = move_module_to_device(EFFDock(**model_kwargs), self.device)
         if self.world_size > 1:
             ddp_device = self.device.index
             self.model = DDP(
@@ -408,7 +423,7 @@ class Trainer:
         # fused_tp kernels only support FP32 inputs (they raise on BF16).
         # TF32 is enabled globally in scripts/train.py and already accelerates
         # the scalar path of the model.
-        self.use_amp = tcfg.get("use_amp", False)
+        self.use_amp = bool(tcfg.get("use_amp", False)) and self.device.type == "cuda"
         self.amp_dtype = torch.bfloat16
         self.dummy_weight = tcfg.get("dummy_weight", 0.0)
         self.use_time_weighting = tcfg.get("use_time_weighting", True)
@@ -602,7 +617,7 @@ class Trainer:
 
         loader_kwargs = dict(
             collate_fn=collate_fn,
-            pin_memory=torch.cuda.is_available(),
+            pin_memory=self.device.type == "cuda",
             persistent_workers=False,
             prefetch_factor=4 if nw > 0 else None,
         )
@@ -670,13 +685,14 @@ class Trainer:
         else:
             time_weight = None
 
+        count_dtype = torch.float32 if self.device.type == "mps" else torch.float64
         counts = torch.tensor(
             [
                 batch["frag_sizes"].numel(),
                 (batch["frag_sizes"] > 1).sum().item(),
                 batch["atom_pos_t"].numel(),
             ],
-            dtype=torch.float64,
+            dtype=count_dtype,
             device=self.device,
         )
         local_counts = counts.clone()
@@ -741,7 +757,7 @@ class Trainer:
                 lig_frag_slice=batch["lig_frag_slice"],
             )
             dg_normalizer = torch.tensor(
-                float(dg["normalizer"]), dtype=torch.float64, device=self.device
+                float(dg["normalizer"]), dtype=count_dtype, device=self.device
             )
             global_dg_normalizer = dg_normalizer.clone()
             if self.world_size > 1:
@@ -1137,9 +1153,7 @@ class Trainer:
                         break
 
                     batch = self._dict_batch_to_device(batch, self.device)
-                    with torch.autocast(
-                        device_type="cuda", dtype=self.amp_dtype, enabled=self.use_amp
-                    ):
+                    with _training_autocast(self.device, self.amp_dtype, self.use_amp):
                         out = self.model(batch)
                     losses = self._compute_loss_unified(out, batch)
                     raw_loss = losses["loss"]
@@ -1369,7 +1383,7 @@ class Trainer:
         with torch.no_grad():
             for batch in self.val_loader:
                 batch = self._dict_batch_to_device(batch, self.device)
-                with torch.autocast(device_type="cuda", dtype=self.amp_dtype, enabled=self.use_amp):
+                with _training_autocast(self.device, self.amp_dtype, self.use_amp):
                     out = em(batch)
                 losses = self._compute_loss_unified(out, batch)
                 total_loss += losses["loss"].item()
@@ -1500,7 +1514,7 @@ class Trainer:
             batch_gpu["frag_sizes"] = frag_sizes
             batch_gpu["t"] = t_val.view(1, 1)
 
-            with torch.autocast(device_type="cuda", dtype=self.amp_dtype, enabled=self.use_amp):
+            with _training_autocast(self.device, self.amp_dtype, self.use_amp):
                 out = raw_model(batch_gpu)
             if self.pose_objective in ("vp_score", "vp_score_full"):
                 sigma_per_frag = torch.full(

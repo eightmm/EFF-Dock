@@ -633,5 +633,13 @@ runs/
 /benchmarks/figures/
 /benchmarks/results/
 /benchmarks/reference/
+!/benchmarks/figures/
+!/benchmarks/results/
+benchmarks/figures/*
+benchmarks/results/*
+!/benchmarks/figures/README.md
+!/benchmarks/figures/render_guidance_relaxation.py
+!/benchmarks/figures/guidance_relaxation_inline.html
+!/benchmarks/results/README.md
 /scripts/paper_*.py
 /scripts/collect_paper_*.py

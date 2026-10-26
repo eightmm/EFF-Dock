@@ -14,6 +14,25 @@ _FRAME_RANK_RELATIVE_TOLERANCE = 1e-6
 _FRAME_CONTEXT_RELATIVE_TOLERANCE = 1e-5
 
 
+def _svd(
+    matrix: torch.Tensor, *, use_double: bool = False
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Run float64 SVD on CPU for MPS, which does not support float64."""
+    if matrix.device.type == "mps":
+        u, singular, vh = torch.linalg.svd(matrix.detach().cpu().to(torch.float64))
+        return u.to(matrix), singular.to(matrix), vh.to(matrix)
+    if use_double:
+        u, singular, vh = torch.linalg.svd(matrix.to(torch.float64))
+        return u.to(matrix), singular.to(matrix), vh.to(matrix)
+    return torch.linalg.svd(matrix)
+
+
+def _svdvals(matrix: torch.Tensor) -> torch.Tensor:
+    if matrix.device.type == "mps":
+        return torch.linalg.svdvals(matrix.detach().cpu().to(torch.float64)).to(matrix)
+    return torch.linalg.svdvals(matrix.to(torch.float64)).to(matrix)
+
+
 def _context_perpendicular(
     vectors: torch.Tensor, axis: torch.Tensor
 ) -> tuple[torch.Tensor, torch.Tensor]:
@@ -46,7 +65,7 @@ def _rank_one_rotation(
     template_context: torch.Tensor | None,
     receptor_context: torch.Tensor | None,
 ) -> torch.Tensor:
-    _, _, Vh = torch.linalg.svd((local - local.mean(0)).double())
+    _, _, Vh = _svd(local - local.mean(0), use_double=True)
     axis = Vh[0].to(local)
     # A template-only sign convention is unaffected by global scene rotations.
     direction = local - local[0]
@@ -153,7 +172,7 @@ def recover_frag_state(
         x = local_pos[mask]
         T[f] = y.mean(dim=0)
         if frame_policy == "contextual_v1":
-            singular = torch.linalg.svdvals((x - x.mean(0)).double())
+            singular = _svdvals(x - x.mean(0))
             threshold = max(1e-12, float(singular.max()) * _FRAME_RANK_RELATIVE_TOLERANCE)
             rank = int((singular > threshold).sum())
             world_context = atom_pos - T[f]
@@ -180,7 +199,7 @@ def recover_frag_state(
             continue
         y_c = y - T[f]
         H = x.T @ y_c
-        U, singular, Vh = torch.linalg.svd(H)
+        U, singular, Vh = _svd(H)
         if frame_policy == "contextual_v1" and not bool(
             singular[1] > max(1e-12, float(singular[0]) * 1e-12)
         ):

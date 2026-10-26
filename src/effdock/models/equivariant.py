@@ -14,6 +14,9 @@ Public API:
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 
 import cuequivariance as cue
@@ -21,6 +24,26 @@ import cuequivariance_torch as cuet
 import torch
 import torch.nn as nn
 from torch import Tensor
+
+_LINEAR_METHOD_OVERRIDE: ContextVar[str | None] = ContextVar(
+    "effdock_linear_method_override", default=None
+)
+
+
+def _linear_method() -> str:
+    """Use the accelerated kernel on CUDA and cuEquivariance's PyTorch path elsewhere."""
+    override = _LINEAR_METHOD_OVERRIDE.get()
+    return override or ("fused_tp" if torch.cuda.is_available() else "naive")
+
+
+@contextmanager
+def linear_method_for_device(device: torch.device) -> Iterator[None]:
+    """Select a linear implementation for a model's actual inference device."""
+    token = _LINEAR_METHOD_OVERRIDE.set("fused_tp" if device.type == "cuda" else "naive")
+    try:
+        yield
+    finally:
+        _LINEAR_METHOD_OVERRIDE.reset(token)
 
 # ---------------------------------------------------------------------------
 # Irreps layout helper
@@ -355,7 +378,7 @@ class EquivariantBlock(nn.Module):
             irreps_in,
             irreps_out,
             layout=cue.mul_ir,
-            method="fused_tp",
+            method=_linear_method(),
         )
         self.activation = EquivariantActivation(irreps_out, activation=activation)
         self.dropout = EquivariantDropout(irreps_out, p=dropout) if dropout > 0 else nn.Identity()
@@ -392,7 +415,11 @@ class EquivariantMLP(nn.Module):
 
         blocks: list[nn.Module] = []
         if num_layers == 1:
-            blocks.append(cuet.Linear(irreps_in, irreps_out, layout=cue.mul_ir, method="fused_tp"))
+            blocks.append(
+                cuet.Linear(
+                    irreps_in, irreps_out, layout=cue.mul_ir, method=_linear_method()
+                )
+            )
             self._residual_targets: list[bool] = [False]
         else:
             blocks.append(EquivariantBlock(irreps_in, irreps_hidden, dropout, activation))
@@ -402,7 +429,9 @@ class EquivariantMLP(nn.Module):
                 self._residual_targets.append(True)
             # Final layer: linear only (no activation/dropout).
             blocks.append(
-                cuet.Linear(irreps_hidden, irreps_out, layout=cue.mul_ir, method="fused_tp")
+                cuet.Linear(
+                    irreps_hidden, irreps_out, layout=cue.mul_ir, method=_linear_method()
+                )
             )
             self._residual_targets.append(irreps_hidden == irreps_out)
 
@@ -467,6 +496,7 @@ class GatedEquivariantConv(nn.Module):
             layout_out=cue.mul_ir,
             internal_weights=True,
             shared_weights=True,
+            method=_linear_method(),
         )
 
         # Dual radial MLP (MACE/NEQUIP-style): per-channel scale on input & output.

@@ -23,6 +23,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--config", type=Path, default=Path("configs/train.yaml"))
     parser.add_argument("--resume", type=Path)
     parser.add_argument("--init-from", type=Path)
+    parser.add_argument("--device", choices=("auto", "cuda", "mps", "cpu"), default=None)
     args = parser.parse_args(argv)
     if args.resume and args.init_from:
         parser.error("--resume and --init-from are mutually exclusive")
@@ -34,13 +35,16 @@ def main(argv: list[str] | None = None) -> None:
     import yaml
 
     torch.set_float32_matmul_precision("high")
-    torch.backends.cuda.matmul.allow_tf32 = True
-    torch.backends.cudnn.allow_tf32 = True
+    if torch.cuda.is_available():
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
 
     from effdock.training.trainer import Trainer
 
     with args.config.open() as handle:
         config = yaml.safe_load(handle)
+    if args.device and args.device != "auto":
+        config["training"]["device"] = args.device
     trainer = Trainer(config)
     if args.resume:
         trainer.load_checkpoint(str(args.resume))

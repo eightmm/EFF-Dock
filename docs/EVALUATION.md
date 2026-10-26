@@ -20,6 +20,32 @@ pocket centres may be derived from reference ligands in this
 retrospective redocking setting. The reference pose is used for mapping and RMSD
 evaluation, not as a learned model/scorer input or an energy-refinement target.
 
+## Interaction recovery
+
+Each evaluated complex also records distance-based interaction-fingerprint
+recovery for the first sampled pose and the RMSD oracle pose, when the ligand
+has a complete connectivity-preserving atom mapping. The metric compares typed
+ligand–protein contacts in the pose with contacts in the crystal pose, using
+the same fixed receptor and ligand atom order. Equivalent ligand atoms are
+grouped by RDKit canonical symmetry rank. It reports per-class and micro
+precision/recall/F1, plus macro-F1 over interaction classes present in the
+reference. A class with no reference contacts has undefined recall and F1 and
+does not contribute to macro-F1.
+
+The initial classes and inclusive distance ranges are hydrogen bonds (2.2–3.5
+Å), salt bridges (2.0–4.0 Å), hydrophobic contacts (3.0–4.5 Å), and ligand
+donor/acceptor-to-metal contacts (1.8–2.8 Å). Hydrogen bonds are distance-only:
+the receptor representation has no hydrogens, so donor-angle geometry is not
+evaluated. Waters are omitted by the current receptor parser, and this metric
+does not yet score water bridges, aromatic stacking, or covalent interactions.
+These are declared geometric proxies, not a complete interaction-energy model.
+
+Results are stored in `interaction_recovery_by_selector_json`, keyed by the
+pose selectors in that evaluation row (including `first` and `oracle`).
+`interaction_recovery_available` and `interaction_recovery_unavailable_reason`
+explain missing measurements. This diagnostic supplements RMSD and PoseBusters
+and does not affect pose ranking.
+
 ```bash
 uv run eff-dock evaluate \
   --dataset astex \
