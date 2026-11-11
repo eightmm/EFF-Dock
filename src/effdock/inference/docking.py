@@ -24,6 +24,7 @@ from effdock.checkpoint import (
     validate_orientation_injection,
 )
 from effdock.confidence.features import FRAME_RECOVERY_POLICIES
+from effdock.device import move_module_to_device, resolve_device
 from effdock.inference.defaults import (
     DEFAULT_CONFIDENCE_CHECKPOINT,
     DEFAULT_CONFIG,
@@ -92,10 +93,6 @@ def parse_center(value: str | None) -> torch.Tensor | None:
     return torch.tensor([float(p) for p in parts], dtype=torch.float32)
 
 
-def resolve_device(device: str | None) -> torch.device:
-    return torch.device(device if device else ("cuda" if torch.cuda.is_available() else "cpu"))
-
-
 def _ligand_source_identity(value: str) -> dict[str, str]:
     path = Path(value)
     digest = sha256()
@@ -119,6 +116,7 @@ def load_model(
         cfg = yaml.safe_load(f)
 
     from effdock.models.effdock import EFFDock
+    from effdock.models.equivariant import linear_method_for_device
 
     if "orientation_injection" in cfg["model"]:
         validate_orientation_injection(cfg["model"]["orientation_injection"])
@@ -131,9 +129,10 @@ def load_model(
     # checkpoint-owned unless the caller explicitly requests a frozen-weight change.
     cfg["model"]["orientation_injection"] = effective_orientation
     model_cfg = {k: v for k, v in cfg["model"].items() if k != "model_type"}
-    model = EFFDock(**model_cfg)
+    with linear_method_for_device(device):
+        model = EFFDock(**model_cfg)
     load_portable_model_state(model, ckpt["model_state_dict"])
-    model.to(device)
+    move_module_to_device(model, device)
     model.train(False)
     print(
         f"Orientation injection: {effective_orientation} "

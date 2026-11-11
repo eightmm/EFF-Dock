@@ -16,6 +16,7 @@ from typing import Any
 import torch
 
 from effdock.confidence.features import extract_t1_ligand_irreps
+from effdock.device import resolve_device
 from effdock.inference.docking import load_model
 from effdock.inference.preprocess import build_inference_bundle, load_processed
 from effdock.inference.sampler import sample_unified
@@ -82,7 +83,7 @@ def _manifest_row(pid: str, status: str, **fields: Any) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> None:
     args = _parse_args(argv)
-    device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    device = resolve_device(args.device)
     model, cfg, checkpoint = load_model(args.config, args.checkpoint, device)
     checkpoint_step = int(checkpoint.get("step", -1))
     model_cfg = cfg.get("data", {})

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify checkpoint hashes/loading; optionally run one synthetic CUDA pose."""
+"""Verify checkpoint hashes/loading; optionally run one synthetic pose."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def smoke_inference() -> None:
+def smoke_inference(device: str) -> None:
     """Exercise the released pipeline without downloading a benchmark structure."""
     with TemporaryDirectory(prefix="effdock-release-") as directory:
         root = Path(directory)
@@ -71,7 +71,7 @@ def smoke_inference() -> None:
                 num_steps=1,
                 rank_by="confidence",
                 score=False,
-                device="cuda",
+                device=device,
                 seed=42,
                 out_dir=output,
             )
@@ -91,11 +91,14 @@ def smoke_inference() -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--smoke", action="store_true", help="also run one synthetic pose on an available CUDA GPU")
+    parser.add_argument("--smoke", action="store_true", help="also run one synthetic docking pose")
+    parser.add_argument(
+        "--device",
+        default="auto",
+        help="smoke device: auto, cuda, mps, or cpu (default: auto)",
+    )
     args = parser.parse_args()
     torch.set_num_threads(1)
-    if args.smoke and not torch.cuda.is_available():
-        parser.error("--smoke requires an available CUDA GPU; omit it for CPU model loading")
     for path, expected in EXPECTED_SHA256.items():
         if not path.is_file():
             raise FileNotFoundError(f"release artifact is missing: {path}; run git lfs pull")
@@ -110,7 +113,10 @@ def main() -> None:
             )
 
     if args.smoke:
-        smoke_inference()
+        from effdock.inference.docking import resolve_device
+
+        device = str(resolve_device(None if args.device == "auto" else args.device))
+        smoke_inference(device)
         return
 
     device = torch.device("cpu")

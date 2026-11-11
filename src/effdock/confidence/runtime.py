@@ -11,6 +11,8 @@ import torch
 from effdock.checkpoint import load_portable_model_state, validate_orientation_injection
 from effdock.confidence.features import FRAME_RECOVERY_POLICIES, extract_t1_ligand_irreps
 from effdock.confidence.model import DockingGraphPoseConfidence
+from effdock.device import move_module_to_device
+from effdock.models.equivariant import linear_method_for_device
 
 
 def _arg(args: dict[str, Any], key: str, default: Any) -> Any:
@@ -32,17 +34,19 @@ def load_pose_confidence_model(
         )
     model_cfg = dict(ckpt["model_cfg"])
     train_args = ckpt.get("args", {})
-    model = DockingGraphPoseConfidence(
-        **model_cfg,
-        n_rbf=int(_arg(train_args, "n_rbf", 32)),
-        contact_cutoff=float(_arg(train_args, "contact_cutoff", 5.0)),
-        hidden=int(_arg(train_args, "hidden", 512)),
-        num_layers=int(_arg(train_args, "num_layers", 4)),
-        sh_lmax=int(_arg(train_args, "sh_lmax", 2)),
-        cond_dim=int(_arg(train_args, "cond_dim", 128)),
-        dropout=float(_arg(train_args, "dropout", 0.1)),
-        pose_readout=str(_arg(train_args, "pose_readout", "global_pool")),
-    ).to(device)
+    with linear_method_for_device(device):
+        model = DockingGraphPoseConfidence(
+            **model_cfg,
+            n_rbf=int(_arg(train_args, "n_rbf", 32)),
+            contact_cutoff=float(_arg(train_args, "contact_cutoff", 5.0)),
+            hidden=int(_arg(train_args, "hidden", 512)),
+            num_layers=int(_arg(train_args, "num_layers", 4)),
+            sh_lmax=int(_arg(train_args, "sh_lmax", 2)),
+            cond_dim=int(_arg(train_args, "cond_dim", 128)),
+            dropout=float(_arg(train_args, "dropout", 0.1)),
+            pose_readout=str(_arg(train_args, "pose_readout", "global_pool")),
+        )
+    model = move_module_to_device(model, device)
     load_portable_model_state(model, ckpt["state_dict"])
     model.docking_orientation_injection = validate_orientation_injection(
         ckpt.get("docking_orientation_injection", "legacy_rt_w")

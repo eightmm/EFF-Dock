@@ -36,6 +36,8 @@ from effdock.confidence.dataset import (
 from effdock.confidence.losses import pose_confidence_loss
 from effdock.confidence.model import DockingGraphPoseConfidence
 from effdock.confidence.selectors import select_confidence_poses
+from effdock.device import move_module_to_device, resolve_device
+from effdock.models.equivariant import linear_method_for_device
 from effdock.training.trainer import configure_optimizers, get_warmup_stable_cosine_scheduler
 
 torch.set_float32_matmul_precision("high")
@@ -522,7 +524,7 @@ def setup_ddp() -> tuple[int, int, int]:
     world_size = int(os.environ.get("WORLD_SIZE", 1))
     if world_size > 1:
         if not torch.cuda.is_available():
-            raise RuntimeError("DDP confidence training requires CUDA.")
+            raise RuntimeError("Multi-process confidence training currently requires CUDA.")
         torch.cuda.set_device(0 if torch.cuda.device_count() == 1 else local_rank)
         timeout_minutes = int(os.environ.get("CONFIDENCE_DDP_TIMEOUT_MIN", "180"))
         if timeout_minutes <= 0:
@@ -1508,7 +1510,7 @@ def main(argv: list[str] | None = None) -> None:
 
     random.seed(args.seed + rank)
     torch.manual_seed(args.seed + rank)
-    device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    device = resolve_device(args.device)
     # Synchronous loading already returns the batch on the training process.
     # Pinning its nested variable-size tensors in that same process can block
     # one DDP rank indefinitely while its peer waits in a collective.
@@ -1647,17 +1649,19 @@ def main(argv: list[str] | None = None) -> None:
         persistent_workers=args.num_workers > 0,
     )
 
-    raw_model = DockingGraphPoseConfidence(
-        **model_cfg,
-        n_rbf=args.n_rbf,
-        contact_cutoff=args.contact_cutoff,
-        hidden=args.hidden,
-        num_layers=args.num_layers,
-        sh_lmax=args.sh_lmax,
-        cond_dim=args.cond_dim,
-        dropout=args.dropout,
-        pose_readout=args.pose_readout,
-    ).to(device)
+    with linear_method_for_device(device):
+        raw_model = DockingGraphPoseConfidence(
+            **model_cfg,
+            n_rbf=args.n_rbf,
+            contact_cutoff=args.contact_cutoff,
+            hidden=args.hidden,
+            num_layers=args.num_layers,
+            sh_lmax=args.sh_lmax,
+            cond_dim=args.cond_dim,
+            dropout=args.dropout,
+            pose_readout=args.pose_readout,
+        )
+    raw_model = move_module_to_device(raw_model, device)
     resume_step = 0
     if args.resume is not None:
         ckpt = _load_checkpoint(args.resume, device)
