@@ -9,17 +9,34 @@ and were exported at 2,400 pixels wide without redrawing molecular structures.
 | Image | Description | Source PDF SHA-256 |
 | --- | --- | --- |
 | [workflow.png](workflow.png) | Supplied-pocket docking workflow | `64491ede678dd72f9750c9fd88b5f0b009e3b5398d82891ea91c13f516385820` |
-| [architecture.png](architecture.png) | Docking and confidence model architecture | `345f3f8d20cbcad2e1d52cbc6cafb0062d77fbd1321b17902ec5cea0d8089a6c` |
+| [architecture.png](architecture.png) | Six-panel molecular graph, sampling, readout and network architecture (2026-10-28 revision) | `ecd1a9eafc4344519f81b81c97f2309f12dff26f7f76e01a39a455fbb80c6413` |
 
 The workflow includes study-stage post-refinement and chirality-aware
 reselection. The basic `eff-dock dock` command generates and confidence-ranks
 poses; it does not automatically perform those additional stages. Crystal
 RMSDs shown in the example are retrospective labels, not selection inputs.
 
-The architecture depicts the released primary Newton–Euler readout. Its
-model source was checked against the released docking, confidence and
-equivariant-layer implementations. See [the model contract](../MODEL.md)
-for checkpoint and coordinate-convention details.
+The architecture was refreshed on 2026-11-12 from the 2026-10-28 six-panel
+revision. Panels a–b add the molecular graph and sampling step and the
+Newton–Euler readout geometry; panels c–f expand the networks and their shared
+modules. The example ligand, N-benzylnicotinamide, contains only heavy atoms
+and is split into three rigid fragments using the released cut rules, which
+preserve ring and amide bonds. The per-atom vectors are learned velocity
+proposals. The graph panel shows the explicit `rw` orientation convention;
+checkpoint-compatible historical defaults are documented in
+[coordinate conventions](../ORIENTATION_INJECTION.md).
+
+The figure content was checked against the released docking, confidence and
+equivariant-layer implementations. See [the model contract](../MODEL.md).
+The web export uses:
+
+```bash
+pdftoppm -f 1 -singlefile -scale-to-x 2400 -scale-to-y -1 \
+  -png SOURCE.pdf docs/assets/architecture
+```
+
+The workflow source PDF already matches the current illustration, so its
+export is retained.
 
 ## Animations
 

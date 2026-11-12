@@ -144,12 +144,15 @@ dock(DockingOptions(
 
 ## Architecture
 
-[![EFF-Dock architecture: docking and confidence networks, an interaction layer with residual connections, equivariant convolution, and normalization and activation.](docs/assets/architecture.png)](docs/assets/architecture.png)
+[![EFF-Dock architecture: molecular graph and SE(3) sampling, Newton–Euler fragment readout, docking and confidence networks, gated equivariant convolution, normalization and activation.](docs/assets/architecture.png)](docs/assets/architecture.png)
 
-The docking network predicts fragment translation and rotation through a
-Newton–Euler readout. The confidence network combines atom and protein–ligand
-contact features to predict pose RMSD for ranking. The figure expands the
-shared interaction layers, equivariant convolution, normalization and activation.
+Panels **a–b** show the heavy-atom ligand fragments, graph construction and
+SE(3) sampling step, followed by the Newton–Euler readout from learned per-atom
+velocity proposals to fragment translation and rotation. Panels **c–f** expand
+the docking and confidence networks, interaction layers, gated equivariant
+convolution, normalization and activation. The confidence network predicts
+pose RMSD for ranking. The graph panel uses the explicit `rw` convention in
+the inference example above. Click the figure to inspect the full-size image.
 See the [model contract](docs/MODEL.md) and
 [implementation details](docs/methods/README.md) for the released checkpoints
 and coordinate conventions.
