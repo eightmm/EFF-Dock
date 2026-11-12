@@ -33,20 +33,23 @@ def guidance_implementation_identity() -> dict[str, object]:
         {path.resolve() for path in source_paths if path.is_file()},
         key=lambda path: path.relative_to(effdock_root).as_posix(),
     )
-    runtime_versions = {
-        name: importlib.metadata.version(name)
-        for name in (
-            "cuequivariance",
-            "e3nn",
-            "numpy",
-            "rdkit",
-            "torch",
-            "torch-cluster",
-            "torch-geometric",
-            "torch-scatter",
-            "torch-sparse",
-        )
-    }
+    runtime_versions = {}
+    for name in (
+        "cuequivariance",
+        "e3nn",
+        "numpy",
+        "rdkit",
+        "torch",
+        "torch-cluster",
+        "torch-geometric",
+        "torch-scatter",
+        "torch-sparse",
+    ):
+        try:
+            runtime_versions[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            # The CUDA scatter/cluster wheels are intentionally absent on macOS.
+            runtime_versions[name] = "not-installed"
     runtime_versions["rdkit_runtime"] = rdBase.rdkitVersion
     runtime_versions["torch_runtime"] = torch.__version__
     project_inputs = {

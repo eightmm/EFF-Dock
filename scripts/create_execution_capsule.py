@@ -126,8 +126,10 @@ def create_capsule(
                 continue
             mode = 0o555 if path.is_dir() else 0o444
             path.chmod(mode)
-        temporary.chmod(0o555)
+        # macOS requires the source directory itself to remain writable while
+        # it is renamed; all capsule contents are already read-only here.
         os.replace(temporary, output)
+        output.chmod(0o555)
     except BaseException:
         if temporary.exists():
             for path in temporary.rglob("*"):

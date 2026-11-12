@@ -20,6 +20,7 @@ pytest.importorskip("e3nn")
 import cuequivariance as cue  # noqa: E402
 from e3nn import o3  # noqa: E402
 
+from effdock.device import move_module_to_device, resolve_device
 from effdock.models.equivariant import (  # noqa: E402
     EquivariantActivation,
     EquivariantAdaLN,
@@ -29,6 +30,7 @@ from effdock.models.equivariant import (  # noqa: E402
     EquivariantRMSNorm,
     GatedEquivariantConv,
     IrrepsLayout,
+    linear_method_for_device,
 )
 
 # ---------------------------------------------------------------------------
@@ -199,11 +201,10 @@ def test_equivariant_block_rotation_equivariance():
     torch.manual_seed(0)
     irreps_in = cue.Irreps("O3", "16x0e + 4x1o + 2x2e")
     irreps_out = cue.Irreps("O3", "8x0e + 4x1o + 2x2e + 2x2o")
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    if device == "cpu":
-        pytest.skip("EquivariantBlock uses cuEquivariance CUDA kernels")
-
-    block = set_inference_mode(EquivariantBlock(irreps_in, irreps_out, dropout=0.0).to(device))
+    device = resolve_device()
+    with linear_method_for_device(device):
+        block = EquivariantBlock(irreps_in, irreps_out, dropout=0.0)
+    block = set_inference_mode(move_module_to_device(block, device))
     x = torch.randn(6, irreps_in.dim, device=device)
     R = random_rotation(seed=7).to(device=device, dtype=torch.float32)
 
@@ -215,13 +216,10 @@ def test_equivariant_block_rotation_equivariance():
 def test_equivariant_mlp_rotation_equivariance_with_residual():
     torch.manual_seed(0)
     irreps = cue.Irreps("O3", "16x0e + 4x1o + 2x2e + 2x2o")
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    if device == "cpu":
-        pytest.skip("EquivariantMLP uses cuEquivariance CUDA kernels")
-
-    mlp = set_inference_mode(
-        EquivariantMLP(irreps, irreps, irreps, num_layers=3, dropout=0.0).to(device)
-    )
+    device = resolve_device()
+    with linear_method_for_device(device):
+        mlp = EquivariantMLP(irreps, irreps, irreps, num_layers=3, dropout=0.0)
+    mlp = set_inference_mode(move_module_to_device(mlp, device))
     x = torch.randn(6, irreps.dim, device=device)
     R = random_rotation(seed=8).to(device=device, dtype=torch.float32)
 
@@ -235,18 +233,14 @@ def test_gated_equivariant_conv_rotation_equivariance():
     irreps = cue.Irreps("O3", "32x0e + 8x1o + 8x1e + 4x2e + 4x2o")
     edge_scalar_dim = 16
 
-    conv = set_inference_mode(
-        GatedEquivariantConv(
+    device = resolve_device()
+    with linear_method_for_device(device):
+        conv = GatedEquivariantConv(
             irreps,
             sh_lmax=2,
             edge_scalar_dim=edge_scalar_dim,
         )
-    )
-    # cuEquivariance fused_tp kernels require CUDA + fp32.
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    if device == "cpu":
-        pytest.skip("GatedEquivariantConv relies on cuEquivariance CUDA kernels")
-    conv = conv.to(device)
+    conv = set_inference_mode(move_module_to_device(conv, device))
 
     n, e = 8, 24
     h = torch.randn(n, irreps.dim, device=device)

@@ -18,6 +18,7 @@ from rdkit import Chem
 
 from effdock.checkpoint import ORIENTATION_INJECTIONS, checkpoint_orientation_injection
 from effdock.confidence.features import FRAME_RECOVERY_POLICIES
+from effdock.device import resolve_device
 from effdock.evaluation.benchmark import (
     apply_refinement,
     compute_pose_rmsd_with_method,
@@ -1980,7 +1981,7 @@ def main(argv: list[str] | None = None) -> None:
     if not complexes:
         raise SystemExit(f"No complexes found in {args.data_dir}")
 
-    device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    device = resolve_device(args.device)
     model, cfg, ckpt = load_model(
         args.config, args.checkpoint, device, orientation_injection=args.orientation_injection
     )

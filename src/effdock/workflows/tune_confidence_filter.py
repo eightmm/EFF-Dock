@@ -16,6 +16,7 @@ from torch.utils.data import DataLoader
 from effdock.confidence.dataset import LigandPoseConfidenceDataset, collate_complexes, to_device
 from effdock.confidence.runtime import load_pose_confidence_model
 from effdock.confidence.selectors import protein_ligand_clash_rates
+from effdock.device import resolve_device
 from effdock.workflows.train_confidence import load_config_sections
 
 
@@ -282,7 +283,7 @@ def main(argv: list[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    device = resolve_device(args.device)
     train_path = args.output_dir / "train_scores.pt"
     val_path = args.output_dir / "val_scores.pt"
     if args.reuse_cache:

@@ -22,6 +22,7 @@ from .equivariant import (
     EquivariantBlock,
     EquivariantRMSNorm,
     GatedEquivariantConv,
+    _linear_method,
 )
 from .nn_utils import rbf_encode, scatter_mean, sinusoidal_embedding
 
@@ -187,6 +188,15 @@ def newton_euler_aggregate(
             rotation subspace. Apply to omega_target before computing loss.
     """
     device, dtype = f_atom.device, f_atom.dtype
+
+    # MPS does not implement float64. Keep the numerically sensitive inertia
+    # eigensolve on CPU, then return results to the original device.
+    if device.type == "mps":
+        results = newton_euler_aggregate(
+            f_atom.cpu(), atom_pos.cpu(), T_frag.cpu(), frag_id.cpu(), n_frag,
+            frag_sizes.cpu(), eig_threshold,
+        )
+        return tuple(value.to(device) for value in results)
 
     # Translation: mean force per fragment
     v_frag = scatter_mean(f_atom, frag_id, n_frag)
@@ -758,11 +768,11 @@ class EFFDock(nn.Module):
             "O3", "1x1o" if readout == "newton_euler" else "1x1o + 1x1e"
         )
         self.atom_head_pre = cuet.Linear(
-            node_irreps, head_irreps, layout=cue.mul_ir, method="fused_tp"
+            node_irreps, head_irreps, layout=cue.mul_ir, method=_linear_method()
         )
         self.atom_head_act = EquivariantActivation(head_irreps)
         self.f_atom_linear = cuet.Linear(
-            head_irreps, out_irreps, layout=cue.mul_ir, method="fused_tp"
+            head_irreps, out_irreps, layout=cue.mul_ir, method=_linear_method()
         )
 
         # Self-TP head: transfers l=2 (and other non-l=1) directional info into
@@ -782,6 +792,7 @@ class EFFDock(nn.Module):
             layout_out=cue.mul_ir,
             internal_weights=True,
             shared_weights=True,
+            method=_linear_method(),
         )
         with torch.no_grad():
             for p in self.f_atom_self_tp.parameters():
