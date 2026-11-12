@@ -156,9 +156,11 @@ def _single_atom_mol() -> Chem.Mol:
     return mol
 
 
+@pytest.mark.parametrize("interaction_case", ["available", "incomplete_mapping", "invalid_receptor"])
 def test_cluster_free_profile_omits_legacy_scoring_and_pose_outputs(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    interaction_case: str,
 ) -> None:
     mol = _single_atom_mol()
     protein = tmp_path / "protein.pdb"
@@ -191,8 +193,22 @@ def test_cluster_free_profile_omits_legacy_scoring_and_pose_outputs(
     monkeypatch.setattr(
         evaluate,
         "full_heavy_atom_mapping_metadata",
-        lambda *_args: {"accepted": True, "relation": "exact_graph"},
+        lambda *_args: {
+            "accepted": interaction_case != "incomplete_mapping", "relation": "exact_graph"
+        },
     )
+    interaction_calls: list[float] = []
+
+    def recover_interactions(ligand, predicted_xyz, reference_xyz, protein_path):
+        assert ligand is mol
+        assert protein_path == protein
+        torch.testing.assert_close(reference_xyz, torch.zeros(1, 3))
+        interaction_calls.append(float(predicted_xyz[0, 0]))
+        if interaction_case == "invalid_receptor":
+            raise ValueError("unavailable contact fixture")
+        return {"interaction_micro_f1": float(predicted_xyz[0, 0]) / 3.0}
+
+    monkeypatch.setattr(evaluate, "interaction_recovery", recover_interactions)
     monkeypatch.setattr(
         evaluate,
         "preprocess_complex",
@@ -295,6 +311,27 @@ def test_cluster_free_profile_omits_legacy_scoring_and_pose_outputs(
     assert row["selector_profile"] == "confidence_cluster_free"
     assert row["confidence_index"] == 1
     assert row["confidence_filter_index"] == 1
+    assert row["interaction_recovery_contract"] == "distance_fingerprint_v1"
+    recovery = json.loads(row["interaction_recovery_by_selector_json"])
+    assert row["interaction_recovery_available"] == (interaction_case == "available")
+    if interaction_case == "incomplete_mapping":
+        assert interaction_calls == []
+        assert recovery == {}
+        assert row["interaction_recovery_unavailable_reason"] == (
+            "incomplete_or_connectivity_mismatched_ligand_mapping"
+        )
+    else:
+        # Oracle and both confidence selectors share one pose; compute it once.
+        assert sorted(interaction_calls) == [1.0, 3.0]
+        assert set(recovery) == {"first", "oracle", "confidence", "confidence_filter"}
+        if interaction_case == "available":
+            assert recovery["first"]["interaction_micro_f1"] == 1.0
+            for selector in ("oracle", "confidence", "confidence_filter"):
+                assert recovery[selector]["interaction_micro_f1"] == pytest.approx(1.0 / 3.0)
+            assert row["interaction_recovery_unavailable_reason"] == ""
+        else:
+            assert all(metrics is None for metrics in recovery.values())
+            assert row["interaction_recovery_unavailable_reason"] == "unavailable contact fixture"
     assert "first_rmsd" in row and "oracle_rmsd" in row
     assert not any(key.startswith("vina_") for key in row)
     assert not any(key.startswith("confidence_final_") for key in row)
