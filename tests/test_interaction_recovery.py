@@ -82,14 +82,31 @@ def test_displaced_pose_loses_native_contacts(tmp_path: Path) -> None:
     assert scores["interaction_micro_f1"] == 0.0
 
 
-def test_ligand_symmetry_equivalent_contacts_are_matched(tmp_path: Path) -> None:
+@pytest.mark.parametrize("smiles", ["CC(=O)[O-]", "CC([O-])=O"])
+@pytest.mark.parametrize(
+    ("atom_name", "residue", "element", "xyz", "interaction_type"),
+    [
+        ("OG", "SER", "O", (4.9, 2.0, 0.0), "hbond"),
+        ("NZ", "LYS", "N", (5.5, 2.0, 0.0), "salt_bridge"),
+        ("ZN", "ZN", "ZN", (4.5, 2.0, 0.0), "metal_coordination"),
+    ],
+)
+def test_ligand_symmetry_equivalent_contacts_are_matched(
+    tmp_path: Path,
+    smiles: str,
+    atom_name: str,
+    residue: str,
+    element: str,
+    xyz: tuple[float, float, float],
+    interaction_type: str,
+) -> None:
     mol = _mol_with_coords(
-        "CC(=O)[O-]",
+        smiles,
         [(0.0, 0.0, 0.0), (1.5, 0.0, 0.0), (2.1, 1.0, 0.0), (2.1, -1.0, 0.0)],
     )
     protein = _write_protein(
         tmp_path / "protein.pdb",
-        _protein_atom("OG", "SER", "O", (4.9, 1.0, 0.0)),
+        _protein_atom(atom_name, residue, element, xyz),
     )
     ref = torch.tensor(
         [[0.0, 0.0, 0.0], [1.5, 0.0, 0.0], [2.1, 1.0, 0.0], [2.1, -1.0, 0.0]]
@@ -99,9 +116,86 @@ def test_ligand_symmetry_equivalent_contacts_are_matched(tmp_path: Path) -> None
 
     scores = interaction_recovery(mol, pred, ref, protein)
 
-    assert scores["hbond_reference_count"] == 1
-    assert scores["hbond_recovered_count"] == 1
+    # Only one oxygen is in range, so passing requires both consistent atom
+    # typing and a shared contact identity across the resonance-equivalent pair.
+    assert scores[f"{interaction_type}_reference_count"] == 1
+    assert scores[f"{interaction_type}_predicted_count"] == 1
+    assert scores[f"{interaction_type}_recovered_count"] == 1
     assert scores["interaction_micro_f1"] == 1.0
+
+
+def test_metal_coordination_excludes_carboxyl_carbon(tmp_path: Path) -> None:
+    coords = torch.tensor(
+        [[0.0, 0.0, 0.0], [1.5, 0.0, 0.0], [2.1, 1.0, 0.0], [2.1, -1.0, 0.0]]
+    )
+    mol = _mol_with_coords("CC(=O)[O-]", coords.tolist())
+    protein = _write_protein(
+        tmp_path / "protein.pdb",
+        _protein_atom("ZN", "ZN", "ZN", (1.5, 0.0, 2.7)),
+    )
+
+    scores = interaction_recovery(mol, coords, coords, protein)
+
+    # Carbon is 2.70 A from Zn; both oxygens are 2.94 A away (outside 2.8 A).
+    assert scores["metal_coordination_reference_count"] == 0
+    assert scores["metal_coordination_predicted_count"] == 0
+
+
+@pytest.mark.parametrize(("smiles", "donor_index"), [("c1ccncc1", 3), ("CO", 1), ("C[S-]", 1)])
+def test_metal_coordination_retains_heteroatom_donors(
+    tmp_path: Path, smiles: str, donor_index: int
+) -> None:
+    mol = Chem.MolFromSmiles(smiles)
+    coords = torch.zeros((mol.GetNumAtoms(), 3))
+    coords[donor_index, 0] = 1.5
+    protein = _write_protein(
+        tmp_path / "protein.pdb",
+        _protein_atom("ZN", "ZN", "ZN", (3.9, 0.0, 0.0)),
+    )
+
+    scores = interaction_recovery(mol, coords, coords, protein)
+
+    assert scores["metal_coordination_reference_count"] == 1
+    assert scores["metal_coordination_f1"] == 1.0
+
+
+@pytest.mark.parametrize("limit", ["_MAX_RESONANCE_STRUCTURES", "_MAX_RESONANCE_MATCHES"])
+def test_incomplete_resonance_enumeration_is_not_scored(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, limit: str
+) -> None:
+    monkeypatch.setattr(f"effdock.evaluation.interaction_recovery.{limit}", 1)
+    coords = torch.tensor(
+        [[0.0, 0.0, 0.0], [1.5, 0.0, 0.0], [2.1, 1.0, 0.0], [2.1, -1.0, 0.0]]
+    )
+    mol = _mol_with_coords("CC(=O)[O-]", coords.tolist())
+    protein = _write_protein(
+        tmp_path / "protein.pdb",
+        _protein_atom("OG", "SER", "O", (4.9, 2.0, 0.0)),
+    )
+
+    with pytest.raises(ValueError, match="resonance .* limit exceeded"):
+        interaction_recovery(mol, coords, coords, protein)
+
+
+@pytest.mark.parametrize("smiles", ["CC(=O)O", "CC(=O)OC", "CC(=O)[18O-]"])
+def test_inequivalent_oxygens_are_not_collapsed(tmp_path: Path, smiles: str) -> None:
+    mol = Chem.MolFromSmiles(smiles)
+    coords = torch.zeros((mol.GetNumAtoms(), 3))
+    coords[:4] = torch.tensor(
+        [[0.0, 0.0, 0.0], [1.5, 0.0, 0.0], [2.1, 1.0, 0.0], [2.1, -1.0, 0.0]]
+    )
+    pred = coords.clone()
+    pred[[2, 3]] = pred[[3, 2]]
+    protein = _write_protein(
+        tmp_path / "protein.pdb",
+        _protein_atom("OG", "SER", "O", (4.9, 2.0, 0.0)),
+    )
+
+    scores = interaction_recovery(mol, pred, coords, protein)
+
+    assert scores["hbond_reference_count"] == 1
+    assert scores["hbond_recovered_count"] == 0
+    assert scores["interaction_micro_f1"] == 0.0
 
 
 def test_interaction_recovery_marks_absent_reference_class_undefined(tmp_path: Path) -> None:

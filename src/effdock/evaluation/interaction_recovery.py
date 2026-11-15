@@ -27,6 +27,56 @@ _DISTANCE_RANGES = {
     "hydrophobic": (3.0, 4.5),
     "metal_coordination": (1.8, 2.8),
 }
+_MAX_RESONANCE_STRUCTURES = 1000
+_MAX_RESONANCE_MATCHES = 10000
+
+
+def _ligand_contact_features(mol: Chem.Mol) -> tuple[dict[str, torch.Tensor], list[int]]:
+    """Use the same resonance-aware atom groups for typing and contact identity."""
+    features = compute_atom_pharmacophore_features(mol)
+    features["atom_is_anion"] = torch.tensor(
+        [atom.GetFormalCharge() < 0 for atom in mol.GetAtoms()], dtype=torch.bool
+    )
+    ranks = list(Chem.CanonicalRankAtoms(mol, breakTies=False, includeChirality=True))
+    parents = list(range(mol.GetNumAtoms()))
+
+    def root(index: int) -> int:
+        while parents[index] != index:
+            parents[index] = parents[parents[index]]
+            index = parents[index]
+        return index
+
+    by_rank: dict[int, int] = {}
+    for index, rank in enumerate(ranks):
+        parents[index] = by_rank.setdefault(rank, index)
+
+    # Canonical ranks alone distinguish the localized C=O and C-O- atoms.
+    # Full-molecule matches across resonance forms add equivalences while
+    # retaining connectivity, isotopes, and stereochemistry (not tautomers).
+    resonance = Chem.ResonanceMolSupplier(mol, maxStructs=_MAX_RESONANCE_STRUCTURES + 1)
+    if len(resonance) > _MAX_RESONANCE_STRUCTURES:
+        raise ValueError("interaction recovery resonance structure limit exceeded")
+    if len(resonance) > 1:
+        matches = resonance.GetSubstructMatches(
+            mol,
+            uniquify=False,
+            useChirality=True,
+            maxMatches=_MAX_RESONANCE_MATCHES + 1,
+        )
+        if len(matches) > _MAX_RESONANCE_MATCHES:
+            raise ValueError("interaction recovery resonance match limit exceeded")
+        for match in matches:
+            for index, equivalent in enumerate(match):
+                parents[root(equivalent)] = root(index)
+
+    groups: dict[int, list[int]] = {}
+    identities = [root(index) for index in range(mol.GetNumAtoms())]
+    for index, identity in enumerate(identities):
+        groups.setdefault(identity, []).append(index)
+    for indices in groups.values():
+        for flags in features.values():
+            flags[indices] = flags[indices].any()
+    return features, identities
 
 
 def _coordinates(value: torch.Tensor, n_atoms: int, name: str) -> torch.Tensor:
@@ -53,8 +103,7 @@ def _ligand_fingerprint(
 
     prot_xyz = torch.tensor([atom.coords for atom in protein_atoms], dtype=torch.float32)
     distances = torch.cdist(lig_xyz, prot_xyz)
-    ligand_features = compute_atom_pharmacophore_features(mol)
-    ranks = list(Chem.CanonicalRankAtoms(mol, breakTies=False, includeChirality=True))
+    ligand_features, ranks = _ligand_contact_features(mol)
 
     prot_features = [_patom_pharmacophore(atom.res_name, atom.atom_name) for atom in protein_atoms]
     prot_donor = torch.tensor([flags[0] for flags in prot_features])
@@ -69,6 +118,12 @@ def _ligand_fingerprint(
     lig_positive = ligand_features["atom_is_positive"]
     lig_negative = ligand_features["atom_is_negative"]
     lig_hydrophobic = ligand_features["atom_is_hydrophobe"]
+    # NegIonizable features describe whole groups, including carboxyl carbon.
+    # This distance proxy only permits N/O/S acceptors or negatively charged
+    # N/O/S atoms to coordinate a metal, not other atoms in an ionizable group.
+    lig_metal_donor = (lig_acceptor | ligand_features["atom_is_anion"]) & torch.tensor(
+        [atom.GetAtomicNum() in (7, 8, 16) for atom in mol.GetAtoms()], dtype=torch.bool
+    )
 
     compatible_pairs = {
         "hbond": (lig_donor[:, None] & prot_acceptor[None, :])
@@ -76,7 +131,7 @@ def _ligand_fingerprint(
         "salt_bridge": (lig_positive[:, None] & prot_negative[None, :])
         | (lig_negative[:, None] & prot_positive[None, :]),
         "hydrophobic": lig_hydrophobic[:, None] & prot_hydrophobic[None, :],
-        "metal_coordination": (lig_acceptor | lig_negative)[:, None] & prot_metal[None, :],
+        "metal_coordination": lig_metal_donor[:, None] & prot_metal[None, :],
     }
 
     for interaction_type, compatible in compatible_pairs.items():
@@ -160,8 +215,9 @@ def interaction_recovery(
 
     ``predicted_xyz`` and ``reference_xyz`` must both use ``mol``'s heavy-atom
     order and the receptor PDB's absolute coordinate frame. Ligand symmetry is
-    handled by grouping equivalent atoms using RDKit canonical ranks. Contact
-    identities retain the protein chain, residue, and atom identity.
+    handled by grouping equivalent atoms using RDKit canonical ranks and
+    resonance-aware matches, with pharmacophore flags shared within each group.
+    Contact identities retain the protein chain, residue, and atom identity.
 
     The returned precision/recall/F1 values are fractions. A class with no
     reference contacts has ``None`` recall/F1 and is omitted from macro-F1.
