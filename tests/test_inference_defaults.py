@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from effdock.inference.defaults import (
     DEFAULT_CONFIDENCE_CHECKPOINT,
     DEFAULT_CONFIG,
@@ -68,18 +70,13 @@ def test_evaluate_uses_same_promoted_inference_stack_by_default() -> None:
     assert args.pocket_cutoff == DEFAULT_POCKET_CUTOFF
 
 
-def test_confidence_can_be_disabled_explicitly() -> None:
-    dock_args = build_dock_parser().parse_args(
-        [
-            "--protein",
-            "receptor.pdb",
-            "--ligand",
-            "ligand.sdf",
-            "--pocket-center",
-            "0,0,0",
-            "--no-confidence",
-        ]
-    )
+def test_dock_always_annotates_confidence_and_evaluate_can_opt_out() -> None:
+    args = ["--protein", "receptor.pdb", "--ligand", "ligand.sdf", "--pocket-center", "0,0,0"]
+    dock_args = build_dock_parser().parse_args([*args, "--no-score"])
+    assert dock_args.confidence_checkpoint == DEFAULT_CONFIDENCE_CHECKPOINT
+    assert dock_args.score is False
+    with pytest.raises(SystemExit):
+        build_dock_parser().parse_args([*args, "--no-confidence"])
     evaluate_args = build_evaluate_parser().parse_args(
         [
             "--dataset",
@@ -92,6 +89,5 @@ def test_confidence_can_be_disabled_explicitly() -> None:
         ]
     )
 
-    assert dock_args.confidence_checkpoint is None
     assert evaluate_args.confidence_checkpoint is None
     assert isinstance(DEFAULT_DOCKING_CHECKPOINT, Path)

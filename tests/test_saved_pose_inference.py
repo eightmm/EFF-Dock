@@ -8,8 +8,8 @@ import torch
 from rdkit import Chem
 
 from effdock.cli import main
-from effdock.confidence import runtime
-from effdock.inference import MinimizationOptions, minimize, saved_poses
+from effdock.confidence import runtime, selectors
+from effdock.inference import MinimizationOptions, docking, minimize, saved_poses
 from effdock.inference.preprocess import load_ligand
 
 
@@ -126,3 +126,64 @@ def test_minimize_rejects_input_as_output(pose_inputs):
     protein, poses, center = pose_inputs
     with pytest.raises(ValueError, match="separate from the input"):
         minimize(MinimizationOptions(protein, poses, center, poses, device="cpu"))
+
+
+@pytest.mark.parametrize("count", [1, 2])
+def test_dock_writes_matched_raw_and_minimized_confidence(pose_inputs, tmp_path, monkeypatch, count):
+    protein, _, center = pose_inputs
+    model = SimpleNamespace(
+        orientation_injection="legacy_rt_w", docking_orientation_injection="legacy_rt_w",
+        confidence_frame_policy="historical_kabsch",
+    )
+    monkeypatch.setattr(docking, "load_model", lambda *args, **kw: (model, {"data": {}}, {}))
+    monkeypatch.setattr(runtime, "load_pose_confidence_model", lambda *args: (model, {}))
+    ligand, _ = load_ligand("CCO")
+    coordinates = torch.tensor(ligand.GetConformer().GetPositions(), dtype=torch.float32)
+    first = coordinates - coordinates[0]
+    candidates = [
+        {"atom_pos_pred": first + torch.tensor([float(index), 0.0, 0.0]), "sigma": index + 1.0}
+        for index in range(count)
+    ]
+    monkeypatch.setattr(docking, "sample_docked_poses", lambda *args, **kw: candidates)
+    calls = []
+
+    def score(confidence, base, graph, lig_data, meta, poses, *, sigma, **kwargs):
+        calls.append(sigma.tolist())
+        if len(calls) == 1:
+            estimates = [3.0 - index for index in range(len(poses))]
+        else:
+            assert all(torch.allclose(pose[0, 1], torch.tensor(0.5)) for pose in poses)
+            estimates = [1.0 + (count - index) for index in range(len(poses))]
+        return [dict(confidence_rmsd=v, confidence_success=0.5, confidence_atom_ok=0.4)
+                for v in estimates]
+
+    def optimize(mol, receptor, poses, pocket_center, ids, device):
+        assert poses[0, 0, 0].item() == count - 1
+        return ([pose + torch.tensor([0.0, 0.5, 0.0]) for pose in poses],
+                [{"minimization_status": "max_steps"} for _ in poses])
+
+    monkeypatch.setattr(runtime, "score_poses_with_confidence", score)
+    monkeypatch.setattr(selectors, "select_confidence_poses",
+                        lambda *args: {"confidence": count - 1})
+    monkeypatch.setattr(docking, "minimize_poses", optimize)
+    output = tmp_path / "docked"
+    docking.dock(docking.DockingOptions(
+        protein=protein, ligand="CCO", pocket_center=center, out_dir=output,
+        num_samples=count, score=False, device="cpu",
+    ))
+    stem = "docked" if count == 1 else "docked_poses"
+    raw = list(Chem.SDMolSupplier(str(output / f"{stem}.sdf")))
+    minimized = list(Chem.SDMolSupplier(str(output / f"{stem}_minimized.sdf")))
+    assert len(raw) == len(minimized) == count
+    assert calls == [list(range(1, count + 1)), list(range(count, 0, -1))]
+    for index, (original, refined) in enumerate(zip(raw, minimized, strict=True)):
+        assert original.GetIntProp("sample_index") == refined.GetIntProp("sample_index") == index
+        assert original.GetIntProp("confidence_rank") == index + 1
+        assert refined.GetIntProp("confidence_rank") == count - index
+        assert refined.GetDoubleProp("confidence_pred_rmsd") == 1 + count - index
+        assert original.GetDoubleProp("confidence_pred_rmsd") == 4 - count + index
+        assert refined.GetDoubleProp("sample_sigma") == original.GetDoubleProp("sample_sigma") == count - index
+        assert refined.GetProp("minimization_status") == "max_steps"
+    tensors = torch.load(output / "results.pt", weights_only=True)
+    assert len(tensors["poses"]) == count
+    assert tensors["poses"][0]["score"]["confidence_rmsd"] == raw[0].GetDoubleProp("confidence_rmsd")

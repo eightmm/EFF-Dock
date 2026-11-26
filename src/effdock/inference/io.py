@@ -31,6 +31,15 @@ def _tag_props(mol_out: Chem.Mol, props: dict | None) -> None:
         mol_out.SetProp(str(key), str(value))
 
 
+def _clear_pose_scores(mol: Chem.Mol) -> None:
+    """Remove scores tied to the input coordinates before re-exporting a pose."""
+    for name in mol.GetPropNames():
+        if name.startswith("confidence_") or name in {
+            "vina_score", "dg_strain", "total_score", "pl_clash_1p6", "fast_valid",
+        }:
+            mol.ClearProp(name)
+
+
 def _tag_score(mol_out: Chem.Mol, score: dict | None) -> None:
     """Write pose score fields as SDF properties."""
     if not score:

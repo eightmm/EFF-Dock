@@ -32,7 +32,8 @@ The promoted deployment pair is
 `weights/effdock_confidence_s50_raw_refined_u70k.pt`. N100/S10, translation
 sigma 2.0, a 10A pocket crop, late-power-3 time sampling, and pure minimum
 predicted-RMSD ranking are the defaults for both `dock` and `evaluate`. Every
-value remains overridable; `--no-confidence` runs generator-only diagnostics.
+value remains overridable. `evaluate --no-confidence` runs generator-only
+diagnostics.
 U70k was selected only on the fixed 1,035-complex PLINDER validation bank at
 622/1,035 (60.10%) Top-1 `<2A`.
 
@@ -53,10 +54,10 @@ reproduction. The completed active diagnostic found pure confidence slightly
 stronger overall than this composite, so all results remain separate and none
 may be used to tune a new external-test selector post hoc.
 
-The public sampler writes raw poses. The benchmark's `Refined` columns use a
-separate deterministic physical-refinement pass and must not be interpreted as
-an implicit `eff-dock dock` step. Equations, numerical settings and the
-chirality-selector fallback are specified in
+The public docking command exports matched raw and physically minimized
+pose banks with separately computed confidence. The reported benchmark
+condition adds chirality-filtered selection with a fallback. Equations and
+numerical settings are specified in
 [the inference methods](methods/07_inference_and_evaluation.md). Internal
 checkpoint selection is documented in the
 [confidence model card](../weights/CONFIDENCE_MODEL_CARD.md).
@@ -86,7 +87,7 @@ steps, translation-prior sigma 2 Å, a 10 Å generation crop, no center jitter
 and no in-ODE guidance. Each candidate is refined for at most 100 iterations.
 Selection takes the lowest predicted RMSD among input-chirality-compatible
 candidates, falling back to the unfiltered top-ranked pose when none qualifies.
-This is a separate post-generation workflow, not the raw-pose quick-start command.
+The reported runs use the explicit benchmark settings above.
 
 The three repeats use inference seeds 42, 100042 and 200042 with the same
 trained weights. Astex and PoseBusters fix the starting conformer; the remaining
@@ -123,9 +124,10 @@ Source SHA-256: `4b41dc2d5cbb1f8430bfd0c45ed6f497cbcf383142894cc9ad495936423fb7c
 ## Candidate SDF outputs
 
 Candidate persistence is part of the inference contract. Public `dock` writes
-all generated poses to `docked_poses.sdf` (or the one-record `docked.sdf` for a
-single-pose request). By default, benchmark `evaluate` writes one
-multi-record `all_poses/<complex-id>.sdf` beside its selector-specific pose
+all generated poses to `docked_poses.sdf` and `docked_poses_minimized.sdf` in
+matched record order, with separately computed confidence in both. A single
+pose uses `docked.sdf` and `docked_minimized.sdf`. By default, benchmark
+`evaluate` writes one multi-record `all_poses/<complex-id>.sdf` beside its selector-specific pose
 directories. Records stay in sampling order and carry `sample_index`, the
 candidate-ensemble hash, and every available confidence output as SDF molecule
 properties. The active `confidence_*` names and historical

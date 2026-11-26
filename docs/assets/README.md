@@ -11,10 +11,9 @@ and were exported at 2,400 pixels wide without redrawing molecular structures.
 | [workflow.png](workflow.png) | Supplied-pocket docking workflow | `64491ede678dd72f9750c9fd88b5f0b009e3b5398d82891ea91c13f516385820` |
 | [architecture.png](architecture.png) | Six-panel molecular graph, sampling, readout and network architecture (2026-10-28 revision) | `ecd1a9eafc4344519f81b81c97f2309f12dff26f7f76e01a39a455fbb80c6413` |
 
-The workflow includes study-stage post-refinement and chirality-aware
-reselection. The basic `eff-dock dock` command generates and confidence-ranks
-poses; it does not automatically perform those additional stages. Crystal
-RMSDs shown in the example are retrospective labels, not selection inputs.
+The workflow shows energy refinement and study-stage chirality-aware selection.
+Public docking exports raw and minimized poses with matched IDs and separate
+confidence scores. Crystal RMSDs in the example are retrospective labels.
 
 The architecture was refreshed on 2026-11-12 from the 2026-10-28 six-panel
 revision. Panels a–b add the molecular graph and sampling step and the

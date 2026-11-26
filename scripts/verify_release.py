@@ -76,17 +76,22 @@ def smoke_inference(device: str) -> None:
                 out_dir=output,
             )
         )
-        poses = list(Chem.SDMolSupplier(str(output / "docked.sdf"), removeHs=False))
-        if len(poses) != 1 or poses[0] is None or poses[0].GetNumAtoms() != 3:
-            raise RuntimeError("release smoke did not export the complete three-atom ligand")
-        pose = poses[0]
-        coordinates = torch.as_tensor(pose.GetConformer().GetPositions())
-        score = torch.tensor(pose.GetDoubleProp("confidence_rmsd"))
-        if not bool(torch.isfinite(coordinates).all() and torch.isfinite(score) and score >= 0):
-            raise RuntimeError("release smoke produced invalid coordinates or confidence")
+        for file, stage in (("docked.sdf", "raw"), ("docked_minimized.sdf", "minimized")):
+            poses = list(Chem.SDMolSupplier(str(output / file), removeHs=False))
+            if len(poses) != 1 or poses[0] is None or poses[0].GetNumAtoms() != 3:
+                raise RuntimeError(f"release smoke did not export the complete ligand in {file}")
+            pose = poses[0]
+            coordinates = torch.as_tensor(pose.GetConformer().GetPositions())
+            score = torch.tensor(pose.GetDoubleProp("confidence_rmsd"))
+            if not bool(torch.isfinite(coordinates).all() and torch.isfinite(score) and score >= 0):
+                raise RuntimeError(f"release smoke produced invalid coordinates or confidence in {file}")
+            if pose.GetProp("pose_stage") != stage or pose.GetIntProp("sample_index") != 0:
+                raise RuntimeError(f"release smoke produced incorrect pose identity in {file}")
+        if pose.GetDoubleProp("minimization_final_energy") > pose.GetDoubleProp("minimization_initial_energy"):
+            raise RuntimeError("release smoke minimization increased GuidanceEnergy")
         if not (output / "results.pt").is_file():
             raise RuntimeError("release smoke did not export inference provenance")
-    print("release smoke passed: preparation, one ODE step, confidence and SDF export")
+    print("release smoke passed: docking, minimization, and confidence on both SDFs")
 
 
 def main() -> None:

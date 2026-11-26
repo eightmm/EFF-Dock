@@ -44,9 +44,19 @@ uv run eff-dock dock \
 ```
 
 The default budget is 100 poses, 10 sampling steps, a 2 Å translation prior,
-and a 10 Å receptor crop. The output includes raw `docked_poses.sdf` in
-confidence rank order and `results.pt` with coordinates and provenance.
-A single-pose run writes `docked.sdf`.
+and a 10 Å receptor crop. Each run writes three files.
+
+| File | Contents |
+| --- | --- |
+| `docked_poses.sdf` | Raw poses in the selected rank order |
+| `docked_poses_minimized.sdf` | GuidanceEnergy-minimized poses with per-pose energies and status |
+| `results.pt` | Raw coordinates, scores, and provenance |
+
+The two SDFs share record order and `sample_index`. Each stores confidence
+computed on its own coordinates, including `confidence_rmsd` and the one-based
+`confidence_rank`, even with `--no-score`. For one pose, the SDF names are
+`docked.sdf` and `docked_minimized.sdf`. With MPS, docking and confidence use
+MPS and minimization runs on CPU.
 [Coordinate conventions and checkpoint compatibility](docs/ORIENTATION_INJECTION.md).
 
 #### Score or minimize saved poses
@@ -59,7 +69,7 @@ rank to JSON in input order.
 
 ```bash
 uv run eff-dock minimize \
-  --protein receptor.pdb --poses outputs/docked/docked_poses.sdf \
+  --protein receptor.pdb --poses existing_poses.sdf \
   --pocket-center '12.4,-3.1,8.7' --ligand-template ligand.sdf \
   --output outputs/minimized.sdf
 
@@ -94,14 +104,16 @@ site = {
 }
 ligand = "ligand.sdf"
 docked = Path("outputs/docked")
-minimized = Path("outputs/minimized.sdf")
 
 dock(DockingOptions(
     **site, ligand=ligand, rank_by="confidence",
     score=False, seed=42, out_dir=docked,
 ))
+
+# Process poses from a separate run or another program.
+minimized = Path("outputs/minimized.sdf")
 minimize(MinimizationOptions(
-    **site, poses=docked / "docked_poses.sdf", ligand_template=ligand, output=minimized,
+    **site, poses=Path("existing_poses.sdf"), ligand_template=ligand, output=minimized,
 ))
 score_saved_poses(ConfidenceOptions(
     **site, poses=minimized, ligand_template=ligand,

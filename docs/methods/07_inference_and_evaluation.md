@@ -28,10 +28,11 @@ $$
 
 `Exp_q` converts an axis-angle vector to a unit quaternion; it is not the
 componentwise exponential of quaternion coordinates. Contact edges are updated
-from the evolving coordinates. The public `dock()` API emits raw poses; energy
-refinement and chirality-filtered selection are separately executed benchmark
-conditions. All candidates retain generation-order indices. No crystal RMSD,
-PB label or energy score enters the deployed confidence ranking.
+from the evolving coordinates. The public `dock()` API exports raw and
+GuidanceEnergy-minimized poses in matched record order with separately
+computed confidence. The benchmark selection applies its input-chirality
+filter separately and retains generation-order indices. Confidence ranking
+uses predicted RMSD.
 
 The pocket must be supplied. For these retrospective redocking benchmarks,
 frozen pocket centres can be reference-ligand-derived. The receptor can be a
@@ -175,8 +176,9 @@ rescaled to satisfy the actual reconstructed maximum atom displacement.
 | Physical cutoff; largest interaction cutoff | 8 Å; 10 Å |
 | Receptor policy | geometry_only |
 
-The full benchmark driver explicitly enables the energy-plateau criterion;
-the standalone refiner CLI leaves it disabled unless those arguments are supplied.
+Public docking, the saved-pose minimizer, and the full benchmark driver enable
+the energy-plateau criterion. The archived benchmark refiner script takes it
+as explicit arguments.
 Do not confuse CLI defaults with the executed campaign settings.
 Each pose has its own line search and stopping state. A finite failed line
 search retains its last accepted pose and records failure. Nonfinite states

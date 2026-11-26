@@ -25,7 +25,8 @@ from effdock.inference.defaults import (
     DEFAULT_SIGMA,
 )
 from effdock.inference.docking import load_model, parse_center
-from effdock.inference.io import _set_coords
+from effdock.inference.io import _clear_pose_scores, _set_coords, _tag_props
+from effdock.inference.minimization import minimize_poses
 from effdock.inference.preprocess import load_ligand, preprocess_complex
 
 
@@ -185,69 +186,24 @@ def score_saved_poses(opts: ConfidenceOptions) -> None:
 @torch.enable_grad()
 def minimize(opts: MinimizationOptions) -> None:
     """Lower GuidanceEnergy for each supplied pose in a fixed receptor."""
-    from effdock.guidance import InteractionEnergyConfig, build_physical_system
     from effdock.preprocess.fragments import decompose_fragments
-    from effdock.workflows.relax_guidance import RigidRelaxationConfig, relax_rigid_fragments_batch
 
-    if opts.steps < 1 or opts.batch_size < 1:
-        raise ValueError("Steps and batch size must be positive")
     molecules, template, poses, center = _read_poses(opts, ".sdf")
     template_coords = torch.as_tensor(template.GetConformer().GetPositions(), dtype=torch.float32)
     fragments = decompose_fragments(template, template_coords)
     if fragments is None:
         raise ValueError("Ligand fragment decomposition failed")
-    config = RigidRelaxationConfig(
-        initialization_mode="model_prior",
-        max_steps=opts.steps,
-        save_every=opts.steps,
-        physical_cutoff_angstrom=8.0,
-        protein_shell_cutoff_angstrom=18.0,
-        convergence_energy_absolute_kcal_mol=0.02,
-        convergence_energy_relative=0.001,
-        convergence_energy_min_steps=25,
+    minimized, diagnostics = minimize_poses(
+        template, opts.protein, poses, center, fragments["fragment_id"],
+        resolve_device(opts.device), steps=opts.steps, batch_size=opts.batch_size,
     )
-    device = resolve_device(opts.device)
-    system = build_physical_system(
-        template, opts.protein, fragment_id=fragments["fragment_id"],
-        near_coords=center.view(1, 3), coordinate_origin=center,
-        protein_cutoff=config.protein_shell_cutoff_angstrom, receptor_policy="geometry_only",
-    ).to(device=device, dtype=torch.float32)
-    interaction = InteractionEnergyConfig()
-    origin = torch.zeros(3, device=device)
     with _atomic_output(opts.output) as temporary, Chem.SDWriter(str(temporary)) as writer:
         writer.SetForceV3000(True)
-        index = 0
-        for batch in poses.split(opts.batch_size):
-            # The first pose anchors diagnostic displacements; the objective
-            # uses the current coordinates of each pose in the batch.
-            result = relax_rigid_fragments_batch(
-                batch[0], batch, system, config=config, mode="unified", pocket_center=origin,
-                interaction_config=interaction, collect_every_step_metrics=False,
-                collect_contact_stats=False,
-            )
-            for coords, trace, status, steps, in_shell in zip(
-                result.frames[-1], result.metrics, result.statuses, result.terminal_steps,
-                result.shell_envelope_valid, strict=True,
-            ):
-                before = trace[0]["energy_groups"]["combined"]
-                after = trace[-1]["energy_groups"]["combined"]
-                if (status.startswith("nonfinite") or not bool(torch.isfinite(coords).all())
-                        or not math.isfinite(before) or not math.isfinite(after)):
-                    raise ValueError(f"Non-finite minimization for SDF record {index + 1}: {status}")
-                mol = _set_coords(molecules[index], coords + center)
-                for name in mol.GetPropNames():
-                    if name.startswith("confidence_") or name in {
-                        "vina_score", "dg_strain", "total_score", "pl_clash_1p6", "fast_valid",
-                    }:
-                        mol.ClearProp(name)
-                mol.SetIntProp("minimization_input_index", index)
-                mol.SetProp("minimization_status", status)
-                mol.SetIntProp("minimization_steps", steps)
-                mol.SetDoubleProp("minimization_initial_energy", before)
-                mol.SetDoubleProp("minimization_final_energy", after)
-                mol.SetBoolProp("minimization_shell_envelope_valid", in_shell)
-                writer.write(mol)
-                index += 1
+        for mol, coords, properties in zip(molecules, minimized, diagnostics, strict=True):
+            mol = _set_coords(mol, coords + center)
+            _clear_pose_scores(mol)
+            _tag_props(mol, properties)
+            writer.write(mol)
 
 
 def _pose_parser(prog: str, description: str, *, output: str, batch_size: int) -> argparse.ArgumentParser:

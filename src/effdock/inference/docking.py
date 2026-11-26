@@ -8,12 +8,15 @@ Keep CLI wrappers thin.
 from __future__ import annotations
 
 import argparse
+import math
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import torch
 import yaml
+from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
 
 from effdock.checkpoint import (
@@ -37,11 +40,13 @@ from effdock.inference.defaults import (
     DEFAULT_TIME_SCHEDULE,
 )
 from effdock.inference.io import (
+    _clear_pose_scores,
     write_multi_sdf,
     write_sdf,
     write_traj_pdb,
     write_traj_sdf,
 )
+from effdock.inference.minimization import minimize_poses
 from effdock.inference.preprocess import load_ligand, preprocess_complex
 from effdock.inference.sampler import (
     parse_sigma_list,
@@ -78,7 +83,7 @@ class DockingOptions:
     vina_guidance_max_velocity: float = 5.0
     vina_guidance_max_angular_velocity: float = 5.0
     vina_guidance_protein_shell: float = 18.0
-    confidence_checkpoint: Path | None = DEFAULT_CONFIDENCE_CHECKPOINT
+    confidence_checkpoint: Path = DEFAULT_CONFIDENCE_CHECKPOINT
     rank_by: str = "auto"
     orientation_injection: str | None = None
     confidence_frame_policy: str = "historical_kabsch"
@@ -204,7 +209,12 @@ def write_docking_outputs(
     poses,
     trajs,
     opts: DockingOptions,
-    scores=None,
+    *,
+    scores: list[dict[str, float]],
+    sigmas: torch.Tensor,
+    minimized: list[torch.Tensor],
+    minimized_scores: list[dict[str, float]],
+    minimization_props: list[dict],
     effective_rank_by: str | None = None,
     effective_orientation_injection: str | None = None,
     checkpoint_orientation: str | None = None,
@@ -237,7 +247,7 @@ def write_docking_outputs(
         "vina_guidance_max_velocity": opts.vina_guidance_max_velocity,
         "vina_guidance_max_angular_velocity": opts.vina_guidance_max_angular_velocity,
         "vina_guidance_protein_shell": opts.vina_guidance_protein_shell,
-        "confidence_checkpoint": str(opts.confidence_checkpoint or ""),
+        "confidence_checkpoint": str(opts.confidence_checkpoint),
         "rank_by": opts.rank_by,
         "effective_rank_by": effective_rank_by or opts.rank_by,
         "orientation_injection": effective_orientation_injection or opts.orientation_injection,
@@ -252,37 +262,49 @@ def write_docking_outputs(
             else None
         ),
     }
-    if opts.num_samples == 1:
-        out_path = opts.out_dir / "docked.sdf"
-        write_sdf(
-            mol,
-            poses[0],
-            pocket_center,
-            out_path,
-            score=scores[0] if scores else None,
-            props={**run_props, "sample_index": 0},
-        )
-        print(f"\nDocked pose saved to {out_path}")
-    else:
-        out_path = opts.out_dir / "docked_poses.sdf"
-        write_multi_sdf(mol, poses, pocket_center, out_path, scores=scores, props=run_props)
-        print(f"\n{opts.num_samples} poses saved to {out_path}")
+    stem = "docked" if opts.num_samples == 1 else "docked_poses"
+    raw_name, minimized_name = f"{stem}.sdf", f"{stem}_minimized.sdf"
+    output_mol = Chem.Mol(mol)
+    _clear_pose_scores(output_mol)
+    for name in output_mol.GetPropNames():
+        if name.startswith("minimization_"):
+            output_mol.ClearProp(name)
 
-    if opts.save_traj:
+    # Stage the matched files together before replacing any previous outputs.
+    with TemporaryDirectory(prefix=".docking-", dir=opts.out_dir) as directory:
+        staged = Path(directory)
+        order = sorted(range(len(scores)), key=lambda index: scores[index]["confidence_rmsd"])
+        raw_props = [{"sample_sigma": float(sigma)} for sigma in sigmas]
+        for rank, index in enumerate(order, 1):
+            raw_props[index]["confidence_rank"] = rank
+        if opts.num_samples == 1:
+            write_sdf(
+                output_mol, poses[0], pocket_center, staged / raw_name, score=scores[0],
+                props={**run_props, **raw_props[0], "sample_index": 0, "pose_stage": "raw"},
+            )
+        else:
+            write_multi_sdf(
+                output_mol, poses, pocket_center, staged / raw_name, scores=scores,
+                props={**run_props, "pose_stage": "raw"}, per_pose_props=raw_props,
+            )
+        order = sorted(
+            range(len(minimized_scores)), key=lambda index: minimized_scores[index]["confidence_rmsd"],
+        )
+        for rank, index in enumerate(order, 1):
+            minimization_props[index].update(
+                confidence_rank=rank, sample_sigma=raw_props[index]["sample_sigma"],
+            )
+        write_multi_sdf(
+            output_mol, minimized, pocket_center, staged / minimized_name, scores=minimized_scores,
+            props={**run_props, "pose_stage": "minimized", "effective_rank_by": "raw_pose_order"},
+            per_pose_props=minimization_props, force_v3000=True,
+        )
         for i, res in enumerate(trajs):
             suffix = f"_{i}" if opts.num_samples > 1 else ""
-            write_traj_sdf(
-                mol,
-                res["traj"],
-                res["traj_times"],
-                pocket_center,
-                opts.out_dir / f"traj{suffix}.sdf",
-            )
-            write_traj_pdb(mol, res["traj"], pocket_center, opts.out_dir / f"traj{suffix}.pdb")
+            write_traj_sdf(mol, res["traj"], res["traj_times"], pocket_center, staged / f"traj{suffix}.sdf")
+            write_traj_pdb(mol, res["traj"], pocket_center, staged / f"traj{suffix}.pdb")
             print(f"  Trajectory{suffix}: {len(res['traj'])} frames")
-
-    torch.save(
-        {
+        torch.save({
             "schema_version": "effdock.docking_results.v2",
             "ligand_identity": {
                 **ligand_graph_identity(mol, lig_data["fragment_id"]),
@@ -292,21 +314,40 @@ def write_docking_outputs(
             "frag_centers": lig_data["frag_centers"],
             "frag_sizes": lig_data["frag_sizes"],
             "poses": [
-                {"atom_pos_pred": p, **({"score": scores[i]} if scores else {})}
-                for i, p in enumerate(poses)
+                {"atom_pos_pred": pose, "score": score}
+                for pose, score in zip(poses, scores, strict=True)
             ],
             "scores": scores,
             "options": run_props,
             "trajectories": [{"traj": r["traj"], "traj_times": r["traj_times"]} for r in trajs]
             if opts.save_traj
             else None,
-        },
-        opts.out_dir / "results.pt",
-    )
+        }, staged / "results.pt")
+        files = list(staged.iterdir())
+        blocked = next((opts.out_dir / file.name for file in files
+                        if (opts.out_dir / file.name).is_dir()), None)
+        if blocked is not None:
+            raise IsADirectoryError(f"Expected an output file at {blocked}")
+        for file in files:
+            file.replace(opts.out_dir / file.name)
+
+    print(f"\nRaw poses saved to {opts.out_dir / raw_name}")
+    print(f"Minimized poses saved to {opts.out_dir / minimized_name}")
     print(f"Raw tensors saved to {opts.out_dir / 'results.pt'}")
 
 
 def dock(opts: DockingOptions) -> None:
+    from effdock.confidence.runtime import (
+        load_pose_confidence_model,
+        sample_sigmas,
+        score_poses_with_confidence,
+    )
+    from effdock.confidence.selectors import select_confidence_poses
+
+    if opts.confidence_checkpoint is None:
+        raise ValueError("dock requires a confidence checkpoint")
+    if opts.num_samples < 1:
+        raise ValueError("Number of poses must be positive")
     if opts.confidence_frame_policy not in FRAME_RECOVERY_POLICIES:
         raise ValueError(f"unknown confidence frame policy: {opts.confidence_frame_policy!r}")
     if not opts.protein.exists():
@@ -403,73 +444,28 @@ def dock(opts: DockingOptions) -> None:
             w_strain=opts.w_strain,
         )
 
-    confidence_indices: dict[str, int] = {}
-    confidence_training_orientation = None
-    confidence_training_frame_policy = None
-    if opts.confidence_checkpoint is not None:
-        from effdock.confidence.runtime import (
-            load_pose_confidence_model,
-            sample_sigmas,
-            score_poses_with_confidence,
-        )
-        from effdock.confidence.selectors import select_confidence_poses
+    print("\nScoring raw poses (EFF-Dock confidence)...")
+    confidence_model, confidence_ckpt = load_pose_confidence_model(opts.confidence_checkpoint, device)
+    default_sigma = float(opts.sigma if opts.sigma is not None else cfg["data"].get("prior_sigma", 1.0))
+    sigmas = sample_sigmas(results, default_sigma)
+    confidence_scores = score_poses_with_confidence(
+        confidence_model, model, graph, lig_data, meta, poses, sigma=sigmas,
+        device=device, frame_policy=opts.confidence_frame_policy,
+    )
+    _validate_confidence_scores(confidence_scores, len(poses), "raw")
+    if scores is None:
+        scores = confidence_scores
+    else:
+        for physical, learned in zip(scores, confidence_scores, strict=True):
+            physical.update(learned)
+    confidence_indices = select_confidence_poses(poses, scores, graph, meta["pocket_center"])
+    print(f"  Confidence loaded: {opts.confidence_checkpoint} (step {confidence_ckpt.get('step', '?')})")
 
-        print("\nScoring poses (EFF-Dock confidence)...")
-        confidence_model, confidence_ckpt = load_pose_confidence_model(
-            opts.confidence_checkpoint, device
-        )
-        confidence_training_orientation = confidence_model.docking_orientation_injection
-        confidence_training_frame_policy = confidence_model.confidence_frame_policy
-        default_sigma = float(
-            opts.sigma if opts.sigma is not None else cfg["data"].get("prior_sigma", 1.0)
-        )
-        confidence_scores = score_poses_with_confidence(
-            confidence_model,
-            model,
-            graph,
-            lig_data,
-            meta,
-            poses,
-            sigma=sample_sigmas(results, default_sigma),
-            device=device,
-            frame_policy=opts.confidence_frame_policy,
-        )
-        if scores is None:
-            scores = confidence_scores
-        else:
-            for physical, learned in zip(scores, confidence_scores, strict=True):
-                physical.update(learned)
-        confidence_indices = select_confidence_poses(poses, scores, graph, meta["pocket_center"])
-        print(
-            f"  Confidence loaded: {opts.confidence_checkpoint} "
-            f"(step {confidence_ckpt.get('step', '?')})"
-        )
-
-    rank_by = opts.rank_by
-    if rank_by == "auto":
-        if opts.confidence_checkpoint is not None:
-            rank_by = "confidence"
-        elif opts.score:
-            rank_by = "vina"
-        else:
-            rank_by = "sample"
+    rank_by = "confidence" if opts.rank_by == "auto" else opts.rank_by
     if rank_by == "vina" and not opts.score:
-        raise ValueError("--rank_by vina requires --score")
-    if (
-        rank_by
-        in {
-            "confidence",
-            "success",
-            "atom_success",
-            "rank_vote",
-            "confidence_filter_v1",
-            "pair_gate_density_rank_vote_plclash_ambig",
-        }
-        and opts.confidence_checkpoint is None
-    ):
-        raise ValueError(f"--rank-by {rank_by} requires --confidence-checkpoint")
+        raise ValueError("--rank-by vina requires --score")
 
-    if scores is not None and rank_by != "sample":
+    if rank_by != "sample":
         if rank_by == "vina":
             order = sorted(range(len(scores)), key=lambda i: scores[i]["total"])
         elif rank_by in confidence_indices:
@@ -489,22 +485,34 @@ def dock(opts: DockingOptions) -> None:
             raise ValueError(f"unsupported rank_by={opts.rank_by!r}")
         poses = [poses[i] for i in order]
         scores = [scores[i] for i in order]
+        sigmas = sigmas[order]
         if opts.save_traj:
-            results = [results[i] for i in order]
-            trajs = results
+            trajs = [results[i] for i in order]
 
-    if scores is not None:
-        if "confidence_rmsd" in scores[0]:
-            print(f"  {'rank':<6}{'pred_rmsd':>12}{'success':>11}{'atom_ok':>10}")
-            for rank, s in enumerate(scores):
-                print(
-                    f"  {rank:<6}{s['confidence_rmsd']:>12.3f}"
-                    f"{s['confidence_success']:>11.4f}{s['confidence_atom_ok']:>10.4f}"
-                )
-        elif "total" in scores[0]:
-            print(f"  {'rank':<6}{'total':>10}{'vina':>10}{'strain':>10}")
-            for rank, s in enumerate(scores):
-                print(f"  {rank:<6}{s['total']:>10.3f}{s['vina']:>10.3f}{s['strain']:>10.3f}")
+    print(f"  {'rank':<6}{'pred_rmsd':>12}{'success':>11}{'atom_ok':>10}")
+    for rank, s in enumerate(scores):
+        print(
+            f"  {rank:<6}{s['confidence_rmsd']:>12.3f}"
+            f"{s['confidence_success']:>11.4f}{s['confidence_atom_ok']:>10.4f}"
+        )
+
+    print("\nMinimizing poses (EFF-Dock GuidanceEnergy)...")
+    # Keep backend coverage for docking on MPS while running the force-gradient
+    # and eigensolver path on CPU.
+    minimization_device = torch.device("cpu") if device.type == "mps" else device
+    minimized, minimization_props = minimize_poses(
+        mol, opts.protein, torch.stack(poses), meta["pocket_center"],
+        lig_data["fragment_id"], minimization_device,
+    )
+    print("\nScoring minimized poses (EFF-Dock confidence)...")
+    minimized_scores = []
+    for start in range(0, len(minimized), 20):
+        stop = start + 20
+        minimized_scores.extend(score_poses_with_confidence(
+            confidence_model, model, graph, lig_data, meta, minimized[start:stop],
+            sigma=sigmas[start:stop], device=device, frame_policy=opts.confidence_frame_policy,
+        ))
+    _validate_confidence_scores(minimized_scores, len(poses), "minimized")
 
     write_docking_outputs(
         mol,
@@ -514,12 +522,24 @@ def dock(opts: DockingOptions) -> None:
         trajs,
         opts,
         scores=scores,
+        sigmas=sigmas,
+        minimized=minimized,
+        minimized_scores=minimized_scores,
+        minimization_props=minimization_props,
         effective_rank_by=rank_by,
         effective_orientation_injection=model.orientation_injection,
         checkpoint_orientation=checkpoint_orientation_injection(ckpt),
-        confidence_training_orientation=confidence_training_orientation,
-        confidence_training_frame_policy=confidence_training_frame_policy,
+        confidence_training_orientation=confidence_model.docking_orientation_injection,
+        confidence_training_frame_policy=confidence_model.confidence_frame_policy,
     )
+
+
+def _validate_confidence_scores(scores: list[dict[str, float]], count: int, phase: str) -> None:
+    if len(scores) != count or any(
+        "confidence_rmsd" not in score or not all(math.isfinite(value) for value in score.values())
+        for score in scores
+    ):
+        raise ValueError(f"Incomplete or non-finite confidence for {phase} poses")
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -576,7 +596,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--score",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Score poses with Vina + DG strain and rank them (--no-score to skip).",
+        help="Include optional Vina + DG strain scores on raw poses.",
     )
     parser.add_argument(
         "--w-strain",
@@ -605,14 +625,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--confidence-checkpoint",
         type=Path,
         default=DEFAULT_CONFIDENCE_CHECKPOINT,
-        help="Learned pose-confidence checkpoint used for reranking.",
-    )
-    parser.add_argument(
-        "--no-confidence",
-        action="store_const",
-        dest="confidence_checkpoint",
-        const=None,
-        help="Disable learned confidence reranking.",
+        help="Learned pose-confidence checkpoint for both pose SDFs.",
     )
     parser.add_argument(
         "--rank-by",
@@ -629,7 +642,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "confidence_filter_v1",
             "pair_gate_density_rank_vote_plclash_ambig",
         ),
-        help="Pose ordering for SDF/results.pt.",
+        help="Order raw poses and keep matching records in the minimized SDF.",
     )
     return parser
 
