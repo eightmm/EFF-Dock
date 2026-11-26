@@ -121,3 +121,21 @@ The corrected output root is
 
 No preliminary single-run value is promoted to the final comparison until its
 contract check, full-coverage check, and three-repeat aggregation all pass.
+### Recover saved SurfDock minimization failures
+
+In the pinned SurfDock force-optimization environment, add the upstream
+checkout to `PYTHONPATH`. Supply a CSV with columns `pose_id,pose,receptor`
+for one saved SDF pose and its corresponding prepared receptor PDB per row.
+
+```bash
+OPENMM_CPU_THREADS=1 python benchmarks/external_models/recover_surfdock_minimization.py \
+  --manifest fallback-poses.csv --output-dir outputs/surfdock-recovery
+```
+
+The recovery runs fixed-receptor OpenMM minimization on CPU. It tries the
+released OpenFF force field, then SurfDock's GAFF 2.11 postprocessing
+fallback. Each row gets a JSON status with the force field and energy
+change when successful. Compatible coordinates are written to a separate
+SDF with the original pose ID. Collapsed bonds and coordinates outside
+the PDB frame are recorded as invalid inputs. The manifest order and
+source poses are preserved.
