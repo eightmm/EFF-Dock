@@ -1,23 +1,122 @@
 # EFF-Dock
 
 **Fragment-based protein–ligand docking with SE(3) flow matching.**
+Generate poses in a supplied protein pocket and rank them with a paired confidence model.
 
-Generate poses in a supplied protein pocket and rank them with a paired
-confidence model. Includes runnable code and two pretrained checkpoints.
+[Install](#install) · [CLI](#cli) · [Python API](#python-api) · [Results](#benchmark-results) · [Demos](#docking-in-motion)
 
-[Results](#benchmark-results) · [Animations](#docking-in-motion) · [Install](#install) · [Usage](#dock-a-ligand) · [Architecture](#architecture) · [Documentation](#documentation)
+[![EFF-Dock workflow from a supplied pocket and ligand fragments to pose generation, refinement, and confidence ranking.](docs/assets/workflow.png)](docs/assets/workflow.png)
 
-[![EFF-Dock workflow: prepare a supplied pocket and ligand fragments, generate poses, refine them, rank candidates by predicted RMSD and select a pose.](docs/assets/workflow.png)](docs/assets/workflow.png)
+## Install
 
-From ligand fragments and a supplied pocket to pose generation, energy-based
-refinement and confidence selection. Crystal overlays and RMSDs are
-retrospective annotations, not ranking inputs.
+Install [uv](https://docs.astral.sh/uv/) and [Git LFS](https://git-lfs.com/).
+Inference uses Python 3.12 and selects CUDA on compatible Linux/NVIDIA systems
+(CUDA 13.0), MPS on Apple Silicon, or CPU. Use `--device cpu` to select CPU explicitly.
+
+```bash
+git lfs install
+git clone https://github.com/eightmm/EFF-Dock.git
+cd EFF-Dock
+git lfs pull
+uv sync --frozen --python 3.12
+uv run python scripts/verify_release.py --smoke
+```
+
+The smoke test verifies both released checkpoints and docks one synthetic ligand.
+
+## Usage
+
+From the repository root, supply a prepared receptor PDB, ligand SDF or SMILES,
+and pocket center in the receptor's coordinate frame.
+
+### CLI
+
+#### Dock a ligand
+
+```bash
+uv run eff-dock dock \
+  --protein receptor.pdb --ligand ligand.sdf \
+  --pocket-center '12.4,-3.1,8.7' \
+  --orientation-injection rw --confidence-frame-policy contextual_v1 \
+  --rank-by confidence --no-score --seed 42 --output-dir outputs/docked
+```
+
+The default budget is 100 poses, 10 sampling steps, a 2 Å translation prior,
+and a 10 Å receptor crop. The output includes raw `docked_poses.sdf` in
+confidence rank order and `results.pt` with coordinates and provenance.
+A single-pose run writes `docked.sdf`.
+[Coordinate conventions and checkpoint compatibility](docs/ORIENTATION_INJECTION.md).
+
+#### Score or minimize saved poses
+
+Both commands accept one or more SDF records for the same ligand in the same
+heavy-atom order. `minimize` uses fixed-receptor GuidanceEnergy and defaults to
+at most 100 steps. It writes a new SDF with per-pose energies and status.
+`confidence score` accepts raw or minimized poses and writes predicted RMSD and
+rank to JSON in input order.
+
+```bash
+uv run eff-dock minimize \
+  --protein receptor.pdb --poses outputs/docked/docked_poses.sdf \
+  --pocket-center '12.4,-3.1,8.7' --ligand-template ligand.sdf \
+  --output outputs/minimized.sdf
+
+uv run eff-dock confidence score \
+  --protein receptor.pdb --poses outputs/minimized.sdf \
+  --pocket-center '12.4,-3.1,8.7' --ligand-template ligand.sdf \
+  --orientation-injection rw --confidence-frame-policy contextual_v1 \
+  --output outputs/confidence.json
+```
+
+Minimization runs without model checkpoints. To reproduce a docking score,
+use the original ligand template, crop, prior sigma, and feature conventions.
+
+### Python API
+
+```python
+from pathlib import Path
+
+import torch
+
+from effdock.inference import (
+    ConfidenceOptions,
+    DockingOptions,
+    MinimizationOptions,
+    dock,
+    minimize,
+    score_saved_poses,
+)
+
+site = {
+    "protein": Path("receptor.pdb"),
+    "pocket_center": torch.tensor([12.4, -3.1, 8.7]),
+}
+conventions = {
+    "orientation_injection": "rw",
+    "confidence_frame_policy": "contextual_v1",
+}
+ligand = "ligand.sdf"
+docked = Path("outputs/docked")
+minimized = Path("outputs/minimized.sdf")
+
+dock(DockingOptions(
+    **site, **conventions, ligand=ligand, rank_by="confidence",
+    score=False, seed=42, out_dir=docked,
+))
+minimize(MinimizationOptions(
+    **site, poses=docked / "docked_poses.sdf", ligand_template=ligand, output=minimized,
+))
+score_saved_poses(ConfidenceOptions(
+    **site, **conventions, poses=minimized, ligand_template=ligand,
+    output=Path("outputs/confidence.json"),
+))
+```
 
 ## Benchmark results
 
-Reference-pocket redocking with 100 poses, 10 unguided sampling steps,
-energy refinement and chirality-filtered confidence selection. Values are
-percent mean ± sample SD over three inference repeats of the released weights.
+Reference-pocket redocking with the released checkpoints, 100 poses, 10 unguided
+sampling steps, energy refinement, and chirality-filtered confidence selection.
+Values are percentages, reported as mean ± sample SD over three inference repeats.
 
 <!-- benchmark-summary:start -->
 
@@ -31,206 +130,34 @@ percent mean ± sample SD over three inference repeats of the released weights.
 
 <!-- benchmark-summary:end -->
 
-**Top-1 RMSD:** selected-pose symmetry-aware heavy-atom RMSD <2 Å.
-**Top-1 RMSD + PB:** the same pose also passes all 27 non-RMSD PoseBusters checks.
-**Oracle@100:** any of the 100 refined poses has RMSD <2 Å, irrespective of validity.
+Success uses symmetry-aware heavy-atom RMSD <2 Å in the fixed receptor frame.
+**+ PB** requires the same pose to pass all 27 non-RMSD PoseBusters checks.
+**Oracle@100** counts targets with any refined pose below 2 Å.
 
-These are descriptive results under a supplied-holo protocol. Astex and
-PoseBusters were used during development; the historical training exclusions
-do not establish complete benchmark disjointness.
-[Protocol, cohort definitions and source values](docs/EVALUATION.md#reported-benchmark-results).
+These are descriptive supplied-holo results. Astex and PoseBusters were used
+during development, and complete disjointness from training is unverified.
+[Benchmark protocol and source values](docs/EVALUATION.md#reported-benchmark-results).
 
 ## Docking in motion
 
 <p align="center">
-  <a href="docs/assets/pocket-context.gif"><img src="docs/assets/pocket-context.gif" width="32%" alt="Astex 1T46 receptor: camera zoom from the full protein into the supplied pocket."></a>
-  <a href="docs/assets/fragment-flow.gif"><img src="docs/assets/fragment-flow.gif" width="32%" alt="Eleven actual saved ODE states of six rigid ligand fragments in the fixed 1T46 pocket."></a>
-  <a href="docs/assets/confidence-ranking.gif"><img src="docs/assets/confidence-ranking.gif" width="32%" alt="Four refined 1T46 candidates with predicted RMSD ranks and retrospective crystal overlays; rank1 is selected."></a>
+  <a href="docs/assets/pocket-context.gif"><img src="docs/assets/pocket-context.gif" width="32%" alt="Camera zoom into the supplied 1T46 pocket."></a>
+  <a href="docs/assets/fragment-flow.gif"><img src="docs/assets/fragment-flow.gif" width="32%" alt="Eleven saved ODE states of six rigid ligand fragments."></a>
+  <a href="docs/assets/confidence-ranking.gif"><img src="docs/assets/confidence-ranking.gif" width="32%" alt="Four refined candidates and their predicted RMSD ranks."></a>
 </p>
 
-3Dmol.js views of **Astex 1T46**. The fragment flow is one saved illustrative
-trajectory; confidence ranking shows four poses from a **separate 100-pose
-refined bank**. Amber denotes the crystal reference, used only for retrospective
-RMSD. Click a view to enlarge it. [Animation details and provenance](docs/assets/README.md#animations).
-
-## Install
-
-The accelerated environment is Linux, Python 3.12 and an NVIDIA GPU/driver
-compatible with CUDA 13.0. Apple Silicon Macs support inference, single-device
-training and evaluation with native PyTorch. MPS is selected automatically
-when available, with CPU as a fallback; multi-process training remains
-CUDA-only. Install [uv](https://docs.astral.sh/uv/) and
-[Git LFS](https://git-lfs.com/) first. The Python version and dependencies are
-pinned in `.python-version` and `uv.lock`.
-
-```bash
-git lfs install
-git clone https://github.com/eightmm/EFF-Dock.git
-cd EFF-Dock
-git lfs pull
-uv sync --frozen --python 3.12
-uv run python scripts/verify_release.py
-```
-
-On Apple Silicon, use the same `uv sync --frozen --python 3.12` command. The
-lockfile selects macOS PyTorch and skips Linux-only CUDA and PyG extension
-wheels. Use `--device mps` to request Apple GPU inference explicitly, or
-`--device cpu` if an operation is unsupported by your installed PyTorch MPS
-backend. For docking and evaluation, omit `--device` to select the available
-backend automatically. For training use `uv run eff-dock train --device mps`;
-confidence training also accepts `--device mps`. Training on a Mac runs in
-float32 and can be much slower than the CUDA setup. Distributed training and
-the retained large-scale benchmark shard scripts remain Linux/CUDA workflows.
-
-The LFS download contains approximately 100 MB of model files. If cloning was
-done with LFS downloads disabled, `git lfs pull` replaces the pointer files
-with the checkpoints. The verifier checks their SHA-256 hashes and loads both
-models on CPU. No dataset, API key or experiment-tracking login is needed for
-inference.
-
-## Dock a ligand
-
-Run from the repository root. Supply a prepared receptor PDB, a ligand SDF or
-SMILES string, and a pocket center in the receptor's coordinate frame:
-
-```bash
-uv run eff-dock dock \
-  --protein receptor.pdb \
-  --ligand ligand.sdf \
-  --pocket-center '12.4,-3.1,8.7' \
-  --orientation-injection rw \
-  --confidence-frame-policy contextual_v1 \
-  --rank-by confidence \
-  --no-score \
-  --seed 42 \
-  --output-dir outputs/docked
-```
-
-Replace the input filenames and example center with your own. For SMILES, use
-an argument such as `--ligand 'CCO'`. The default budget is 100 poses, 10
-late-biased ODE steps, a 2 Å translation prior and a 10 Å receptor crop. The
-explicit convention options above select the evaluated `rw` and
-`contextual_v1` paths; checkpoint-compatible historical defaults remain
-available as documented in [coordinate conventions](docs/ORIENTATION_INJECTION.md).
-
-The command generates poses and ranks them by the confidence model's predicted
-RMSD. `--no-score` disables the optional Vina/DG scoring, while confidence
-scoring remains active. Outputs are `docked_poses.sdf` (best-ranked pose first)
-and `results.pt`; a single-pose run writes `docked.sdf` instead. This command
-does not automatically apply energy refinement or chirality-filtered reselection; those are separate workflows.
-It requires a known pocket and does not predict binding affinity.
-
-For a small installation check using a synthetic receptor and one pose:
-
-```bash
-uv run python scripts/verify_release.py --smoke
-```
-
-This check chooses CUDA, MPS or CPU automatically (or accepts `--device cpu`)
-and exercises preparation, sampling, confidence scoring and SDF export with
-the released checkpoints. It is not an accuracy benchmark; the command without
-`--smoke` only loads the models on CPU.
-
-<details>
-<summary>Python API</summary>
-
-```python
-from pathlib import Path
-import torch
-from effdock.inference import DockingOptions, dock
-
-dock(DockingOptions(
-    protein=Path("receptor.pdb"),
-    ligand="ligand.sdf",
-    pocket_center=torch.tensor([12.4, -3.1, 8.7]),
-    orientation_injection="rw",
-    confidence_frame_policy="contextual_v1",
-    rank_by="confidence",
-    score=False,
-    seed=42,
-    out_dir=Path("outputs/docked"),
-))
-```
-
-</details>
-
-## Score or minimize saved poses
-
-Both commands accept a single- or multi-record SDF with one ligand in the
-same heavy-atom order throughout. Supply the receptor PDB and the pocket
-center in its coordinate frame.
-
-```bash
-uv run eff-dock minimize \
-  --protein receptor.pdb --poses docked_poses.sdf \
-  --pocket-center '12.4,-3.1,8.7' --output outputs/minimized.sdf
-
-uv run eff-dock confidence score \
-  --protein receptor.pdb --poses outputs/minimized.sdf \
-  --pocket-center '12.4,-3.1,8.7' \
-  --orientation-injection rw --confidence-frame-policy contextual_v1 \
-  --output outputs/confidence.json
-```
-
-`minimize` uses EFF-Dock's GuidanceEnergy with a fixed receptor and up to
-100 rigid-fragment descent steps per pose. It needs no model checkpoints.
-The output SDF keeps the input order and includes energies, termination
-status, and receptor-shell coverage for each pose.
-
-`confidence score` accepts the original SDF or the minimized SDF directly.
-It uses the released docking checkpoint for features and the confidence
-checkpoint for scoring. The JSON keeps input order and assigns ascending
-predicted-RMSD ranks. For both commands, `--ligand-template` can supply the
-original ligand chemistry and conformer in the same atom order. Give
-`confidence score` the original template, crop, prior sigma, and feature
-conventions when reproducing a specific docking setup.
-
-The Python equivalents are `effdock.inference.minimize(MinimizationOptions(...))`
-and `effdock.inference.score_saved_poses(ConfidenceOptions(...))`.
-
-## Architecture
-
-[![EFF-Dock architecture: molecular graph and SE(3) sampling, Newton–Euler fragment readout, docking and confidence networks, gated equivariant convolution, normalization and activation.](docs/assets/architecture.png)](docs/assets/architecture.png)
-
-Panels **a–b** show the heavy-atom ligand fragments, graph construction and
-SE(3) sampling step, followed by the Newton–Euler readout from learned per-atom
-velocity proposals to fragment translation and rotation. Panels **c–f** expand
-the docking and confidence networks, interaction layers, gated equivariant
-convolution, normalization and activation. The confidence network predicts
-pose RMSD for ranking. The graph panel uses the explicit `rw` convention in
-the inference example above. Click the figure to inspect the full-size image.
-See the [model contract](docs/MODEL.md) and
-[implementation details](docs/methods/README.md) for the released checkpoints
-and coordinate conventions.
+Astex 1T46. The trajectory shows one saved rollout. Ranking shows four candidates from a
+separate 100-pose refined bank. Amber marks the crystal reference used for RMSD.
+[Animation details and provenance](docs/assets/README.md#animations).
 
 ## Documentation
 
+- [Architecture diagram](docs/assets/architecture.png) · [Model and methods](docs/methods/README.md)
 - [Checkpoints and model cards](weights/MANIFEST.md)
-- [Data, architecture and training](docs/README.md)
-- [Evaluation protocol and benchmark source values](docs/EVALUATION.md)
-- [Reproducibility](docs/REPRODUCIBILITY.md)
-- [Workflow helpers](scripts/README.md) and [external-model adapters](benchmarks/README.md)
-
-Figure provenance is recorded [here](docs/assets/README.md). Manuscripts,
-full figure bundles and local study outputs are kept separately.
-
-Training and evaluation require separately prepared data. They are exposed
-through `eff-dock data`, `eff-dock train`, `eff-dock confidence` and
-`eff-dock evaluate`; run each command with `--help` for its options.
-
-<details>
-<summary>Development checks</summary>
-
-```bash
-uv sync --frozen --python 3.12 --group dev
-uv run pytest -q -m 'not gpu'
-bash scripts/check.sh fast
-```
-
-</details>
+- [Data, training, and evaluation](docs/README.md) · [Reproducibility](docs/REPRODUCIBILITY.md)
+- [Workflow helpers](scripts/README.md) · [External-model adapters](benchmarks/README.md)
 
 ## License
 
-Source code and the two released EFF-Dock checkpoints are provided under
-[Apache License 2.0](LICENSE). Third-party software and datasets retain their
-own terms.
+Source code and released weights use the [Apache License 2.0](LICENSE).
+Third-party software and datasets retain their own terms.
