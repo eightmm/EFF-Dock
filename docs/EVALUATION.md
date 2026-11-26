@@ -133,26 +133,3 @@ properties. The active `confidence_*` names and historical
 is required for post-hoc, label-blind reranking without repeating sampling.
 `--no-save-selected-poses` explicitly opts out of both the complete ensemble
 and selector-specific pose artifacts.
-
-## Archived Vina-guided sampling (inactive)
-
-This path is retained only for historical reproduction and is not the unified
-`GuidanceEnergy` or recommended inference path. It can act inside the ODE
-sampler, which is distinct from scoring a finished candidate set. The
-inference-time callback differentiates the Torch Vina+DG energy with respect to
-current ligand coordinates, converts atom forces to fragment
-translation/torque, and adds the capped late-time correction to the learned
-vector field. Scale zero is the exact unguided path.
-
-```bash
-uv run eff-dock dock ... \
-  --vina-guidance-scale 0.05 \
-  --vina-guidance-start-t 0.5 \
-  --vina-guidance-max-force 10
-```
-
-The scorer's explicit XS-type path matches the official Vina 1.2 potential,
-weights, radii, flags, center-distance cutoff, and torsion normalization. The
-current benchmark inputs are PDB/RDKit, so their automatic atom typing is a
-declared best-effort compatibility path rather than exact PDBQT protonation.
-See `VINA_GUIDANCE_PROTOCOL.md` for the frozen experiment and attribution.

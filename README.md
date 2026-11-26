@@ -154,6 +154,40 @@ dock(DockingOptions(
 
 </details>
 
+## Score or minimize saved poses
+
+Both commands accept a single- or multi-record SDF with one ligand in the
+same heavy-atom order throughout. Supply the receptor PDB and the pocket
+center in its coordinate frame.
+
+```bash
+uv run eff-dock minimize \
+  --protein receptor.pdb --poses docked_poses.sdf \
+  --pocket-center '12.4,-3.1,8.7' --output outputs/minimized.sdf
+
+uv run eff-dock confidence score \
+  --protein receptor.pdb --poses outputs/minimized.sdf \
+  --pocket-center '12.4,-3.1,8.7' \
+  --orientation-injection rw --confidence-frame-policy contextual_v1 \
+  --output outputs/confidence.json
+```
+
+`minimize` uses EFF-Dock's GuidanceEnergy with a fixed receptor and up to
+100 rigid-fragment descent steps per pose. It needs no model checkpoints.
+The output SDF keeps the input order and includes energies, termination
+status, and receptor-shell coverage for each pose.
+
+`confidence score` accepts the original SDF or the minimized SDF directly.
+It uses the released docking checkpoint for features and the confidence
+checkpoint for scoring. The JSON keeps input order and assigns ascending
+predicted-RMSD ranks. For both commands, `--ligand-template` can supply the
+original ligand chemistry and conformer in the same atom order. Give
+`confidence score` the original template, crop, prior sigma, and feature
+conventions when reproducing a specific docking setup.
+
+The Python equivalents are `effdock.inference.minimize(MinimizationOptions(...))`
+and `effdock.inference.score_saved_poses(ConfidenceOptions(...))`.
+
 ## Architecture
 
 [![EFF-Dock architecture: molecular graph and SE(3) sampling, Newton–Euler fragment readout, docking and confidence networks, gated equivariant convolution, normalization and activation.](docs/assets/architecture.png)](docs/assets/architecture.png)

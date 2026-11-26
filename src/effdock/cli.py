@@ -16,9 +16,11 @@ commands:
   train           train or resume EFF-Dock
   confidence prepare generate labeled pose shards for confidence training
   confidence train train or resume the learned pose-confidence model
+  confidence score score saved ligand poses with the learned confidence model
   evaluate        evaluate a checkpoint on an external benchmark
   benchmark       aggregate completed external benchmark shards
   dock            dock one ligand into an explicitly defined pocket
+  minimize        minimize saved ligand poses in a fixed receptor
   physical trace  trace unified guidance on crystal/saved trajectory coordinates
 
 Run `eff-dock <command> --help` for command-specific options.
@@ -42,6 +44,16 @@ def _resolve(command: str, data_command: str | None = None) -> Callable[[list[st
         from effdock.workflows.prepare_confidence import main
 
         return main
+
+    if command == "confidence" and data_command == "score":
+        from effdock.inference.saved_poses import confidence_main
+
+        return confidence_main
+
+    if command == "minimize":
+        from effdock.inference.saved_poses import minimize_main
+
+        return minimize_main
     if command == "evaluate":
         from effdock.workflows.evaluate import main
 
@@ -90,7 +102,7 @@ def main(argv: list[str] | None = None) -> None:
             if command == "data":
                 print("usage: eff-dock data {curate,prepare,split,benchmark,external} [options]")
             elif command == "confidence":
-                print("usage: eff-dock confidence {prepare,train} [options]")
+                print("usage: eff-dock confidence {prepare,train,score} [options]")
             else:
                 print("usage: eff-dock physical {trace} [options]")
             return

@@ -1296,8 +1296,8 @@ def relax_rigid_fragments_batch(
     """
     if initial_coords.ndim != 3 or initial_coords.shape[-1] != 3:
         raise ValueError("initial_coords must have shape [B,N,3]")
-    if initial_coords.shape[0] < 2:
-        raise ValueError("batched relaxation requires at least two poses")
+    if initial_coords.shape[0] == 0:
+        raise ValueError("batched relaxation requires at least one pose")
     if mode not in RELAXATION_MODES:
         raise ValueError(f"unknown relaxation mode: {mode!r}")
     if config.initialization_mode != "crystal_tear" and pocket_center is None:
