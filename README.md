@@ -3,7 +3,7 @@
 **Fragment-based protein–ligand docking with SE(3) flow matching.**
 Generate poses in a supplied protein pocket and rank them with a paired confidence model.
 
-[Install](#install) · [CLI](#cli) · [Python API](#python-api) · [Results](#benchmark-results) · [Demos](#docking-in-motion)
+[Install](#install) · [Usage](#usage) · [Results](#benchmark-results) · [Demos](#docking-in-motion)
 
 [![EFF-Dock workflow from a supplied pocket and ligand fragments to pose generation, refinement, and confidence ranking.](docs/assets/workflow.png)](docs/assets/workflow.png)
 
@@ -26,6 +26,9 @@ The smoke test verifies both released checkpoints and docks one synthetic ligand
 
 ## Usage
 
+<details>
+<summary>CLI and Python API examples</summary>
+
 From the repository root, supply a prepared receptor PDB, ligand SDF or SMILES,
 and pocket center in the receptor's coordinate frame.
 
@@ -37,7 +40,6 @@ and pocket center in the receptor's coordinate frame.
 uv run eff-dock dock \
   --protein receptor.pdb --ligand ligand.sdf \
   --pocket-center '12.4,-3.1,8.7' \
-  --orientation-injection rw --confidence-frame-policy contextual_v1 \
   --rank-by confidence --no-score --seed 42 --output-dir outputs/docked
 ```
 
@@ -64,7 +66,6 @@ uv run eff-dock minimize \
 uv run eff-dock confidence score \
   --protein receptor.pdb --poses outputs/minimized.sdf \
   --pocket-center '12.4,-3.1,8.7' --ligand-template ligand.sdf \
-  --orientation-injection rw --confidence-frame-policy contextual_v1 \
   --output outputs/confidence.json
 ```
 
@@ -91,26 +92,24 @@ site = {
     "protein": Path("receptor.pdb"),
     "pocket_center": torch.tensor([12.4, -3.1, 8.7]),
 }
-conventions = {
-    "orientation_injection": "rw",
-    "confidence_frame_policy": "contextual_v1",
-}
 ligand = "ligand.sdf"
 docked = Path("outputs/docked")
 minimized = Path("outputs/minimized.sdf")
 
 dock(DockingOptions(
-    **site, **conventions, ligand=ligand, rank_by="confidence",
+    **site, ligand=ligand, rank_by="confidence",
     score=False, seed=42, out_dir=docked,
 ))
 minimize(MinimizationOptions(
     **site, poses=docked / "docked_poses.sdf", ligand_template=ligand, output=minimized,
 ))
 score_saved_poses(ConfidenceOptions(
-    **site, **conventions, poses=minimized, ligand_template=ligand,
+    **site, poses=minimized, ligand_template=ligand,
     output=Path("outputs/confidence.json"),
 ))
 ```
+
+</details>
 
 ## Benchmark results
 
